@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF题目提取器</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .upload-section {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            background-color: #fafafa;
+        }
+        .file-input {
+            display: none;
+        }
+        .upload-btn {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+            margin: 0 10px;
+        }
+        .upload-btn:hover {
+            background-color: #0056b3;
+        }
+        .file-info {
+            margin-top: 10px;
+            color: #666;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #007bff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .result-section {
+            margin-top: 30px;
+        }
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .result-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+        .copy-btn {
+            background-color: #28a745;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+        .copy-btn:hover {
+            background-color: #218838;
+        }
+        .tab-container {
+            margin-bottom: 20px;
+        }
+        .tab-buttons {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        .tab-btn {
+            padding: 10px 20px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        .tab-btn.active {
+            border-bottom-color: #007bff;
+            color: #007bff;
+            font-weight: bold;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .content-display {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 20px;
+            max-height: 600px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .question-item {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .question-type {
+            background: #007bff;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .question-type.code {
+            background: #28a745;
+        }
+        .question-type.text {
+            background: #ffc107;
+            color: #333;
+        }
+        .question-text {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        .question-code {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+        .options-list {
+            margin: 15px 0;
+        }
+        .option-item {
+            padding: 8px 12px;
+            margin: 5px 0;
+            border-radius: 5px;
+            background: #f8f9fa;
+            border-left: 4px solid #dee2e6;
+        }
+        .option-item.correct {
+            border-left-color: #28a745;
+            background: #d4edda;
+        }
+        .option-label {
+            font-weight: bold;
+            color: #007bff;
+            margin-right: 10px;
+        }
+        .explanation {
+            background: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        .explanation-title {
+            font-weight: bold;
+            color: #0056b3;
+            margin-bottom: 8px;
+        }
+        .difficulty-info {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        .difficulty-item {
+            background: #f8f9fa;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+        }
+        
+
+        .error {
+            color: #dc3545;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        .success {
+            color: #155724;
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        .warning {
+            color: #856404;
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        
+        .processing-info {
+            padding: 20px;
+        }
+        
+        .info-section {
+            margin-bottom: 30px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .info-section h3 {
+            margin: 0 0 15px 0;
+            color: #333;
+            font-size: 16px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #495057;
+        }
+        
+        .info-value {
+            color: #007bff;
+            font-weight: bold;
+        }
+        
+        .log-container {
+            max-height: 300px;
+            overflow-y: auto;
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+        }
+        
+        .log-item {
+            padding: 5px 0;
+            border-bottom: 1px solid #f1f3f4;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+        
+        .log-item:last-child {
+            border-bottom: none;
+        }
+        
+        .log-item.success {
+            color: #28a745;
+        }
+        
+        .log-item.info {
+            color: #007bff;
+        }
+        
+        .log-item.warning {
+            color: #ffc107;
+        }
+        
+        .log-item.error {
+            color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PDF题目提取器</h1>
+        
+        <div class="upload-section">
+            <form id="uploadForm" enctype="multipart/form-data">
+                <input type="file" name="file" accept=".pdf" required id="fileInput" class="file-input" />
+                <button type="button" class="upload-btn" onclick="document.getElementById('fileInput').click()">
+                    选择PDF文件
+                </button>
+                <button type="button" class="upload-btn" onclick="uploadWithLLM()">
+                    提取题目（使用大模型）
+                </button>
+                <button type="button" class="upload-btn" onclick="uploadRawText()">
+                    仅提取文本
+                </button>
+            </form>
+            
+            <div style="margin-top: 15px; text-align: center;">
+                <label for="parallelWorkers" style="margin-right: 10px;">并行线程数:</label>
+                <select id="parallelWorkers" style="padding: 5px; border-radius: 3px; border: 1px solid #ddd;">
+                    <option value="1">1 (串行)</option>
+                    <option value="2">2</option>
+                    <option value="3" selected>3 (推荐)</option>
+                    <option value="5">5</option>
+                    <option value="8">8</option>
+                </select>
+                
+                <label for="expectedQuestions" style="margin-left: 20px; margin-right: 10px;">预期题目数:</label>
+                <input type="number" id="expectedQuestions" placeholder="请输入预期题目数" style="padding: 5px; border-radius: 3px; border: 1px solid #ddd; width: 120px;" min="1" max="1000">
+                
+                <small style="display: block; margin-top: 5px; color: #666;">
+                    更多线程数可以加快处理速度，但可能增加API调用频率<br>
+                    设置预期题目数用于校准，帮助大模型更准确地提取所有题目
+                </small>
+            </div>
+            <div class="file-info" id="fileInfo"></div>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>正在处理PDF文件，请稍候...</p>
+        </div>
+
+        <div class="result-section" id="resultSection" style="display: none;">
+            <div class="result-header">
+                <div class="result-title">处理结果</div>
+                <div>
+                    <button class="copy-btn" onclick="copyRawContent()">复制原始文本</button>
+                    <button class="copy-btn" onclick="copyQuestions()">复制题目JSON</button>
+                </div>
+            </div>
+            
+
+            
+            <div class="tab-container">
+                <div class="tab-buttons">
+                    <button class="tab-btn active" onclick="showTab('questions')">题目列表</button>
+                    <button class="tab-btn" onclick="showTab('processing')">处理信息</button>
+                    <button class="tab-btn" onclick="showTab('raw')">原始文本</button>
+                    <button class="tab-btn" onclick="showTab('json')">JSON格式</button>
+                </div>
+                
+                <div id="questions-tab" class="tab-content active">
+                    <div id="questionsList"></div>
+                </div>
+                
+                <div id="processing-tab" class="tab-content">
+                    <div class="processing-info" id="processingInfo">
+                        <div class="info-section">
+                            <h3>📊 处理统计</h3>
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <span class="info-label">PDF文本长度:</span>
+                                    <span class="info-value" id="textLength">-</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">分割片段数:</span>
+                                    <span class="info-value" id="segmentCount">-</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">并行线程数:</span>
+                                    <span class="info-value" id="parallelWorkers">-</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">预期题目数:</span>
+                                    <span class="info-value" id="expectedQuestions">-</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">提取题目数:</span>
+                                    <span class="info-value" id="questionCount">-</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-section">
+                            <h3>🔄 处理日志</h3>
+                            <div class="log-container" id="processingLog">
+                                <div class="log-item">等待处理...</div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-section">
+                            <h3>⚡ 性能指标</h3>
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <span class="info-label">处理时间:</span>
+                                    <span class="info-value" id="processingTime">-</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">平均速度:</span>
+                                    <span class="info-value" id="processingSpeed">-</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="raw-tab" class="tab-content">
+                    <div class="content-display" id="rawContent"></div>
+                </div>
+                
+                <div id="json-tab" class="tab-content">
+                    <div class="content-display" id="jsonContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentResponse = null;
+        
+        $(document).ready(function() {
+            $('#fileInput').change(function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    $('#fileInfo').html(`
+                        <strong>文件名:</strong> ${file.name}<br>
+                        <strong>大小:</strong> ${(file.size / 1024 / 1024).toFixed(2)} MB
+                    `);
+                }
+            });
+        });
+
+        function uploadWithLLM() {
+            uploadFile(true);
+        }
+
+        function uploadRawText() {
+            uploadFile(false);
+        }
+
+
+
+        function displayQuestion(question) {
+            const questionHtml = `
+                <div class="question-item">
+                    <div class="question-header">
+                        <span class="question-type ${question.question_type}">${question.question_type.toUpperCase()}</span>
+                        <span>新题目</span>
+                    </div>
+                    <div class="question-text">${question.question_text}</div>
+                    ${question.question_code ? `<div class="question-code">${question.question_code}</div>` : ''}
+                    <div class="options-list">
+                        ${question.options.map(option => `
+                            <div class="option-item ${option.value === question.correct_answer ? 'correct' : ''}">
+                                <span class="option-label">${option.label}.</span>
+                                ${option.text}
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="explanation">
+                        <div class="explanation-title">正确答案: ${question.correct_answer}</div>
+                        <div>${question.explanation}</div>
+                    </div>
+                    <div class="difficulty-info">
+                        <span class="difficulty-item">难度等级: ${question.level}</span>
+                        <span class="difficulty-item">难度: ${question.difficulty}</span>
+                    </div>
+                </div>
+            `;
+            $('#questionsList').append(questionHtml);
+        }
+
+        function uploadFile(useLLM) {
+            const file = document.getElementById('fileInput').files[0];
+            if (!file) {
+                showMessage('请先选择PDF文件', 'error');
+                return;
+            }
+
+            $('#loading').show();
+            $('#resultSection').hide();
+            
+            // 重置处理信息
+            resetProcessingInfo();
+            
+            var formData = new FormData();
+            formData.append('file', file);
+            formData.append('use_llm', useLLM);
+            
+            // 获取并行线程数
+            const parallelWorkers = document.getElementById('parallelWorkers').value;
+            formData.append('parallel_workers', parallelWorkers);
+            
+            // 获取预期题目数
+            const expectedQuestions = document.getElementById('expectedQuestions').value;
+            if (expectedQuestions) {
+                formData.append('expected_questions', expectedQuestions);
+            }
+            
+            // 打印发送的参数
+            console.log('🔧 发送的参数:');
+            console.log('  - parallel_workers:', parallelWorkers);
+            console.log('  - expected_questions:', expectedQuestions);
+            
+            // 记录开始时间
+            window.startTime = Date.now();
+            
+            // 开始进度轮询
+            let progressId = null;
+            let progressInterval = null;
+
+            $.ajax({
+                url: '/upload',
+                type: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function(response) {
+                    $('#loading').hide();
+                    $('#resultSection').show();
+                    currentResponse = response;
+                    
+                    // 停止进度轮询
+                    if (progressInterval) {
+                        clearInterval(progressInterval);
+                    }
+                    
+                    if (response.status === 'success') {
+                        displayResults(response);
+                        updateProcessingInfo(response);
+                        
+                        // 开始进度轮询
+                        if (response.progress_id) {
+                            progressInterval = startProgressPolling(response.progress_id);
+                        }
+                        
+                        if (response.processed) {
+                            showMessage('PDF题目提取成功！', 'success');
+                        } else if (response.llm_error) {
+                            showMessage('大模型处理失败，已返回原始文本。错误: ' + response.llm_error, 'warning');
+                        } else {
+                            showMessage('PDF文本提取成功！', 'success');
+                        }
+                    } else {
+                        showMessage('处理失败: ' + response.error, 'error');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    $('#loading').hide();
+                    showMessage('上传失败: ' + error, 'error');
+                }
+            });
+        }
+
+        function displayResults(response) {
+            // 显示原始文本
+            $('#rawContent').text(response.raw_content || '');
+            
+            // 显示JSON格式
+            $('#jsonContent').text(JSON.stringify(response, null, 2));
+            
+            // 显示题目列表
+            if (response.questions && response.questions.length > 0) {
+                displayQuestions(response.questions);
+            } else {
+                $('#questionsList').html('<p>未找到题目或未使用大模型处理</p>');
+            }
+        }
+
+        function displayQuestions(questions) {
+            let html = '';
+            questions.forEach((question, index) => {
+                html += `
+                    <div class="question-item">
+                        <div class="question-header">
+                            <span class="question-type ${question.question_type}">${question.question_type.toUpperCase()}</span>
+                            <span>题目 ${index + 1}</span>
+                        </div>
+                        <div class="question-text">${question.question_text}</div>
+                        ${question.question_code ? `<div class="question-code">${question.question_code}</div>` : ''}
+                        <div class="options-list">
+                            ${question.options.map(option => `
+                                <div class="option-item ${option.value === question.correct_answer ? 'correct' : ''}">
+                                    <span class="option-label">${option.label}.</span>
+                                    ${option.text}
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="explanation">
+                            <div class="explanation-title">正确答案: ${question.correct_answer}</div>
+                            <div>${question.explanation}</div>
+                        </div>
+                        <div class="difficulty-info">
+                            <span class="difficulty-item">难度等级: ${question.level}</span>
+                            <span class="difficulty-item">难度: ${question.difficulty}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            $('#questionsList').html(html);
+        }
+
+        function showTab(tabName) {
+            $('.tab-btn').removeClass('active');
+            $('.tab-content').removeClass('active');
+            
+            $(`[onclick="showTab('${tabName}')"]`).addClass('active');
+            $(`#${tabName}-tab`).addClass('active');
+        }
+
+        function copyRawContent() {
+            const content = currentResponse.raw_content || '';
+            copyToClipboard(content, '原始文本已复制到剪贴板！');
+        }
+
+        function copyQuestions() {
+            const content = JSON.stringify(currentResponse.questions || [], null, 2);
+            copyToClipboard(content, '题目JSON已复制到剪贴板！');
+        }
+
+        function copyToClipboard(text, message) {
+            navigator.clipboard.writeText(text).then(function() {
+                alert(message);
+            }).catch(function(err) {
+                console.error('复制失败: ', err);
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert(message);
+            });
+        }
+
+        function resetProcessingInfo() {
+            $('#textLength').text('-');
+            $('#segmentCount').text('-');
+            $('#parallelWorkers').text('-');
+            $('#expectedQuestions').text('-'); // Reset expected questions
+            $('#questionCount').text('-');
+            $('#processingTime').text('-');
+            $('#processingSpeed').text('-');
+            $('#processingLog').html('<div class="log-item">等待处理...</div>');
+        }
+        
+        function updateProcessingInfo(response) {
+            // 更新统计信息
+            if (response.raw_content) {
+                $('#textLength').text(response.raw_content.length + ' 字符');
+            }
+            if (response.segment_count) {
+                $('#segmentCount').text(response.segment_count);
+            }
+            if (response.parallel_workers) {
+                $('#parallelWorkers').text(response.parallel_workers);
+            }
+            if (response.expected_questions) {
+                $('#expectedQuestions').text(response.expected_questions);
+            }
+            if (response.question_count) {
+                $('#questionCount').text(response.question_count);
+            }
+            
+            // 计算处理时间
+            const endTime = Date.now();
+            const processingTime = (endTime - window.startTime) / 1000;
+            $('#processingTime').text(processingTime.toFixed(2) + ' 秒');
+            
+            // 计算处理速度
+            if (response.raw_content && processingTime > 0) {
+                const speed = (response.raw_content.length / processingTime).toFixed(0);
+                $('#processingSpeed').text(speed + ' 字符/秒');
+            }
+            
+            // 添加处理日志
+            addProcessingLog('✅ 处理完成！', 'success');
+            addProcessingLog(`📊 提取到 ${response.question_count || 0} 个题目`, 'info');
+            addProcessingLog(`⚡ 处理时间: ${processingTime.toFixed(2)} 秒`, 'info');
+        }
+        
+        function addProcessingLog(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logItem = $(`<div class="log-item ${type}">[${timestamp}] ${message}</div>`);
+            $('#processingLog').append(logItem);
+            $('#processingLog').scrollTop($('#processingLog')[0].scrollHeight);
+        }
+        
+        function startProgressPolling(progressId) {
+            const pollInterval = setInterval(async function() {
+                try {
+                    const response = await fetch(`/progress/${progressId}`);
+                    const data = await response.json();
+                    
+                    if (data.type === 'start') {
+                        addProcessingLog(`📄 ${data.message}`, 'info');
+                        $('#textLength').text(data.text_length + ' 字符');
+                    } else if (data.type === 'split_complete') {
+                        addProcessingLog(`📝 ${data.message}`, 'info');
+                        $('#segmentCount').text(data.segment_count);
+                        $('#parallelWorkers').text(data.parallel_workers);
+                    } else if (data.type === 'progress') {
+                        addProcessingLog(`🔄 ${data.message}，找到 ${data.questions_found} 个题目`, 'info');
+                        $('#questionCount').text(data.total_questions);
+                    } else if (data.type === 'complete') {
+                        addProcessingLog(`✅ ${data.message}`, 'success');
+                        clearInterval(pollInterval);
+                    } else if (data.type === 'error') {
+                        addProcessingLog(`❌ ${data.message}`, 'error');
+                        clearInterval(pollInterval);
+                    }
+                } catch (error) {
+                    console.error('进度查询失败:', error);
+                }
+            }, 1000); // 每秒查询一次
+            
+            return pollInterval;
+        }
+        
+        function showMessage(message, type) {
+            $('.message').remove();
+            const messageDiv = $('<div class="message ' + type + '">' + message + '</div>');
+            $('.container').append(messageDiv);
+            setTimeout(function() {
+                $('.message').fadeOut();
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

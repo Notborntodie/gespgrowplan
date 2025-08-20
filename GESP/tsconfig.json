@@ -10,5 +10,10 @@
     {
       "path": "./tsconfig.vitest.json"
     }
-  ]
+  ],
+  "compilerOptions": {
+    "allowJs": true,  // 允许编译 JavaScript 文件
+    "checkJs": true   // 可选：对 JS 文件也进行类型检查
+  }
+  
 }
