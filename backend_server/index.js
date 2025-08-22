@@ -51,9 +51,9 @@ app.use('/uploads', express.static('uploads'));
 
 // 数据库连接配置
 const dbConfig = {
-  host: 'localhost',
-  user: 'root',
-  password: '', // 替换为你的MySQL密码
+  host: '106.14.143.27',
+  user: 'gesp_user',
+  password: 'Gesp@2025!',
   database: 'gesp_practice_system',
   charset: 'utf8mb4'
 };
@@ -307,10 +307,11 @@ app.post('/api/upload-image', upload.single('image'), async (req, res) => {
   }
 });
 
-// 4. 创建题目
-app.post('/api/questions', async (req, res) => {
+// 4. 上传题目（修改版 - 不需要exam_id）
+app.post('/api/upload-question', async (req, res) => {
   try {
     const {
+      exam_id = 1, // 默认使用考试ID为1
       question_text,
       question_type = 'text',
       question_code = null,
@@ -319,12 +320,11 @@ app.post('/api/questions', async (req, res) => {
       level = 1,
       difficulty = 'medium',
       image_url = null,
-      question_date = null,
       knowledge_point_ids = [],
       options = []
     } = req.body;
 
-    // 验证必需参数
+    // 验证必需参数（去掉exam_id）
     if (!question_text || !correct_answer) {
       return res.status(400).json({ 
         error: '缺少必需参数', 
@@ -338,16 +338,43 @@ app.post('/api/questions', async (req, res) => {
     try {
       await connection.beginTransaction();
       
-      // 插入题目
+      // 获取题目编号 - 从exam_questions表获取
+      const [questionNumberResult] = await connection.execute(
+        'SELECT MAX(question_number) as max_number FROM exam_questions WHERE exam_id = ?',
+        [exam_id]
+      );
+      const questionNumber = (questionNumberResult[0].max_number || 0) + 1;
+      
+      // 确保所有参数都有值，避免undefined
+      const safeParams = [
+        exam_id,
+        questionNumber,
+        question_text,
+        question_type || 'text',
+        question_code || null,
+        correct_answer,
+        explanation || '',
+        level || 1,
+        difficulty || 'medium',
+        image_url || null
+      ];
+      
+      // 插入题目 - 不包含exam_id和question_number
       const [questionResult] = await connection.execute(
-        `INSERT INTO questions (question_text, question_type, question_code, correct_answer, 
-         explanation, level, difficulty, image_url, question_date) 
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [question_text, question_type, question_code, correct_answer, explanation, 
-         level, difficulty, image_url, question_date]
+        `INSERT INTO questions (question_text, question_type, 
+         question_code, correct_answer, explanation, level, difficulty, image_url) 
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        [question_text, question_type || 'text', question_code || null, correct_answer, 
+         explanation || '', level || 1, difficulty || 'medium', image_url || null]
       );
       
       const questionId = questionResult.insertId;
+      
+      // 插入考试-题目关联
+      await connection.execute(
+        'INSERT INTO exam_questions (exam_id, question_id, question_number) VALUES (?, ?, ?)',
+        [exam_id, questionId, questionNumber]
+      );
       
       // 插入选项
       if (options && options.length > 0) {
@@ -382,8 +409,10 @@ app.post('/api/questions', async (req, res) => {
       await connection.commit();
       
       res.json({ 
-        message: '题目创建成功',
-        questionId: questionId
+        message: '题目上传成功',
+        questionId: questionId,
+        questionNumber: questionNumber,
+        examId: exam_id
       });
       
     } catch (error) {
@@ -394,16 +423,16 @@ app.post('/api/questions', async (req, res) => {
     }
     
   } catch (error) {
-    console.error('创建题目错误:', error);
+    console.error('上传题目错误:', error);
     res.status(500).json({ 
-      error: '题目创建失败',
+      error: '题目上传失败',
       details: error.message 
     });
   }
 });
 
-// 5. 批量创建题目
-app.post('/api/questions/batch', async (req, res) => {
+// 5. 批量上传题目
+app.post('/api/upload-questions-batch', async (req, res) => {
   try {
     const { questions } = req.body;
     
@@ -421,6 +450,24 @@ app.post('/api/questions/batch', async (req, res) => {
     try {
       await connection.beginTransaction();
       
+          // 获取第一个可用的考试ID，如果没有则创建默认考试
+    let defaultExamId = 1;
+    try {
+      const [examResult] = await connection.execute('SELECT id FROM exams LIMIT 1');
+      if (examResult.length > 0) {
+        defaultExamId = examResult[0].id;
+      } else {
+        // 如果没有考试，创建一个默认考试
+        const [newExamResult] = await connection.execute(
+          'INSERT INTO exams (name, level, description, total_questions) VALUES (?, ?, ?, ?)',
+          ['默认考试', 1, '系统默认考试', 0]
+        );
+        defaultExamId = newExamResult.insertId;
+      }
+    } catch (error) {
+      console.warn('获取默认考试ID失败，使用ID=1:', error.message);
+    }
+      
       for (let i = 0; i < questions.length; i++) {
         const questionData = questions[i];
         const {
@@ -432,29 +479,29 @@ app.post('/api/questions/batch', async (req, res) => {
           level = 1,
           difficulty = 'medium',
           image_url = null,
-          question_date = null,
           knowledge_point_ids = [],
           options = []
         } = questionData;
         
         // 验证必需参数
-        if (!question_text) {
-          throw new Error(`第${i + 1}题缺少必需参数: question_text`);
+        if (!question_text || !correct_answer) {
+          throw new Error(`第${i + 1}题缺少必需参数: question_text=${question_text}, correct_answer=${correct_answer}`);
         }
-
-        // 使用默认值或原始值
-        const finalCorrectAnswer = correct_answer || 'A';
         
-        // 插入题目
+        // 批量上传不需要关联考试，直接插入题目即可
+        // 不需要获取题目编号，因为不关联到考试
+        
+        // 插入题目 - 使用正确的数据库结构
         const [questionResult] = await connection.execute(
           `INSERT INTO questions (question_text, question_type, question_code, 
-           correct_answer, explanation, level, difficulty, image_url, question_date) 
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-          [question_text, question_type, question_code, finalCorrectAnswer, 
-           explanation, level, difficulty, image_url, question_date]
+           correct_answer, explanation, level, difficulty, image_url) 
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+          [question_text, question_type, question_code, correct_answer, 
+           explanation, level, difficulty, image_url]
         );
-        
         const questionId = questionResult.insertId;
+        
+        // 批量上传不关联考试，跳过exam_questions表的插入
         
         // 插入选项
         if (options && options.length > 0) {
@@ -500,7 +547,7 @@ app.post('/api/questions/batch', async (req, res) => {
       await connection.commit();
       
       res.json({ 
-        message: `批量创建成功，共创建 ${results.length} 道题目`,
+        message: `批量上传成功，共上传 ${results.length} 道题目`,
         results: results
       });
       
@@ -512,9 +559,9 @@ app.post('/api/questions/batch', async (req, res) => {
     }
     
   } catch (error) {
-    console.error('批量创建题目错误:', error);
+    console.error('批量上传题目错误:', error);
     res.status(500).json({ 
-      error: '批量创建失败',
+      error: '批量上传失败',
       details: error.message 
     });
   }
@@ -586,7 +633,6 @@ app.put('/api/questions/:questionId', async (req, res) => {
       level,
       difficulty,
       image_url,
-      question_date,
       knowledge_point_ids = [],
       options = []
     } = req.body;
@@ -606,14 +652,13 @@ app.put('/api/questions/:questionId', async (req, res) => {
         level || 1,
         difficulty || 'medium',
         image_url || null,
-        question_date || null,
         questionId
       ];
       
       // 更新题目基本信息
       await connection.execute(
         `UPDATE questions SET question_text = ?, question_type = ?, question_code = ?, correct_answer = ?, 
-         explanation = ?, level = ?, difficulty = ?, image_url = ?, question_date = ? WHERE id = ?`,
+         explanation = ?, level = ?, difficulty = ?, image_url = ? WHERE id = ?`,
         safeParams
       );
       
@@ -748,48 +793,19 @@ app.put('/api/question-uploads/:uploadId/review', async (req, res) => {
 // 1. 获取所有考试列表
 app.get('/api/exams', async (req, res) => {
   try {
-    const { level } = req.query;
     const connection = await pool.getConnection();
     
-    let query = `
-      SELECT e.*, COUNT(eq.question_id) as total_questions
+    // 获取考试基本信息
+    const [examRows] = await connection.execute(`
+      SELECT e.*, COUNT(eq.question_id) as question_count
       FROM exams e
       LEFT JOIN exam_questions eq ON e.id = eq.exam_id
-    `;
-    
-    let params = [];
-    
-    // 如果指定了等级，添加过滤条件
-    if (level) {
-      query += ` WHERE e.level = ?`;
-      params.push(level);
-    }
-    
-    query += ` GROUP BY e.id ORDER BY e.created_at DESC`;
-    
-    // 获取考试基本信息
-    const [examRows] = await connection.execute(query, params);
-    
-    // 为每个考试获取题目详情
-    const examsWithDetails = await Promise.all(
-      examRows.map(async (exam) => {
-        const [questionRows] = await connection.execute(`
-          SELECT q.*, eq.question_number
-          FROM questions q
-          JOIN exam_questions eq ON q.id = eq.question_id
-          WHERE eq.exam_id = ?
-          ORDER BY eq.question_number
-        `, [exam.id]);
-        
-        return {
-          ...exam,
-          questions: questionRows
-        };
-      })
-    );
+      GROUP BY e.id
+      ORDER BY e.created_at DESC
+    `);
     
     connection.release();
-    res.json(examsWithDetails);
+    res.json(examRows);
   } catch (error) {
     console.error('获取考试列表错误:', error);
     res.status(500).json({ error: '服务器错误' });
@@ -1190,423 +1206,6 @@ app.get('/api/available-questions', async (req, res) => {
   }
 });
 
-// =============================================
-// 提交相关API
-// =============================================
-
-// 1. 提交考试答案
-app.post('/api/submit-exam', async (req, res) => {
-  try {
-    const { user_id, exam_id, answers } = req.body;
-    const connection = await pool.getConnection();
-    
-    // 验证必需参数
-    if (!user_id || !exam_id || !answers || !Array.isArray(answers)) {
-      return res.status(400).json({ 
-        error: '缺少必需参数',
-        required: 'user_id, exam_id, answers array'
-      });
-    }
-    
-    // 获取考试信息
-    const [examRows] = await connection.execute(
-      'SELECT * FROM exams WHERE id = ?',
-      [exam_id]
-    );
-    
-    if (examRows.length === 0) {
-      connection.release();
-      return res.status(404).json({ error: '考试不存在' });
-    }
-    
-    // 获取用户信息
-    const [userRows] = await connection.execute(
-      'SELECT * FROM users WHERE id = ?',
-      [user_id]
-    );
-    
-    if (userRows.length === 0) {
-      connection.release();
-      return res.status(404).json({ error: '用户不存在' });
-    }
-    
-    // 获取考试题目
-    const [questionRows] = await connection.execute(`
-      SELECT q.*, eq.question_number
-      FROM questions q
-      JOIN exam_questions eq ON q.id = eq.question_id
-      WHERE eq.exam_id = ?
-      ORDER BY eq.question_number
-    `, [exam_id]);
-    
-    if (questionRows.length === 0) {
-      connection.release();
-      return res.status(404).json({ error: '考试中没有题目' });
-    }
-    
-    // 计算尝试次数
-    const [attemptRows] = await connection.execute(
-      'SELECT MAX(attempt_number) as max_attempt FROM submissions WHERE user_id = ? AND exam_id = ?',
-      [user_id, exam_id]
-    );
-    
-    const attemptNumber = (attemptRows[0].max_attempt || 0) + 1;
-    
-    // 开始事务
-    await connection.beginTransaction();
-    
-    try {
-      // 创建提交记录
-      const [submissionResult] = await connection.execute(
-        'INSERT INTO submissions (user_id, exam_id, attempt_number, score) VALUES (?, ?, ?, 0)',
-        [user_id, exam_id, attemptNumber]
-      );
-      
-      const submissionId = submissionResult.insertId;
-      let correctCount = 0;
-      const submissionAnswers = [];
-      
-      // 处理每道题的答案
-      for (const answer of answers) {
-        const { question_id, user_answer } = answer;
-        
-        // 验证题目是否在此考试中
-        const questionInExam = questionRows.find(q => q.id === question_id);
-        if (!questionInExam) {
-          throw new Error(`题目ID ${question_id} 不在此考试中`);
-        }
-        
-        // 检查答案是否正确
-        const isCorrect = user_answer === questionInExam.correct_answer;
-        if (isCorrect) {
-          correctCount++;
-        }
-        
-        // 记录答题详情
-        await connection.execute(
-          'INSERT INTO submission_answers (submission_id, question_id, user_answer, is_correct) VALUES (?, ?, ?, ?)',
-          [submissionId, question_id, user_answer, isCorrect ? 1 : 0]
-        );
-        
-        submissionAnswers.push({
-          question_id,
-          user_answer,
-          is_correct: isCorrect,
-          correct_answer: questionInExam.correct_answer,
-          question_text: questionInExam.question_text
-        });
-      }
-      
-      // 计算得分
-      const score = Math.round((correctCount / questionRows.length) * 100);
-      
-      // 更新提交记录的得分
-      await connection.execute(
-        'UPDATE submissions SET score = ? WHERE id = ?',
-        [score, submissionId]
-      );
-      
-      await connection.commit();
-      
-      res.json({
-        message: '考试提交成功',
-        submission_id: submissionId,
-        score: score,
-        total_questions: questionRows.length,
-        correct_count: correctCount,
-        attempt_number: attemptNumber,
-        answers: submissionAnswers
-      });
-      
-    } catch (error) {
-      await connection.rollback();
-      throw error;
-    } finally {
-      connection.release();
-    }
-    
-  } catch (error) {
-    console.error('提交考试错误:', error);
-    res.status(500).json({ error: '提交考试失败', details: error.message });
-  }
-});
-
-// 2. 获取用户的提交记录
-app.get('/api/submissions', async (req, res) => {
-  try {
-    const { user_id, exam_id } = req.query;
-    const connection = await pool.getConnection();
-    
-    let sql = `
-      SELECT s.*, e.name as exam_name, e.level as exam_level
-      FROM submissions s
-      JOIN exams e ON s.exam_id = e.id
-      WHERE 1=1
-    `;
-    const params = [];
-    
-    if (user_id) {
-      sql += ' AND s.user_id = ?';
-      params.push(user_id);
-    }
-    
-    if (exam_id) {
-      sql += ' AND s.exam_id = ?';
-      params.push(exam_id);
-    }
-    
-    sql += ' ORDER BY s.submit_time DESC';
-    
-    const [results] = await connection.execute(sql, params);
-    connection.release();
-    
-    res.json(results);
-  } catch (error) {
-    console.error('获取提交记录错误:', error);
-    res.status(500).json({ error: '获取提交记录失败' });
-  }
-});
-
-// 3. 获取单次提交的详细答案
-app.get('/api/submissions/:submissionId', async (req, res) => {
-  try {
-    const { submissionId } = req.params;
-    const connection = await pool.getConnection();
-    
-    // 获取提交基本信息
-    const [submissionRows] = await connection.execute(`
-      SELECT s.*, e.name as exam_name, e.level as exam_level, u.username
-      FROM submissions s
-      JOIN exams e ON s.exam_id = e.id
-      JOIN users u ON s.user_id = u.id
-      WHERE s.id = ?
-    `, [submissionId]);
-    
-    if (submissionRows.length === 0) {
-      connection.release();
-      return res.status(404).json({ error: '提交记录不存在' });
-    }
-    
-    const submission = submissionRows[0];
-    
-    // 获取详细答题信息
-    const [answerRows] = await connection.execute(`
-      SELECT sa.*, q.question_text, q.question_type, q.question_code, 
-             q.correct_answer, q.explanation, q.level, q.difficulty,
-             eq.question_number
-      FROM submission_answers sa
-      JOIN questions q ON sa.question_id = q.id
-      JOIN exam_questions eq ON q.id = eq.question_id AND eq.exam_id = ?
-      WHERE sa.submission_id = ?
-      ORDER BY eq.question_number
-    `, [submission.exam_id, submissionId]);
-    
-    // 获取选项信息
-    const questionIds = answerRows.map(row => row.question_id);
-    let options = [];
-    if (questionIds.length > 0) {
-      const [optionRows] = await connection.execute(`
-        SELECT o.* FROM options o 
-        WHERE o.question_id IN (${questionIds.map(() => '?').join(',')})
-        ORDER BY o.question_id, o.option_label
-      `, questionIds);
-      options = optionRows;
-    }
-    
-    // 整理答案数据
-    const answers = answerRows.map(answer => {
-      const questionOptions = options.filter(opt => opt.question_id === answer.question_id);
-      return {
-        ...answer,
-        options: questionOptions
-      };
-    });
-    
-    connection.release();
-    
-    res.json({
-      submission: submission,
-      answers: answers
-    });
-    
-  } catch (error) {
-    console.error('获取提交详情错误:', error);
-    res.status(500).json({ error: '获取提交详情失败' });
-  }
-});
-
-// 4. 获取用户的所有错题
-app.get('/api/wrong-questions', async (req, res) => {
-  try {
-    const { user_id, level, difficulty, limit = 50 } = req.query;
-    const connection = await pool.getConnection();
-    
-    // 如果没有user_id，返回空数组
-    if (!user_id) {
-      connection.release();
-      return res.json([]);
-    }
-    
-    let sql = `
-      SELECT DISTINCT q.*, sa.user_answer, sa.is_correct, sa.created_at as answered_at,
-             e.name as exam_name, e.level as exam_level
-      FROM questions q
-      JOIN submission_answers sa ON q.id = sa.question_id
-      JOIN submissions s ON sa.submission_id = s.id
-      JOIN exams e ON s.exam_id = e.id
-      WHERE sa.is_correct = 0 AND s.user_id = ?
-    `;
-    const params = [user_id];
-    
-    if (level) {
-      sql += ' AND q.level = ?';
-      params.push(level);
-    }
-    
-    if (difficulty) {
-      sql += ' AND q.difficulty = ?';
-      params.push(difficulty);
-    }
-    
-    sql += ' ORDER BY sa.created_at DESC';
-    
-    // 使用字符串拼接而不是参数绑定的方式处理LIMIT
-    const limitNum = parseInt(limit) || 50;
-    sql += ` LIMIT ${limitNum}`;
-    
-    const [results] = await connection.execute(sql, params);
-    
-    // 为每道题获取选项
-    const questionIds = results.map(row => row.id);
-    let options = [];
-    if (questionIds.length > 0) {
-      const [optionRows] = await connection.execute(`
-        SELECT o.* FROM options o 
-        WHERE o.question_id IN (${questionIds.map(() => '?').join(',')})
-        ORDER BY o.question_id, o.option_label
-      `, questionIds);
-      options = optionRows;
-    }
-    
-    // 整理数据
-    const wrongQuestions = results.map(question => {
-      const questionOptions = options.filter(opt => opt.question_id === question.id);
-      return {
-        ...question,
-        options: questionOptions
-      };
-    });
-    
-    connection.release();
-    
-    res.json(wrongQuestions);
-    
-  } catch (error) {
-    console.error('获取错题错误:', error);
-    res.status(500).json({ error: '获取错题失败' });
-  }
-});
-
-// 5. 获取用户的答题统计
-app.get('/api/user-stats', async (req, res) => {
-  try {
-    const { user_id } = req.query;
-    const connection = await pool.getConnection();
-    
-    if (!user_id) {
-      return res.status(400).json({ error: '缺少user_id参数' });
-    }
-    
-    // 获取基本统计
-    const [statsRows] = await connection.execute(`
-      SELECT 
-        COUNT(DISTINCT s.id) as total_submissions,
-        COUNT(DISTINCT s.exam_id) as total_exams,
-        AVG(s.score) as average_score,
-        MAX(s.score) as best_score,
-        MIN(s.score) as worst_score
-      FROM submissions s
-      WHERE s.user_id = ?
-    `, [user_id]);
-    
-    // 获取答题详情统计
-    const [answerStatsRows] = await connection.execute(`
-      SELECT 
-        COUNT(*) as total_answers,
-        SUM(sa.is_correct) as correct_answers,
-        COUNT(*) - SUM(sa.is_correct) as wrong_answers,
-        ROUND(SUM(sa.is_correct) * 100.0 / COUNT(*), 2) as correct_rate
-      FROM submission_answers sa
-      JOIN submissions s ON sa.submission_id = s.id
-      WHERE s.user_id = ?
-    `, [user_id]);
-    
-    // 获取按等级统计
-    const [levelStatsRows] = await connection.execute(`
-      SELECT 
-        q.level,
-        COUNT(*) as question_count,
-        SUM(sa.is_correct) as correct_count,
-        ROUND(SUM(sa.is_correct) * 100.0 / COUNT(*), 2) as correct_rate
-      FROM submission_answers sa
-      JOIN submissions s ON sa.submission_id = s.id
-      JOIN questions q ON sa.question_id = q.id
-      WHERE s.user_id = ?
-      GROUP BY q.level
-      ORDER BY q.level
-    `, [user_id]);
-    
-    connection.release();
-    
-    res.json({
-      basic_stats: statsRows[0],
-      answer_stats: answerStatsRows[0],
-      level_stats: levelStatsRows
-    });
-    
-  } catch (error) {
-    console.error('获取用户统计错误:', error);
-    res.status(500).json({ error: '获取用户统计失败' });
-  }
-});
-
-// 6. 获取考试排行榜
-app.get('/api/exam-leaderboard', async (req, res) => {
-  try {
-    const { exam_id, limit = 20 } = req.query;
-    const connection = await pool.getConnection();
-    
-    if (!exam_id) {
-      return res.status(400).json({ error: '缺少exam_id参数' });
-    }
-    
-    const limitNum = parseInt(limit) || 20;
-    const [results] = await connection.execute(`
-      SELECT 
-        s.score,
-        s.submit_time,
-        s.attempt_number,
-        u.username,
-        e.name as exam_name
-      FROM submissions s
-      JOIN users u ON s.user_id = u.id
-      JOIN exams e ON s.exam_id = e.id
-      WHERE s.exam_id = ?
-      ORDER BY s.score DESC, s.submit_time ASC
-      LIMIT ${limitNum}
-    `, [exam_id]);
-    
-    connection.release();
-    
-    res.json(results);
-    
-  } catch (error) {
-    console.error('获取排行榜错误:', error);
-    res.status(500).json({ error: '获取排行榜失败' });
-  }
-});
-
-// 启动服务器
 app.listen(port, () => {
-  console.log(`GESP练习系统服务器运行在 http://localhost:${port}`);
+  console.log(`服务器运行在 http://localhost:${port}`);
 });

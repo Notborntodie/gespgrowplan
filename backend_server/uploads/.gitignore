@@ -1,0 +1,5 @@
+# 忽略uploads目录中的所有文件，但保留目录结构
+*
+!.gitkeep
+!.gitignore
+
