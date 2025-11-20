@@ -26,7 +26,7 @@ echo "🔍 检查数据库连接..."
 node -e "
 const mysql = require('mysql2/promise');
 const pool = mysql.createPool({
-  host: '106.14.143.27',
+  host: '127.0.0.1',
   user: 'gesp_user',
   password: 'Gesp@2025!',
   database: 'gesp_practice_system'

@@ -139,7 +139,7 @@ const dbConfig = {
 
 ```env
 # 数据库配置
-DB_HOST=106.14.143.27
+DB_HOST=
 DB_PORT=3306
 DB_NAME=gesp_practice_system
 DB_USER=gesp_user
