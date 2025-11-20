@@ -1,0 +1,13 @@
+# 部署配置文件示例
+# 复制此文件为 .deploy-config 并根据实际情况修改配置
+
+# 服务器配置
+DEPLOY_SERVER_IP=106.14.143.27
+DEPLOY_SERVER_USER=root
+DEPLOY_PATH=/var/www/gesp-frontend
+NGINX_CONFIG_PATH=/etc/nginx/conf.d/gesp-frontend.conf
+
+# API配置（用于构建时注入环境变量）
+API_BASE_URL=http://106.14.143.27:4000/api
+AI_API_BASE_URL=http://106.14.143.27:7000/api
+

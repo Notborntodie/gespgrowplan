@@ -1,0 +1,17 @@
+{
+  "files": [],
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    },
+    {
+      "path": "./tsconfig.app.json"
+    }
+  ],
+  "compilerOptions": {
+    "allowJs": true,  // 允许编译 JavaScript 文件
+    "checkJs": true,  // 可选：对 JS 文件也进行类型检查
+    "skipLibCheck": true  // 跳过第三方库的类型检查
+  }
+  
+}
