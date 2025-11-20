@@ -1,0 +1,62 @@
+{
+  "title": "[GESP202303 一级] 每月天数",
+  "description": "小明刚刚学习了每月有多少天，以及如何判断平年和闰年，想到可以使用编程方法求出给定的月份有多少天。你能做到吗？",
+  "input_format": "输入一行，包含两个整数 $A, B$，分别表示一个日期的年、月。约定 $2000 \\leq A \\leq 3000$，$1 \\leq B \\leq 12$。",
+  "output_format": "输出一行，包含一个整数，表示输入月份有多少天。",
+  "data_range": "",
+  "time_limit": 1000,
+  "memory_limit": 128,
+  "level": 1,
+  "publish_date": "2023-03-01",
+  "samples": [
+    {
+      "input": "2022 1",
+      "output": "31",
+      "explanation": "样例",
+      "is_hidden": false,
+      "sort_order": 1
+    },
+    {
+      "input": "2020 2",
+      "output": "29",
+      "explanation": "test",
+      "is_hidden": true,
+      "sort_order": 2
+    },
+    {
+      "input": "2023 2",
+      "output": "28",
+      "explanation": "test_1",
+      "is_hidden": true,
+      "sort_order": 3
+    },
+    {
+      "input": "2100 2",
+      "output": "28",
+      "explanation": "test_2",
+      "is_hidden": true,
+      "sort_order": 4
+    },
+    {
+      "input": "2412 1",
+      "output": "31",
+      "explanation": "test_3",
+      "is_hidden": true,
+      "sort_order": 5
+    },
+    {
+      "input": "2015 12",
+      "output": "31",
+      "explanation": "test_4",
+      "is_hidden": true,
+      "sort_order": 6
+    },
+    {
+      "input": "2019 3",
+      "output": "31",
+      "explanation": "test_5",
+      "is_hidden": true,
+      "sort_order": 7
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+{
+  "title": "[GESP202506 四级] 画布裁剪",
+  "description": "小 A 在高为 $h$ 宽为 $w$ 的矩形画布上绘制了一幅画。由于画布边缘留白太多，小 A 想适当地裁剪画布，只保留画的主体。具体来说，画布可以视为 $h$ 行 $w$ 列的字符矩阵，其中的字符均为 ASCII 码位于 $33 \\sim 126$ 之间的可见字符，小 A 只保留画布中由第 $x_1$ 行到第 $x_2$ 行、第 $y_1$ 列到第 $y_2$ 列构成的子矩阵。\r\n\n\t    小 A 将画布交给了你，你能帮他完成画布的裁剪吗？",
+  "input_format": "第一行，两个正整数 $h, w$，分别表示画布的行数与列数。\r\n\n\t    第二行，四个正整数 $x_1, x_2, y_1, y_2$，表示保留的行列边界。\r\n\n\t    接下来 $h$ 行，每行一个长度为 $w$ 的字符串，表示画布内容。",
+  "output_format": "输出共 $x_2 - x_1 + 1$ 行，每行一个长度为 $y_2 - y_1 + 1$ 的字符串，表示裁剪后的画布。",
+  "data_range": "对于所有测试点，保证 $1 \\leq h, w \\leq 100$，$1 \\leq x_1 \\leq x_2 \\leq h$，$1 \\leq y_1 \\leq y_2 \\leq w$。",
+  "time_limit": 1000,
+  "memory_limit": 128,
+  "level": 4,
+  "publish_date": "2025-06-01",
+  "samples": [
+    {
+      "input": "3 5\r\n2 2 2 4\r\n.....\r\n.>_<.\r\n.....",
+      "output": ">_<",
+      "explanation": "样例",
+      "is_hidden": false,
+      "sort_order": 1
+    },
+    {
+      "input": "5 5\n1 2 3 4\nAbCdE\nfGhIk\nLmNoP\nqRsTu\nVwXyZ",
+      "output": "Cd\nhI",
+      "explanation": "test",
+      "is_hidden": true,
+      "sort_order": 2
+    },
+    {
+      "input": "4 6\n1 4 1 6\nabcdef\nghijkl\nmnopqr\nstuvwx",
+      "output": "abcdef\nghijkl\nmnopqr\nstuvwx",
+      "explanation": "test_1",
+      "is_hidden": true,
+      "sort_order": 3
+    },
+    {
+      "input": "5 3\n3 3 1 3\n123\n456\n789\nabc\ndef",
+      "output": "789",
+      "explanation": "test_2",
+      "is_hidden": true,
+      "sort_order": 4
+    },
+    {
+      "input": "7 8\n7 7 8 8\n!@#$%^&*\n()_+{}|~\nabcdefgh\nijklmnop\nqrstuvwx\nyzABCDEF\nGHIJKLMN",
+      "output": "N",
+      "explanation": "test_3",
+      "is_hidden": true,
+      "sort_order": 5
+    },
+    {
+      "input": "2 4\n1 2 2 3\n!@#$\n%^&*",
+      "output": "@#\n^&",
+      "explanation": "test_4",
+      "is_hidden": true,
+      "sort_order": 6
+    },
+    {
+      "input": "1 1\n1 1 1 1\nA",
+      "output": "A",
+      "explanation": "test_5",
+      "is_hidden": true,
+      "sort_order": 7
+    },
+    {
+      "input": "5 5\n3 3 2 2\nabcde\nfghij\nklmno\npqrst\nuvwxy",
+      "output": "l",
+      "explanation": "test_6",
+      "is_hidden": true,
+      "sort_order": 8
+    },
+    {
+      "input": "6 7\n1 3 1 4\n!@#$%^&\nabcdefg\nhijklmn\nopqrstu\nvwxyz12\n3456789",
+      "output": "!@#$\nabcd\nhijk",
+      "explanation": "test_7",
+      "is_hidden": true,
+      "sort_order": 9
+    },
+    {
+      "input": "3 8\n1 3 5 7\n12345678\nabcdefgh\nijklmnop",
+      "output": "567\nefg\nmno",
+      "explanation": "test_8",
+      "is_hidden": true,
+      "sort_order": 10
+    },
+    {
+      "input": "7 4\n3 6 1 4\nabcd\nefgh\nijkl\nmnop\nqrst\nuvwx\nyz12",
+      "output": "ijkl\nmnop\nqrst\nuvwx",
+      "explanation": "test_9",
+      "is_hidden": true,
+      "sort_order": 11
+    }
+  ]
+}

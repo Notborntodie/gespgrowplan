@@ -1,0 +1,90 @@
+{
+  "title": "[GESP202503 三级] 词频统计",
+  "description": "在文本处理中，统计单词出现的频率是一个常见的任务。现在，给定 $n$ 个单词，你需要找出其中出现次数最多的单词。在本题中，忽略单词中字母的大小写（即 Apple、apple、APPLE、aPPle 等均视为同一个单词）。\r\n\n\t    请你编写一个程序，输入 $n$ 个单词，输出其中出现次数最多的单词。",
+  "input_format": "第一行，一个整数 $n$，表示单词的个数；\r\n\n\t    接下来 $n$ 行，每行包含一个单词，单词由大小写英文字母组成。\r\n\n\t    输入保证，出现次数最多的单词只会有一个。",
+  "output_format": "输出一行，包含出现次数最多的单词（输出单词为小写形式）。",
+  "data_range": "对于所有测试点，$1\\leq n\\leq 100$，每个单词的长度不超过 $30$，且仅由大小写字母组成。",
+  "time_limit": 1000,
+  "memory_limit": 128,
+  "level": 3,
+  "publish_date": "2025-03-01",
+  "samples": [
+    {
+      "input": "6\r\nApple\r\nbanana\r\napple\r\nOrange\r\nbanana\r\napple",
+      "output": "apple",
+      "explanation": "样例",
+      "is_hidden": false,
+      "sort_order": 1
+    },
+    {
+      "input": "6\nApple\nbanana\napple\nOrange\nbanana\napple",
+      "output": "apple",
+      "explanation": "test",
+      "is_hidden": true,
+      "sort_order": 2
+    },
+    {
+      "input": "3\nApple\napple\nApple",
+      "output": "apple",
+      "explanation": "test_1",
+      "is_hidden": true,
+      "sort_order": 3
+    },
+    {
+      "input": "5\nBanana\nBanana\nCherry\nDate\nDate",
+      "output": "banana",
+      "explanation": "test_2",
+      "is_hidden": true,
+      "sort_order": 4
+    },
+    {
+      "input": "8\nElephant\nFox\nFox\nGiraffe\nGiraffe\nGiraffe\nHorse\nHorse",
+      "output": "giraffe",
+      "explanation": "test_3",
+      "is_hidden": true,
+      "sort_order": 5
+    },
+    {
+      "input": "1\nCat",
+      "output": "cat",
+      "explanation": "test_4",
+      "is_hidden": true,
+      "sort_order": 6
+    },
+    {
+      "input": "10\nDog\nDog\nElephant\nElephant\nFish\nFish\nGoat\nGoat\nHen\nHen",
+      "output": "dog",
+      "explanation": "test_5",
+      "is_hidden": true,
+      "sort_order": 7
+    },
+    {
+      "input": "7\nLion\nTiger\nTiger\nLion\nBear\nBear\nBear",
+      "output": "bear",
+      "explanation": "test_6",
+      "is_hidden": true,
+      "sort_order": 8
+    },
+    {
+      "input": "12\nApple\nBanana\nApple\nCherry\nBanana\nDate\nDate\nEgg\nEgg\nEgg\nFig\nFig",
+      "output": "egg",
+      "explanation": "test_7",
+      "is_hidden": true,
+      "sort_order": 9
+    },
+    {
+      "input": "2\nAnt\nAnt",
+      "output": "ant",
+      "explanation": "test_8",
+      "is_hidden": true,
+      "sort_order": 10
+    },
+    {
+      "input": "15\nSun\nMoon\nSun\nStar\nMoon\nStar\nCloud\nCloud\nCloud\nRain\nRain\nSnow\nSnow\nSnow\nSnow",
+      "output": "snow",
+      "explanation": "test_9",
+      "is_hidden": true,
+      "sort_order": 11
+    }
+  ]
+}

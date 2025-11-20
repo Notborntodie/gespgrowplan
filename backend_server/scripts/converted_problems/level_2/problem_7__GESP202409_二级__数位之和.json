@@ -1,0 +1,62 @@
+{
+  "title": "[GESP202409 二级] 数位之和",
+  "description": "小杨有 $n$ 个正整数，他认为一个正整数是美丽数字当且仅当该正整数每一位数字的总和是 $7$ 的倍数。\r\n\n\t小杨想请你编写一个程序判断 $n$ 个正整数哪些是美丽数字。",
+  "input_format": "第一行包含一个正整数 $n$，表示正整数个数。  \r\n\n\t    之后 $n$ 行，每行一个包含一个正整数 $a_i$。",
+  "output_format": "对于每个正整数输出一行一个字符串，如果是美丽数字则输出 Yes，否则输出 No。",
+  "data_range": "对全部的测试数据，保证 $1 \\leq n \\leq 10^5$，$1 \\leq a_i \\leq 10^5$。",
+  "time_limit": 1000,
+  "memory_limit": 128,
+  "level": 2,
+  "publish_date": "2024-09-01",
+  "samples": [
+    {
+      "input": "3\r\n7\r\n52\r\n103",
+      "output": "Yes\r\nYes\r\nNo",
+      "explanation": "样例",
+      "is_hidden": false,
+      "sort_order": 1
+    },
+    {
+      "input": "3\n7\n52\n103",
+      "output": "Yes\nYes\nNo",
+      "explanation": "test",
+      "is_hidden": true,
+      "sort_order": 2
+    },
+    {
+      "input": "5 234 6234 2354 23 453",
+      "output": "No\nNo\nYes\nNo\nNo",
+      "explanation": "test1",
+      "is_hidden": true,
+      "sort_order": 3
+    },
+    {
+      "input": "5\n16\n77\n2024\n35\n99999",
+      "output": "Yes\nYes\nNo\nNo\nNo",
+      "explanation": "test_1",
+      "is_hidden": true,
+      "sort_order": 4
+    },
+    {
+      "input": "4\n700\n124\n86\n7777",
+      "output": "Yes\nYes\nYes\nYes",
+      "explanation": "test_2",
+      "is_hidden": true,
+      "sort_order": 5
+    },
+    {
+      "input": "6\n1\n133\n2025\n49\n567\n9999",
+      "output": "No\nYes\nNo\nNo\nNo\nNo",
+      "explanation": "test_3",
+      "is_hidden": true,
+      "sort_order": 6
+    },
+    {
+      "input": "3\n100000\n777\n223",
+      "output": "No\nYes\nYes",
+      "explanation": "test_4",
+      "is_hidden": true,
+      "sort_order": 7
+    }
+  ]
+}

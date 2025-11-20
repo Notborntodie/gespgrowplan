@@ -1,0 +1,90 @@
+{
+  "title": "[GESP202403 六级] 游戏",
+  "description": "你有四个正整数 $n,a,b,c$，并准备用它们玩一个简单的小游戏。\r\n\n\t    在一轮游戏操作中，你可以选择将 $n$ 减去 $a$，或是将 $n$ 减去 $b$。游戏将会进行多轮操作，直到当 $n \\leq c$ 时游戏结束。\r\n\n\t    你想知道游戏结束时有多少种不同的游戏操作序列。两种游戏操作序列不同，当且仅当游戏操作轮数不同，或是某一轮游戏操作中，一种操作序列选择将 $n$ 减去 $a$，而另一种操作序列选择将 $n$ 减去 $b$。如果 $a=b$，也认为将 $n$ 减去 $a$ 与将 $n$ 减去 $b$ 是不同的操作。\r\n\n\t    由于答案可能很大，你只需要求出答案对 $10^9 + 7$ 取模的结果。",
+  "input_format": "一行四个整数 $n,a,b,c$。",
+  "output_format": "输出一行一个整数表示答案。",
+  "data_range": "测试样例2\r\n\r\n114 51 4 1\r\n\n\t样例2输出\r\n\r\n176\r\n\n\t测试样例3\r\n\n114514 191 9 810\r\n\n\t样例3输出\r\n\n\t数据规模与约定\r\n\n\t\t对 $20\\%$ 的数据，$a=b=c=1$，$n \\leq 30$。\r\n\n\t\t对 $40\\%$ 的数据，$c = 1$，$n \\leq 10^3$。\r\n\n\t\t对全部的测试数据，保证 $1 \\leq a,b,c \\leq n \\leq 2 \\times 10^5$。",
+  "time_limit": 1000,
+  "memory_limit": 128,
+  "level": 6,
+  "publish_date": "2024-03-01",
+  "samples": [
+    {
+      "input": "1 1 1 1",
+      "output": "1",
+      "explanation": "样例",
+      "is_hidden": false,
+      "sort_order": 1
+    },
+    {
+      "input": "114 51 4 1",
+      "output": "176",
+      "explanation": "test",
+      "is_hidden": true,
+      "sort_order": 2
+    },
+    {
+      "input": "114 51 4 1",
+      "output": "176",
+      "explanation": "test_1",
+      "is_hidden": true,
+      "sort_order": 3
+    },
+    {
+      "input": "114514 191 9 810",
+      "output": "384178446",
+      "explanation": "test_2",
+      "is_hidden": true,
+      "sort_order": 4
+    },
+    {
+      "input": "5 2 3 1",
+      "output": "4",
+      "explanation": "test_3",
+      "is_hidden": true,
+      "sort_order": 5
+    },
+    {
+      "input": "10 2 2 3",
+      "output": "16",
+      "explanation": "test_4",
+      "is_hidden": true,
+      "sort_order": 6
+    },
+    {
+      "input": "7 3 5 2",
+      "output": "3",
+      "explanation": "test_5",
+      "is_hidden": true,
+      "sort_order": 7
+    },
+    {
+      "input": "20 4 5 5",
+      "output": "15",
+      "explanation": "test_6",
+      "is_hidden": true,
+      "sort_order": 8
+    },
+    {
+      "input": "15 1 1 5",
+      "output": "1024",
+      "explanation": "test_7",
+      "is_hidden": true,
+      "sort_order": 9
+    },
+    {
+      "input": "100 10 20 30",
+      "output": "34",
+      "explanation": "test_8",
+      "is_hidden": true,
+      "sort_order": 10
+    },
+    {
+      "input": "200000 1 2 100000",
+      "output": "879053727",
+      "explanation": "test_9",
+      "is_hidden": true,
+      "sort_order": 11
+    }
+  ]
+}

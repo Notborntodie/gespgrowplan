@@ -1,0 +1,48 @@
+{
+  "title": "[GESP202312 三级] 小猫分鱼",
+  "description": "海滩上有一堆鱼，$N$ 只小猫来分。第一只小猫把这堆鱼平均分为 $N$ 份，多了 $i<N$ 个，这只小猫把多的 $i$ 个扔入海中，拿走了一份。第二只小猫接着把剩下的鱼平均分成 $N$ 份，又多了 $i$ 个，小猫同样把多的 $i$ 个扔入海中，拿走了一份。第三、第四、……，第 $N$ 只小猫仍是最终剩下的鱼分成 $N$ 份，扔掉多了的 $i$ 个，并拿走一份。\r\n\n\t    编写程序，输入小猫的数量 $N$ 以及每次扔到海里的鱼的数量 $i$，输出海滩上最少的鱼数，使得每只小猫都可吃到鱼。\r\n\n\t    例如：两只小猫来分鱼 $N=2$，每次扔掉鱼的数量为 $i=1$，为了每只小猫都可吃到鱼，可令第二只小猫需要拿走 $1$ 条鱼，则此时待分配的有 $3$ 条鱼。第一只小猫待分配的鱼有  $3\\times 2+1=7$ 条。",
+  "input_format": "总共 $2$ 行。第一行一个整数 $N$，第二行一个整数 $i$。\r\n\n\t保证 $0<N<10$；$i<N$ 。",
+  "output_format": "一行一个整数，表示满足要求的海滩上最少的鱼数。",
+  "data_range": "样例解释：\n\n\t三只小猫来分鱼 $N=3$，每次扔掉鱼的数量为 $i=1$，为了每只小猫都可吃到鱼，可令第三只小猫需要拿走 $3$ 条鱼（拿走 $1$ 条和 $2$ 条不满足要求），则此时待分配的有 $10$ 条鱼。第二只小猫待分配的鱼有 $10×3/2+1 = 16$ 条。第一只小猫待分配的鱼有 $16×3/2+1 = 25$ 条。",
+  "time_limit": 1000,
+  "memory_limit": 128,
+  "level": 3,
+  "publish_date": "2023-12-01",
+  "samples": [
+    {
+      "input": "3\r\n1",
+      "output": "25",
+      "explanation": "样例",
+      "is_hidden": false,
+      "sort_order": 1
+    },
+    {
+      "input": "2\n1",
+      "output": "7",
+      "explanation": "test",
+      "is_hidden": true,
+      "sort_order": 2
+    },
+    {
+      "input": "4\n2",
+      "output": "250",
+      "explanation": "test1",
+      "is_hidden": true,
+      "sort_order": 3
+    },
+    {
+      "input": "5\n1",
+      "output": "3121",
+      "explanation": "test2",
+      "is_hidden": true,
+      "sort_order": 4
+    },
+    {
+      "input": "7\n3",
+      "output": "823525",
+      "explanation": "test3",
+      "is_hidden": true,
+      "sort_order": 5
+    }
+  ]
+}

@@ -1,0 +1,2803 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE fps PUBLIC 
+  "-//freeproblemset//An opensource XML standard for Algorithm Contest Problem Set//EN"
+  "http://hustoj.com/fps.current.dtd" >
+
+<fps version="1.5" url="https://github.com/zhblue/freeproblemset/">
+  <generator name="HUSTOJ" url="https://github.com/zhblue/hustoj/" />
+  
+  <item>
+    <title><![CDATA[[GESP202506 二级] 数三角形]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4709]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;直角三角形有两条直角边与一条斜边，设两条直角边的长度分别为 $a&#44; b$，则直角三角形的面积为 $\frac{ab}{2}$。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;请你计算当直角边长 $a&#44; b$ 均取不超过 $n$ 的正整数时，有多少个不同的面积为整数的直角三角形。直角边长分别为 $a&#44; b$ 和 $a'&#44; b'$ 的两个直角三角形相同，当且仅当 $a = a'$&#44; $b = b'$ 或者 $a = b'$&#44; $b = a'$。
+</p>]]></description>
+    <input><![CDATA[一行，一个整数 $n$，表示直角边长的最大值。<span class="md"> </span>]]></input> 
+    <output><![CDATA[输出一行，一个整数，表示不同的直角三角形数量。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[3]]></sample_input>
+    <sample_output><![CDATA[3]]></sample_output>
+    <test_input name="test"><![CDATA[5]]></test_input>
+<test_output name="test"><![CDATA[9]]></test_output>
+<test_input name="test01"><![CDATA[555]]></test_input>
+<test_output name="test01"><![CDATA[115509]]></test_output>
+<test_input name="test02"><![CDATA[66]]></test_input>
+<test_output name="test02"><![CDATA[1650]]></test_output>
+<test_input name="test03"><![CDATA[999]]></test_input>
+<test_output name="test03"><![CDATA[374250]]></test_output>
+<test_input name="test04"><![CDATA[1000]]></test_input>
+<test_output name="test04"><![CDATA[375250]]></test_output>
+<test_input name="test05"><![CDATA[452]]></test_input>
+<test_output name="test05"><![CDATA[76727]]></test_output>
+    <hint><![CDATA[对于所有测试点，保证 $1 \leq n \leq 1000$。<span class="md"> </span>]]></hint>
+    <source><![CDATA[GESP二级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include <iostream>
+using namespace std;
+int main()
+{
+    int n, a, b, cnt=0;
+    cin >> n;
+    for(a=1; a<=n; a++)
+    {
+        for(b=a; b<=n; b++)
+        {
+            if(a*b%2==0) cnt++;
+        }
+    }
+    cout << cnt <<endl;
+    return 0;
+}]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[ [GESP202506 二级] 幂和数]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4710]]></url>
+    <time_limit unit="s"><![CDATA[5]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select">
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;对于正整数 $n$，如果 $n$ 可以表为两个 $2$ 的次幂之和，即 $n = 2^x + 2^y$（$x&#44; y$ 均为非负整数），那么称 $n$ 为幂和数。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;给定正整数 $l&#44; r$，请你求出满足 $l \leq n \leq r$ 的整数 $n$ 中有多少个幂和数。
+</p>
+</span>]]></description>
+    <input><![CDATA[一行，两个正整数 $l&#44; r$，含义如上。<span class="md"> </span>]]></input> 
+    <output><![CDATA[输出一行，一个整数，表示 $l&#44; r$ 之间幂和数的数量。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[2 8]]></sample_input>
+    <sample_output><![CDATA[6]]></sample_output>
+    <test_input name="test"><![CDATA[10 100]]></test_input>
+<test_output name="test"><![CDATA[20]]></test_output>
+<test_input name="test1"><![CDATA[20 50]]></test_input>
+<test_output name="test1"><![CDATA[8]]></test_output>
+<test_input name="test2"><![CDATA[22 33]]></test_input>
+<test_output name="test2"><![CDATA[3]]></test_output>
+<test_input name="test_1"><![CDATA[20 100]]></test_input>
+<test_output name="test_1"><![CDATA[15]]></test_output>
+<test_input name="test_2"><![CDATA[50 200]]></test_input>
+<test_output name="test_2"><![CDATA[15]]></test_output>
+<test_input name="test_3"><![CDATA[1 500]]></test_input>
+<test_output name="test_3"><![CDATA[44]]></test_output>
+<test_input name="test_4"><![CDATA[50 300]]></test_input>
+<test_output name="test_4"><![CDATA[22]]></test_output>
+    <hint><![CDATA[对于所有测试点，保证 $1 \leq l \leq r \leq 10^4$。<span class="md"> </span>]]></hint>
+    <source><![CDATA[GESP二级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include <iostream>
+using namespace std;
+int main()
+{
+    int l, r, a, b, n, cnt = 0;
+    cin >> l >> r;
+    a = 1;
+    while(a<=r)
+    {
+        b = a;
+        while(b<=r)
+        {
+            n = a+b;
+            if(n>=l && n<=r) cnt++;
+            b *= 2;
+        }
+        a *= 2;
+    }
+cout << cnt <<endl;
+return 0;
+}]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202503 二级] 等差矩阵]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4711]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select">
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小 A 想构造一个 $n$ 行 $m$ 列的矩阵，使得矩阵的每一行与每一列均是等差数列。小 A 发现，在矩阵的第 $i$ 行第 $j$ 列填入整数 $i \times j$，得到的矩阵能满足要求。你能帮小 A 输出这个矩阵吗？
+</p>
+</span>]]></description>
+    <input><![CDATA[一行，两个正整数 $n&#44; m$。<span class="md"> </span>]]></input> 
+    <output><![CDATA[共 $n$ 行，每行 $m$ 个由空格分割的整数，表示小 A 需要构造的矩阵。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[3 4]]></sample_input>
+    <sample_output><![CDATA[1 2 3 4
+2 4 6 8
+3 6 9 12]]></sample_output>
+    <test_input name="test"><![CDATA[3 4]]></test_input>
+<test_output name="test"><![CDATA[1 2 3 4
+2 4 6 8
+3 6 9 12]]></test_output>
+<test_input name="test1"><![CDATA[8 15]]></test_input>
+<test_output name="test1"><![CDATA[1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
+2 4 6 8 10 12 14 16 18 20 22 24 26 28 30
+3 6 9 12 15 18 21 24 27 30 33 36 39 42 45
+4 8 12 16 20 24 28 32 36 40 44 48 52 56 60
+5 10 15 20 25 30 35 40 45 50 55 60 65 70 75
+6 12 18 24 30 36 42 48 54 60 66 72 78 84 90
+7 14 21 28 35 42 49 56 63 70 77 84 91 98 105
+8 16 24 32 40 48 56 64 72 80 88 96 104 112 120]]></test_output>
+<test_input name="test2"><![CDATA[4 7]]></test_input>
+<test_output name="test2"><![CDATA[1 2 3 4 5 6 7
+2 4 6 8 10 12 14
+3 6 9 12 15 18 21
+4 8 12 16 20 24 28]]></test_output>
+<test_input name="test_1"><![CDATA[1 50]]></test_input>
+<test_output name="test_1"><![CDATA[1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43
+44 45 46 47 48 49 50]]></test_output>
+<test_input name="test_2"><![CDATA[13 33]]></test_input>
+<test_output name="test_2"><![CDATA[1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33
+2 4 6 8 10 12 14 16 18 20 22 24 26 28 30 32 34 36 38 40 42 44 46 48 50 52 54 56 58 60 62 64 66
+3 6 9 12 15 18 21 24 27 30 33 36 39 42 45 48 51 54 57 60 63 66 69 72 75 78 81 84 87 90 93 96 99
+4 8 12 16 20 24 28 32 36 40 44 48 52 56 60 64 68 72 76 80 84 88 92 96 100 104 108 112 116 120 124 128 132
+5 10 15 20 25 30 35 40 45 50 55 60 65 70 75 80 85 90 95 100 105 110 115 120 125 130 135 140 145 150 155 160 165
+6 12 18 24 30 36 42 48 54 60 66 72 78 84 90 96 102 108 114 120 126 132 138 144 150 156 162 168 174 180 186 192 198
+7 14 21 28 35 42 49 56 63 70 77 84 91 98 105 112 119 126 133 140 147 154 161 168 175 182 189 196 203 210 217 224 231
+8 16 24 32 40 48 56 64 72 80 88 96 104 112 120 128 136 144 152 160 168 176 184 192 200 208 216 224 232 240 248 256 264
+9 18 27 36 45 54 63 72 81 90 99 108 117 126 135 144 153 162 171 180 189 198 207 216 225 234 243 252 261 270 279 288 297
+
+10 20 30 40 50 60 70 80 90 100 110 120 130 140 150 160 170 180 190 200 210 220 230 240 250 260 270 280 290 300 310 320 3
+30
+11 22 33 44 55 66 77 88 99 110 121 132 143 154 165 176 187 198 209 220 231 242 253 264 275 286 297 308 319 330 341 352 3
+63
+12 24 36 48 60 72 84 96 108 120 132 144 156 168 180 192 204 216 228 240 252 264 276 288 300 312 324 336 348 360 372 384
+396
+13 26 39 52 65 78 91 104 117 130 143 156 169 182 195 208 221 234 247 260 273 286 299 312 325 338 351 364 377 390 403 416
+ 429]]></test_output>
+<test_input name="test_3"><![CDATA[22 45]]></test_input>
+<test_output name="test_3"><![CDATA[1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43
+44 45
+2 4 6 8 10 12 14 16 18 20 22 24 26 28 30 32 34 36 38 40 42 44 46 48 50 52 54 56 58 60 62 64 66 68 70 72 74 76 78 80 82 8
+4 86 88 90
+3 6 9 12 15 18 21 24 27 30 33 36 39 42 45 48 51 54 57 60 63 66 69 72 75 78 81 84 87 90 93 96 99 102 105 108 111 114 117
+120 123 126 129 132 135
+4 8 12 16 20 24 28 32 36 40 44 48 52 56 60 64 68 72 76 80 84 88 92 96 100 104 108 112 116 120 124 128 132 136 140 144 14
+8 152 156 160 164 168 172 176 180
+5 10 15 20 25 30 35 40 45 50 55 60 65 70 75 80 85 90 95 100 105 110 115 120 125 130 135 140 145 150 155 160 165 170 175
+180 185 190 195 200 205 210 215 220 225
+6 12 18 24 30 36 42 48 54 60 66 72 78 84 90 96 102 108 114 120 126 132 138 144 150 156 162 168 174 180 186 192 198 204 2
+10 216 222 228 234 240 246 252 258 264 270
+7 14 21 28 35 42 49 56 63 70 77 84 91 98 105 112 119 126 133 140 147 154 161 168 175 182 189 196 203 210 217 224 231 238
+ 245 252 259 266 273 280 287 294 301 308 315
+8 16 24 32 40 48 56 64 72 80 88 96 104 112 120 128 136 144 152 160 168 176 184 192 200 208 216 224 232 240 248 256 264 2
+72 280 288 296 304 312 320 328 336 344 352 360
+9 18 27 36 45 54 63 72 81 90 99 108 117 126 135 144 153 162 171 180 189 198 207 216 225 234 243 252 261 270 279 288 297
+306 315 324 333 342 351 360 369 378 387 396 405
+10 20 30 40 50 60 70 80 90 100 110 120 130 140 150 160 170 180 190 200 210 220 230 240 250 260 270 280 290 300 310 320 3
+30 340 350 360 370 380 390 400 410 420 430 440 450
+11 22 33 44 55 66 77 88 99 110 121 132 143 154 165 176 187 198 209 220 231 242 253 264 275 286 297 308 319 330 341 352 3
+63 374 385 396 407 418 429 440 451 462 473 484 495
+12 24 36 48 60 72 84 96 108 120 132 144 156 168 180 192 204 216 228 240 252 264 276 288 300 312 324 336 348 360 372 384
+396 408 420 432 444 456 468 480 492 504 516 528 540
+13 26 39 52 65 78 91 104 117 130 143 156 169 182 195 208 221 234 247 260 273 286 299 312 325 338 351 364 377 390 403 416
+ 429 442 455 468 481 494 507 520 533 546 559 572 585
+14 28 42 56 70 84 98 112 126 140 154 168 182 196 210 224 238 252 266 280 294 308 322 336 350 364 378 392 406 420 434 448
+ 462 476 490 504 518 532 546 560 574 588 602 616 630
+15 30 45 60 75 90 105 120 135 150 165 180 195 210 225 240 255 270 285 300 315 330 345 360 375 390 405 420 435 450 465 48
+0 495 510 525 540 555 570 585 600 615 630 645 660 675
+16 32 48 64 80 96 112 128 144 160 176 192 208 224 240 256 272 288 304 320 336 352 368 384 400 416 432 448 464 480 496 51
+2 528 544 560 576 592 608 624 640 656 672 688 704 720
+17 34 51 68 85 102 119 136 153 170 187 204 221 238 255 272 289 306 323 340 357 374 391 408 425 442 459 476 493 510 527 5
+44 561 578 595 612 629 646 663 680 697 714 731 748 765
+18 36 54 72 90 108 126 144 162 180 198 216 234 252 270 288 306 324 342 360 378 396 414 432 450 468 486 504 522 540 558 5
+76 594 612 630 648 666 684 702 720 738 756 774 792 810
+19 38 57 76 95 114 133 152 171 190 209 228 247 266 285 304 323 342 361 380 399 418 437 456 475 494 513 532 551 570 589 6
+08 627 646 665 684 703 722 741 760 779 798 817 836 855
+20 40 60 80 100 120 140 160 180 200 220 240 260 280 300 320 340 360 380 400 420 440 460 480 500 520 540 560 580 600 620
+640 660 680 700 720 740 760 780 800 820 840 860 880 900
+21 42 63 84 105 126 147 168 189 210 231 252 273 294 315 336 357 378 399 420 441 462 483 504 525 546 567 588 609 630 651
+672 693 714 735 756 777 798 819 840 861 882 903 924 945
+22 44 66 88 110 132 154 176 198 220 242 264 286 308 330 352 374 396 418 440 462 484 506 528 550 572 594 616 638 660 682
+704 726 748 770 792 814 836 858 880 902 924 946 968 990]]></test_output>
+<test_input name="test_4"><![CDATA[15 50]]></test_input>
+<test_output name="test_4"><![CDATA[1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43
+44 45 46 47 48 49 50
+2 4 6 8 10 12 14 16 18 20 22 24 26 28 30 32 34 36 38 40 42 44 46 48 50 52 54 56 58 60 62 64 66 68 70 72 74 76 78 80 82 8
+4 86 88 90 92 94 96 98 100
+3 6 9 12 15 18 21 24 27 30 33 36 39 42 45 48 51 54 57 60 63 66 69 72 75 78 81 84 87 90 93 96 99 102 105 108 111 114 117
+120 123 126 129 132 135 138 141 144 147 150
+4 8 12 16 20 24 28 32 36 40 44 48 52 56 60 64 68 72 76 80 84 88 92 96 100 104 108 112 116 120 124 128 132 136 140 144 14
+8 152 156 160 164 168 172 176 180 184 188 192 196 200
+5 10 15 20 25 30 35 40 45 50 55 60 65 70 75 80 85 90 95 100 105 110 115 120 125 130 135 140 145 150 155 160 165 170 175
+180 185 190 195 200 205 210 215 220 225 230 235 240 245 250
+6 12 18 24 30 36 42 48 54 60 66 72 78 84 90 96 102 108 114 120 126 132 138 144 150 156 162 168 174 180 186 192 198 204 2
+10 216 222 228 234 240 246 252 258 264 270 276 282 288 294 300
+7 14 21 28 35 42 49 56 63 70 77 84 91 98 105 112 119 126 133 140 147 154 161 168 175 182 189 196 203 210 217 224 231 238
+ 245 252 259 266 273 280 287 294 301 308 315 322 329 336 343 350
+8 16 24 32 40 48 56 64 72 80 88 96 104 112 120 128 136 144 152 160 168 176 184 192 200 208 216 224 232 240 248 256 264 2
+72 280 288 296 304 312 320 328 336 344 352 360 368 376 384 392 400
+9 18 27 36 45 54 63 72 81 90 99 108 117 126 135 144 153 162 171 180 189 198 207 216 225 234 243 252 261 270 279 288 297
+306 315 324 333 342 351 360 369 378 387 396 405 414 423 432 441 450
+10 20 30 40 50 60 70 80 90 100 110 120 130 140 150 160 170 180 190 200 210 220 230 240 250 260 270 280 290 300 310 320 3
+30 340 350 360 370 380 390 400 410 420 430 440 450 460 470 480 490 500
+11 22 33 44 55 66 77 88 99 110 121 132 143 154 165 176 187 198 209 220 231 242 253 264 275 286 297 308 319 330 341 352 3
+63 374 385 396 407 418 429 440 451 462 473 484 495 506 517 528 539 550
+12 24 36 48 60 72 84 96 108 120 132 144 156 168 180 192 204 216 228 240 252 264 276 288 300 312 324 336 348 360 372 384
+396 408 420 432 444 456 468 480 492 504 516 528 540 552 564 576 588 600
+13 26 39 52 65 78 91 104 117 130 143 156 169 182 195 208 221 234 247 260 273 286 299 312 325 338 351 364 377 390 403 416
+ 429 442 455 468 481 494 507 520 533 546 559 572 585 598 611 624 637 650
+14 28 42 56 70 84 98 112 126 140 154 168 182 196 210 224 238 252 266 280 294 308 322 336 350 364 378 392 406 420 434 448
+ 462 476 490 504 518 532 546 560 574 588 602 616 630 644 658 672 686 700
+15 30 45 60 75 90 105 120 135 150 165 180 195 210 225 240 255 270 285 300 315 330 345 360 375 390 405 420 435 450 465 48
+0 495 510 525 540 555 570 585 600 615 630 645 660 675 690 705 720 735 750]]></test_output>
+    <hint><![CDATA[<span class="md">对于所有测试点，保证 $1\leq n&#44;m \leq 50$。 </span>]]></hint>
+    <source><![CDATA[GESP二级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include <bits/stdc++.h>
+using namespace std;
+int n, m;
+int main() {
+    scanf("%d%d", &n, &m);
+    assert(1 <= n && n <= 50 && 1 <= m && m <= 50);
+    for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= m; j++)
+            printf("%d%c", i * j, " \n"[j == m]);
+    return 0;
+}]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[ [GESP202503 二级] 时间跨越]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4712]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select">
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;假设现在是 $y$ 年 $m$ 月 $d$ 日 $h$ 时而 $k$ 小时后是 $y'$ 年 $m'$ 月 $d'$ 日 $h'$ 时，对于给定的 $y&#44; m&#44; d&#44; h&#44; k$，小杨想请你帮他计算出对应的 $y'&#44; m'&#44; d'&#44; h'$ 是多少。
+</p>
+</span>]]></description>
+    <input><![CDATA[输入包含五行，每行一个正整数，分别代表 $y&#44; m&#44; d&#44; h&#44; k$。<span class="md"> </span>]]></input> 
+    <output><![CDATA[输出四个正整数，代表 $y'&#44; m'&#44; d'&#44; h'$。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[2008
+2
+28
+23
+1]]></sample_input>
+    <sample_output><![CDATA[2008 2 29 0]]></sample_output>
+    <test_input name="test"><![CDATA[2008
+2
+28
+23
+1]]></test_input>
+<test_output name="test"><![CDATA[2008 2 29 0]]></test_output>
+<test_input name="test_1"><![CDATA[2019
+3
+1
+15
+17]]></test_input>
+<test_output name="test_1"><![CDATA[2019 3 2 8]]></test_output>
+<test_input name="test_2"><![CDATA[1999
+12
+28
+5
+21]]></test_input>
+<test_output name="test_2"><![CDATA[1999 12 29 2]]></test_output>
+<test_input name="test_3"><![CDATA[2004
+2
+29
+21
+16]]></test_input>
+<test_output name="test_3"><![CDATA[2004 3 1 13]]></test_output>
+<test_input name="test_4"><![CDATA[2008
+2
+28
+23
+12]]></test_input>
+<test_output name="test_4"><![CDATA[2008 2 29 11]]></test_output>
+<test_input name="test_5"><![CDATA[2025
+2
+22
+19
+23]]></test_input>
+<test_output name="test_5"><![CDATA[2025 2 23 18]]></test_output>
+    <hint><![CDATA[<p>
+	对于全部数据，保证有 $2000 \leq y \leq 3000$，$1 \leq m \leq 12$，$1 \leq d \leq 31$，$0 \leq h \leq 23$，$1 \leq k \leq 24$。数据保证为合法时间。
+</p>
+<p>
+	闰年判断规则
+</p>
+<p>
+	1. 普通闰年：年份能被 $4$ 整除，但不能被 $100$ 整除。
+</p>
+<p>
+	2. 世纪闰年：年份能被 $400$ 整除。
+</p>
+<p>
+	满足以上任意一条规则的年份就是闰年，否则是平年。
+</p>]]></hint>
+    <source><![CDATA[GESP二级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include<bits/stdc++.h>
+using namespace std;
+
+bool runnian(int y){
+	return (y % 4 == 0 && y % 100 != 0) || (y % 400 == 0);
+}
+
+int yuefen(int y,int m){
+	int day[]={31,28,31,30,31,30,31,31,30,31,30,31};
+	if(m==2&&runnian(y)){
+		return 29;
+	}
+	return day[m-1];
+}
+
+int main(){
+	int y,m,d,h,k;
+	int shijian;
+	cin>>y>>m>>d>>h>>k;
+	
+	h+=k;
+	
+	int d2=h/24;
+	h%=24;
+	
+	while(d2>0){
+		int month=yuefen(y,m);
+		if(d+d2>month){
+			d2-=(month-d+1);
+			d=1;
+			m++;
+			if(m>12){
+				m=1;
+				y++;
+			}
+		}else{
+			d+=d2;
+			d2=0;
+		}
+	}
+	
+	cout<<y<<" "<<m<<" "<<d<<" "<<h;
+return 0;
+}
+
+
+
+//累死我了 ！！！]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202412 二级] 寻找数字]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4713]]></url>
+    <time_limit unit="s"><![CDATA[5]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select"> 
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小杨有一个正整数 $a$，小杨想知道是否存在一个正整数 $b$ 满足 $a=b^4$
+</p>
+</span>]]></description>
+    <input><![CDATA[<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;第一行包含一个正整数 $t$，代表测试数据组数。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;对于每组测试数据，第一行包含一个正整数代表 $a$。
+</p>]]></input> 
+    <output><![CDATA[<span class="md">&nbsp;&nbsp;&nbsp;&nbsp;对于每组测试数据，如果存在满足条件的正整数 $b$，则输出 $b$，否则输出 $-1$。 </span>]]></output>
+    <sample_input><![CDATA[3
+16
+81
+10]]></sample_input>
+    <sample_output><![CDATA[2
+3
+-1]]></sample_output>
+    <test_input name="test"><![CDATA[3
+16
+81
+10]]></test_input>
+<test_output name="test"><![CDATA[2
+3
+-1]]></test_output>
+<test_input name="test1"><![CDATA[5
+54567
+3452
+3465
+5783545
+81]]></test_input>
+<test_output name="test1"><![CDATA[-1
+-1
+-1
+-1
+3]]></test_output>
+<test_input name="test_1"><![CDATA[5
+1
+2
+625
+100
+100000000]]></test_input>
+<test_output name="test_1"><![CDATA[-1
+-1
+5
+-1
+100]]></test_output>
+<test_input name="test_2"><![CDATA[5
+810000
+1296
+7
+256
+99999999]]></test_input>
+<test_output name="test_2"><![CDATA[30
+6
+-1
+4
+-1]]></test_output>
+<test_input name="test_3"><![CDATA[5
+65536
+15
+2401
+1000
+1679616]]></test_input>
+<test_output name="test_3"><![CDATA[16
+-1
+7
+-1
+36]]></test_output>
+<test_input name="test_4"><![CDATA[5
+104976
+30
+6561
+500
+7311616]]></test_input>
+<test_output name="test_4"><![CDATA[18
+-1
+9
+-1
+52]]></test_output>
+    <hint><![CDATA[对于全部数据，保证有 $1\leq t\leq 10^5$，$1\leq a_i\leq 10^8$。<span class="md"> </span>]]></hint>
+    <source><![CDATA[GESP二级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include <iostream>
+#include <cmath>
+using namespace std;
+int main() {
+    int t;
+    cin >> t;
+    while (t--) {
+        int a;
+        cin >> a;
+        int b = (int)(sqrt(sqrt(a)));
+        if (b * b * b * b == a) {
+            cout << b << endl;
+        } else {
+            cout << -1 << endl;
+        }
+    }
+    return 0;
+}]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202412 二级] 数位和]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4714]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select"> 
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小杨有 $n$ 个正整数，小杨想知道这些正整数的数位和中最大值是多少。“数位和”指的是一个数字中所有数位的和。例如:对于数字 $12345$，它的各个数位分别是 $1,2,3,4,5$。将这些数位相加，得到
+</p>
+<p>
+	$$1+2+3+4+5=15$$
+</p>
+<p>
+	因此，$12345$ 的数位和是 $15$。
+</p>
+</span>]]></description>
+    <input><![CDATA[<p>
+	第一行包含一个正整数 $n$，代表正整数个数。
+</p>
+<p>
+	之后 $n$ 行，每行包含一个正整数。
+</p>]]></input> 
+    <output><![CDATA[输出这些正整数的数位和的最值。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[3
+16
+81
+10]]></sample_input>
+    <sample_output><![CDATA[9]]></sample_output>
+    <test_input name="test"><![CDATA[3
+16
+81
+10]]></test_input>
+<test_output name="test"><![CDATA[9]]></test_output>
+<test_input name="test1"><![CDATA[6
+34433
+4562334
+342
+543
+4564
+28456]]></test_input>
+<test_output name="test1"><![CDATA[27]]></test_output>
+<test_input name="test2"><![CDATA[2
+993888888888
+99999999999]]></test_input>
+<test_output name="test2"><![CDATA[99]]></test_output>
+<test_input name="test_1"><![CDATA[5
+12345
+6789
+999
+100000000000
+55555]]></test_input>
+<test_output name="test_1"><![CDATA[30]]></test_output>
+<test_input name="test_2"><![CDATA[4
+999999999999
+123
+456789
+8888]]></test_input>
+<test_output name="test_2"><![CDATA[108]]></test_output>
+<test_input name="test_3"><![CDATA[6
+1
+22
+333
+4444
+55555
+666666]]></test_input>
+<test_output name="test_3"><![CDATA[36]]></test_output>
+<test_input name="test_4"><![CDATA[3
+102030405060
+987654321
+111111111111]]></test_input>
+<test_output name="test_4"><![CDATA[45]]></test_output>
+    <hint><![CDATA[对于全部数据，保证有 $1\leq n\leq 10^5$，每个正整数不超过 $10^{12}$。<span class="md"> </span>]]></hint>
+    <source><![CDATA[GESP二级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include <bits/stdc++.h>
+using namespace std;
+#define ll long long
+int main() {
+    int n;
+    cin >> n;
+    int x = 0;
+    for (int i = 0; i < n; i++) {
+        int smu = 0;
+        ll tmp;
+        cin >> tmp;
+        while (tmp > 0) {
+            smu += tmp % 10;
+            tmp /= 10;
+        }
+        x = max(x, smu);
+    }
+    cout << x << endl;
+    return 0;
+}]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202409 二级] 数位之和]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4715]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select"> 
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小杨有 $n$ 个正整数，他认为一个正整数是美丽数字当且仅当该正整数每一位数字的总和是 $7$ 的倍数。
+</p>
+<p>
+	小杨想请你编写一个程序判断 $n$ 个正整数哪些是美丽数字。
+</p>
+</span>]]></description>
+    <input><![CDATA[<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;第一行包含一个正整数 $n$，表示正整数个数。&nbsp;&nbsp;
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;之后 $n$ 行，每行一个包含一个正整数 $a_i$。
+</p>]]></input> 
+    <output><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;对于每个正整数输出一行一个字符串，如果是美丽数字则输出 Yes，否则输出 No。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[3
+7
+52
+103]]></sample_input>
+    <sample_output><![CDATA[Yes
+Yes
+No]]></sample_output>
+    <test_input name="test"><![CDATA[3
+7
+52
+103]]></test_input>
+<test_output name="test"><![CDATA[Yes
+Yes
+No]]></test_output>
+<test_input name="test1"><![CDATA[5 234 6234 2354 23 453]]></test_input>
+<test_output name="test1"><![CDATA[No
+No
+Yes
+No
+No]]></test_output>
+<test_input name="test_1"><![CDATA[5
+16
+77
+2024
+35
+99999]]></test_input>
+<test_output name="test_1"><![CDATA[Yes
+Yes
+No
+No
+No]]></test_output>
+<test_input name="test_2"><![CDATA[4
+700
+124
+86
+7777]]></test_input>
+<test_output name="test_2"><![CDATA[Yes
+Yes
+Yes
+Yes]]></test_output>
+<test_input name="test_3"><![CDATA[6
+1
+133
+2025
+49
+567
+9999]]></test_input>
+<test_output name="test_3"><![CDATA[No
+Yes
+No
+No
+No
+No]]></test_output>
+<test_input name="test_4"><![CDATA[3
+100000
+777
+223]]></test_input>
+<test_output name="test_4"><![CDATA[No
+Yes
+Yes]]></test_output>
+    <hint><![CDATA[对全部的测试数据，保证 $1 \leq n \leq 10^5$，$1 \leq a_i \leq 10^5$。<span class="md"> </span>]]></hint>
+    <source><![CDATA[GESP二级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include<bits/stdc++.h>
+using namespace std;
+int main(){
+int n;
+cin>>n;
+int ans=0;
+for(int i=1;i<=n;i++){
+int x;
+cin>>x;
+int tot=0;
+while(x){
+tot+=(x%10);
+x/=10;
+}
+if(tot%7==0)cout<<"Yes\n";
+else cout<<"No\n";
+}
+return 0;
+}]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202409 二级] 小杨的 N 字矩阵]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4716]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select"> 
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小杨想要构造一个 $m \times m$ 的 $N$ 字矩阵（$m$ 为奇数），这个矩阵的从左上角到右下角的对角线、第 $1$ 列和第 $m$ 列都是半角加号 `+` ，其余都是半角减号 `-` 。例如，一个 $5 \times 5$ 的 N 字矩阵如下：
+</p>
+<pre class="prettyprint lang-cpp">+---+
+++--+
++-+-+
++--++
++---+</pre>
+<p>
+	请你帮小杨根据给定的 $m$ 打印出对应的 N 字矩阵。
+</p>
+</span>]]></description>
+    <input><![CDATA[输入只有一行包含一个正整数 $m$。<span class="md"> </span>]]></input> 
+    <output><![CDATA[输出对应的 $N$ 字矩阵。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[5]]></sample_input>
+    <sample_output><![CDATA[+---+
+++--+
++-+-+
++--++
++---+]]></sample_output>
+    <test_input name="test"><![CDATA[5]]></test_input>
+<test_output name="test"><![CDATA[+---+
+++--+
++-+-+
++--++
++---+]]></test_output>
+<test_input name="test1"><![CDATA[49]]></test_input>
+<test_output name="test1"><![CDATA[+-----------------------------------------------+
+++----------------------------------------------+
++-+---------------------------------------------+
++--+--------------------------------------------+
++---+-------------------------------------------+
++----+------------------------------------------+
++-----+-----------------------------------------+
++------+----------------------------------------+
++-------+---------------------------------------+
++--------+--------------------------------------+
++---------+-------------------------------------+
++----------+------------------------------------+
++-----------+-----------------------------------+
++------------+----------------------------------+
++-------------+---------------------------------+
++--------------+--------------------------------+
++---------------+-------------------------------+
++----------------+------------------------------+
++-----------------+-----------------------------+
++------------------+----------------------------+
++-------------------+---------------------------+
++--------------------+--------------------------+
++---------------------+-------------------------+
++----------------------+------------------------+
++-----------------------+-----------------------+
++------------------------+----------------------+
++-------------------------+---------------------+
++--------------------------+--------------------+
++---------------------------+-------------------+
++----------------------------+------------------+
++-----------------------------+-----------------+
++------------------------------+----------------+
++-------------------------------+---------------+
++--------------------------------+--------------+
++---------------------------------+-------------+
++----------------------------------+------------+
++-----------------------------------+-----------+
++------------------------------------+----------+
++-------------------------------------+---------+
++--------------------------------------+--------+
++---------------------------------------+-------+
++----------------------------------------+------+
++-----------------------------------------+-----+
++------------------------------------------+----+
++-------------------------------------------+---+
++--------------------------------------------+--+
++---------------------------------------------+-+
++----------------------------------------------++
++-----------------------------------------------+]]></test_output>
+<test_input name="test_1"><![CDATA[47]]></test_input>
+<test_output name="test_1"><![CDATA[+---------------------------------------------+
+++--------------------------------------------+
++-+-------------------------------------------+
++--+------------------------------------------+
++---+-----------------------------------------+
++----+----------------------------------------+
++-----+---------------------------------------+
++------+--------------------------------------+
++-------+-------------------------------------+
++--------+------------------------------------+
++---------+-----------------------------------+
++----------+----------------------------------+
++-----------+---------------------------------+
++------------+--------------------------------+
++-------------+-------------------------------+
++--------------+------------------------------+
++---------------+-----------------------------+
++----------------+----------------------------+
++-----------------+---------------------------+
++------------------+--------------------------+
++-------------------+-------------------------+
++--------------------+------------------------+
++---------------------+-----------------------+
++----------------------+----------------------+
++-----------------------+---------------------+
++------------------------+--------------------+
++-------------------------+-------------------+
++--------------------------+------------------+
++---------------------------+-----------------+
++----------------------------+----------------+
++-----------------------------+---------------+
++------------------------------+--------------+
++-------------------------------+-------------+
++--------------------------------+------------+
++---------------------------------+-----------+
++----------------------------------+----------+
++-----------------------------------+---------+
++------------------------------------+--------+
++-------------------------------------+-------+
++--------------------------------------+------+
++---------------------------------------+-----+
++----------------------------------------+----+
++-----------------------------------------+---+
++------------------------------------------+--+
++-------------------------------------------+-+
++--------------------------------------------++
++---------------------------------------------+]]></test_output>
+<test_input name="test_2"><![CDATA[17]]></test_input>
+<test_output name="test_2"><![CDATA[+---------------+
+++--------------+
++-+-------------+
++--+------------+
++---+-----------+
++----+----------+
++-----+---------+
++------+--------+
++-------+-------+
++--------+------+
++---------+-----+
++----------+----+
++-----------+---+
++------------+--+
++-------------+-+
++--------------++
++---------------+]]></test_output>
+<test_input name="test_3"><![CDATA[23]]></test_input>
+<test_output name="test_3"><![CDATA[+---------------------+
+++--------------------+
++-+-------------------+
++--+------------------+
++---+-----------------+
++----+----------------+
++-----+---------------+
++------+--------------+
++-------+-------------+
++--------+------------+
++---------+-----------+
++----------+----------+
++-----------+---------+
++------------+--------+
++-------------+-------+
++--------------+------+
++---------------+-----+
++----------------+----+
++-----------------+---+
++------------------+--+
++-------------------+-+
++--------------------++
++---------------------+]]></test_output>
+<test_input name="test_4"><![CDATA[43]]></test_input>
+<test_output name="test_4"><![CDATA[+-----------------------------------------+
+++----------------------------------------+
++-+---------------------------------------+
++--+--------------------------------------+
++---+-------------------------------------+
++----+------------------------------------+
++-----+-----------------------------------+
++------+----------------------------------+
++-------+---------------------------------+
++--------+--------------------------------+
++---------+-------------------------------+
++----------+------------------------------+
++-----------+-----------------------------+
++------------+----------------------------+
++-------------+---------------------------+
++--------------+--------------------------+
++---------------+-------------------------+
++----------------+------------------------+
++-----------------+-----------------------+
++------------------+----------------------+
++-------------------+---------------------+
++--------------------+--------------------+
++---------------------+-------------------+
++----------------------+------------------+
++-----------------------+-----------------+
++------------------------+----------------+
++-------------------------+---------------+
++--------------------------+--------------+
++---------------------------+-------------+
++----------------------------+------------+
++-----------------------------+-----------+
++------------------------------+----------+
++-------------------------------+---------+
++--------------------------------+--------+
++---------------------------------+-------+
++----------------------------------+------+
++-----------------------------------+-----+
++------------------------------------+----+
++-------------------------------------+---+
++--------------------------------------+--+
++---------------------------------------+-+
++----------------------------------------++
++-----------------------------------------+]]></test_output>
+    <hint><![CDATA[对全部的测试数据，保证 $3 \leq m \leq 49$ 且 $m$ 是奇数。<span class="md"> </span>]]></hint>
+    <source><![CDATA[GESP二级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include<bits/stdc++.h>
+using namespace std;
+int main(){
+int n;
+cin>>n;
+for(int i=1;i<=n;i++){
+for(int j=1;j<=n;j++){
+if(j==1||j==n)cout<<"+";
+else{
+if(i==j)cout<<"+";
+else cout<<"-";
+}
+}
+cout<<"\n";
+}
+}]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202406 二级] 平方之和]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4717]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select">
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小杨有 $n$ 个正整数 $a_1&#44;a_2&#44;\dots&#44;a_n$，他想知道对于所有的 $i (1\le i\le n)$，是否存在两个正整数 $x$ 和 $y$ 满足 $x\times x+y \times y=a_i$。
+</p>
+
+</span>]]></description>
+    <input><![CDATA[<p>
+	第一行包含一个正整数 $n$，代表正整数数量。
+</p>
+<p>
+	之后 $n$ 行，每行包含一个正整数，代表 $a_i$。
+</p>]]></input> 
+    <output><![CDATA[对于每个正整数 $a_i$，如果存在两个正整数 $x$ 和 $y$ 满足 $x\times x+y \times y=a_i$，输出 `Yes`，否则输出 `No`。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[2
+5
+4]]></sample_input>
+    <sample_output><![CDATA[Yes
+No]]></sample_output>
+    <test_input name="test"><![CDATA[2
+5
+4]]></test_input>
+<test_output name="test"><![CDATA[Yes
+No]]></test_output>
+<test_input name="test1"><![CDATA[5 3453 2342 5 35 645]]></test_input>
+<test_output name="test1"><![CDATA[No
+No
+Yes
+No
+No]]></test_output>
+<test_input name="test_1"><![CDATA[5
+25
+10
+3
+65
+1000000]]></test_input>
+<test_output name="test_1"><![CDATA[Yes
+Yes
+No
+Yes
+Yes]]></test_output>
+<test_input name="test_2"><![CDATA[4
+2
+50
+17
+9999]]></test_input>
+<test_output name="test_2"><![CDATA[Yes
+Yes
+Yes
+No]]></test_output>
+<test_input name="test_3"><![CDATA[6
+13
+7
+250000
+9
+14
+85]]></test_input>
+<test_output name="test_3"><![CDATA[Yes
+No
+Yes
+No
+No
+Yes]]></test_output>
+<test_input name="test_4"><![CDATA[3
+500
+1001
+2]]></test_input>
+<test_output name="test_4"><![CDATA[Yes
+No
+Yes]]></test_output>
+    <hint><![CDATA[<p>
+	对于第一个正整数，存在 $1\times 1+2 \times 2=5$，因此答案为 `Yes`。
+</p>
+<p>
+	对于全部数据，保证有 $1 \le n \le 10&#44;1 \le a_i \le 10^6$。
+</p>]]></hint>
+    <source><![CDATA[GESP二级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include<bits/stdc++.h>
+using namespace std;
+bool check(int x){
+int y = sqrt(x);
+return y*y==x;
+}
+int main(){
+int t;
+cin>>t;
+while(t--){
+int n;
+cin>>n;
+int fl=0;
+for(int i=1;i*i<n;i++){
+int j=n-i*i;
+if(check(j))fl=1;
+}
+if(fl)cout<<"Yes\n";
+else cout<<"No\n";
+}
+}]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202406 二级] 计数]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4718]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select"> 
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小杨认为自己的幸运数是正整数 $k$（注：保证 $1 \le k\le 9$）。小杨想知道，对于从 $1$ 到 $n$ 的所有正整数中， $k$ 出现了多少次。
+</p>
+</span>]]></description>
+    <input><![CDATA[<p>
+	第一行包含一个正整数 $n$。
+</p>
+<p>
+	第二行包含一个正整数 $k$。
+</p>]]></input> 
+    <output><![CDATA[输出从 $1$ 到 $n$ 的所有正整数中， $k$ 出现的次数。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[25
+2]]></sample_input>
+    <sample_output><![CDATA[9]]></sample_output>
+    <test_input name="test"><![CDATA[25
+2]]></test_input>
+<test_output name="test"><![CDATA[9]]></test_output>
+<test_input name="test1"><![CDATA[30 4]]></test_input>
+<test_output name="test1"><![CDATA[3]]></test_output>
+<test_input name="test_1"><![CDATA[200
+6]]></test_input>
+<test_output name="test_1"><![CDATA[40]]></test_output>
+<test_input name="test_2"><![CDATA[30 2]]></test_input>
+<test_output name="test_2"><![CDATA[13]]></test_output>
+<test_input name="test_3"><![CDATA[555 8]]></test_input>
+<test_output name="test_3"><![CDATA[105]]></test_output>
+<test_input name="test_4"><![CDATA[1000
+9]]></test_input>
+<test_output name="test_4"><![CDATA[300]]></test_output>
+    <hint><![CDATA[<p>
+	从 $1$ 到 $25$ 中，$2$ 出现的正整数有 $2&#44;12&#44;20&#44;21&#44;22&#44;23&#44;24&#44;25$ ，一共出现了 $9$ 次。
+</p>
+<p>
+	对于全部数据，保证有 $1 \le n\le 1000&#44;1 \le k\le 9$。
+</p>]]></hint>
+    <source><![CDATA[GESP二级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include <iostream>
+using namespace std;
+int check(int x, int y) {
+int cnt = 0;
+while (x > 0) {
+int tmp = x % 10;
+if (tmp == y) {
+cnt++;
+}
+x = x / 10;
+}
+return cnt;
+}
+int main() {
+int n, k;
+cin >> n >> k;
+int ans = 0;
+for (int i = 1; i <= n; i++) {
+ans += check(i, k);
+}
+cout << ans << endl;
+return 0;
+}]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202403 二级] 乘法问题]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4719]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select"> 
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小 A 最初刚刚学习了乘法，为了帮助他练习，我们给他若干个正整数，并要求他将这些数乘起来。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;对于大部分题目，小 A 可以精确地算出答案，不过，若这些数的乘积超过 $10^6$，小 A 就不会做了。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;请你写一个程序，告诉我们小 A 会如何作答。
+</p>
+</span>]]></description>
+    <input><![CDATA[<p>
+	第一行一个整数 $n$，表示正整数的个数。
+</p>
+<p>
+	接下来 $n$，每行一个整数 $a$。小 A 需要将所有的 $a$ 乘起来。
+</p>]]></input> 
+    <output><![CDATA[输出一行，如果乘积超过 $10^6$，则输出 `&gt;1000000`；否则输出所有数的乘积。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[2
+3
+5]]></sample_input>
+    <sample_output><![CDATA[15]]></sample_output>
+    <test_input name="sample1"><![CDATA[4
+100
+100
+100
+2]]></test_input>
+<test_output name="sample1"><![CDATA[>1000000]]></test_output>
+<test_input name="test"><![CDATA[3
+100
+100
+100]]></test_input>
+<test_output name="test"><![CDATA[1000000]]></test_output>
+<test_input name="test1"><![CDATA[5 4 5 34 43 6]]></test_input>
+<test_output name="test1"><![CDATA[175440]]></test_output>
+<test_input name="test_1"><![CDATA[5
+20
+30
+40
+5
+1]]></test_input>
+<test_output name="test_1"><![CDATA[120000]]></test_output>
+<test_input name="test_2"><![CDATA[4
+500
+500
+5
+2]]></test_input>
+<test_output name="test_2"><![CDATA[>1000000]]></test_output>
+<test_input name="test_3"><![CDATA[3
+1000
+100
+10]]></test_input>
+<test_output name="test_3"><![CDATA[1000000]]></test_output>
+<test_input name="test_4"><![CDATA[6
+10
+10
+10
+10
+10
+10]]></test_input>
+<test_output name="test_4"><![CDATA[1000000]]></test_output>
+    <hint><![CDATA[对全部的测试数据，保证 $1 \leq n \leq 50$，$1 \leq a \leq 100$。<span class="md"> </span>]]></hint>
+    <source><![CDATA[GESP二级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include <iostream>
+using namespace std;
+int main() {
+int n;
+cin >> n;
+long long product = 1;
+for (int i = 0; i < n; ++i) {
+int a;
+cin >> a;
+if (product * a > 1000000) {
+cout << ">1000000" << endl;
+return 0;
+}
+product *= a;
+}
+cout << product << endl;
+return 0;
+}]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202403 二级] 小杨的日字矩阵]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4720]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[512]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select"> 
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小杨想要构造一个 $N\times N$ &nbsp;的日字矩阵（$N$ 为奇数），具体来说，这个矩阵共有 $N$ 行，每行 $N$ 个字符，其中最左列、最右列都是 `|`，而第一行、最后一行、以及中间一行（即第 $\frac{N+1}{2}$ 行）的第 $2\sim N-1$ 个字符都是 `-` ，其余所有字符都是半角小写字母 `x` 。例如，一个 $N = 5$ 日字矩阵如下:
+</p>
+<pre class="prettyprint lang-cpp">|---|
+|xxx|
+|---|
+|xxx|
+|---|</pre>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;请你帮小杨根据给定的 $N$ 打印出对应的“日字矩阵”。
+</p>
+</span>]]></description>
+    <input><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;一行一个整数 $N$（$5\leq N \leq 49$，保证 $N$ 为奇数）。<span class="md"> </span>]]></input> 
+    <output><![CDATA[<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;输出对应的“日字矩阵”。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;请严格按格式要求输出，不要擅自添加任何空格、标点、空格等任何符号。你一个恰好输出 $N$ 行，每行除了换行符外恰好包含 $N$ 个字符，这些字符要么是 `-`，要么是 `|`，要么是 `x`。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;你的输出必须和标准答案完全一致才能得分，请在提交前仔细检查！
+</p>]]></output>
+    <sample_input><![CDATA[5]]></sample_input>
+    <sample_output><![CDATA[|---|
+|xxx|
+|---|
+|xxx|
+|---|]]></sample_output>
+    <test_input name="test"><![CDATA[7]]></test_input>
+<test_output name="test"><![CDATA[|-----|
+|xxxxx|
+|xxxxx|
+|-----|
+|xxxxx|
+|xxxxx|
+|-----|]]></test_output>
+<test_input name="test1"><![CDATA[49]]></test_input>
+<test_output name="test1"><![CDATA[|-----------------------------------------------|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|-----------------------------------------------|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|-----------------------------------------------|]]></test_output>
+<test_input name="test_1"><![CDATA[7]]></test_input>
+<test_output name="test_1"><![CDATA[|-----|
+|xxxxx|
+|xxxxx|
+|-----|
+|xxxxx|
+|xxxxx|
+|-----|]]></test_output>
+<test_input name="test_2"><![CDATA[17]]></test_input>
+<test_output name="test_2"><![CDATA[|---------------|
+|xxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxx|
+|---------------|
+|xxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxx|
+|---------------|]]></test_output>
+<test_input name="test_3"><![CDATA[37]]></test_input>
+<test_output name="test_3"><![CDATA[|-----------------------------------|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|-----------------------------------|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|-----------------------------------|]]></test_output>
+<test_input name="test_4"><![CDATA[47]]></test_input>
+<test_output name="test_4"><![CDATA[|---------------------------------------------|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|---------------------------------------------|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+|---------------------------------------------|]]></test_output>
+    <hint><![CDATA[<span class="md"> </span>]]></hint>
+    <source><![CDATA[GESP二级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include <iostream>
+using namespace std;
+int main() {
+int n;
+cin >> n;
+for (int i = 0; i < n; ++i) {
+for (int j = 0; j < n; ++j) {
+char ch;
+if (j == 0 || j == n - 1) {
+ch = '|';
+} else if (i == 0 || i == n - 1 || i == n / 2) {
+ch = '-';
+} else {
+ch = 'x';
+}
+cout << ch;
+}
+cout << endl;
+}
+return 0;
+}]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202312 二级] 小杨做题]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4721]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select"> 
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;为了准备考试，小杨每天都要做题。第 $1$ 天，小杨做了 $a$ 道题；第 $2$ 天，小杨做了 $b$ 道题；从第 $3$ 天起，小杨每天做的题目数量是前两天的总和。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;此外，小杨还规定，当自己某一天做了大于或等于 $m$ 题时，接下来的所有日子里，他就再也不做题了。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;请问，到了第 $N$ 天，小杨总共做了多少题呢？
+</p>
+</span>]]></description>
+    <input><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;总共 $4$ 行。第一行一个整数 $a$，第二行一个整数 $b$，第三行一个整数 $m$，第四行一个整数 $N$。<span class="md"><br />
+</span> 
+<p>
+	<span class="md">&nbsp;&nbsp;&nbsp;&nbsp;保证 $0 \le a,b \le 10$；$a,b&lt;m&lt;1,000,000$；$3 \le N \le 364$。</span> 
+</p>]]></input> 
+    <output><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;一行一个整数，表示小杨 $N$ 天里总共做了多少题目。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[1
+2
+10
+5]]></sample_input>
+    <sample_output><![CDATA[19]]></sample_output>
+    <test_input name="test"><![CDATA[1
+1
+5
+8]]></test_input>
+<test_output name="test"><![CDATA[12]]></test_output>
+<test_input name="test1"><![CDATA[4 5 3 3]]></test_input>
+<test_output name="test1"><![CDATA[18]]></test_output>
+<test_input name="test_1"><![CDATA[2
+3
+20
+6]]></test_input>
+<test_output name="test_1"><![CDATA[52]]></test_output>
+<test_input name="test_2"><![CDATA[0
+1
+10
+7]]></test_input>
+<test_output name="test_2"><![CDATA[20]]></test_output>
+<test_input name="test_3"><![CDATA[0
+2
+15
+8]]></test_input>
+<test_output name="test_3"><![CDATA[40]]></test_output>
+<test_input name="test_4"><![CDATA[3
+4
+25
+6]]></test_input>
+<test_output name="test_4"><![CDATA[72]]></test_output>
+    <hint><![CDATA[<p>
+	样例解释：
+</p>
+<p>
+	小杨第一天做 $1$ 题，第二天做 $2$ 题，第三天做 $1+2=3$ 题，第四天做 $2+3=5$ 题，第五天做 $3+5=8$ 题。因此他总共做了 $1+2+3+5+8=19$ 题。
+</p>]]></hint>
+    <source><![CDATA[GESP二级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include <stdio.h>
+int main(int argc, char **argv)
+{
+long long a=0, b=0, m=0, n=0, ans=0, c=0, i;
+scanf("%lld%lld%lld%lld", &a, &b, &m, &n);
+ans = a+b;
+for(i=3; i<=n; i++)
+{
+c = a+b;
+ans += c;
+a = b;
+b = c;
+if(c>=m) break;
+}
+printf("%lld\n", ans);
+return 0;
+}]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202312 二级] 小杨的H字矩阵]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4722]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select"> 
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小杨想要构造一个 $N \times N$ 的 H 字矩阵（$N$ 为奇数），具体来说，这个矩阵共有 $N$ 行，每行 $N$ 个字符，其中最左列、最右列都是 `|` ，而中间一行（即第$\frac{N+1}{2}$行）的第 $2 \sim N-1$ 个字符都是 `-` ，其余所有字符都是半角小写字母 `a`。例如，一个 $N=5$ 的 H 字矩阵如下：
+</p>
+<pre class="prettyprint lang-cpp">|aaa|
+|aaa|
+|---|
+|aaa|
+|aaa|</pre>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;请你帮小杨根据给定的 $N$ 打印出对应的“H 字矩阵”。
+</p>
+</span>]]></description>
+    <input><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;一行一个整数 $N$（$5\le N \le 49$ ，保证 $N$ 为奇数）。<span class="md"> </span>]]></input> 
+    <output><![CDATA[<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;输出对应的“H 字矩阵”。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;请严格按格式要求输出，不要擅自添加任何空格、标点、空行等任何符号。你应该恰好输出 $N$ 行，每行除了换行符外恰好包含 $N$ 个字符，这些字符要么是 - ，要么是 | ，要么是 a 。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;你的输出必须和标准答案完全一致才能得分，请在提交前仔细检查。
+</p>]]></output>
+    <sample_input><![CDATA[5]]></sample_input>
+    <sample_output><![CDATA[|aaa|
+|aaa|
+|---|
+|aaa|
+|aaa|]]></sample_output>
+    <test_input name="test"><![CDATA[7]]></test_input>
+<test_output name="test"><![CDATA[|aaaaa|
+|aaaaa|
+|aaaaa|
+|-----|
+|aaaaa|
+|aaaaa|
+|aaaaa|]]></test_output>
+<test_input name="test_1"><![CDATA[7]]></test_input>
+<test_output name="test_1"><![CDATA[|aaaaa|
+|aaaaa|
+|aaaaa|
+|-----|
+|aaaaa|
+|aaaaa|
+|aaaaa|]]></test_output>
+<test_input name="test_2"><![CDATA[17]]></test_input>
+<test_output name="test_2"><![CDATA[|aaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaa|
+|---------------|
+|aaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaa|]]></test_output>
+<test_input name="test_3"><![CDATA[27]]></test_input>
+<test_output name="test_3"><![CDATA[|aaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaa|
+|-------------------------|
+|aaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaa|]]></test_output>
+<test_input name="test_4"><![CDATA[37]]></test_input>
+<test_output name="test_4"><![CDATA[|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|-----------------------------------|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|]]></test_output>
+<test_input name="test_5"><![CDATA[47]]></test_input>
+<test_output name="test_5"><![CDATA[|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|---------------------------------------------|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|
+|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|]]></test_output>
+    <hint><![CDATA[<span class="md"> </span>]]></hint>
+    <source><![CDATA[GESP二级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include<bits/stdc++.h>
+using namespace std;
+int main() {
+	int N;
+	cin>>N;
+	for(int i=1;i<=N;i++){
+		for(int j=1;j<=N;j++){
+			if(j==1 || j==N) cout<<'|';
+			else if((j!=1 && j!=N) && i==(N+1)/2) cout<<'-';
+			else cout<<'a';
+		}
+		cout<<endl;
+	}
+	return 0;
+}]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202309 二级] 小杨的 X 字矩阵]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4723]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select"> 
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小杨想要构造一个 的 X 字矩阵（ 为奇数），这个矩阵的两条对角线都是半角加号 `+` ，其余都是半角减号 `-` 。例如，一个 $5 \times 5$ 的 X 字矩阵如下：
+</p>
+<pre class="prettyprint">+---+
+-+-+-
+--+--
+-+-+-
++---+</pre>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;请你帮小杨根据给定的 打印出对应的“X 字矩阵”。
+</p>
+</span>]]></description>
+    <input><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;一行一个整数 （ $5 \le N \le 49$，保证为奇数）。<span class="md"> </span>]]></input> 
+    <output><![CDATA[<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;输出对应的“X 字矩阵”。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;请严格按格式要求输出，不要擅自添加任何空格、标点、空行等任何符号。你应该恰好输出 $N$ 行，每行除了换行符外恰好包含 $N$ 个字符，这些字符要么是 `+`，要么是 `-`。
+</p>]]></output>
+    <sample_input><![CDATA[5]]></sample_input>
+    <sample_output><![CDATA[+---+
+-+-+-
+--+--
+-+-+-
++---+]]></sample_output>
+    <test_input name="test"><![CDATA[7]]></test_input>
+<test_output name="test"><![CDATA[+-----+
+-+---+-
+--+-+--
+---+---
+--+-+--
+-+---+-
++-----+]]></test_output>
+<test_input name="test1"><![CDATA[49]]></test_input>
+<test_output name="test1"><![CDATA[+-----------------------------------------------+
+-+---------------------------------------------+-
+--+-------------------------------------------+--
+---+-----------------------------------------+---
+----+---------------------------------------+----
+-----+-------------------------------------+-----
+------+-----------------------------------+------
+-------+---------------------------------+-------
+--------+-------------------------------+--------
+---------+-----------------------------+---------
+----------+---------------------------+----------
+-----------+-------------------------+-----------
+------------+-----------------------+------------
+-------------+---------------------+-------------
+--------------+-------------------+--------------
+---------------+-----------------+---------------
+----------------+---------------+----------------
+-----------------+-------------+-----------------
+------------------+-----------+------------------
+-------------------+---------+-------------------
+--------------------+-------+--------------------
+---------------------+-----+---------------------
+----------------------+---+----------------------
+-----------------------+-+-----------------------
+------------------------+------------------------
+-----------------------+-+-----------------------
+----------------------+---+----------------------
+---------------------+-----+---------------------
+--------------------+-------+--------------------
+-------------------+---------+-------------------
+------------------+-----------+------------------
+-----------------+-------------+-----------------
+----------------+---------------+----------------
+---------------+-----------------+---------------
+--------------+-------------------+--------------
+-------------+---------------------+-------------
+------------+-----------------------+------------
+-----------+-------------------------+-----------
+----------+---------------------------+----------
+---------+-----------------------------+---------
+--------+-------------------------------+--------
+-------+---------------------------------+-------
+------+-----------------------------------+------
+-----+-------------------------------------+-----
+----+---------------------------------------+----
+---+-----------------------------------------+---
+--+-------------------------------------------+--
+-+---------------------------------------------+-
++-----------------------------------------------+]]></test_output>
+<test_input name="test_1"><![CDATA[7]]></test_input>
+<test_output name="test_1"><![CDATA[+-----+
+-+---+-
+--+-+--
+---+---
+--+-+--
+-+---+-
++-----+]]></test_output>
+<test_input name="test_2"><![CDATA[17]]></test_input>
+<test_output name="test_2"><![CDATA[+---------------+
+-+-------------+-
+--+-----------+--
+---+---------+---
+----+-------+----
+-----+-----+-----
+------+---+------
+-------+-+-------
+--------+--------
+-------+-+-------
+------+---+------
+-----+-----+-----
+----+-------+----
+---+---------+---
+--+-----------+--
+-+-------------+-
++---------------+]]></test_output>
+<test_input name="test_3"><![CDATA[27]]></test_input>
+<test_output name="test_3"><![CDATA[+-------------------------+
+-+-----------------------+-
+--+---------------------+--
+---+-------------------+---
+----+-----------------+----
+-----+---------------+-----
+------+-------------+------
+-------+-----------+-------
+--------+---------+--------
+---------+-------+---------
+----------+-----+----------
+-----------+---+-----------
+------------+-+------------
+-------------+-------------
+------------+-+------------
+-----------+---+-----------
+----------+-----+----------
+---------+-------+---------
+--------+---------+--------
+-------+-----------+-------
+------+-------------+------
+-----+---------------+-----
+----+-----------------+----
+---+-------------------+---
+--+---------------------+--
+-+-----------------------+-
++-------------------------+]]></test_output>
+<test_input name="test_4"><![CDATA[37]]></test_input>
+<test_output name="test_4"><![CDATA[+-----------------------------------+
+-+---------------------------------+-
+--+-------------------------------+--
+---+-----------------------------+---
+----+---------------------------+----
+-----+-------------------------+-----
+------+-----------------------+------
+-------+---------------------+-------
+--------+-------------------+--------
+---------+-----------------+---------
+----------+---------------+----------
+-----------+-------------+-----------
+------------+-----------+------------
+-------------+---------+-------------
+--------------+-------+--------------
+---------------+-----+---------------
+----------------+---+----------------
+-----------------+-+-----------------
+------------------+------------------
+-----------------+-+-----------------
+----------------+---+----------------
+---------------+-----+---------------
+--------------+-------+--------------
+-------------+---------+-------------
+------------+-----------+------------
+-----------+-------------+-----------
+----------+---------------+----------
+---------+-----------------+---------
+--------+-------------------+--------
+-------+---------------------+-------
+------+-----------------------+------
+-----+-------------------------+-----
+----+---------------------------+----
+---+-----------------------------+---
+--+-------------------------------+--
+-+---------------------------------+-
++-----------------------------------+]]></test_output>
+    <hint><![CDATA[<p>
+	特别提醒：
+</p>
+<p>
+	在常规程序中，输入、输出时提供提示是好习惯。但是在考试中，由于系统限定，请不要在输入、输出中附带任何提示信息。
+</p>]]></hint>
+    <source><![CDATA[GESP二级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include <iostream>
+using namespace std;
+int main() {
+int n = 0;
+cin >> n;
+ for (int i = 0; i < n; i++) {
+ for (int j = 0; j < n; j++) {
+ if (i == j || i + j == n - 1) {
+ cout << "+";
+ } else {
+ cout << "-";
+ }
+ }
+ cout << endl;
+ }
+return 0;
+}]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202309 二级] 数字黑洞]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4724]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select">
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;给定一个三位数，要求各位不能相同。例如，$352$ 是符合要求的，$112$ 是不符合要求的。将这个三位数的三个数字重新排列，得到的最大的数，减去得到的最小的数，形成一个新的三位数。对这个新的三位数可以重复上述过程。神奇的是，最终一定会得到 $495$！
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;试试看，重新排列 $352$，得到的最大数为 $532$，最小数为 $235$，它们的差是 $297$；变换 $297$，得到 $972-279=693$；变换 $693$，$963-369=594$；变换 $594$，$954-459=495$。因此，经过 $4$ 次变换得到了 $495$。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;现在，输入的三位数，你能通过编程得出，这个三位数经过多少次变换能够得到 $495$ 吗？
+</p>
+</span>]]></description>
+    <input><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;输入一行，包含一个符合要求的三位数 $N$。<span class="md"> </span>]]></input> 
+    <output><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;输出一行，包含一个整数 $C$，表示经过 $C$ 次变换得到 $495$。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[352]]></sample_input>
+    <sample_output><![CDATA[4]]></sample_output>
+    <test_input name="test"><![CDATA[352]]></test_input>
+<test_output name="test"><![CDATA[4]]></test_output>
+<test_input name="test1"><![CDATA[897]]></test_input>
+<test_output name="test1"><![CDATA[5]]></test_output>
+<test_input name="test_1"><![CDATA[456]]></test_input>
+<test_output name="test_1"><![CDATA[5]]></test_output>
+<test_input name="test_2"><![CDATA[865]]></test_input>
+<test_output name="test_2"><![CDATA[4]]></test_output>
+<test_input name="test_3"><![CDATA[123]]></test_input>
+<test_output name="test_3"><![CDATA[5]]></test_output>
+<test_input name="test_4"><![CDATA[789]]></test_input>
+<test_output name="test_4"><![CDATA[5]]></test_output>
+    <hint><![CDATA[<span class='md'>
+</span>]]></hint>
+    <source><![CDATA[GESP二级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include <iostream>
+using namespace std;
+int main() {
+int n = 0;
+cin >> n;
+ for (int t = 0; ; t++) {
+ if (n == 495) {
+ cout << t << endl;
+ break;
+ }
+ int m0 = n % 10, m1 = n / 10 % 10, m2 = n / 100;
+ int tmax = 0, tmin = 0;
+ if (m0 >= m1 && m1 >= m2) {
+ tmax = m0 * 100 + m1 * 10 + m2;
+ tmin = m2 * 100 + m1 * 10 + m0;
+ } else if (m0 >= m2 && m2 >= m1) {
+ tmax = m0 * 100 + m2 * 10 + m1;
+ tmin = m1 * 100 + m2 * 10 + m0;
+ } else if (m1 >= m0 && m0 >= m2) {
+ tmax = m1 * 100 + m0 * 10 + m2;
+ tmin = m2 * 100 + m0 * 10 + m1;
+ } else if (m1 >= m2 && m2 >= m0) {
+ tmax = m1 * 100 + m2 * 10 + m0;
+ tmin = m0 * 100 + m2 * 10 + m1;
+ } else if (m2 >= m0 && m0 >= m1) {
+ tmax = m2 * 100 + m0 * 10 + m1;
+ tmin = m1 * 100 + m0 * 10 + m2;
+ } else { // m2 >= m1 && m1 >= m0
+ tmax = m2 * 100 + m1 * 10 + m0;
+ tmin = m0 * 100 + m1 * 10 + m2;
+ }
+ n = tmax - tmin;
+ }
+return 0;
+}]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202306 二级] 找素数]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4725]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select"> 
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小明刚刚学习了素数的概念：如果一个大于 $1$ 的正整数，除了 $1$ 和它自身外，不能被其他正整数整除，则这个正整数是素数。现在，小明想找到两个正整数 $A$ 和 $B$ 之间（包括 $A$ 和 $B$）有多少个素数？
+</p>
+</span>]]></description>
+    <input><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;输入只有一行两个正整数 $A, B$。约定 $1 \le A \le B \le 1000$。<span class="md"> </span>]]></input> 
+    <output><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;输出一行，包含一个整数 $C$，表示找到 $C$ 个素数。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[2 10]]></sample_input>
+    <sample_output><![CDATA[4]]></sample_output>
+    <test_input name="test"><![CDATA[98 100]]></test_input>
+<test_output name="test"><![CDATA[0]]></test_output>
+<test_input name="test1"><![CDATA[56 79]]></test_input>
+<test_output name="test1"><![CDATA[6]]></test_output>
+<test_input name="test2"><![CDATA[645 999]]></test_input>
+<test_output name="test2"><![CDATA[51]]></test_output>
+<test_input name="test3"><![CDATA[1 999]]></test_input>
+<test_output name="test3"><![CDATA[168]]></test_output>
+<test_input name="test4"><![CDATA[488 953]]></test_input>
+<test_output name="test4"><![CDATA[69]]></test_output>
+<test_input name="test5"><![CDATA[234 765]]></test_input>
+<test_output name="test5"><![CDATA[84]]></test_output>
+    <hint><![CDATA[<p>
+	【样例解释 】
+</p>
+<p>
+	在 $2$ 和 $10$ 之间有 $4$ 个素数，分别为：$2$、$3$、$5$、$7$。
+</p>]]></hint>
+    <source><![CDATA[GESP二级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include <iostream>
+using namespace std;
+int main() {
+int a = 0, b = 0, cnt = 0;
+cin >> a >> b;
+for (int n = a; n <= b; n++) {
+bool isPrime = true;
+for (int i = 2; i * i <= n; i++) {
+if (n % i == 0) {
+isPrime = false;
+break;
+}
+}
+if (isPrime)
+cnt++;
+}
+cout << cnt << endl;
+return 0;
+}]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202306 二级] 自幂数判断]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4726]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select">
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;自幂数是指，一个 $N$ 位数，满足各位数字 $N$ 次方之和是本身。例如，$153$ 是 $3$ 位数，其每位数的 $3$ 次方之和，$1^3+5^3+3^3=153$，因此 $153$ 是自幂数；$1634$ 是 $4$ 位数，其每位数的 $4$ 次方之和，$1^4+6^4+3^4+4^4=1634$，因此 $1634$ 是自幂数。现在，输入若干个正整数，请判断它们是否是自幂数。
+</p>
+</span>]]></description>
+    <input><![CDATA[<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;输入第一行是一个正整数 $M$，表示有 $M$ 个待判断的正整数。约定 $1 \le M \le 100$。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;从第 $2$ 行开始的 $M$ 行，每行一个待判断的正整数。约定这些正整数均小于 $10^8$。
+</p>]]></input> 
+    <output><![CDATA[<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;输出 $M$ 行，如果对应的待判断正整数为自幂数，则输出英文大写字母 $\texttt T$，否则输出英文大写字母 $\texttt F$。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;提示：不需要等到所有输入结束在依次输出，可以输入一个数就判断一个数并输出，再输入下一个数。
+</p>]]></output>
+    <sample_input><![CDATA[3
+152
+111
+153]]></sample_input>
+    <sample_output><![CDATA[F
+F
+T]]></sample_output>
+    <test_input name="test"><![CDATA[5
+8208
+548834
+88593477
+12345
+5432]]></test_input>
+<test_output name="test"><![CDATA[T
+T
+T
+F
+F]]></test_output>
+<test_input name="test1"><![CDATA[6 847263 47165 88593477 582374 123054 9173]]></test_input>
+<test_output name="test1"><![CDATA[F
+F
+T
+F
+F
+F]]></test_output>
+    <hint><![CDATA[<span class='md'>
+</span>]]></hint>
+    <source><![CDATA[GESP二级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include <iostream>
+using namespace std;
+int main() {
+int m = 0;
+cin >> m;
+for (int i = 0; i < m; i++) {
+int n = 0;
+cin >> n;
+// 数一下 n 有多少位数，记为 l
+int t = n, l = 0;
+while (t > 0) {
+t /= 10;
+l++;
+}
+// 每位数 l 次方求和，记为 sum
+int sum = 0;
+t = n;
+while (t > 0) {
+int d = t % 10;
+t /= 10;
+int mul = 1;
+for (int j = 0; j < l; j++)
+mul *= d;
+sum += mul;
+}
+// 根据 sum 和 n 是否相等，判断是否为自幂数
+if (sum == n)
+cout << "T" << endl;
+else
+cout << "F" << endl;
+}
+return 0;
+}]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202303 二级] 画三角形]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4727]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select"> 
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;输入一个正整数 $n$，请使用大写字母拼成一个这样的三角形图案（参考样例输入输出）：三角形图案的第 $1$ 行有 $1$ 个字母，第 $2$ 行有 $2$ 个字母，以此类推；在三角形图案中，由上至下、由左至右依次由大写字母 $\texttt{A}-\texttt{Z}$ 填充，每次使用大写字母 $\texttt Z$ 填充后，将从头使用大写字母 $\texttt A$ 填充。
+</p>
+</span>]]></description>
+    <input><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;输入一行，包含一个正整数 $n$。约定 $2 \le n \le 40$。<span class="md"> </span>]]></input> 
+    <output><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;输出符合要求的三角形图案。注意每行三角形图案的右侧不要有多余的空格。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[3]]></sample_input>
+    <sample_output><![CDATA[A
+BC
+DEF]]></sample_output>
+    <test_input name="test"><![CDATA[7]]></test_input>
+<test_output name="test"><![CDATA[A
+BC
+DEF
+GHIJ
+KLMNO
+PQRSTU
+VWXYZAB]]></test_output>
+<test_input name="test1"><![CDATA[40]]></test_input>
+<test_output name="test1"><![CDATA[A
+BC
+DEF
+GHIJ
+KLMNO
+PQRSTU
+VWXYZAB
+CDEFGHIJ
+KLMNOPQRS
+TUVWXYZABC
+DEFGHIJKLMN
+OPQRSTUVWXYZ
+ABCDEFGHIJKLM
+NOPQRSTUVWXYZA
+BCDEFGHIJKLMNOP
+QRSTUVWXYZABCDEF
+GHIJKLMNOPQRSTUVW
+XYZABCDEFGHIJKLMNO
+PQRSTUVWXYZABCDEFGH
+IJKLMNOPQRSTUVWXYZAB
+CDEFGHIJKLMNOPQRSTUVW
+XYZABCDEFGHIJKLMNOPQRS
+TUVWXYZABCDEFGHIJKLMNOP
+QRSTUVWXYZABCDEFGHIJKLMN
+OPQRSTUVWXYZABCDEFGHIJKLM
+NOPQRSTUVWXYZABCDEFGHIJKLM
+NOPQRSTUVWXYZABCDEFGHIJKLMN
+OPQRSTUVWXYZABCDEFGHIJKLMNOP
+QRSTUVWXYZABCDEFGHIJKLMNOPQRS
+TUVWXYZABCDEFGHIJKLMNOPQRSTUVW
+XYZABCDEFGHIJKLMNOPQRSTUVWXYZAB
+CDEFGHIJKLMNOPQRSTUVWXYZABCDEFGH
+IJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNO
+PQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVW
+XYZABCDEFGHIJKLMNOPQRSTUVWXYZABCDEF
+GHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOP
+QRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZA
+BCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLM
+NOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ
+ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMN]]></test_output>
+<test_input name="test2"><![CDATA[17]]></test_input>
+<test_output name="test2"><![CDATA[A
+BC
+DEF
+GHIJ
+KLMNO
+PQRSTU
+VWXYZAB
+CDEFGHIJ
+KLMNOPQRS
+TUVWXYZABC
+DEFGHIJKLMN
+OPQRSTUVWXYZ
+ABCDEFGHIJKLM
+NOPQRSTUVWXYZA
+BCDEFGHIJKLMNOP
+QRSTUVWXYZABCDEF
+GHIJKLMNOPQRSTUVW]]></test_output>
+<test_input name="test_1"><![CDATA[33]]></test_input>
+<test_output name="test_1"><![CDATA[A
+BC
+DEF
+GHIJ
+KLMNO
+PQRSTU
+VWXYZAB
+CDEFGHIJ
+KLMNOPQRS
+TUVWXYZABC
+DEFGHIJKLMN
+OPQRSTUVWXYZ
+ABCDEFGHIJKLM
+NOPQRSTUVWXYZA
+BCDEFGHIJKLMNOP
+QRSTUVWXYZABCDEF
+GHIJKLMNOPQRSTUVW
+XYZABCDEFGHIJKLMNO
+PQRSTUVWXYZABCDEFGH
+IJKLMNOPQRSTUVWXYZAB
+CDEFGHIJKLMNOPQRSTUVW
+XYZABCDEFGHIJKLMNOPQRS
+TUVWXYZABCDEFGHIJKLMNOP
+QRSTUVWXYZABCDEFGHIJKLMN
+OPQRSTUVWXYZABCDEFGHIJKLM
+NOPQRSTUVWXYZABCDEFGHIJKLM
+NOPQRSTUVWXYZABCDEFGHIJKLMN
+OPQRSTUVWXYZABCDEFGHIJKLMNOP
+QRSTUVWXYZABCDEFGHIJKLMNOPQRS
+TUVWXYZABCDEFGHIJKLMNOPQRSTUVW
+XYZABCDEFGHIJKLMNOPQRSTUVWXYZAB
+CDEFGHIJKLMNOPQRSTUVWXYZABCDEFGH
+IJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNO]]></test_output>
+<test_input name="test_2"><![CDATA[44]]></test_input>
+<test_output name="test_2"><![CDATA[A
+BC
+DEF
+GHIJ
+KLMNO
+PQRSTU
+VWXYZAB
+CDEFGHIJ
+KLMNOPQRS
+TUVWXYZABC
+DEFGHIJKLMN
+OPQRSTUVWXYZ
+ABCDEFGHIJKLM
+NOPQRSTUVWXYZA
+BCDEFGHIJKLMNOP
+QRSTUVWXYZABCDEF
+GHIJKLMNOPQRSTUVW
+XYZABCDEFGHIJKLMNO
+PQRSTUVWXYZABCDEFGH
+IJKLMNOPQRSTUVWXYZAB
+CDEFGHIJKLMNOPQRSTUVW
+XYZABCDEFGHIJKLMNOPQRS
+TUVWXYZABCDEFGHIJKLMNOP
+QRSTUVWXYZABCDEFGHIJKLMN
+OPQRSTUVWXYZABCDEFGHIJKLM
+NOPQRSTUVWXYZABCDEFGHIJKLM
+NOPQRSTUVWXYZABCDEFGHIJKLMN
+OPQRSTUVWXYZABCDEFGHIJKLMNOP
+QRSTUVWXYZABCDEFGHIJKLMNOPQRS
+TUVWXYZABCDEFGHIJKLMNOPQRSTUVW
+XYZABCDEFGHIJKLMNOPQRSTUVWXYZAB
+CDEFGHIJKLMNOPQRSTUVWXYZABCDEFGH
+IJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNO
+PQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVW
+XYZABCDEFGHIJKLMNOPQRSTUVWXYZABCDEF
+GHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOP
+QRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZA
+BCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLM
+NOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ
+ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMN
+OPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZABC
+DEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRS
+TUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJ
+KLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZAB]]></test_output>
+<test_input name="test_3"><![CDATA[17]]></test_input>
+<test_output name="test_3"><![CDATA[A
+BC
+DEF
+GHIJ
+KLMNO
+PQRSTU
+VWXYZAB
+CDEFGHIJ
+KLMNOPQRS
+TUVWXYZABC
+DEFGHIJKLMN
+OPQRSTUVWXYZ
+ABCDEFGHIJKLM
+NOPQRSTUVWXYZA
+BCDEFGHIJKLMNOP
+QRSTUVWXYZABCDEF
+GHIJKLMNOPQRSTUVW]]></test_output>
+<test_input name="test_4"><![CDATA[20]]></test_input>
+<test_output name="test_4"><![CDATA[A
+BC
+DEF
+GHIJ
+KLMNO
+PQRSTU
+VWXYZAB
+CDEFGHIJ
+KLMNOPQRS
+TUVWXYZABC
+DEFGHIJKLMN
+OPQRSTUVWXYZ
+ABCDEFGHIJKLM
+NOPQRSTUVWXYZA
+BCDEFGHIJKLMNOP
+QRSTUVWXYZABCDEF
+GHIJKLMNOPQRSTUVW
+XYZABCDEFGHIJKLMNO
+PQRSTUVWXYZABCDEFGH
+IJKLMNOPQRSTUVWXYZAB]]></test_output>
+    <hint><![CDATA[<span class='md'>
+</span>]]></hint>
+    <source><![CDATA[GESP二级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include <iostream>
+using namespace std;
+int main() {
+ int n;
+ cin >> n;
+ int ch = 0;
+ for (int i = 1; i <= n; i++) {
+ for (int j = 1; j <= i; j++)
+ cout << (char)('A' + (ch++) % 26);
+ cout << endl;
+ }
+ return 0;
+}]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202303 二级] 百鸡问题]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4728]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select"> 
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;百鸡问题”是出自我国古代《张丘建算经》的著名数学问题。大意为
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;“每只公鸡 $5$ 元，每只母鸡 $3$ 元，每 $3$ 只小鸡 $1$ 元；现在有 $100$ 元，买了 $100$ 只鸡，共有多少种方案？”
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小明很喜欢这个故事，他决定对这个问题进行扩展，并使用编程解决：如果每只公鸡 $x$ 元，每只母鸡 $y$ 元，每 $z$ 只小鸡 $1$ 元；现在有 $n$ 元，买了 $m$ 只鸡，共有多少种方案？
+</p>
+</span>]]></description>
+    <input><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;输入一行，包含五个整数，分别为问题描述中的 $x$，$y$，$z$，$n$，$m$。约定 $1 \le x,y,z \le 10$，$1 \le n,m \le 1000$。<span class="md"> </span>]]></input> 
+    <output><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;输出一行，包含一个整数 $C$，表示有 $C$ 种方案。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[5 3 3 100 100]]></sample_input>
+    <sample_output><![CDATA[4]]></sample_output>
+    <test_input name="test"><![CDATA[1 1 1 100 100]]></test_input>
+<test_output name="test"><![CDATA[5151]]></test_output>
+<test_input name="test1"><![CDATA[6 5 3 363 462 432]]></test_input>
+<test_output name="test1"><![CDATA[2]]></test_output>
+<test_input name="test2"><![CDATA[8 4 6 257 234 234]]></test_input>
+<test_output name="test2"><![CDATA[1]]></test_output>
+<test_input name="test_1"><![CDATA[2 3 2 50 40]]></test_input>
+<test_output name="test_1"><![CDATA[5]]></test_output>
+<test_input name="test_2"><![CDATA[5 5 5 30 10]]></test_input>
+<test_output name="test_2"><![CDATA[0]]></test_output>
+<test_input name="test_3"><![CDATA[1 2 4 60 80]]></test_input>
+<test_output name="test_3"><![CDATA[8]]></test_output>
+<test_input name="test_4"><![CDATA[3 4 1 100 50]]></test_input>
+<test_output name="test_4"><![CDATA[9]]></test_output>
+<test_input name="test_5"><![CDATA[2 3 3 20 10]]></test_input>
+<test_output name="test_5"><![CDATA[2]]></test_output>
+    <hint><![CDATA[<p>
+	这就是问题描述中的“百鸡问题”。$4$ 种方案分别为：
+</p>
+<p>
+	<ul>
+		<li>
+			公鸡 $0$ 只、母鸡 $25$ 只、小鸡 $75$ 只。
+		</li>
+		<li>
+			公鸡 $4$ 只、母鸡 $18$ 只、小鸡 $78$ 只。
+		</li>
+		<li>
+			公鸡 $8$ 只、母鸡 $11$ 只、小鸡 $81$ 只。
+		</li>
+		<li>
+			公鸡 $12$ 只、母鸡 $4$ 只、小鸡 $84$ 只。
+		</li>
+	</ul>
+</p>]]></hint>
+    <source><![CDATA[GESP二级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include <iostream>
+using namespace std;
+int main() {
+ int x, y, z, n, m, cnt = 0;
+ cin >> x >> y >> z >> n >> m;
+ for (int gj = 0; gj * x <= n && gj <= m; gj++)
+ for (int mj = 0; mj * y + gj * x <= n && mj + gj <= m; mj++) {
+ int xj = (n - gj * x - mj * y) * z;
+ if (gj + mj + xj == m)
+ cnt++;
+ }
+ cout << cnt << endl;
+ return 0;
+}]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202509 二级] 菱形]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4847]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select">
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小 A 想绘制一个菱形。具体来说，需要绘制的菱形是一个 $n$ 行 $n$ 列的字符画，$n$ 是一个大于 $1$ 的奇数。菱形的四个顶点依次位于第 $1$ 行、第 $1$ 列、第 $n$ 行、第 $n$ 列的正中间，使用 `#` 绘制。相邻顶点之间也用 `#` 连接。其余位置都是 `.`。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;例如，一个 $5$ 行 $5$ 列的菱形字符画是这样的：
+</p>
+<p>
+<pre class="prettyprint lang-cpp">..#..
+.#.#.
+#...#
+.#.#.
+..#..</pre>
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;给定 $n$，请你帮小 A 绘制对应的菱形。
+</p>
+</span>]]></description>
+    <input><![CDATA[一行，一个正整数 $n$。<span class="md"> </span>]]></input> 
+    <output><![CDATA[输出共 $n$ 行，表示对应的菱形。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[3]]></sample_input>
+    <sample_output><![CDATA[.#.
+#.#
+.#.]]></sample_output>
+    <test_input name="test_1"><![CDATA[9]]></test_input>
+<test_output name="test_1"><![CDATA[....#....
+...#.#...
+..#...#..
+.#.....#.
+#.......#
+.#.....#.
+..#...#..
+...#.#...
+....#....]]></test_output>
+<test_input name="test_2"><![CDATA[29]]></test_input>
+<test_output name="test_2"><![CDATA[..............#..............
+.............#.#.............
+............#...#............
+...........#.....#...........
+..........#.......#..........
+.........#.........#.........
+........#...........#........
+.......#.............#.......
+......#...............#......
+.....#.................#.....
+....#...................#....
+...#.....................#...
+..#.......................#..
+.#.........................#.
+#...........................#
+.#.........................#.
+..#.......................#..
+...#.....................#...
+....#...................#....
+.....#.................#.....
+......#...............#......
+.......#.............#.......
+........#...........#........
+.........#.........#.........
+..........#.......#..........
+...........#.....#...........
+............#...#............
+.............#.#.............
+..............#..............]]></test_output>
+<test_input name="test_3"><![CDATA[16]]></test_input>
+<test_output name="test_3"><![CDATA[........#.......
+.......#.#......
+......#...#.....
+.....#.....#....
+....#.......#...
+...#.........#..
+..#...........#.
+.#.............#
+#...............
+.#.............#
+..#...........#.
+...#.........#..
+....#.......#...
+.....#.....#....
+......#...#.....
+.......#.#......]]></test_output>
+<test_input name="test_4"><![CDATA[25]]></test_input>
+<test_output name="test_4"><![CDATA[............#............
+...........#.#...........
+..........#...#..........
+.........#.....#.........
+........#.......#........
+.......#.........#.......
+......#...........#......
+.....#.............#.....
+....#...............#....
+...#.................#...
+..#...................#..
+.#.....................#.
+#.......................#
+.#.....................#.
+..#...................#..
+...#.................#...
+....#...............#....
+.....#.............#.....
+......#...........#......
+.......#.........#.......
+........#.......#........
+.........#.....#.........
+..........#...#..........
+...........#.#...........
+............#............]]></test_output>
+<test_input name="test_5"><![CDATA[12]]></test_input>
+<test_output name="test_5"><![CDATA[......#.....
+.....#.#....
+....#...#...
+...#.....#..
+..#.......#.
+.#.........#
+#...........
+.#.........#
+..#.......#.
+...#.....#..
+....#...#...
+.....#.#....]]></test_output>
+    <hint><![CDATA[<strong>输入样例2：</strong>
+<p>
+<pre class="prettyprint lang-cpp">9</pre>
+</p>
+<p>
+	<strong>样例2输出：</strong>
+</p>
+<p>
+<pre class="prettyprint lang-cpp">....#....
+...#.#...
+..#...#..
+.#.....#.
+#.......#
+.#.....#.
+..#...#..
+...#.#...
+....#....</pre>
+</p>
+<p>
+	对于所有测试点，保证 $3 \leq n \leq 29$ 并且 $n$ 为奇数。<span class="md"> </span>
+</p>]]></hint>
+    <source><![CDATA[GESP二级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include <algorithm>
+#include <cstdio>
+using namespace std;
+int main() {
+	int n, i, j, k;
+	scanf("%d", &n);
+	k = n / 2;
+	for (i = 1; i <= n; i++) {
+	for (j = 1; j <= n; j++) {
+	if (abs(k - i + 1) + abs(k - j + 1) == k)
+	printf("#");
+	else
+	printf(".");
+	}
+	printf("\n");
+	}
+	return 0;
+}]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202509 二级] 优美的数字]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4848]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select">
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;如果一个正整数在十进制下的所有数位都相同，小 A 就会觉得这个正整数很优美。例如，正整数 $6$ 的数位都是 $6$，所以 $6$ 是优美的。正整数 $99$ 的数位都是 $9$，所以 $99$ 是优美的。正整数 $123$ 的数位不都相同，所以 $123$ 并不优美。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小 A 想知道不超过 $n$ 的正整数中有多少优美的数字。你能帮他数一数吗？
+</p>
+</span>]]></description>
+    <input><![CDATA[一行，一个正整数 $n$。<span class="md"> </span>]]></input> 
+    <output><![CDATA[一行，一个正整数，表示不超过 $n$ 的优美正整数的数量。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[6]]></sample_input>
+    <sample_output><![CDATA[6]]></sample_output>
+    <test_input name="test"><![CDATA[2025]]></test_input>
+<test_output name="test"><![CDATA[28]]></test_output>
+<test_input name="test_1"><![CDATA[2000]]></test_input>
+<test_output name="test_1"><![CDATA[28]]></test_output>
+<test_input name="test_2"><![CDATA[1234]]></test_input>
+<test_output name="test_2"><![CDATA[28]]></test_output>
+<test_input name="test_3"><![CDATA[1]]></test_input>
+<test_output name="test_3"><![CDATA[1]]></test_output>
+<test_input name="test_4"><![CDATA[142]]></test_input>
+<test_output name="test_4"><![CDATA[19]]></test_output>
+<test_input name="test_5"><![CDATA[1535]]></test_input>
+<test_output name="test_5"><![CDATA[28]]></test_output>
+    <hint><![CDATA[<strong>测试样例2：</strong>
+<p>
+<pre class="prettyprint lang-cpp">2025</pre>
+</p>
+<p>
+	<strong>样例2输出：</strong>
+</p>
+<p>
+<pre class="prettyprint lang-cpp">28</pre>
+</p>
+<p>
+	对于所有测试点，保证 $1 \leq n \leq 2025$。<span class="md"> </span>
+</p>]]></hint>
+    <source><![CDATA[GESP二级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include <algorithm>
+#include <cstdio>
+using namespace std;
+int n, ans;
+int main() {
+	scanf("%d", &n);
+	for (int i = 1; i <= n; i++) {
+	int v = i % 10, t = i / 10, chk = 1;
+	while (t) {
+		if (t % 10 != v) chk = 0;
+			t /= 10;
+		}
+		ans += chk;
+	}
+	printf("%d\n", ans);
+	return 0;
+}]]></solution>
+    
+</item>
+
+</fps>

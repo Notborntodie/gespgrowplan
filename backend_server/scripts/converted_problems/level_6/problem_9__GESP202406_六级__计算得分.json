@@ -1,0 +1,90 @@
+{
+  "title": "[GESP202406 六级] 计算得分",
+  "description": "小杨想要计算由 $m$ 个小写字母组成的字符串的得分。\r\n\n\t    小杨设置了一个包含 $n$ 个正整数的计分序列 $A=[a_1,a_2,\\ldots,a_n]$，如果字符串的一个子串由 $k(1\\leq k \\leq n)$ 个 $\\texttt{abc}$ 首尾相接组成，那么能够得到分数 $a_k$，并且字符串包含的字符不能够重复计算得分，整个字符串的得分是计分子串的总和。\r\n\n\t    例如，假设 ，字符串 $\\texttt{dabcabcabcabzabc}$ 的所有可能计分方式如下：\r\n\n\t\t\t$\\texttt{d+abc+abcabc+abz+abc}$ 或者 $\\texttt{d+abcabc+abc+abz+abc}$，其中 $\\texttt{d}$ 和 $\\texttt{abz}$ 不计算得分，总得分为 $a_1+a_2+a_1$。\r\n\n\t\t\t$\\texttt{d+abc+abc+abc+abz+abc}$，总得分为 $a_1+a_1+a_1+a_1$。\r\n\n\t\t\t$\\texttt{d+abcabcabc+abz+abc}$，总得分为 $a_3+a_1$。\r\n\n\t    小杨想知道对于给定的字符串，最大总得分是多少。",
+  "input_format": "第一行包含一个正整数 $n$，代表计分序列 $A$ 的长度。\n\r\n    第二行包含 $n$ 个正整数，代表计分序列 $A$。\n\r\n    第三行包含一个正整数 $m$，代表字符串的长度。\n\r\n    第四行包含一个由 $m$ 个小写字母组成的字符串。",
+  "output_format": "输出一个整数，代表给定字符串的最大总得分。",
+  "data_range": "样例解释\r\n\n\t最优的计分方式为 $\\texttt{d+abc+abc+abc+abz}$，总得分为 $a_1+a_1+a_1$，共 $9$ 分。\r\n\n\t数据范围\r\n\n\t对于全部数据，保证有 $1\\leq n\\leq 20$，$1\\leq m\\leq 10^5$，$1\\leq a_i\\leq 1000$。\r\n\n\t\t\t\t\t子任务编号\n\n\t\t\t\t\t数据点占比\n\n\t\t\t\t\t$n$\n\n\t\t\t\t\t$m$\n\n\t\t\t\t\t$a_i$\n\n\t\t\t\t\t特殊性质\n\n\t\t\t\t\t$1$\n\n\t\t\t\t\t$20\\%$\n\n\t\t\t\t\t$\\le 20$\n\n\t\t\t\t\t$\\le 10^5$\n\n\t\t\t\t\t$\\le 1000$\n\n\t\t\t\t\t对于所有的 $i(1 \\le i \\le n)$，存在 $a_i \\ge a_{i+1}$\n\n\t\t\t\t\t$2$\n\n\t\t\t\t\t$40\\%$\n\n\t\t\t\t\t$\\le 3$\n\n\t\t\t\t\t$\\le 10^5$\n\n\t\t\t\t\t$\\le 1000$\n\n\t\t\t\t\t$3$\n\n\t\t\t\t\t$40\\%$\n\n\t\t\t\t\t$\\le 20$\n\n\t\t\t\t\t$\\le 10^5$\n\n\t\t\t\t\t$\\le 1000$",
+  "time_limit": 1000,
+  "memory_limit": 128,
+  "level": 6,
+  "publish_date": "2024-06-01",
+  "samples": [
+    {
+      "input": "3\r\n3 1 2\r\n13\r\ndabcabcabcabz",
+      "output": "9",
+      "explanation": "样例",
+      "is_hidden": false,
+      "sort_order": 1
+    },
+    {
+      "input": "3\n3 1 2\n13\ndabcabcabcabz",
+      "output": "9",
+      "explanation": "test",
+      "is_hidden": true,
+      "sort_order": 2
+    },
+    {
+      "input": "2\n5 9\n7\nabcabcx",
+      "output": "10",
+      "explanation": "test_1",
+      "is_hidden": true,
+      "sort_order": 3
+    },
+    {
+      "input": "1\n10\n3\nabc",
+      "output": "10",
+      "explanation": "test_2",
+      "is_hidden": true,
+      "sort_order": 4
+    },
+    {
+      "input": "4\n2 5 3 10\n15\naabcabcabcabcab",
+      "output": "10",
+      "explanation": "test_3",
+      "is_hidden": true,
+      "sort_order": 5
+    },
+    {
+      "input": "3\n4 3 8\n12\nxxabcabcabcxx",
+      "output": "12",
+      "explanation": "test_4",
+      "is_hidden": true,
+      "sort_order": 6
+    },
+    {
+      "input": "5\n1 2 3 4 5\n20\nabcabcabcabcabcabc",
+      "output": "6",
+      "explanation": "test_5",
+      "is_hidden": true,
+      "sort_order": 7
+    },
+    {
+      "input": "2\n10 8\n6\nabcabc",
+      "output": "20",
+      "explanation": "test_6",
+      "is_hidden": true,
+      "sort_order": 8
+    },
+    {
+      "input": "3\n5 10 6\n18\nabcabcabcabcabc",
+      "output": "25",
+      "explanation": "test_7",
+      "is_hidden": true,
+      "sort_order": 9
+    },
+    {
+      "input": "4\n3 5 7 6\n9\nabcabcabc",
+      "output": "9",
+      "explanation": "test_8",
+      "is_hidden": true,
+      "sort_order": 10
+    },
+    {
+      "input": "2\n1 100\n12\nabcxabcabcabc",
+      "output": "101",
+      "explanation": "test_9",
+      "is_hidden": true,
+      "sort_order": 11
+    }
+  ]
+}

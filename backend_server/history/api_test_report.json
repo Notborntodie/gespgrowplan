@@ -1,0 +1,504 @@
+{
+  "summary": {
+    "total": 28,
+    "passed": 27,
+    "failed": 1,
+    "successRate": "96.4"
+  },
+  "results": [
+    {
+      "test": "健康检查",
+      "success": true,
+      "data": {
+        "status": "healthy",
+        "timestamp": "2025-08-23T03:37:38.996Z",
+        "uptime": 1600.432741191,
+        "memory": {
+          "rss": 67989504,
+          "heapTotal": 28950528,
+          "heapUsed": 26586792,
+          "external": 1543387,
+          "arrayBuffers": 269763
+        },
+        "database": "connected"
+      },
+      "error": null,
+      "timestamp": "2025-08-23T03:37:39.023Z"
+    },
+    {
+      "test": "用户注册",
+      "success": true,
+      "data": {
+        "message": "注册成功"
+      },
+      "error": null,
+      "timestamp": "2025-08-23T03:37:39.106Z"
+    },
+    {
+      "test": "用户登录",
+      "success": true,
+      "data": {
+        "message": "登录成功",
+        "token": "fake-jwt-token",
+        "user": {
+          "id": 26,
+          "username": "testuser_1755920258848"
+        }
+      },
+      "error": null,
+      "timestamp": "2025-08-23T03:37:39.145Z"
+    },
+    {
+      "test": "获取考试列表",
+      "success": true,
+      "data": {
+        "count": 4,
+        "exams": [
+          {
+            "id": 18,
+            "name": "GESP 1级 3月考试",
+            "level": 5,
+            "description": "",
+            "total_questions": 25,
+            "created_at": "2025-08-23 11:10:14",
+            "question_count": "23"
+          },
+          {
+            "id": 16,
+            "name": "测试考试_1755918502460",
+            "level": 1,
+            "description": "这是一个测试考试",
+            "total_questions": 2,
+            "created_at": "2025-08-23 11:08:22",
+            "question_count": "0"
+          },
+          {
+            "id": 12,
+            "name": "更新后的考试名称",
+            "level": 1,
+            "description": "这是更新后的考试描述",
+            "total_questions": 2,
+            "created_at": "2025-08-22 15:32:01",
+            "question_count": "0"
+          }
+        ]
+      },
+      "error": null,
+      "timestamp": "2025-08-23T03:37:39.201Z"
+    },
+    {
+      "test": "获取题目列表",
+      "success": true,
+      "data": {
+        "count": 78,
+        "questions": [
+          {
+            "id": 331,
+            "question_text": "批量上传测试题目1",
+            "question_type": "text",
+            "question_code": null,
+            "correct_answer": "A",
+            "explanation": "",
+            "level": 1,
+            "difficulty": "easy",
+            "image_url": null,
+            "question_date": null,
+            "created_at": "2025-08-22 15:32:28",
+            "updated_at": "2025-08-22 15:32:28"
+          },
+          {
+            "id": 332,
+            "question_text": "批量上传测试题目2",
+            "question_type": "text",
+            "question_code": null,
+            "correct_answer": "B",
+            "explanation": "",
+            "level": 1,
+            "difficulty": "medium",
+            "image_url": null,
+            "question_date": null,
+            "created_at": "2025-08-22 15:32:28",
+            "updated_at": "2025-08-22 15:32:28"
+          },
+          {
+            "id": 336,
+            "question_text": "批量测试题目2_1755855959968",
+            "question_type": "text",
+            "question_code": null,
+            "correct_answer": "B",
+            "explanation": "批量测试题目2",
+            "level": 2,
+            "difficulty": "medium",
+            "image_url": null,
+            "question_date": null,
+            "created_at": "2025-08-22 17:46:00",
+            "updated_at": "2025-08-22 17:46:00"
+          }
+        ]
+      },
+      "error": null,
+      "timestamp": "2025-08-23T03:37:39.282Z"
+    },
+    {
+      "test": "获取知识点列表",
+      "success": true,
+      "data": {
+        "count": 25,
+        "knowledgePoints": [
+          {
+            "id": 3,
+            "name": "DFS",
+            "description": "深度优先搜索算法",
+            "category": "algorithm",
+            "level": 6,
+            "created_at": "2025-01-16 10:00:00",
+            "updated_at": "2025-08-22 14:02:59"
+          },
+          {
+            "id": 2,
+            "name": "",
+            "description": "数据结构基础",
+            "category": "data_structure",
+            "level": 5,
+            "created_at": "2025-01-16 10:00:00",
+            "updated_at": "2025-08-22 14:02:59"
+          },
+          {
+            "id": 5,
+            "name": "",
+            "description": "基础数据结构",
+            "category": "data_structure",
+            "level": 1,
+            "created_at": "2025-01-16 10:00:00",
+            "updated_at": "2025-08-22 14:02:59"
+          }
+        ]
+      },
+      "error": null,
+      "timestamp": "2025-08-23T03:37:39.337Z"
+    },
+    {
+      "test": "添加知识点",
+      "success": true,
+      "data": {
+        "message": "知识点添加成功",
+        "id": 26
+      },
+      "error": null,
+      "timestamp": "2025-08-23T03:37:39.394Z"
+    },
+    {
+      "test": "获取特定考试",
+      "success": true,
+      "data": {
+        "examId": 18,
+        "examName": "GESP 1级 3月考试",
+        "questionCount": 23
+      },
+      "error": null,
+      "timestamp": "2025-08-23T03:37:39.608Z"
+    },
+    {
+      "test": "上传题目",
+      "success": true,
+      "data": {
+        "message": "题目上传成功",
+        "questionId": 416
+      },
+      "error": null,
+      "timestamp": "2025-08-23T03:37:39.721Z"
+    },
+    {
+      "test": "批量上传题目",
+      "success": true,
+      "data": {
+        "message": "批量上传成功，共上传 2 道题目",
+        "results": [
+          {
+            "questionId": 417,
+            "status": "success",
+            "index": 1
+          },
+          {
+            "questionId": 418,
+            "status": "success",
+            "index": 2
+          }
+        ]
+      },
+      "error": null,
+      "timestamp": "2025-08-23T03:37:39.785Z"
+    },
+    {
+      "test": "获取题目详情",
+      "success": true,
+      "data": {
+        "questionId": 331,
+        "questionText": "批量上传测试题目1...",
+        "optionsCount": 0,
+        "knowledgePointsCount": 0
+      },
+      "error": null,
+      "timestamp": "2025-08-23T03:37:39.887Z"
+    },
+    {
+      "test": "更新题目",
+      "success": true,
+      "data": {
+        "message": "题目更新成功"
+      },
+      "error": null,
+      "timestamp": "2025-08-23T03:37:39.998Z"
+    },
+    {
+      "test": "删除题目",
+      "success": true,
+      "data": {
+        "message": "题目删除成功"
+      },
+      "error": null,
+      "timestamp": "2025-08-23T03:37:40.167Z"
+    },
+    {
+      "test": "获取题目上传历史",
+      "success": true,
+      "data": {
+        "count": 12,
+        "uploads": [
+          {
+            "id": 19,
+            "user_id": 1,
+            "question_id": 416,
+            "upload_type": "manual",
+            "upload_status": "approved",
+            "review_notes": null,
+            "created_at": "2025-08-23 11:37:39",
+            "updated_at": "2025-08-23 11:37:39",
+            "question_text": "测试题目_1755920259610",
+            "question_code": null,
+            "username": "czy"
+          },
+          {
+            "id": 17,
+            "user_id": 1,
+            "question_id": 387,
+            "upload_type": "manual",
+            "upload_status": "approved",
+            "review_notes": "测试审核通过",
+            "created_at": "2025-08-23 11:08:21",
+            "updated_at": "2025-08-23 11:08:22",
+            "question_text": "测试题目_1755918501694",
+            "question_code": null,
+            "username": "czy"
+          },
+          {
+            "id": 15,
+            "user_id": 1,
+            "question_id": 383,
+            "upload_type": "manual",
+            "upload_status": "approved",
+            "review_notes": null,
+            "created_at": "2025-08-23 11:07:51",
+            "updated_at": "2025-08-23 11:07:51",
+            "question_text": "测试题目_1755918471052",
+            "question_code": null,
+            "username": "czy"
+          }
+        ]
+      },
+      "error": null,
+      "timestamp": "2025-08-23T03:37:40.235Z"
+    },
+    {
+      "test": "审核题目上传",
+      "success": true,
+      "data": {
+        "message": "审核完成"
+      },
+      "error": null,
+      "timestamp": "2025-08-23T03:37:40.542Z"
+    },
+    {
+      "test": "创建考试",
+      "success": true,
+      "data": {
+        "message": "考试创建成功",
+        "examId": 19,
+        "questionCount": 2
+      },
+      "error": null,
+      "timestamp": "2025-08-23T03:37:40.744Z"
+    },
+    {
+      "test": "更新考试",
+      "success": true,
+      "data": {
+        "message": "考试更新成功"
+      },
+      "error": null,
+      "timestamp": "2025-08-23T03:37:40.924Z"
+    },
+    {
+      "test": "删除考试",
+      "success": true,
+      "data": {
+        "message": "考试删除成功"
+      },
+      "error": null,
+      "timestamp": "2025-08-23T03:37:41.168Z"
+    },
+    {
+      "test": "获取可用题目列表",
+      "success": true,
+      "data": {
+        "count": 81,
+        "questions": [
+          {
+            "id": 418,
+            "question_text": "批量测试题目2_1755920259724",
+            "question_type": "text",
+            "question_code": null,
+            "correct_answer": "B",
+            "explanation": "批量测试题目2",
+            "level": 2,
+            "difficulty": "medium",
+            "image_url": null,
+            "question_date": null,
+            "created_at": "2025-08-23 11:37:39",
+            "updated_at": "2025-08-23 11:37:39",
+            "knowledge_points": null
+          },
+          {
+            "id": 417,
+            "question_text": "批量测试题目1_1755920259724",
+            "question_type": "text",
+            "question_code": null,
+            "correct_answer": "A",
+            "explanation": "批量测试题目1",
+            "level": 1,
+            "difficulty": "easy",
+            "image_url": null,
+            "question_date": null,
+            "created_at": "2025-08-23 11:37:39",
+            "updated_at": "2025-08-23 11:37:39",
+            "knowledge_points": null
+          },
+          {
+            "id": 416,
+            "question_text": "测试题目_1755920259610",
+            "question_type": "text",
+            "question_code": null,
+            "correct_answer": "A",
+            "explanation": "这是一个测试题目",
+            "level": 1,
+            "difficulty": "easy",
+            "image_url": null,
+            "question_date": null,
+            "created_at": "2025-08-23 11:37:39",
+            "updated_at": "2025-08-23 11:37:39",
+            "knowledge_points": null
+          }
+        ]
+      },
+      "error": null,
+      "timestamp": "2025-08-23T03:37:41.245Z"
+    },
+    {
+      "test": "获取可用题目列表（带过滤条件）",
+      "success": true,
+      "data": {
+        "count": 19,
+        "filters": {
+          "level": 1,
+          "difficulty": "easy"
+        }
+      },
+      "error": null,
+      "timestamp": "2025-08-23T03:37:41.325Z"
+    },
+    {
+      "test": "图片上传",
+      "success": false,
+      "data": null,
+      "error": "Request failed with status code 400",
+      "timestamp": "2025-08-23T03:37:41.387Z"
+    },
+    {
+      "test": "知识点按分类过滤",
+      "success": true,
+      "data": {
+        "count": 9,
+        "category": "编程"
+      },
+      "error": null,
+      "timestamp": "2025-08-23T03:37:41.455Z"
+    },
+    {
+      "test": "知识点按级别过滤",
+      "success": true,
+      "data": {
+        "count": 20,
+        "level": 1
+      },
+      "error": null,
+      "timestamp": "2025-08-23T03:37:41.535Z"
+    },
+    {
+      "test": "并发请求测试",
+      "success": true,
+      "data": {
+        "requests": 4,
+        "allSuccessful": true,
+        "statusCodes": [
+          200,
+          200,
+          200,
+          200
+        ]
+      },
+      "error": null,
+      "timestamp": "2025-08-23T03:37:41.677Z"
+    },
+    {
+      "test": "缓存功能测试",
+      "success": true,
+      "data": {
+        "firstRequestTime": 51,
+        "secondRequestTime": 21,
+        "cacheHit": true,
+        "dataConsistent": true
+      },
+      "error": null,
+      "timestamp": "2025-08-23T03:37:41.750Z"
+    },
+    {
+      "test": "404错误处理",
+      "success": true,
+      "data": {
+        "status": 404
+      },
+      "error": null,
+      "timestamp": "2025-08-23T03:37:41.781Z"
+    },
+    {
+      "test": "400错误处理",
+      "success": true,
+      "data": {
+        "status": 400
+      },
+      "error": null,
+      "timestamp": "2025-08-23T03:37:41.808Z"
+    },
+    {
+      "test": "限流测试",
+      "success": true,
+      "data": {
+        "requests": 5,
+        "allSuccessful": true
+      },
+      "error": null,
+      "timestamp": "2025-08-23T03:37:41.972Z"
+    }
+  ],
+  "timestamp": "2025-08-23T03:37:41.979Z"
+}

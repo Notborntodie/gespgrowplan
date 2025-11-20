@@ -1,0 +1,62 @@
+{
+  "title": "[GESP202403 一级] 小杨买书",
+  "description": "小杨同学积攒了一部分零用钱想要用来购买书籍，已知一本书的单价是 $13$ 元，请根据小杨零用钱的金额，编写程序计算可以购买多少本书，还剩多少零用钱。",
+  "input_format": "输入一个正整数 $m$，表示小杨拥有的零用钱数。",
+  "output_format": "输出包含两行，第一行，购买图书的本数；第二行，剩余的零用钱数。",
+  "data_range": "输入样例2：\n\n\t100\r\n\n\t样例2输出：\r\n\n\t7\r\n\n\t9\r\n\n\t对全部的测试数据，保证 $0 < m < 200$。",
+  "time_limit": 1000,
+  "memory_limit": 128,
+  "level": 1,
+  "publish_date": "2024-03-01",
+  "samples": [
+    {
+      "input": "100",
+      "output": "7\r\n9",
+      "explanation": "样例",
+      "is_hidden": false,
+      "sort_order": 1
+    },
+    {
+      "input": "199",
+      "output": "15\n4",
+      "explanation": "test",
+      "is_hidden": true,
+      "sort_order": 2
+    },
+    {
+      "input": "29",
+      "output": "2\n3",
+      "explanation": "test_1",
+      "is_hidden": true,
+      "sort_order": 3
+    },
+    {
+      "input": "67",
+      "output": "5\n2",
+      "explanation": "test_2",
+      "is_hidden": true,
+      "sort_order": 4
+    },
+    {
+      "input": "109",
+      "output": "8\n5",
+      "explanation": "test_3",
+      "is_hidden": true,
+      "sort_order": 5
+    },
+    {
+      "input": "199",
+      "output": "15\n4",
+      "explanation": "test_4",
+      "is_hidden": true,
+      "sort_order": 6
+    },
+    {
+      "input": "100",
+      "output": "7\n9",
+      "explanation": "test_5",
+      "is_hidden": true,
+      "sort_order": 7
+    }
+  ]
+}

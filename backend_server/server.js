@@ -1,3 +1,6 @@
+// 加载环境变量（必须在其他模块之前加载）
+require('dotenv').config();
+
 const app = require('./app');
 const { logger } = require('./config/logger');
 
@@ -10,6 +13,11 @@ const server = app.listen(port, () => {
     timestamp: new Date().toISOString()
   });
 });
+
+// 设置超时配置，防止socket hang up
+server.timeout = 30000; // 30秒超时
+server.keepAliveTimeout = 65000; // 65秒keep-alive超时
+server.headersTimeout = 66000; // 66秒headers超时
 
 // 优雅关闭
 process.on('SIGTERM', () => {

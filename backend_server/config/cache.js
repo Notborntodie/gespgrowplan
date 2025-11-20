@@ -1,23 +1,23 @@
 const Redis = require('ioredis');
 
-// Redis配置
+// Redis配置（从环境变量读取，如果没有则使用默认值）
 const redisConfig = {
-  host: '127.0.0.1',
-  port: 6379,
-  password: null, // 如果有密码，请设置
-  db: 0,
+  host: process.env.REDIS_HOST || '127.0.0.1',
+  port: parseInt(process.env.REDIS_PORT) || 6379,
+  password: process.env.REDIS_PASSWORD || null, // 如果有密码，请设置
+  db: parseInt(process.env.REDIS_DB) || 0,
   // 连接配置
   lazyConnect: true,
   enableReadyCheck: false,
   // 重试配置
-  maxRetriesPerRequest: 3,
-  retryDelayOnFailover: 100,
+  maxRetriesPerRequest: parseInt(process.env.REDIS_MAX_RETRIES) || 3,
+  retryDelayOnFailover: parseInt(process.env.REDIS_RETRY_DELAY) || 100,
   retryDelayOnClusterDown: 300,
   // 高可用配置
   enableOfflineQueue: true, // 启用离线队列，允许在连接断开时缓存命令
   // 超时配置
-  connectTimeout: 10000,
-  commandTimeout: 5000
+  connectTimeout: parseInt(process.env.REDIS_CONNECT_TIMEOUT) || 10000,
+  commandTimeout: parseInt(process.env.REDIS_COMMAND_TIMEOUT) || 5000
 };
 
 // 创建Redis客户端
@@ -121,6 +121,7 @@ const cacheUtils = {
       const keys = await redis.keys(pattern);
       if (keys.length > 0) {
         await redis.del(...keys);
+        console.log(`已删除 ${keys.length} 个缓存键: ${pattern}`);
       }
       return keys.length;
     } catch (error) {
@@ -146,6 +147,203 @@ const cacheUtils = {
     } catch (error) {
       console.error('设置缓存过期时间失败:', error);
       return false;
+    }
+  },
+
+  // 知识点专用缓存管理
+  knowledge: {
+    // 清除所有知识点相关缓存
+    async clearAll() {
+      const patterns = [
+        'cache:knowledge:*',
+        'cache:knowledge-points:*',
+        'cache:knowledge-categories:*',
+        'cache:knowledge-levels:*'
+      ];
+      
+      let totalDeleted = 0;
+      for (const pattern of patterns) {
+        const deleted = await cacheUtils.delPattern(pattern);
+        totalDeleted += deleted;
+      }
+      
+      console.log(`知识点缓存清理完成，共删除 ${totalDeleted} 个缓存键`);
+      return totalDeleted;
+    },
+
+    // 清除特定分类的缓存
+    async clearByCategory(category) {
+      const patterns = [
+        `cache:knowledge:*category=${category}*`,
+        `cache:knowledge-points:*category=${category}*`
+      ];
+      
+      let totalDeleted = 0;
+      for (const pattern of patterns) {
+        const deleted = await cacheUtils.delPattern(pattern);
+        totalDeleted += deleted;
+      }
+      
+      return totalDeleted;
+    },
+
+    // 清除特定级别的缓存
+    async clearByLevel(level) {
+      const patterns = [
+        `cache:knowledge:*level=${level}*`,
+        `cache:knowledge-points:*level=${level}*`
+      ];
+      
+      let totalDeleted = 0;
+      for (const pattern of patterns) {
+        const deleted = await cacheUtils.delPattern(pattern);
+        totalDeleted += deleted;
+      }
+      
+      return totalDeleted;
+    },
+
+    // 预加载知识点缓存
+    async preload(pool) {
+      try {
+        const connection = await pool.getConnection();
+        
+        // 预加载所有知识点
+        const [allKnowledge] = await connection.execute('SELECT * FROM knowledge_points ORDER BY category, level, name');
+        await cacheUtils.set('cache:knowledge:all', allKnowledge, 600);
+        
+        // 按分类预加载
+        const categories = [...new Set(allKnowledge.map(k => k.category))];
+        for (const category of categories) {
+          const categoryKnowledge = allKnowledge.filter(k => k.category === category);
+          await cacheUtils.set(`cache:knowledge:category=${category}`, categoryKnowledge, 600);
+        }
+        
+        // 按级别预加载
+        const levels = [...new Set(allKnowledge.map(k => k.level))];
+        for (const level of levels) {
+          const levelKnowledge = allKnowledge.filter(k => k.level === level);
+          await cacheUtils.set(`cache:knowledge:level=${level}`, levelKnowledge, 600);
+        }
+        
+        connection.release();
+        console.log('知识点缓存预加载完成');
+        return true;
+      } catch (error) {
+        console.error('知识点缓存预加载失败:', error);
+        return false;
+      }
+    }
+  },
+
+  // OJ 专用缓存管理
+  oj: {
+    // 获取题目信息（带缓存）
+    async getProblem(problemId, pool) {
+      const cacheKey = `cache:oj:problem:${problemId}`;
+      
+      // 尝试从缓存获取
+      let problem = await cacheUtils.get(cacheKey);
+      if (problem) {
+        console.log(`题目缓存命中: ${problemId}`);
+        return problem;
+      }
+      
+      // 从数据库查询
+      try {
+        const [problems] = await pool.query('SELECT * FROM oj_problems WHERE id = ?', [problemId]);
+        if (problems.length > 0) {
+          problem = problems[0];
+          // 缓存30分钟
+          await cacheUtils.set(cacheKey, problem, 1800);
+          console.log(`题目已缓存: ${problemId}`);
+          return problem;
+        }
+        return null;
+      } catch (error) {
+        console.error('查询题目失败:', error);
+        return null;
+      }
+    },
+
+    // 获取测试样例（带缓存）
+    async getSamples(problemId, pool) {
+      const cacheKey = `cache:oj:samples:${problemId}`;
+      
+      // 尝试从缓存获取
+      let samples = await cacheUtils.get(cacheKey);
+      if (samples) {
+        console.log(`样例缓存命中: ${problemId}, 样例数: ${samples.length}`);
+        return samples;
+      }
+      
+      // 从数据库查询
+      try {
+        const [samples] = await pool.query(
+          'SELECT id, input, output, is_hidden FROM oj_samples WHERE problem_id = ? ORDER BY sort_order',
+          [problemId]
+        );
+        
+        // 缓存30分钟
+        await cacheUtils.set(cacheKey, samples, 1800);
+        console.log(`样例已缓存: ${problemId}, 样例数: ${samples.length}`);
+        return samples;
+      } catch (error) {
+        console.error('查询样例失败:', error);
+        return [];
+      }
+    },
+
+    // 清除特定题目的所有缓存
+    async clearProblem(problemId) {
+      const patterns = [
+        `cache:oj:problem:${problemId}`,
+        `cache:oj:samples:${problemId}`,
+        `cache:/api/oj/problems/${problemId}*`
+      ];
+      
+      let totalDeleted = 0;
+      for (const pattern of patterns) {
+        const deleted = await cacheUtils.delPattern(pattern);
+        totalDeleted += deleted;
+      }
+      
+      console.log(`题目 ${problemId} 缓存已清除，共 ${totalDeleted} 个键`);
+      return totalDeleted;
+    },
+
+    // 清除题目列表缓存
+    async clearProblemList() {
+      const patterns = [
+        'cache:/api/oj/problems?*',
+        'cache:oj:problems:*'
+      ];
+      
+      let totalDeleted = 0;
+      for (const pattern of patterns) {
+        const deleted = await cacheUtils.delPattern(pattern);
+        totalDeleted += deleted;
+      }
+      
+      console.log(`题目列表缓存已清除，共 ${totalDeleted} 个键`);
+      return totalDeleted;
+    },
+
+    // 清除所有OJ相关缓存
+    async clearAll() {
+      const patterns = [
+        'cache:oj:*',
+        'cache:/api/oj/*'
+      ];
+      
+      let totalDeleted = 0;
+      for (const pattern of patterns) {
+        const deleted = await cacheUtils.delPattern(pattern);
+        totalDeleted += deleted;
+      }
+      
+      console.log(`OJ缓存清理完成，共删除 ${totalDeleted} 个缓存键`);
+      return totalDeleted;
     }
   }
 };

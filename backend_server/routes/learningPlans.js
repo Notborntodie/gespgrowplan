@@ -1,0 +1,2282 @@
+const express = require('express');
+const router = express.Router();
+const { pool } = require('../config/database');
+const { logger } = require('../config/logger');
+const { submitExamInternal } = require('./submissions');
+const { submitOjInternal } = require('./oj');
+
+// ==================== 1. 获取我的学习计划列表 ====================
+router.get('/learning-plans/my-plans', async (req, res) => {
+  try {
+    const { user_id } = req.query;
+    
+    // 验证必需参数
+    if (!user_id) {
+      return res.status(400).json({ 
+        success: false,
+        error: '缺少必需参数: user_id'
+      });
+    }
+    
+    const connection = await pool.getConnection();
+    
+    try {
+      // 获取用户加入的学习计划及进度
+      const [plans] = await connection.execute(`
+        SELECT 
+          lp.id,
+          lp.name,
+          lp.description,
+          lp.level,
+          lp.start_time,
+          lp.end_time,
+          ulp.status,
+          ulp.joined_at,
+          COUNT(DISTINCT lt.id) as total_tasks,
+          COUNT(DISTINCT CASE WHEN utp.is_completed = 1 THEN utp.task_id END) as completed_tasks,
+          CASE 
+            WHEN COUNT(DISTINCT lt.id) > 0 
+            THEN ROUND(COUNT(DISTINCT CASE WHEN utp.is_completed = 1 THEN utp.task_id END) * 100.0 / COUNT(DISTINCT lt.id), 0)
+            ELSE 0 
+          END as progress
+        FROM user_learning_plans ulp
+        JOIN learning_plans lp ON ulp.plan_id = lp.id
+        LEFT JOIN learning_tasks lt ON lp.id = lt.plan_id
+        LEFT JOIN user_task_progress utp ON lt.id = utp.task_id AND utp.user_id = ulp.user_id
+        WHERE ulp.user_id = ? AND lp.is_active = 1
+        GROUP BY lp.id, lp.name, lp.description, lp.level, lp.start_time, lp.end_time, ulp.status, ulp.joined_at
+        ORDER BY ulp.joined_at DESC
+      `, [user_id]);
+      
+      connection.release();
+      
+      res.json({
+        success: true,
+        data: plans
+      });
+      
+    } catch (error) {
+      connection.release();
+      throw error;
+    }
+    
+  } catch (error) {
+    logger.error('获取学习计划列表失败:', error);
+    res.status(500).json({ 
+      success: false,
+      error: '获取学习计划列表失败',
+      message: error.message 
+    });
+  }
+});
+
+// ==================== 2. 获取所有学习计划列表 ====================
+router.get('/learning-plans/all', async (req, res) => {
+  try {
+    const { level, is_active } = req.query;
+    
+    const connection = await pool.getConnection();
+    
+    try {
+      let query = `
+        SELECT 
+          lp.id,
+          lp.name,
+          lp.description,
+          lp.level,
+          lp.start_time,
+          lp.end_time,
+          lp.is_active,
+          lp.created_at,
+          lp.updated_at,
+          COUNT(DISTINCT lt.id) as total_tasks,
+          COUNT(DISTINCT te.exam_id) as total_exams,
+          COUNT(DISTINCT top.problem_id) as total_oj_problems
+        FROM learning_plans lp
+        LEFT JOIN learning_tasks lt ON lp.id = lt.plan_id
+        LEFT JOIN task_exams te ON lt.id = te.task_id
+        LEFT JOIN task_oj_problems top ON lt.id = top.task_id
+        WHERE 1=1
+      `;
+      
+      const params = [];
+      
+      // 如果指定了级别，添加级别过滤
+      if (level) {
+        query += ' AND lp.level = ?';
+        params.push(level);
+      }
+      
+      // 如果指定了状态，添加状态过滤
+      if (is_active !== undefined) {
+        query += ' AND lp.is_active = ?';
+        params.push(is_active);
+      }
+      
+      query += `
+        GROUP BY lp.id, lp.name, lp.description, lp.level, lp.start_time, lp.end_time, 
+                 lp.is_active, lp.created_at, lp.updated_at
+        ORDER BY lp.created_at DESC
+      `;
+      
+      const [plans] = await connection.execute(query, params);
+      
+      connection.release();
+      
+      res.json({
+        success: true,
+        data: plans
+      });
+      
+    } catch (error) {
+      connection.release();
+      throw error;
+    }
+    
+  } catch (error) {
+    logger.error('获取所有学习计划列表失败:', error);
+    res.status(500).json({ 
+      success: false,
+      error: '获取所有学习计划列表失败',
+      message: error.message 
+    });
+  }
+});
+
+// ==================== 3. 获取可加入的计划列表 ====================
+router.get('/learning-plans/available', async (req, res) => {
+  try {
+    const { user_id, level } = req.query;
+    
+    // 验证必需参数
+    if (!user_id) {
+      return res.status(400).json({ 
+        success: false,
+        error: '缺少必需参数: user_id'
+      });
+    }
+    
+    const connection = await pool.getConnection();
+    
+    try {
+      let query = `
+        SELECT 
+          lp.id,
+          lp.name,
+          lp.description,
+          lp.level,
+          lp.start_time,
+          lp.end_time,
+          lp.created_at,
+          COUNT(DISTINCT lt.id) as total_tasks
+        FROM learning_plans lp
+        LEFT JOIN learning_tasks lt ON lp.id = lt.plan_id
+        LEFT JOIN user_learning_plans ulp ON lp.id = ulp.plan_id AND ulp.user_id = ?
+        WHERE lp.is_active = 1 
+          AND ulp.id IS NULL
+      `;
+      
+      const params = [user_id];
+      
+      // 如果指定了级别，添加级别过滤
+      if (level) {
+        query += ' AND lp.level = ?';
+        params.push(level);
+      }
+      
+      query += `
+        GROUP BY lp.id, lp.name, lp.description, lp.level, lp.start_time, lp.end_time, lp.created_at
+        ORDER BY lp.start_time DESC
+      `;
+      
+      const [plans] = await connection.execute(query, params);
+      
+      connection.release();
+      
+      res.json({
+        success: true,
+        data: plans
+      });
+      
+    } catch (error) {
+      connection.release();
+      throw error;
+    }
+    
+  } catch (error) {
+    logger.error('获取可加入计划列表失败:', error);
+    res.status(500).json({ 
+      success: false,
+      error: '获取可加入计划列表失败',
+      message: error.message 
+    });
+  }
+});
+
+// ==================== 4. 加入学习计划 ====================
+router.post('/learning-plans/join', async (req, res) => {
+  try {
+    const { user_id, plan_id } = req.body;
+    
+    // 验证必需参数
+    if (!user_id || !plan_id) {
+      return res.status(400).json({ 
+        success: false,
+        error: '缺少必需参数: user_id, plan_id'
+      });
+    }
+    
+    const connection = await pool.getConnection();
+    
+    try {
+      await connection.beginTransaction();
+      
+      // 检查计划是否存在且有效
+      const [planRows] = await connection.execute(
+        'SELECT * FROM learning_plans WHERE id = ? AND is_active = 1',
+        [plan_id]
+      );
+      
+      if (planRows.length === 0) {
+        await connection.rollback();
+        connection.release();
+        return res.status(404).json({ 
+          success: false,
+          error: '学习计划不存在或已停用' 
+        });
+      }
+      
+      // 检查用户是否已加入该计划
+      const [existingRows] = await connection.execute(
+        'SELECT * FROM user_learning_plans WHERE user_id = ? AND plan_id = ?',
+        [user_id, plan_id]
+      );
+      
+      if (existingRows.length > 0) {
+        await connection.rollback();
+        connection.release();
+        return res.status(400).json({ 
+          success: false,
+          error: '您已加入该学习计划' 
+        });
+      }
+      
+      // 加入学习计划
+      await connection.execute(
+        'INSERT INTO user_learning_plans (user_id, plan_id, status) VALUES (?, ?, ?)',
+        [user_id, plan_id, 'active']
+      );
+      
+      // 为该计划的所有任务创建进度记录
+      await connection.execute(`
+        INSERT INTO user_task_progress (user_id, task_id, is_completed)
+        SELECT ?, id, FALSE
+        FROM learning_tasks
+        WHERE plan_id = ?
+      `, [user_id, plan_id]);
+      
+      // 为该计划的所有客观题创建进度记录
+      await connection.execute(`
+        INSERT INTO user_exam_progress (user_id, exam_id, is_completed, best_score, attempt_count)
+        SELECT ?, te.exam_id, FALSE, 0, 0
+        FROM task_exams te
+        JOIN learning_tasks lt ON te.task_id = lt.id
+        WHERE lt.plan_id = ?
+        ON DUPLICATE KEY UPDATE
+          is_completed = FALSE,
+          best_score = 0,
+          attempt_count = 0,
+          completed_at = NULL
+      `, [user_id, plan_id]);
+      
+      // 为该计划的所有OJ题目创建进度记录
+      await connection.execute(`
+        INSERT INTO user_oj_progress (user_id, problem_id, is_completed, best_verdict, attempt_count)
+        SELECT ?, top.problem_id, FALSE, NULL, 0
+        FROM task_oj_problems top
+        JOIN learning_tasks lt ON top.task_id = lt.id
+        WHERE lt.plan_id = ?
+        ON DUPLICATE KEY UPDATE
+          is_completed = FALSE,
+          best_verdict = NULL,
+          attempt_count = 0,
+          completed_at = NULL
+      `, [user_id, plan_id]);
+      
+      await connection.commit();
+      connection.release();
+      
+      res.json({
+        success: true,
+        message: '成功加入学习计划'
+      });
+      
+    } catch (error) {
+      await connection.rollback();
+      connection.release();
+      throw error;
+    }
+    
+  } catch (error) {
+    logger.error('加入学习计划失败:', error);
+    res.status(500).json({ 
+      success: false,
+      error: '加入学习计划失败',
+      message: error.message 
+    });
+  }
+});
+
+// ==================== 5. 获取学习计划完整信息（管理员专用） ====================
+router.get('/learning-plans/:id/admin', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const connection = await pool.getConnection();
+    
+    try {
+      // 1. 获取学习计划基本信息
+      const [planRows] = await connection.execute(
+        'SELECT * FROM learning_plans WHERE id = ?',
+        [id]
+      );
+      
+      if (planRows.length === 0) {
+        connection.release();
+        return res.status(404).json({ 
+          success: false,
+          error: '学习计划不存在' 
+        });
+      }
+      
+      const plan = planRows[0];
+      
+      // 2. 获取所有任务
+      const [tasksRows] = await connection.execute(`
+        SELECT 
+          lt.*
+        FROM learning_tasks lt
+        WHERE lt.plan_id = ?
+        ORDER BY lt.task_order, lt.start_time
+      `, [id]);
+      
+      // 3. 为每个任务获取关联的客观题和 OJ 题目
+      const tasks = [];
+      for (const task of tasksRows) {
+        // 获取客观题列表（包含详细信息）
+        const [examsRows] = await connection.execute(`
+          SELECT 
+            e.id as exam_id,
+            e.name as exam_name,
+            e.description as exam_description,
+            e.level as exam_level,
+            e.type as exam_type,
+            e.total_questions,
+            te.exam_order
+          FROM task_exams te
+          JOIN exams e ON te.exam_id = e.id
+          WHERE te.task_id = ?
+          ORDER BY te.exam_order
+        `, [task.id]);
+        
+        // 获取 OJ 题目列表（包含详细信息）
+        const [ojProblemsRows] = await connection.execute(`
+          SELECT 
+            op.id as problem_id,
+            op.title as problem_title,
+            op.description as problem_description,
+            op.level as problem_level,
+            op.time_limit,
+            op.memory_limit,
+            top.problem_order
+          FROM task_oj_problems top
+          JOIN oj_problems op ON top.problem_id = op.id
+          WHERE top.task_id = ?
+          ORDER BY top.problem_order
+        `, [task.id]);
+        
+        tasks.push({
+          ...task,
+          exams: examsRows,
+          oj_problems: ojProblemsRows
+        });
+      }
+      
+      connection.release();
+      
+      res.json({
+        success: true,
+        data: {
+          ...plan,
+          tasks: tasks
+        }
+      });
+      
+    } catch (error) {
+      connection.release();
+      throw error;
+    }
+    
+  } catch (error) {
+    logger.error('获取学习计划完整信息失败:', error);
+    res.status(500).json({ 
+      success: false,
+      error: '获取学习计划完整信息失败',
+      message: error.message 
+    });
+  }
+});
+
+// ==================== 6. 获取计划的任务列表 ====================
+router.get('/learning-plans/:planId/tasks', async (req, res) => {
+  try {
+    const { planId } = req.params;
+    const { user_id } = req.query;
+    
+    // 验证必需参数
+    if (!user_id) {
+      return res.status(400).json({ 
+        success: false,
+        error: '缺少必需参数: user_id'
+      });
+    }
+    
+    const connection = await pool.getConnection();
+    
+    try {
+      // 获取计划基本信息
+      const [planRows] = await connection.execute(`
+        SELECT 
+          lp.id,
+          lp.name,
+          lp.description,
+          lp.level,
+          lp.start_time,
+          lp.end_time,
+          COUNT(DISTINCT lt.id) as total_tasks,
+          COUNT(DISTINCT CASE WHEN utp.is_completed = 1 THEN utp.task_id END) as completed_tasks,
+          CASE 
+            WHEN COUNT(DISTINCT lt.id) > 0 
+            THEN ROUND(COUNT(DISTINCT CASE WHEN utp.is_completed = 1 THEN utp.task_id END) * 100.0 / COUNT(DISTINCT lt.id), 0)
+            ELSE 0 
+          END as progress
+        FROM learning_plans lp
+        LEFT JOIN learning_tasks lt ON lp.id = lt.plan_id
+        LEFT JOIN user_task_progress utp ON lt.id = utp.task_id AND utp.user_id = ?
+        WHERE lp.id = ? AND lp.is_active = 1
+        GROUP BY lp.id, lp.name, lp.description, lp.level, lp.start_time, lp.end_time
+      `, [user_id, planId]);
+      
+      if (planRows.length === 0) {
+        connection.release();
+        return res.status(404).json({ 
+          success: false,
+          error: '学习计划不存在' 
+        });
+      }
+      
+      // 检查用户是否加入了该计划
+      const [joinedRows] = await connection.execute(
+        'SELECT * FROM user_learning_plans WHERE user_id = ? AND plan_id = ?',
+        [user_id, planId]
+      );
+      
+      if (joinedRows.length === 0) {
+        connection.release();
+        return res.status(403).json({ 
+          success: false,
+          error: '您尚未加入该学习计划' 
+        });
+      }
+      
+      // 获取任务列表及进度
+      const [tasks] = await connection.execute(`
+        SELECT 
+          lt.id,
+          lt.name,
+          lt.description,
+          lt.review_content,
+          lt.review_video_url,
+          lt.start_time,
+          lt.end_time,
+          lt.task_order,
+          COALESCE(utp.is_completed, 0) as is_completed,
+          utp.completed_at,
+          COUNT(DISTINCT te.exam_id) as exam_count,
+          COUNT(DISTINCT top.problem_id) as oj_count
+        FROM learning_tasks lt
+        LEFT JOIN user_task_progress utp ON lt.id = utp.task_id AND utp.user_id = ?
+        LEFT JOIN task_exams te ON lt.id = te.task_id
+        LEFT JOIN task_oj_problems top ON lt.id = top.task_id
+        WHERE lt.plan_id = ?
+        GROUP BY lt.id, lt.name, lt.description, lt.review_content, lt.review_video_url, 
+                 lt.start_time, lt.end_time, lt.task_order, utp.is_completed, utp.completed_at
+        ORDER BY lt.task_order, lt.start_time
+      `, [user_id, planId]);
+      
+      connection.release();
+      
+      res.json({
+        success: true,
+        data: {
+          plan: planRows[0],
+          tasks: tasks
+        }
+      });
+      
+    } catch (error) {
+      connection.release();
+      throw error;
+    }
+    
+  } catch (error) {
+    logger.error('获取任务列表失败:', error);
+    res.status(500).json({ 
+      success: false,
+      error: '获取任务列表失败',
+      message: error.message 
+    });
+  }
+});
+
+// ==================== 7. 获取任务的练习列表 ====================
+router.get('/learning-tasks/:taskId/exercises', async (req, res) => {
+  try {
+    const { taskId } = req.params;
+    const { user_id } = req.query;
+    
+    // 验证必需参数
+    if (!user_id) {
+      return res.status(400).json({ 
+        success: false,
+        error: '缺少必需参数: user_id'
+      });
+    }
+    
+    const connection = await pool.getConnection();
+    
+    try {
+      // 获取任务基本信息
+      const [taskRows] = await connection.execute(`
+        SELECT 
+          lt.id,
+          lt.plan_id,
+          lt.name,
+          lt.description,
+          lt.review_content,
+          lt.review_video_url,
+          lt.start_time,
+          lt.end_time
+        FROM learning_tasks lt
+        WHERE lt.id = ?
+      `, [taskId]);
+      
+      if (taskRows.length === 0) {
+        connection.release();
+        return res.status(404).json({ 
+          success: false,
+          error: '任务不存在' 
+        });
+      }
+      
+      const task = taskRows[0];
+      
+      // 检查用户是否加入了该计划
+      const [joinedRows] = await connection.execute(
+        'SELECT * FROM user_learning_plans WHERE user_id = ? AND plan_id = ?',
+        [user_id, task.plan_id]
+      );
+      
+      if (joinedRows.length === 0) {
+        connection.release();
+        return res.status(403).json({ 
+          success: false,
+          error: '您尚未加入该学习计划' 
+        });
+      }
+      
+      // 获取客观题练习列表（只返回完成状态）
+      const [exams] = await connection.execute(`
+        SELECT 
+          e.id,
+          e.name,
+          CASE 
+            WHEN uep.is_completed IS NULL THEN 0
+            ELSE uep.is_completed 
+          END as is_completed
+        FROM task_exams te
+        JOIN exams e ON te.exam_id = e.id
+        LEFT JOIN user_exam_progress uep ON e.id = uep.exam_id AND uep.user_id = ?
+        WHERE te.task_id = ?
+        ORDER BY te.exam_order
+      `, [user_id, taskId]);
+      
+      // 获取OJ题目列表（只返回完成状态）
+      const [ojProblems] = await connection.execute(`
+        SELECT 
+          op.id,
+          op.title,
+          CASE 
+            WHEN uop.is_completed IS NULL THEN 0
+            ELSE uop.is_completed 
+          END as is_completed
+        FROM task_oj_problems top
+        JOIN oj_problems op ON top.problem_id = op.id
+        LEFT JOIN user_oj_progress uop ON op.id = uop.problem_id AND uop.user_id = ?
+        WHERE top.task_id = ?
+        ORDER BY top.problem_order
+      `, [user_id, taskId]);
+      
+      connection.release();
+      
+      res.json({
+        success: true,
+        data: {
+          task: {
+            id: task.id,
+            name: task.name,
+            description: task.description,
+            review_content: task.review_content,
+            review_video_url: task.review_video_url
+          },
+          exams: exams,
+          oj_problems: ojProblems
+        }
+      });
+      
+    } catch (error) {
+      connection.release();
+      throw error;
+    }
+    
+  } catch (error) {
+    logger.error('获取练习列表失败:', error);
+    res.status(500).json({ 
+      success: false,
+      error: '获取练习列表失败',
+      message: error.message 
+    });
+  }
+});
+
+// ==================== 8. 标记任务完成 ====================
+router.post('/learning-tasks/:taskId/complete', async (req, res) => {
+  try {
+    const { taskId } = req.params;
+    const { user_id } = req.body;
+    
+    // 验证必需参数
+    if (!user_id) {
+      return res.status(400).json({ 
+        success: false,
+        error: '缺少必需参数: user_id'
+      });
+    }
+    
+    const connection = await pool.getConnection();
+    
+    try {
+      await connection.beginTransaction();
+      
+      // 检查任务是否存在
+      const [taskRows] = await connection.execute(
+        'SELECT * FROM learning_tasks WHERE id = ?',
+        [taskId]
+      );
+      
+      if (taskRows.length === 0) {
+        await connection.rollback();
+        connection.release();
+        return res.status(404).json({ 
+          success: false,
+          error: '任务不存在' 
+        });
+      }
+      
+      // 检查用户是否加入了该计划
+      const [joinedRows] = await connection.execute(
+        'SELECT * FROM user_learning_plans WHERE user_id = ? AND plan_id = ?',
+        [user_id, taskRows[0].plan_id]
+      );
+      
+      if (joinedRows.length === 0) {
+        await connection.rollback();
+        connection.release();
+        return res.status(403).json({ 
+          success: false,
+          error: '您尚未加入该学习计划' 
+        });
+      }
+      
+      // 更新任务完成状态
+      await connection.execute(`
+        INSERT INTO user_task_progress (user_id, task_id, is_completed, completed_at)
+        VALUES (?, ?, TRUE, NOW())
+        ON DUPLICATE KEY UPDATE 
+          is_completed = TRUE,
+          completed_at = NOW(),
+          updated_at = NOW()
+      `, [user_id, taskId]);
+      
+      await connection.commit();
+      connection.release();
+      
+      res.json({
+        success: true,
+        message: '任务已标记为完成'
+      });
+      
+    } catch (error) {
+      await connection.rollback();
+      connection.release();
+      throw error;
+    }
+    
+  } catch (error) {
+    logger.error('标记任务完成失败:', error);
+    res.status(500).json({ 
+      success: false,
+      error: '标记任务完成失败',
+      message: error.message 
+    });
+  }
+});
+
+// ==================== 9. 创建学习计划（整体含任务和练习） ====================
+router.post('/learning-plans', async (req, res) => {
+  try {
+    const { name, description, level, start_time, end_time, tasks } = req.body;
+    
+    // 验证必需参数
+    if (!name) {
+      return res.status(400).json({ 
+        success: false,
+        error: '缺少必需参数: name'
+      });
+    }
+    
+    const connection = await pool.getConnection();
+    
+    try {
+      await connection.beginTransaction();
+      
+      // 1. 创建学习计划
+      const [planResult] = await connection.execute(`
+        INSERT INTO learning_plans (name, description, level, start_time, end_time, is_active)
+        VALUES (?, ?, ?, ?, ?, 1)
+      `, [
+        name, 
+        description || null, 
+        level || null, 
+        start_time || null, 
+        end_time || null
+      ]);
+      
+      const planId = planResult.insertId;
+      
+      // 2. 如果有任务列表，创建任务及关联的练习
+      if (tasks && Array.isArray(tasks) && tasks.length > 0) {
+        for (let i = 0; i < tasks.length; i++) {
+          const task = tasks[i];
+          
+          // 创建任务
+          const [taskResult] = await connection.execute(`
+            INSERT INTO learning_tasks 
+            (plan_id, name, description, review_content, review_video_url, start_time, end_time, task_order)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+          `, [
+            planId,
+            task.name || `任务${i + 1}`,
+            task.description || null,
+            task.review_content || null,
+            task.review_video_url || null,
+            task.start_time || null,
+            task.end_time || null,
+            task.task_order !== undefined ? task.task_order : i + 1
+          ]);
+          
+          const taskId = taskResult.insertId;
+          
+          // 关联客观题（exams）
+          if (task.exams && Array.isArray(task.exams) && task.exams.length > 0) {
+            for (let j = 0; j < task.exams.length; j++) {
+              const exam = task.exams[j];
+              await connection.execute(`
+                INSERT INTO task_exams (task_id, exam_id, exam_order)
+                VALUES (?, ?, ?)
+              `, [
+                taskId,
+                exam.exam_id,
+                exam.exam_order !== undefined ? exam.exam_order : j + 1
+              ]);
+            }
+          }
+          
+          // 关联OJ题目（oj_problems）
+          if (task.oj_problems && Array.isArray(task.oj_problems) && task.oj_problems.length > 0) {
+            for (let j = 0; j < task.oj_problems.length; j++) {
+              const problem = task.oj_problems[j];
+              await connection.execute(`
+                INSERT INTO task_oj_problems (task_id, problem_id, problem_order)
+                VALUES (?, ?, ?)
+              `, [
+                taskId,
+                problem.problem_id,
+                problem.problem_order !== undefined ? problem.problem_order : j + 1
+              ]);
+            }
+          }
+        }
+      }
+      
+      // 获取完整的学习计划信息（包含任务）
+      const [planData] = await connection.execute(
+        'SELECT * FROM learning_plans WHERE id = ?',
+        [planId]
+      );
+      
+      const [tasksData] = await connection.execute(`
+        SELECT 
+          lt.*,
+          (SELECT JSON_ARRAYAGG(JSON_OBJECT('exam_id', te.exam_id, 'exam_order', te.exam_order))
+           FROM task_exams te WHERE te.task_id = lt.id) as exams,
+          (SELECT JSON_ARRAYAGG(JSON_OBJECT('problem_id', top.problem_id, 'problem_order', top.problem_order))
+           FROM task_oj_problems top WHERE top.task_id = lt.id) as oj_problems
+        FROM learning_tasks lt
+        WHERE lt.plan_id = ?
+        ORDER BY lt.task_order, lt.start_time
+      `, [planId]);
+      
+      await connection.commit();
+      connection.release();
+      
+      res.json({
+        success: true,
+        message: '学习计划创建成功',
+        data: {
+          ...planData[0],
+          tasks: tasksData
+        }
+      });
+      
+    } catch (error) {
+      await connection.rollback();
+      connection.release();
+      throw error;
+    }
+    
+  } catch (error) {
+    logger.error('创建学习计划失败:', error);
+    res.status(500).json({ 
+      success: false,
+      error: '创建学习计划失败',
+      message: error.message 
+    });
+  }
+});
+
+// ==================== 10. 编辑学习计划（整体含任务和练习） ====================
+router.put('/learning-plans/:planId', async (req, res) => {
+  try {
+    const { planId } = req.params;
+    const { name, description, level, start_time, end_time, is_active, tasks } = req.body;
+    
+    const connection = await pool.getConnection();
+    
+    try {
+      await connection.beginTransaction();
+      
+      // 1. 检查学习计划是否存在
+      const [existingPlan] = await connection.execute(
+        'SELECT * FROM learning_plans WHERE id = ?',
+        [planId]
+      );
+      
+      if (existingPlan.length === 0) {
+        await connection.rollback();
+        connection.release();
+        return res.status(404).json({ 
+          success: false,
+          error: '学习计划不存在' 
+        });
+      }
+      
+      // 2. 更新学习计划基本信息
+      const updates = [];
+      const params = [];
+      
+      if (name !== undefined) {
+        updates.push('name = ?');
+        params.push(name);
+      }
+      if (description !== undefined) {
+        updates.push('description = ?');
+        params.push(description);
+      }
+      if (level !== undefined) {
+        updates.push('level = ?');
+        params.push(level);
+      }
+      if (start_time !== undefined) {
+        updates.push('start_time = ?');
+        params.push(start_time);
+      }
+      if (end_time !== undefined) {
+        updates.push('end_time = ?');
+        params.push(end_time);
+      }
+      if (is_active !== undefined) {
+        updates.push('is_active = ?');
+        params.push(is_active);
+      }
+      
+      if (updates.length > 0) {
+        params.push(planId);
+        await connection.execute(`
+          UPDATE learning_plans 
+          SET ${updates.join(', ')}, updated_at = NOW()
+          WHERE id = ?
+        `, params);
+      }
+      
+      // 3. 如果提供了任务列表，完全替换现有任务
+      if (tasks !== undefined && Array.isArray(tasks)) {
+        // 3.0 在删除任务之前，先备份用户的完成进度（按exam_id和problem_id保存）
+        const [joinedUsers] = await connection.execute(
+          'SELECT user_id FROM user_learning_plans WHERE plan_id = ?',
+          [planId]
+        );
+        
+        // 备份每个用户的客观题完成进度（按exam_id保存）
+        const examProgressBackup = new Map(); // key: "user_id:exam_id", value: {is_completed, best_score, attempt_count, completed_at}
+        // 备份每个用户的OJ题目完成进度（按problem_id保存）
+        const ojProgressBackup = new Map(); // key: "user_id:problem_id", value: {is_completed, best_verdict, attempt_count, completed_at}
+        // 备份每个用户的任务完成进度（按任务名称和顺序匹配）
+        const taskProgressBackup = new Map(); // key: "user_id:task_order:task_name", value: {is_completed, completed_at}
+        
+        for (const user of joinedUsers) {
+          // 备份客观题进度（只备份该计划内任务关联的）
+          const [examProgress] = await connection.execute(`
+            SELECT uep.exam_id, uep.is_completed, uep.best_score, uep.attempt_count, uep.completed_at
+            FROM user_exam_progress uep
+            JOIN task_exams te ON uep.exam_id = te.exam_id AND uep.task_id = te.task_id
+            JOIN learning_tasks lt ON te.task_id = lt.id
+            WHERE lt.plan_id = ? AND uep.user_id = ?
+          `, [planId, user.user_id]);
+          
+          for (const progress of examProgress) {
+            const key = `${user.user_id}:${progress.exam_id}`;
+            examProgressBackup.set(key, {
+              is_completed: progress.is_completed,
+              best_score: progress.best_score,
+              attempt_count: progress.attempt_count,
+              completed_at: progress.completed_at
+            });
+          }
+          
+          // 备份OJ题目进度（只备份该计划内任务关联的）
+          const [ojProgress] = await connection.execute(`
+            SELECT uop.problem_id, uop.is_completed, uop.best_verdict, uop.attempt_count, uop.completed_at
+            FROM user_oj_progress uop
+            JOIN task_oj_problems top ON uop.problem_id = top.problem_id AND uop.task_id = top.task_id
+            JOIN learning_tasks lt ON top.task_id = lt.id
+            WHERE lt.plan_id = ? AND uop.user_id = ?
+          `, [planId, user.user_id]);
+          
+          for (const progress of ojProgress) {
+            const key = `${user.user_id}:${progress.problem_id}`;
+            ojProgressBackup.set(key, {
+              is_completed: progress.is_completed,
+              best_verdict: progress.best_verdict,
+              attempt_count: progress.attempt_count,
+              completed_at: progress.completed_at
+            });
+          }
+          
+          // 备份任务进度
+          const [taskProgress] = await connection.execute(`
+            SELECT utp.task_id, utp.is_completed, utp.completed_at, lt.task_order, lt.name
+            FROM user_task_progress utp
+            JOIN learning_tasks lt ON utp.task_id = lt.id
+            WHERE lt.plan_id = ? AND utp.user_id = ?
+          `, [planId, user.user_id]);
+          
+          for (const progress of taskProgress) {
+            const key = `${user.user_id}:${progress.task_order}:${progress.name}`;
+            taskProgressBackup.set(key, {
+              is_completed: progress.is_completed,
+              completed_at: progress.completed_at
+            });
+          }
+        }
+        
+        // 3.1 删除该计划的所有现有任务（级联删除会自动删除关联的练习和用户进度）
+        await connection.execute(
+          'DELETE FROM learning_tasks WHERE plan_id = ?',
+          [planId]
+        );
+        
+        // 3.2 创建新的任务列表
+        for (let i = 0; i < tasks.length; i++) {
+          const task = tasks[i];
+          
+          // 创建任务
+          const [taskResult] = await connection.execute(`
+            INSERT INTO learning_tasks 
+            (plan_id, name, description, review_content, review_video_url, start_time, end_time, task_order)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+          `, [
+            planId,
+            task.name || `任务${i + 1}`,
+            task.description || null,
+            task.review_content || null,
+            task.review_video_url || null,
+            task.start_time || null,
+            task.end_time || null,
+            task.task_order !== undefined ? task.task_order : i + 1
+          ]);
+          
+          const taskId = taskResult.insertId;
+          
+          // 关联客观题（exams）
+          if (task.exams && Array.isArray(task.exams) && task.exams.length > 0) {
+            for (let j = 0; j < task.exams.length; j++) {
+              const exam = task.exams[j];
+              await connection.execute(`
+                INSERT INTO task_exams (task_id, exam_id, exam_order)
+                VALUES (?, ?, ?)
+              `, [
+                taskId,
+                exam.exam_id,
+                exam.exam_order !== undefined ? exam.exam_order : j + 1
+              ]);
+            }
+          }
+          
+          // 关联OJ题目（oj_problems）
+          if (task.oj_problems && Array.isArray(task.oj_problems) && task.oj_problems.length > 0) {
+            for (let j = 0; j < task.oj_problems.length; j++) {
+              const problem = task.oj_problems[j];
+              await connection.execute(`
+                INSERT INTO task_oj_problems (task_id, problem_id, problem_order)
+                VALUES (?, ?, ?)
+              `, [
+                taskId,
+                problem.problem_id,
+                problem.problem_order !== undefined ? problem.problem_order : j + 1
+              ]);
+            }
+          }
+        }
+        
+        // 3.3 为所有已加入该计划的用户重新创建任务进度和练习进度，并恢复之前的完成状态
+        for (const user of joinedUsers) {
+          // 重新创建任务进度，并尝试恢复之前的完成状态
+          const [newTasks] = await connection.execute(
+            'SELECT id, task_order, name FROM learning_tasks WHERE plan_id = ? ORDER BY task_order',
+            [planId]
+          );
+          
+          for (const newTask of newTasks) {
+            const backupKey = `${user.user_id}:${newTask.task_order}:${newTask.name}`;
+            const backup = taskProgressBackup.get(backupKey);
+            
+            await connection.execute(`
+              INSERT INTO user_task_progress (user_id, task_id, is_completed, completed_at)
+              VALUES (?, ?, ?, ?)
+            `, [
+              user.user_id,
+              newTask.id,
+              backup ? backup.is_completed : false,
+              backup ? backup.completed_at : null
+            ]);
+          }
+          
+          // 重新创建客观题进度，并恢复之前的完成状态
+          const [newTaskExams] = await connection.execute(`
+            SELECT te.exam_id, te.task_id
+            FROM task_exams te
+            JOIN learning_tasks lt ON te.task_id = lt.id
+            WHERE lt.plan_id = ?
+          `, [planId]);
+          
+          for (const taskExam of newTaskExams) {
+            const backupKey = `${user.user_id}:${taskExam.exam_id}`;
+            const backup = examProgressBackup.get(backupKey);
+            
+            if (backup) {
+              // 恢复之前的完成状态
+              await connection.execute(`
+                INSERT INTO user_exam_progress (user_id, exam_id, task_id, is_completed, best_score, attempt_count, completed_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+                ON DUPLICATE KEY UPDATE
+                  is_completed = VALUES(is_completed),
+                  best_score = GREATEST(COALESCE(best_score, 0), VALUES(best_score)),
+                  attempt_count = GREATEST(COALESCE(attempt_count, 0), VALUES(attempt_count)),
+                  completed_at = COALESCE(completed_at, VALUES(completed_at))
+              `, [
+                user.user_id,
+                taskExam.exam_id,
+                taskExam.task_id,
+                backup.is_completed,
+                backup.best_score,
+                backup.attempt_count,
+                backup.completed_at
+              ]);
+            } else {
+              // 创建新的未完成进度
+              await connection.execute(`
+                INSERT INTO user_exam_progress (user_id, exam_id, task_id, is_completed, best_score, attempt_count)
+                VALUES (?, ?, ?, FALSE, 0, 0)
+                ON DUPLICATE KEY UPDATE task_id = VALUES(task_id)
+              `, [user.user_id, taskExam.exam_id, taskExam.task_id]);
+            }
+          }
+          
+          // 重新创建OJ题目进度，并恢复之前的完成状态
+          const [newTaskOjProblems] = await connection.execute(`
+            SELECT top.problem_id, top.task_id
+            FROM task_oj_problems top
+            JOIN learning_tasks lt ON top.task_id = lt.id
+            WHERE lt.plan_id = ?
+          `, [planId]);
+          
+          for (const taskOjProblem of newTaskOjProblems) {
+            const backupKey = `${user.user_id}:${taskOjProblem.problem_id}`;
+            const backup = ojProgressBackup.get(backupKey);
+            
+            if (backup) {
+              // 恢复之前的完成状态
+              await connection.execute(`
+                INSERT INTO user_oj_progress (user_id, problem_id, task_id, is_completed, best_verdict, attempt_count, completed_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+                ON DUPLICATE KEY UPDATE
+                  is_completed = VALUES(is_completed),
+                  best_verdict = COALESCE(best_verdict, VALUES(best_verdict)),
+                  attempt_count = GREATEST(COALESCE(attempt_count, 0), VALUES(attempt_count)),
+                  completed_at = COALESCE(completed_at, VALUES(completed_at))
+              `, [
+                user.user_id,
+                taskOjProblem.problem_id,
+                taskOjProblem.task_id,
+                backup.is_completed,
+                backup.best_verdict,
+                backup.attempt_count,
+                backup.completed_at
+              ]);
+            } else {
+              // 创建新的未完成进度
+              await connection.execute(`
+                INSERT INTO user_oj_progress (user_id, problem_id, task_id, is_completed, best_verdict, attempt_count)
+                VALUES (?, ?, ?, FALSE, NULL, 0)
+                ON DUPLICATE KEY UPDATE task_id = VALUES(task_id)
+              `, [user.user_id, taskOjProblem.problem_id, taskOjProblem.task_id]);
+            }
+          }
+        }
+      }
+      
+      // 4. 获取更新后的完整学习计划信息
+      const [planData] = await connection.execute(
+        'SELECT * FROM learning_plans WHERE id = ?',
+        [planId]
+      );
+      
+      const [tasksData] = await connection.execute(`
+        SELECT 
+          lt.*,
+          (SELECT JSON_ARRAYAGG(JSON_OBJECT('exam_id', te.exam_id, 'exam_order', te.exam_order))
+           FROM task_exams te WHERE te.task_id = lt.id) as exams,
+          (SELECT JSON_ARRAYAGG(JSON_OBJECT('problem_id', top.problem_id, 'problem_order', top.problem_order))
+           FROM task_oj_problems top WHERE top.task_id = lt.id) as oj_problems
+        FROM learning_tasks lt
+        WHERE lt.plan_id = ?
+        ORDER BY lt.task_order, lt.start_time
+      `, [planId]);
+      
+      await connection.commit();
+      connection.release();
+      
+      res.json({
+        success: true,
+        message: '学习计划更新成功',
+        data: {
+          ...planData[0],
+          tasks: tasksData
+        }
+      });
+      
+    } catch (error) {
+      await connection.rollback();
+      connection.release();
+      throw error;
+    }
+    
+  } catch (error) {
+    logger.error('更新学习计划失败:', error);
+    res.status(500).json({ 
+      success: false,
+      error: '更新学习计划失败',
+      message: error.message 
+    });
+  }
+});
+
+// ==================== 11. 任务内提交客观题 ====================
+router.post('/learning-tasks/:taskId/submit-exam', async (req, res) => {
+  try {
+    const { taskId } = req.params;
+    const { user_id, exam_id, answers } = req.body;
+    
+    // 验证必需参数
+    if (!user_id || !exam_id || !answers || !Array.isArray(answers)) {
+      return res.status(400).json({ 
+        success: false,
+        error: '缺少必需参数: user_id, exam_id, answers'
+      });
+    }
+    
+    const connection = await pool.getConnection();
+    
+    try {
+      await connection.beginTransaction();
+      
+      // 1. 验证任务是否存在
+      const [taskRows] = await connection.execute(
+        'SELECT * FROM learning_tasks WHERE id = ?',
+        [taskId]
+      );
+      
+      if (taskRows.length === 0) {
+        await connection.rollback();
+        connection.release();
+        return res.status(404).json({ 
+          success: false,
+          error: '任务不存在' 
+        });
+      }
+      
+      const task = taskRows[0];
+      
+      // 2. 验证用户是否加入了该计划
+      const [joinedRows] = await connection.execute(
+        'SELECT * FROM user_learning_plans WHERE user_id = ? AND plan_id = ?',
+        [user_id, task.plan_id]
+      );
+      
+      if (joinedRows.length === 0) {
+        await connection.rollback();
+        connection.release();
+        return res.status(403).json({ 
+          success: false,
+          error: '您尚未加入该学习计划' 
+        });
+      }
+      
+      // 3. 验证该客观题是否属于该任务
+      const [taskExamRows] = await connection.execute(
+        'SELECT * FROM task_exams WHERE task_id = ? AND exam_id = ?',
+        [taskId, exam_id]
+      );
+      
+      if (taskExamRows.length === 0) {
+        await connection.rollback();
+        connection.release();
+        return res.status(400).json({ 
+          success: false,
+          error: '该客观题不属于此任务' 
+        });
+      }
+      
+      // 4. 调用可复用的提交函数（传入task_id以更新任务进度）
+      const result = await submitExamInternal(connection, user_id, exam_id, answers, taskId);
+      
+      await connection.commit();
+      connection.release();
+      
+      // 5. 先返回结果给前端
+      res.json({
+        success: true,
+        message: '任务内客观题提交成功',
+        ...result
+      });
+      
+      // 6. 异步更新任务和计划完成状态（不影响前端响应）
+      // 使用 setTimeout 确保主事务已提交后再执行
+      setTimeout(async () => {
+        const asyncConnection = await pool.getConnection();
+        try {
+          await asyncConnection.beginTransaction();
+          
+          // 检查并更新任务完成状态（只有60分以上才算完成）
+          await updateTaskCompletionStatus(asyncConnection, user_id, taskId);
+          
+          // 检查并更新计划完成状态
+          await updatePlanCompletionStatus(asyncConnection, user_id, task.plan_id);
+          
+          await asyncConnection.commit();
+          logger.info('异步更新任务完成状态成功', { user_id, taskId, plan_id: task.plan_id });
+        } catch (error) {
+          await asyncConnection.rollback();
+          logger.error('异步更新任务完成状态失败:', {
+            error: error.message,
+            stack: error.stack,
+            user_id,
+            taskId,
+            plan_id: task.plan_id
+          });
+        } finally {
+          asyncConnection.release();
+        }
+      }, 200); // 延迟200ms确保主事务已提交（增加延迟时间）
+      
+    } catch (error) {
+      await connection.rollback();
+      connection.release();
+      throw error;
+    }
+    
+  } catch (error) {
+    logger.error('任务内提交客观题失败:', error);
+    res.status(500).json({ 
+      success: false,
+      error: '任务内提交客观题失败',
+      message: error.message 
+    });
+  }
+});
+
+// ==================== 12. 任务内提交OJ ====================
+router.post('/learning-tasks/:taskId/submit-oj', async (req, res) => {
+  try {
+    const { taskId } = req.params;
+    const { user_id, problem_id, code, language } = req.body;
+    
+    // 验证必需参数
+    if (!user_id || !problem_id || !code || !language) {
+      return res.status(400).json({ 
+        success: false,
+        error: '缺少必需参数: user_id, problem_id, code, language'
+      });
+    }
+    
+    const connection = await pool.getConnection();
+    
+    try {
+      await connection.beginTransaction();
+      
+      // 1. 验证任务是否存在
+      const [taskRows] = await connection.execute(
+        'SELECT * FROM learning_tasks WHERE id = ?',
+        [taskId]
+      );
+      
+      if (taskRows.length === 0) {
+        await connection.rollback();
+        connection.release();
+        return res.status(404).json({ 
+          success: false,
+          error: '任务不存在' 
+        });
+      }
+      
+      const task = taskRows[0];
+      
+      // 2. 验证用户是否加入了该计划
+      const [joinedRows] = await connection.execute(
+        'SELECT * FROM user_learning_plans WHERE user_id = ? AND plan_id = ?',
+        [user_id, task.plan_id]
+      );
+      
+      if (joinedRows.length === 0) {
+        await connection.rollback();
+        connection.release();
+        return res.status(403).json({ 
+          success: false,
+          error: '您尚未加入该学习计划' 
+        });
+      }
+      
+      // 3. 验证该OJ题是否属于该任务
+      const [taskOjRows] = await connection.execute(
+        'SELECT * FROM task_oj_problems WHERE task_id = ? AND problem_id = ?',
+        [taskId, problem_id]
+      );
+      
+      if (taskOjRows.length === 0) {
+        await connection.rollback();
+        connection.release();
+        return res.status(400).json({ 
+          success: false,
+          error: '该OJ题不属于此任务' 
+        });
+      }
+      
+      // 4. 调用可复用的提交函数（传入task_id以更新任务进度）
+      const result = await submitOjInternal(connection, user_id, problem_id, code, language, taskId);
+      
+      await connection.commit();
+      connection.release();
+      
+      // 5. 先返回结果给前端
+      res.json({
+        success: true,
+        message: '任务内OJ提交成功',
+        ...result
+      });
+      
+      // 6. 异步更新任务和计划完成状态（不影响前端响应）
+      // 使用 setTimeout 确保主事务已提交后再执行
+      setTimeout(async () => {
+        const asyncConnection = await pool.getConnection();
+        try {
+          await asyncConnection.beginTransaction();
+          
+          // 检查并更新任务完成状态（只有Accepted才算完成）
+          await updateTaskCompletionStatus(asyncConnection, user_id, taskId);
+          
+          // 检查并更新计划完成状态
+          await updatePlanCompletionStatus(asyncConnection, user_id, task.plan_id);
+          
+          await asyncConnection.commit();
+          logger.info('异步更新任务完成状态成功', { user_id, taskId, plan_id: task.plan_id });
+        } catch (error) {
+          await asyncConnection.rollback();
+          logger.error('异步更新任务完成状态失败:', {
+            error: error.message,
+            stack: error.stack,
+            user_id,
+            taskId,
+            plan_id: task.plan_id
+          });
+        } finally {
+          asyncConnection.release();
+        }
+      }, 200); // 延迟200ms确保主事务已提交（增加延迟时间）
+      
+    } catch (error) {
+      await connection.rollback();
+      connection.release();
+      throw error;
+    }
+    
+  } catch (error) {
+    logger.error('任务内提交OJ失败:', error);
+    res.status(500).json({ 
+      success: false,
+      error: '任务内提交OJ失败',
+      message: error.message 
+    });
+  }
+});
+
+// ==================== 辅助函数：更新任务完成状态 ====================
+async function updateTaskCompletionStatus(connection, user_id, task_id) {
+  // 1. 获取任务内的所有客观题
+  const [taskExams] = await connection.execute(
+    'SELECT exam_id FROM task_exams WHERE task_id = ?',
+    [task_id]
+  );
+  
+  // 2. 获取任务内的所有OJ题
+  const [taskOjs] = await connection.execute(
+    'SELECT problem_id FROM task_oj_problems WHERE task_id = ?',
+    [task_id]
+  );
+  
+  // 3. 检查所有客观题是否都完成
+  let allExamsCompleted = true;
+  if (taskExams.length > 0) {
+    const examIds = taskExams.map(te => te.exam_id);
+    const placeholders = examIds.map(() => '?').join(',');
+    const [examProgress] = await connection.execute(
+      `SELECT COUNT(*) as completed_count 
+       FROM user_exam_progress 
+       WHERE user_id = ? AND exam_id IN (${placeholders}) AND task_id = ? AND is_completed = 1`,
+      [user_id, ...examIds, task_id]
+    );
+    const completedCount = Number(examProgress[0].completed_count) || 0;
+    allExamsCompleted = completedCount === examIds.length;
+    logger.info(`任务完成状态检查 - 客观题: ${completedCount}/${examIds.length}`, {
+      user_id,
+      task_id,
+      examIds,
+      completedCount,
+      allExamsCompleted
+    });
+  } else {
+    logger.info(`任务完成状态检查 - 无客观题`, { user_id, task_id });
+  }
+  
+  // 4. 检查所有OJ题是否都完成
+  let allOjsCompleted = true;
+  if (taskOjs.length > 0) {
+    const problemIds = taskOjs.map(to => to.problem_id);
+    const placeholders = problemIds.map(() => '?').join(',');
+    const [ojProgress] = await connection.execute(
+      `SELECT COUNT(*) as completed_count 
+       FROM user_oj_progress 
+       WHERE user_id = ? AND problem_id IN (${placeholders}) AND task_id = ? AND is_completed = 1`,
+      [user_id, ...problemIds, task_id]
+    );
+    const completedCount = Number(ojProgress[0].completed_count) || 0;
+    allOjsCompleted = completedCount === problemIds.length;
+    logger.info(`任务完成状态检查 - OJ题: ${completedCount}/${problemIds.length}`, {
+      user_id,
+      task_id,
+      problemIds,
+      completedCount,
+      allOjsCompleted
+    });
+  } else {
+    logger.info(`任务完成状态检查 - 无OJ题`, { user_id, task_id });
+  }
+  
+  // 5. 如果都完成了，更新任务完成状态
+  const isTaskCompleted = allExamsCompleted && allOjsCompleted;
+  
+  if (isTaskCompleted) {
+    await connection.execute(`
+      INSERT INTO user_task_progress (user_id, task_id, is_completed, completed_at)
+      VALUES (?, ?, TRUE, NOW())
+      ON DUPLICATE KEY UPDATE 
+        is_completed = TRUE,
+        completed_at = CASE WHEN completed_at IS NULL THEN NOW() ELSE completed_at END,
+        updated_at = NOW()
+    `, [user_id, task_id]);
+    logger.info(`任务完成状态已更新 - 任务已完成`, { user_id, task_id });
+  } else {
+    logger.info(`任务完成状态检查 - 任务未完成`, {
+      user_id,
+      task_id,
+      allExamsCompleted,
+      allOjsCompleted
+    });
+  }
+}
+
+// ==================== 辅助函数：更新计划完成状态 ====================
+async function updatePlanCompletionStatus(connection, user_id, plan_id) {
+  // 1. 获取计划的所有任务
+  const [tasks] = await connection.execute(
+    'SELECT id FROM learning_tasks WHERE plan_id = ?',
+    [plan_id]
+  );
+  
+  if (tasks.length === 0) {
+    return;
+  }
+  
+  // 2. 统计已完成任务数
+  const taskIds = tasks.map(t => t.id);
+  const placeholders = taskIds.map(() => '?').join(',');
+  const [completedTasks] = await connection.execute(
+    `SELECT COUNT(*) as completed_count 
+     FROM user_task_progress 
+     WHERE user_id = ? AND task_id IN (${placeholders}) AND is_completed = 1`,
+    [user_id, ...taskIds]
+  );
+  
+  const completedCount = completedTasks[0].completed_count;
+  const totalCount = tasks.length;
+  const isPlanCompleted = completedCount === totalCount;
+  
+  // 3. 更新或创建计划完成进度
+  await connection.execute(`
+    INSERT INTO user_plan_progress (user_id, plan_id, is_completed, completed_tasks, total_tasks, completed_at)
+    VALUES (?, ?, ?, ?, ?, ?)
+    ON DUPLICATE KEY UPDATE 
+      is_completed = ?,
+      completed_tasks = ?,
+      total_tasks = ?,
+      completed_at = CASE WHEN ? AND completed_at IS NULL THEN NOW() ELSE completed_at END,
+      updated_at = NOW()
+  `, [
+    user_id, plan_id, 
+    isPlanCompleted ? 1 : 0, completedCount, totalCount,
+    isPlanCompleted ? new Date() : null,
+    isPlanCompleted ? 1 : 0, completedCount, totalCount,
+    isPlanCompleted ? 1 : 0
+  ]);
+}
+
+// ==================== 13. 获取计划完成情况 ====================
+router.get('/learning-plans/:planId/progress', async (req, res) => {
+  try {
+    const { planId } = req.params;
+    const { user_id } = req.query;
+    
+    // 验证必需参数
+    if (!user_id) {
+      return res.status(400).json({ 
+        success: false,
+        error: '缺少必需参数: user_id'
+      });
+    }
+    
+    const connection = await pool.getConnection();
+    
+    try {
+      // 1. 获取计划基本信息
+      const [planRows] = await connection.execute(`
+        SELECT 
+          lp.*
+        FROM learning_plans lp
+        WHERE lp.id = ? AND lp.is_active = 1
+      `, [planId]);
+      
+      if (planRows.length === 0) {
+        connection.release();
+        return res.status(404).json({ 
+          success: false,
+          error: '学习计划不存在' 
+        });
+      }
+      
+      const plan = planRows[0];
+      
+      // 2. 检查用户是否加入了该计划
+      const [joinedRows] = await connection.execute(
+        'SELECT * FROM user_learning_plans WHERE user_id = ? AND plan_id = ?',
+        [user_id, planId]
+      );
+      
+      if (joinedRows.length === 0) {
+        connection.release();
+        return res.status(403).json({ 
+          success: false,
+          error: '您未加入该学习计划' 
+        });
+      }
+      
+      // 3. 获取计划完成状态
+      const [planProgressRows] = await connection.execute(
+        'SELECT * FROM user_plan_progress WHERE user_id = ? AND plan_id = ?',
+        [user_id, planId]
+      );
+      
+      const planProgress = planProgressRows[0] || {
+        is_completed: false,
+        completed_tasks: 0,
+        total_tasks: 0,
+        completed_at: null
+      };
+      
+      // 4. 获取计划内的所有任务
+      const [tasks] = await connection.execute(
+        'SELECT * FROM learning_tasks WHERE plan_id = ? ORDER BY task_order',
+        [planId]
+      );
+      
+      // 5. 获取每个任务的完成情况
+      const taskDetails = [];
+      for (const task of tasks) {
+        // 获取任务完成状态
+        const [taskProgressRows] = await connection.execute(
+          'SELECT * FROM user_task_progress WHERE user_id = ? AND task_id = ?',
+          [user_id, task.id]
+        );
+        
+        // 获取任务内的客观题完成情况
+        const [examProgress] = await connection.execute(`
+          SELECT 
+            e.id,
+            e.name,
+            e.level,
+            e.type,
+            te.exam_order,
+            COALESCE(uep.is_completed, 0) as is_completed,
+            uep.best_score,
+            COALESCE(uep.attempt_count, 0) as attempt_count,
+            uep.completed_at
+          FROM task_exams te
+          JOIN exams e ON te.exam_id = e.id
+          LEFT JOIN user_exam_progress uep ON e.id = uep.exam_id 
+            AND uep.user_id = ? AND uep.task_id = ?
+          WHERE te.task_id = ?
+          ORDER BY te.exam_order
+        `, [user_id, task.id, task.id]);
+        
+        // 获取任务内的OJ题完成情况
+        const [ojProgress] = await connection.execute(`
+          SELECT 
+            op.id,
+            op.title,
+            op.level,
+            top.problem_order,
+            COALESCE(uop.is_completed, 0) as is_completed,
+            uop.best_verdict,
+            COALESCE(uop.attempt_count, 0) as attempt_count,
+            uop.completed_at
+          FROM task_oj_problems top
+          JOIN oj_problems op ON top.problem_id = op.id
+          LEFT JOIN user_oj_progress uop ON op.id = uop.problem_id 
+            AND uop.user_id = ? AND uop.task_id = ?
+          WHERE top.task_id = ?
+          ORDER BY top.problem_order
+        `, [user_id, task.id, task.id]);
+        
+        taskDetails.push({
+          ...task,
+          task_progress: {
+            is_completed: taskProgressRows.length > 0 && taskProgressRows[0].is_completed === 1,
+            completed_at: taskProgressRows.length > 0 ? taskProgressRows[0].completed_at : null
+          },
+          exam_progress: {
+            total: examProgress.length,
+            // 确保 is_completed 是数字或布尔值，而不是字符串
+            completed: examProgress.filter(e => Number(e.is_completed) === 1 || e.is_completed === true).length,
+            exams: examProgress
+          },
+          oj_progress: {
+            total: ojProgress.length,
+            // 确保 is_completed 是数字或布尔值，而不是字符串
+            completed: ojProgress.filter(o => Number(o.is_completed) === 1 || o.is_completed === true).length,
+            problems: ojProgress
+          }
+        });
+      }
+      
+      connection.release();
+      
+      res.json({
+        success: true,
+        data: {
+          plan: plan,
+          plan_progress: {
+            is_completed: planProgress.is_completed === 1 || planProgress.is_completed === true,
+            completed_tasks: planProgress.completed_tasks || 0,
+            total_tasks: planProgress.total_tasks || tasks.length,
+            progress_rate: tasks.length > 0 
+              ? Math.round(((planProgress.completed_tasks || 0) / tasks.length) * 100) 
+              : 0,
+            completed_at: planProgress.completed_at
+          },
+          tasks: taskDetails
+        }
+      });
+      
+    } catch (error) {
+      connection.release();
+      throw error;
+    }
+    
+  } catch (error) {
+    logger.error('获取计划完成情况失败:', error);
+    res.status(500).json({ 
+      success: false,
+      error: '获取计划完成情况失败',
+      message: error.message 
+    });
+  }
+});
+
+// ==================== 14. 获取任务完成情况 ====================
+router.get('/learning-tasks/:taskId/progress', async (req, res) => {
+  try {
+    const { taskId } = req.params;
+    const { user_id } = req.query;
+    
+    // 验证必需参数
+    if (!user_id) {
+      return res.status(400).json({ 
+        success: false,
+        error: '缺少必需参数: user_id'
+      });
+    }
+    
+    const connection = await pool.getConnection();
+    
+    try {
+      // 1. 获取任务基本信息
+      const [taskRows] = await connection.execute(`
+        SELECT 
+          lt.*,
+          lp.name as plan_name,
+          lp.level as plan_level
+        FROM learning_tasks lt
+        JOIN learning_plans lp ON lt.plan_id = lp.id
+        WHERE lt.id = ?
+      `, [taskId]);
+      
+      if (taskRows.length === 0) {
+        connection.release();
+        return res.status(404).json({ 
+          success: false,
+          error: '任务不存在' 
+        });
+      }
+      
+      const task = taskRows[0];
+      
+      // 2. 获取任务完成状态
+      const [taskProgressRows] = await connection.execute(
+        'SELECT * FROM user_task_progress WHERE user_id = ? AND task_id = ?',
+        [user_id, taskId]
+      );
+      
+      const taskProgress = taskProgressRows[0] || {
+        is_completed: false,
+        completed_at: null
+      };
+      
+      // 3. 获取任务内的客观题完成情况
+      const [examProgress] = await connection.execute(`
+        SELECT 
+          e.id,
+          e.name,
+          e.level,
+          e.type,
+          e.total_questions,
+          te.exam_order,
+          COALESCE(uep.is_completed, 0) as is_completed,
+          COALESCE(uep.best_score, 0) as best_score,
+          COALESCE(uep.attempt_count, 0) as attempt_count,
+          uep.completed_at
+        FROM task_exams te
+        JOIN exams e ON te.exam_id = e.id
+        LEFT JOIN user_exam_progress uep ON e.id = uep.exam_id 
+          AND uep.user_id = ? AND uep.task_id = ?
+        WHERE te.task_id = ?
+        ORDER BY te.exam_order
+      `, [user_id, taskId, taskId]);
+      
+      // 4. 获取任务内的OJ题完成情况
+      const [ojProgress] = await connection.execute(`
+        SELECT 
+          op.id,
+          op.title,
+          op.level,
+          top.problem_order,
+          COALESCE(uop.is_completed, 0) as is_completed,
+          uop.best_verdict,
+          COALESCE(uop.attempt_count, 0) as attempt_count,
+          uop.completed_at
+        FROM task_oj_problems top
+        JOIN oj_problems op ON top.problem_id = op.id
+        LEFT JOIN user_oj_progress uop ON op.id = uop.problem_id 
+          AND uop.user_id = ? AND uop.task_id = ?
+        WHERE top.task_id = ?
+        ORDER BY top.problem_order
+      `, [user_id, taskId, taskId]);
+      
+      // 5. 统计完成情况
+      const totalExams = examProgress.length;
+      // 确保 is_completed 是数字或布尔值，而不是字符串
+      const completedExams = examProgress.filter(e => Number(e.is_completed) === 1 || e.is_completed === true).length;
+      const totalOjs = ojProgress.length;
+      const completedOjs = ojProgress.filter(o => Number(o.is_completed) === 1 || o.is_completed === true).length;
+      
+      connection.release();
+      
+      res.json({
+        success: true,
+        data: {
+          task: {
+            id: task.id,
+            name: task.name,
+            description: task.description,
+            plan_name: task.plan_name,
+            plan_level: task.plan_level
+          },
+          task_progress: {
+            is_completed: taskProgress.is_completed === 1 || taskProgress.is_completed === true,
+            completed_at: taskProgress.completed_at
+          },
+          exam_progress: {
+            total: totalExams,
+            completed: completedExams,
+            progress_rate: totalExams > 0 ? Math.round((completedExams / totalExams) * 100) : 0,
+            exams: examProgress
+          },
+          oj_progress: {
+            total: totalOjs,
+            completed: completedOjs,
+            progress_rate: totalOjs > 0 ? Math.round((completedOjs / totalOjs) * 100) : 0,
+            problems: ojProgress
+          }
+        }
+      });
+      
+    } catch (error) {
+      connection.release();
+      throw error;
+    }
+    
+  } catch (error) {
+    logger.error('获取任务完成情况失败:', error);
+    res.status(500).json({ 
+      success: false,
+      error: '获取任务完成情况失败',
+      message: error.message 
+    });
+  }
+});
+
+// ==================== 14. 教师查看学生在计划内的完成情况 ====================
+router.get('/learning-plans/:planId/students-progress', async (req, res) => {
+  try {
+    const { planId } = req.params;
+    const { teacher_id } = req.query;
+    
+    // 验证必需参数
+    if (!teacher_id) {
+      return res.status(400).json({ 
+        success: false,
+        error: '缺少必需参数: teacher_id'
+      });
+    }
+    
+    const connection = await pool.getConnection();
+    
+    try {
+      // 1. 验证计划是否存在
+      const [planRows] = await connection.execute(
+        'SELECT * FROM learning_plans WHERE id = ?',
+        [planId]
+      );
+      
+      if (planRows.length === 0) {
+        connection.release();
+        return res.status(404).json({ 
+          success: false,
+          error: '学习计划不存在' 
+        });
+      }
+      
+      // 2. 获取该教师的所有学生
+      const [students] = await connection.execute(`
+        SELECT DISTINCT u.id, u.username, u.real_name
+        FROM users u
+        JOIN teacher_students ts ON u.id = ts.student_id
+        WHERE ts.teacher_id = ?
+      `, [teacher_id]);
+      
+      if (students.length === 0) {
+        connection.release();
+        return res.json({
+          success: true,
+          data: {
+            plan: planRows[0],
+            students: []
+          }
+        });
+      }
+      
+      // 3. 获取计划的所有任务
+      const [tasks] = await connection.execute(
+        'SELECT id, name, task_order FROM learning_tasks WHERE plan_id = ? ORDER BY task_order',
+        [planId]
+      );
+      
+      // 4. 为每个学生获取完成情况
+      const studentsProgress = [];
+      for (const student of students) {
+        // 检查学生是否加入了该计划
+        const [joined] = await connection.execute(
+          'SELECT * FROM user_learning_plans WHERE user_id = ? AND plan_id = ?',
+          [student.id, planId]
+        );
+        
+        if (joined.length === 0) {
+          continue; // 学生未加入该计划，跳过
+        }
+        
+        // 获取计划完成进度
+        const [planProgressRows] = await connection.execute(
+          'SELECT * FROM user_plan_progress WHERE user_id = ? AND plan_id = ?',
+          [student.id, planId]
+        );
+        
+        const planProgress = planProgressRows[0] || {
+          is_completed: false,
+          completed_tasks: 0,
+          total_tasks: tasks.length
+        };
+        
+        // 获取每个任务的完成情况
+        const taskProgressList = [];
+        for (const task of tasks) {
+          const [taskProgressRows] = await connection.execute(
+            'SELECT * FROM user_task_progress WHERE user_id = ? AND task_id = ?',
+            [student.id, task.id]
+          );
+          
+          // 统计任务内的客观题和OJ题完成情况
+          const [examStats] = await connection.execute(`
+            SELECT 
+              COUNT(*) as total,
+              SUM(CASE WHEN uep.is_completed = 1 THEN 1 ELSE 0 END) as completed
+            FROM task_exams te
+            LEFT JOIN user_exam_progress uep ON te.exam_id = uep.exam_id 
+              AND uep.user_id = ? AND uep.task_id = ?
+            WHERE te.task_id = ?
+          `, [student.id, task.id, task.id]);
+          
+          const [ojStats] = await connection.execute(`
+            SELECT 
+              COUNT(*) as total,
+              SUM(CASE WHEN uop.is_completed = 1 THEN 1 ELSE 0 END) as completed
+            FROM task_oj_problems top
+            LEFT JOIN user_oj_progress uop ON top.problem_id = uop.problem_id 
+              AND uop.user_id = ? AND uop.task_id = ?
+            WHERE top.task_id = ?
+          `, [student.id, task.id, task.id]);
+          
+          taskProgressList.push({
+            task_id: task.id,
+            task_name: task.name,
+            task_order: task.task_order,
+            is_completed: taskProgressRows.length > 0 && taskProgressRows[0].is_completed === 1,
+            completed_at: taskProgressRows.length > 0 ? taskProgressRows[0].completed_at : null,
+            exam_completed: examStats[0].completed || 0,
+            exam_total: examStats[0].total || 0,
+            oj_completed: ojStats[0].completed || 0,
+            oj_total: ojStats[0].total || 0
+          });
+        }
+        
+        studentsProgress.push({
+          student_id: student.id,
+          username: student.username,
+          real_name: student.real_name,
+          plan_progress: {
+            is_completed: planProgress.is_completed === 1 || planProgress.is_completed === true,
+            completed_tasks: planProgress.completed_tasks || 0,
+            total_tasks: planProgress.total_tasks || tasks.length,
+            progress_rate: tasks.length > 0 
+              ? Math.round(((planProgress.completed_tasks || 0) / tasks.length) * 100) 
+              : 0
+          },
+          tasks: taskProgressList
+        });
+      }
+      
+      connection.release();
+      
+      res.json({
+        success: true,
+        data: {
+          plan: planRows[0],
+          students: studentsProgress
+        }
+      });
+      
+    } catch (error) {
+      connection.release();
+      throw error;
+    }
+    
+  } catch (error) {
+    logger.error('获取学生完成情况失败:', error);
+    res.status(500).json({ 
+      success: false,
+      error: '获取学生完成情况失败',
+      message: error.message 
+    });
+  }
+});
+
+// ==================== 15. 教师查看单个学生的详细完成情况 ====================
+router.get('/learning-plans/:planId/students/:studentId/progress', async (req, res) => {
+  try {
+    const { planId, studentId } = req.params;
+    const { teacher_id } = req.query;
+    
+    // 验证必需参数
+    if (!teacher_id) {
+      return res.status(400).json({ 
+        success: false,
+        error: '缺少必需参数: teacher_id'
+      });
+    }
+    
+    const connection = await pool.getConnection();
+    
+    try {
+      // 1. 验证教师-学生关系
+      const [relationRows] = await connection.execute(
+        'SELECT * FROM teacher_students WHERE teacher_id = ? AND student_id = ?',
+        [teacher_id, studentId]
+      );
+      
+      if (relationRows.length === 0) {
+        connection.release();
+        return res.status(403).json({ 
+          success: false,
+          error: '您无权查看该学生的信息' 
+        });
+      }
+      
+      // 2. 验证计划是否存在
+      const [planRows] = await connection.execute(
+        'SELECT * FROM learning_plans WHERE id = ?',
+        [planId]
+      );
+      
+      if (planRows.length === 0) {
+        connection.release();
+        return res.status(404).json({ 
+          success: false,
+          error: '学习计划不存在' 
+        });
+      }
+      
+      // 3. 获取学生信息
+      const [studentRows] = await connection.execute(
+        'SELECT id, username, real_name FROM users WHERE id = ?',
+        [studentId]
+      );
+      
+      if (studentRows.length === 0) {
+        connection.release();
+        return res.status(404).json({ 
+          success: false,
+          error: '学生不存在' 
+        });
+      }
+      
+      // 4. 检查学生是否加入了该计划
+      const [joined] = await connection.execute(
+        'SELECT * FROM user_learning_plans WHERE user_id = ? AND plan_id = ?',
+        [studentId, planId]
+      );
+      
+      if (joined.length === 0) {
+        connection.release();
+        return res.json({
+          success: true,
+          data: {
+            student: studentRows[0],
+            plan: planRows[0],
+            message: '该学生尚未加入此学习计划',
+            plan_progress: null,
+            tasks: []
+          }
+        });
+      }
+      
+      // 5. 获取计划完成进度
+      const [planProgressRows] = await connection.execute(
+        'SELECT * FROM user_plan_progress WHERE user_id = ? AND plan_id = ?',
+        [studentId, planId]
+      );
+      
+      const planProgress = planProgressRows[0] || {
+        is_completed: false,
+        completed_tasks: 0,
+        total_tasks: 0
+      };
+      
+      // 6. 获取计划的所有任务及详细完成情况
+      const [tasks] = await connection.execute(
+        'SELECT * FROM learning_tasks WHERE plan_id = ? ORDER BY task_order',
+        [planId]
+      );
+      
+      const taskDetails = [];
+      for (const task of tasks) {
+        // 获取任务完成状态
+        const [taskProgressRows] = await connection.execute(
+          'SELECT * FROM user_task_progress WHERE user_id = ? AND task_id = ?',
+          [studentId, task.id]
+        );
+        
+        // 获取任务内的客观题完成情况
+        const [examProgress] = await connection.execute(`
+          SELECT 
+            e.id,
+            e.name,
+            e.level,
+            e.type,
+            te.exam_order,
+            COALESCE(uep.is_completed, 0) as is_completed,
+            COALESCE(uep.best_score, 0) as best_score,
+            COALESCE(uep.attempt_count, 0) as attempt_count,
+            uep.completed_at
+          FROM task_exams te
+          JOIN exams e ON te.exam_id = e.id
+          LEFT JOIN user_exam_progress uep ON e.id = uep.exam_id 
+            AND uep.user_id = ? AND uep.task_id = ?
+          WHERE te.task_id = ?
+          ORDER BY te.exam_order
+        `, [studentId, task.id, task.id]);
+        
+        // 获取任务内的OJ题完成情况
+        const [ojProgress] = await connection.execute(`
+          SELECT 
+            op.id,
+            op.title,
+            op.level,
+            top.problem_order,
+            COALESCE(uop.is_completed, 0) as is_completed,
+            uop.best_verdict,
+            COALESCE(uop.attempt_count, 0) as attempt_count,
+            uop.completed_at
+          FROM task_oj_problems top
+          JOIN oj_problems op ON top.problem_id = op.id
+          LEFT JOIN user_oj_progress uop ON op.id = uop.problem_id 
+            AND uop.user_id = ? AND uop.task_id = ?
+          WHERE top.task_id = ?
+          ORDER BY top.problem_order
+        `, [studentId, task.id, task.id]);
+        
+        taskDetails.push({
+          ...task,
+          task_progress: {
+            is_completed: taskProgressRows.length > 0 && taskProgressRows[0].is_completed === 1,
+            completed_at: taskProgressRows.length > 0 ? taskProgressRows[0].completed_at : null
+          },
+          exam_progress: {
+            total: examProgress.length,
+            // 确保 is_completed 是数字或布尔值，而不是字符串
+            completed: examProgress.filter(e => Number(e.is_completed) === 1 || e.is_completed === true).length,
+            exams: examProgress
+          },
+          oj_progress: {
+            total: ojProgress.length,
+            // 确保 is_completed 是数字或布尔值，而不是字符串
+            completed: ojProgress.filter(o => Number(o.is_completed) === 1 || o.is_completed === true).length,
+            problems: ojProgress
+          }
+        });
+      }
+      
+      connection.release();
+      
+      res.json({
+        success: true,
+        data: {
+          student: studentRows[0],
+          plan: planRows[0],
+          plan_progress: {
+            is_completed: planProgress.is_completed === 1 || planProgress.is_completed === true,
+            completed_tasks: planProgress.completed_tasks || 0,
+            total_tasks: planProgress.total_tasks || tasks.length,
+            progress_rate: tasks.length > 0 
+              ? Math.round(((planProgress.completed_tasks || 0) / tasks.length) * 100) 
+              : 0
+          },
+          tasks: taskDetails
+        }
+      });
+      
+    } catch (error) {
+      connection.release();
+      throw error;
+    }
+    
+  } catch (error) {
+    logger.error('获取学生详细完成情况失败:', error);
+    res.status(500).json({ 
+      success: false,
+      error: '获取学生详细完成情况失败',
+      message: error.message 
+    });
+  }
+});
+
+module.exports = router;
+module.exports.updateTaskCompletionStatus = updateTaskCompletionStatus;
+module.exports.updatePlanCompletionStatus = updatePlanCompletionStatus;
+

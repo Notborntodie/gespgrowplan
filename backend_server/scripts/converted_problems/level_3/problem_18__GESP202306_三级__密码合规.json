@@ -1,0 +1,62 @@
+{
+  "title": "[GESP202306 三级] 密码合规",
+  "description": "网站注册需要有用户名和密码，编写程序以检查用户输入密码的有效性。合规的密码应满足以下要求 :。\r\n\n\t    1. 只能由 $\\texttt a \\sim \\texttt z$ 之间 $26$ 个小写字母、$\\texttt A \\sim \\texttt Z$ 之间 $26$ 个大写字母、$0 \\sim 9$ 之间 $10$ 个数字以及 !@#$ 四个特殊字符构成。\r\n\n\t    2. 密码最短长度 $:6$ 个字符，密码最大长度 $:12$ 个字符。\r\n\n\t    3. 大写字母，小写字母和数字必须至少有其中两种，以及至少有四个特殊字符中的一个。",
+  "input_format": "输入一行不含空格的字符串。约定长度不超过 $100$。该字符串被英文逗号分隔为多段，作为多组被检测密码。",
+  "output_format": "输出若干行，每行输出一组合规的密码。输出顺序以输入先后为序，即先输入则先输出。",
+  "data_range": "【样例 1 解释】\r\n\n\t输入被英文逗号分为了四组被检测密码：seHJ12!@、sjdkffH$123、sdf!@&12HDHa!、123&^YUhg@!。其中 sdf!@&12HDHa! 长度超过 12 个字符，不合规；123&^YUhg@! 包含四个特殊字符之外的字符不合规。",
+  "time_limit": 1000,
+  "memory_limit": 128,
+  "level": 3,
+  "publish_date": "2023-06-01",
+  "samples": [
+    {
+      "input": "seHJ12!@,sjdkffH$123,sdf!@&12HDHa!,123&^YUhg@!",
+      "output": "seHJ12!@\r\nsjdkffH$123",
+      "explanation": "样例",
+      "is_hidden": false,
+      "sort_order": 1
+    },
+    {
+      "input": "seHJ12!@,sjdkffH$123,sdf!@&12HDHa!,123&^YUhg@!",
+      "output": "seHJ12!@\nsjdkffH$123",
+      "explanation": "test",
+      "is_hidden": true,
+      "sort_order": 2
+    },
+    {
+      "input": "kjahsd@#$@#,ksjldhf@#@#,sdlfkn$@#$,dsfklsef#$%#@,seHJ12!@,sjdkffH$123",
+      "output": "seHJ12!@\nsjdkffH$123",
+      "explanation": "test_1",
+      "is_hidden": true,
+      "sort_order": 3
+    },
+    {
+      "input": "kjahsd@#$@#,ksjldhf@#@#,sdlfkn$@#$,dsfklsef#$%#@,seHJ12!@",
+      "output": "seHJ12!@",
+      "explanation": "test_2",
+      "is_hidden": true,
+      "sort_order": 4
+    },
+    {
+      "input": "akjsdkajshdkahdkahskhkaw@!@#$@#$!@#!wskj,asdawd!@#!@#$,!@#!$@#$@,sdlfkn$@#$,dsfklsef#$%#@,seHJ12!@,sjdkffH$123",
+      "output": "seHJ12!@\nsjdkffH$123",
+      "explanation": "test_3",
+      "is_hidden": true,
+      "sort_order": 5
+    },
+    {
+      "input": "akjsdkajshdkahdkahskhkaw@!@#$@#$!@#!wskj,asdawd!@#!@#$,!@#!$@#$@,sdlfkn$@#$,dsfklsef#$%#@,sjdkffH$123",
+      "output": "sjdkffH$123",
+      "explanation": "test_4",
+      "is_hidden": true,
+      "sort_order": 6
+    },
+    {
+      "input": "akjsdkajshdkahdkahskhkaw@!@#$@#$!@#!wskj,asdawd!@#!@#$,kjashd%@#$@#$,(&)(*&*%sdfs,sdfse,rgsese,wdaw,da,d,!@#!$@#$@,sdlfkn$@#$,dsfklsef#$%#@,sjdkffH$123",
+      "output": "sjdkffH$123",
+      "explanation": "test_5",
+      "is_hidden": true,
+      "sort_order": 7
+    }
+  ]
+}

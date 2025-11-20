@@ -1,0 +1,69 @@
+{
+  "title": "[GESP202509 一级] 金字塔",
+  "description": "金字塔由 $n$ 层石块垒成。从塔底向上，每层依次需要 $n \\times n, (n-1) \\times (n-1), \\cdots, 2 \\times 2, 1 \\times 1$ 块石块。请问搭建金字塔总共需要多少块石块？",
+  "input_format": "一行，一个正整数 $n$，表示金字塔的层数。",
+  "output_format": "一行，一个正整数，表示搭建金字塔所需的石块数量。",
+  "data_range": "测试样例2：\n\n5\r\n\n\t样例2输出：\r\n\n55\r\n\n\t对于所有测试点，保证 $1 \\leq n \\leq 50$。",
+  "time_limit": 1000,
+  "memory_limit": 128,
+  "level": 1,
+  "publish_date": "2025-09-01",
+  "samples": [
+    {
+      "input": "2",
+      "output": "5",
+      "explanation": "样例",
+      "is_hidden": false,
+      "sort_order": 1
+    },
+    {
+      "input": "5",
+      "output": "55",
+      "explanation": "test",
+      "is_hidden": true,
+      "sort_order": 2
+    },
+    {
+      "input": "50",
+      "output": "42925",
+      "explanation": "test_1",
+      "is_hidden": true,
+      "sort_order": 3
+    },
+    {
+      "input": "20",
+      "output": "2870",
+      "explanation": "test_2",
+      "is_hidden": true,
+      "sort_order": 4
+    },
+    {
+      "input": "40",
+      "output": "22140",
+      "explanation": "test_3",
+      "is_hidden": true,
+      "sort_order": 5
+    },
+    {
+      "input": "30",
+      "output": "9455",
+      "explanation": "test_4",
+      "is_hidden": true,
+      "sort_order": 6
+    },
+    {
+      "input": "10",
+      "output": "385",
+      "explanation": "test_5",
+      "is_hidden": true,
+      "sort_order": 7
+    },
+    {
+      "input": "33",
+      "output": "12529",
+      "explanation": "test_6",
+      "is_hidden": true,
+      "sort_order": 8
+    }
+  ]
+}

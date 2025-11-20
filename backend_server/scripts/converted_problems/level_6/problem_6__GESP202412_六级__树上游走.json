@@ -1,0 +1,90 @@
+{
+  "title": "[GESP202412 六级] 树上游走",
+  "description": "小杨有一棵包含无穷节点的二叉树（即每个节点都有左儿子节点和右儿子节点；除根节点外，每个节点都有父节点），其中根节点的编号为 $1$，对于节点 $i$，其左儿子的编号为 $2\\times i$，右儿子的编号为 $2\\times i + 1$。\r\n\n\t    小杨会从节点 $s$ 开始在二叉树上移动，每次移动为以下三种移动方式的任意一种：\r\n\n\t\t第 1 种移动方式：如果当前节点存在父亲节点，向上移动到当前节点的父节点，否则不移动；\r\n\n\t\t第 2 种移动方式：移动到当前节点的左儿子；\r\n\n\t\t第 3 种移动方式：移动到当前节点的右儿子。\r\n\n\t    小杨想知道移动 $n$ 次后自己所处的节点编号。数据保证最后所处的节点编号不超过 $10^{12}$。",
+  "input_format": "第一行包含两个正整数 $n$ 和 $s$，代表移动次数和初始节点编号。\r\n\n\t    第二行包含一个长度为 $n$ 且仅包含大写字母 $\\tt{U}$、$\\tt{L}$ 和 $\\tt{R}$ 的字符串，代表每次移动的方式，其中 $\\tt{U}$ 代表第 1 种移动方式，$\\tt{L}$ 代表第 2 种移动方式，$\\tt{R}$ 代表第 3 种移动方式。",
+  "output_format": "输出一个正整数，代表最后所处的节点编号。",
+  "data_range": "小杨的移动路线为 $2 \\to 1 \\to 3 \\to 7$。\r\n\n\t\t\t\t\t子任务编号\n\n\t\t\t\t\t数据点占比\n\n\t\t\t\t\t$n$\n\n\t\t\t\t\t$s$\n\n\t\t\t\t\t$1$\n\n\t\t\t\t\t$20\\%$\n\n\t\t\t\t\t$\\leq 10$\n\n\t\t\t\t\t$\\leq 2$\n\n\t\t\t\t\t$2$\n\n\t\t\t\t\t$20\\%$\n\n\t\t\t\t\t$\\leq 50$\n\n\t\t\t\t\t$\\leq 10$\n\n\t\t\t\t\t$3$\n\n\t\t\t\t\t$60\\%$\n\n\t\t\t\t\t$\\leq 10^6$\n\n\t\t\t\t\t$\\leq 10^{12}$\n\n\t    对于全部数据，保证有 $1\\leq n\\leq 10^6$，$1\\leq s\\leq 10^{12}$。",
+  "time_limit": 1000,
+  "memory_limit": 128,
+  "level": 6,
+  "publish_date": "2024-12-01",
+  "samples": [
+    {
+      "input": "3 2\r\nURR",
+      "output": "7",
+      "explanation": "样例",
+      "is_hidden": false,
+      "sort_order": 1
+    },
+    {
+      "input": "3 2\nURR",
+      "output": "7",
+      "explanation": "test",
+      "is_hidden": true,
+      "sort_order": 2
+    },
+    {
+      "input": "5 1\nLLRUR",
+      "output": "9",
+      "explanation": "test_1",
+      "is_hidden": true,
+      "sort_order": 3
+    },
+    {
+      "input": "1 1\nU",
+      "output": "1",
+      "explanation": "test_2",
+      "is_hidden": true,
+      "sort_order": 4
+    },
+    {
+      "input": "6 8\nUULLRR",
+      "output": "35",
+      "explanation": "test_3",
+      "is_hidden": true,
+      "sort_order": 5
+    },
+    {
+      "input": "10 16\nUUUUULLLLL",
+      "output": "32",
+      "explanation": "test_4",
+      "is_hidden": true,
+      "sort_order": 6
+    },
+    {
+      "input": "7 5\nRRRLLLU",
+      "output": "188",
+      "explanation": "test_5",
+      "is_hidden": true,
+      "sort_order": 7
+    },
+    {
+      "input": "4 3\nLURR",
+      "output": "15",
+      "explanation": "test_6",
+      "is_hidden": true,
+      "sort_order": 8
+    },
+    {
+      "input": "8 100\nULLRRLUU",
+      "output": "401",
+      "explanation": "test_7",
+      "is_hidden": true,
+      "sort_order": 9
+    },
+    {
+      "input": "5 9\nRRRUU",
+      "output": "19",
+      "explanation": "test_8",
+      "is_hidden": true,
+      "sort_order": 10
+    },
+    {
+      "input": "6 7\nLULURR",
+      "output": "31",
+      "explanation": "test_9",
+      "is_hidden": true,
+      "sort_order": 11
+    }
+  ]
+}

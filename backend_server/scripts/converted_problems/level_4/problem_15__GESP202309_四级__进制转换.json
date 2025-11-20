@@ -1,0 +1,90 @@
+{
+  "title": "[GESP202309 四级] 进制转换",
+  "description": "$N$ 进制数指的是逢 $N$ 进一的计数制。例如，人们日常生活中大多使用十进制计数，而计算机底层则一般使用二进制。除此之外，八进制和十六进制在一些场合也是常用的计数制（十六进制中，一般使用字母 A 至 F 表示十至十五；本题中，十一进制到十五进制也是类似的）。\r\n\n\t    在本题中，我们将给出 个不同进制的数。你需要分别把它们转换成十进制数。",
+  "input_format": "输入的第一行为一个十进制表示的整数 $N$。接下来 $N$ 行，每行一个整数 $K$，随后是一个空格，紧接着是一个 $K$ 进制数，表示需要转换的数。保证所有 $K$ 进制数均由数字和大写字母组成，且不以 $0$ 开头。保证 $K$ 进制数合法。\r\n\n\t    保证 $N \\le 1000$；保证 $2 \\le K \\le 16$。\r\n\n\t    保证所有 $K$ 进制数的位数不超过 $9$。",
+  "output_format": "输出 $N$ 行，每一个十进制数，表示对应 $K$ 进制数的十进制数值。",
+  "data_range": "对于任意一个 $L$ 位 $K$ 进制数，假设其最右边的数位为第 $0$ 位，最左边的数位为第 $L-1$ 位，我们只需要将其第 $i$ 位的数码乘以权值 $K^i$，再将每位的结果相加，即可得到原 $K$ 进制数对应的十进制数。下面是两个例子：\r\n\n\t    1. 八进制数 `1362` 对应的十进制数为：$1×8^3+3×8^2+6×8^1+2×8^0=754$；\r\n\n\t    2. 十六进制数 `3F0` 对应的十进制数为：$3×16^2+15×16^1+0×16^0=1008$。",
+  "time_limit": 1000,
+  "memory_limit": 128,
+  "level": 4,
+  "publish_date": "2023-09-01",
+  "samples": [
+    {
+      "input": "2\r\n8 1362\r\n16 3F0",
+      "output": "754\r\n1008",
+      "explanation": "样例",
+      "is_hidden": false,
+      "sort_order": 1
+    },
+    {
+      "input": "2\n2 11011\n10 123456789",
+      "output": "27\n123456789",
+      "explanation": "test",
+      "is_hidden": true,
+      "sort_order": 2
+    },
+    {
+      "input": "3\n2 101010\n8 777\n16 A1B",
+      "output": "42\n511\n2587",
+      "explanation": "test_1",
+      "is_hidden": true,
+      "sort_order": 3
+    },
+    {
+      "input": "4\n3 2012\n5 4321\n12 9A3\n15 8F2",
+      "output": "59\n586\n1419\n2027",
+      "explanation": "test_2",
+      "is_hidden": true,
+      "sort_order": 4
+    },
+    {
+      "input": "2\n4 3210\n16 FFFF",
+      "output": "228\n65535",
+      "explanation": "test_3",
+      "is_hidden": true,
+      "sort_order": 5
+    },
+    {
+      "input": "5\n2 1\n5 0\n7 10\n11 B\n14 3C",
+      "output": "1\n0\n7\n11\n54",
+      "explanation": "test_4",
+      "is_hidden": true,
+      "sort_order": 6
+    },
+    {
+      "input": "3\n6 54321\n9 87654\n13 7A6B",
+      "output": "7465\n58126\n17158",
+      "explanation": "test_5",
+      "is_hidden": true,
+      "sort_order": 7
+    },
+    {
+      "input": "4\n2 11111111\n8 100000\n10 987654321\n16 1234",
+      "output": "255\n32768\n987654321\n4660",
+      "explanation": "test_6",
+      "is_hidden": true,
+      "sort_order": 8
+    },
+    {
+      "input": "3\n3 12121\n7 65432\n15 A0B0",
+      "output": "151\n16340\n33915",
+      "explanation": "test_7",
+      "is_hidden": true,
+      "sort_order": 9
+    },
+    {
+      "input": "5\n2 1001001\n5 12345\n8 76543\n11 1234\n16 ABCD",
+      "output": "73\n975\n32099\n1610\n43981",
+      "explanation": "test_8",
+      "is_hidden": true,
+      "sort_order": 10
+    },
+    {
+      "input": "4\n6 10203\n9 123456\n14 4321\n16 F00F",
+      "output": "1371\n74733\n11593\n61455",
+      "explanation": "test_9",
+      "is_hidden": true,
+      "sort_order": 11
+    }
+  ]
+}

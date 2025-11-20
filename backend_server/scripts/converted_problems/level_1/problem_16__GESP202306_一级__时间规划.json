@@ -1,0 +1,62 @@
+{
+  "title": "[GESP202306 一级] 时间规划",
+  "description": "小明在为自己规划学习时间。现在他想知道两个时刻之间有多少分钟，你能通过编程帮他做到吗？",
+  "input_format": "输入 $4$ 行，第一行为开始时刻的小时，第二行为开始时刻的分钟，第三行为结束时刻的小时，第四行为结束时刻的分钟。输入保证两个时刻是同一天，开始时刻一定在结束时刻之前。时刻使用 $24$ 小时制，即小时在 $0$ 到 $23$ 之间，分钟在 $0$ 到 $59$ 之间。",
+  "output_format": "输出一行，包含一个整数，从开始时刻到结束时刻之间有多少分钟。",
+  "data_range": "",
+  "time_limit": 1000,
+  "memory_limit": 128,
+  "level": 1,
+  "publish_date": "2023-06-01",
+  "samples": [
+    {
+      "input": "9\r\n5\r\n9\r\n6",
+      "output": "1",
+      "explanation": "样例",
+      "is_hidden": false,
+      "sort_order": 1
+    },
+    {
+      "input": "9\n5\n10\n0",
+      "output": "55",
+      "explanation": "test",
+      "is_hidden": true,
+      "sort_order": 2
+    },
+    {
+      "input": "5\n20\n35",
+      "output": "1780",
+      "explanation": "test_1",
+      "is_hidden": true,
+      "sort_order": 3
+    },
+    {
+      "input": "3\n1\n15",
+      "output": "719",
+      "explanation": "test_2",
+      "is_hidden": true,
+      "sort_order": 4
+    },
+    {
+      "input": "8\n50\n70",
+      "output": "3670",
+      "explanation": "test_3",
+      "is_hidden": true,
+      "sort_order": 5
+    },
+    {
+      "input": "2\n100\n110",
+      "output": "6380",
+      "explanation": "test_4",
+      "is_hidden": true,
+      "sort_order": 6
+    },
+    {
+      "input": "9\n80\n95",
+      "output": "5080",
+      "explanation": "test_5",
+      "is_hidden": true,
+      "sort_order": 7
+    }
+  ]
+}

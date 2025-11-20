@@ -1,0 +1,90 @@
+{
+  "title": "[GESP202403 四级] 相似字符串",
+  "description": "对于两个字符串 $A$ 和 $B$，如果 $A$ 可以通过删除一个字符，或插入一个字符，或修改一个字符变成 $B$，那么我们说 $A$ 和 $B$ 是相似的。\r\n\n\t    比如 $\\texttt{apple}$ 可以通过插入一个字符变成 $\\texttt{applee}$，可以通过删除一个字符变成 $\\texttt{appe}$，也可以通过修改一个字符变成 $\\texttt{bpple}$。因此 $\\texttt{apple}$ 和 $\\texttt{applee}$、$\\texttt{appe}$、$\\texttt{bpple}$ 都是相似的。但 $\\texttt{applee}$ 并不能 通过任意一个操作变成 $\\texttt{bpple}$，因此它们并不相似。\r\n\n\t    特别地，两个完全相同的字符串也是相似的。\r\n\n\t    给定 $T$ 组 $A,B$，请你分别判断它们是否相似。",
+  "input_format": "第一行一个正整数 $T$。  \r\n\n\t    接下来 $T$ 行，每行两个用空格隔开的字符串 $A$ 和 $B$。",
+  "output_format": "对组 $A,B$，如果他们相似，输出 similar，否则输出 not similar。",
+  "data_range": "对全部的测试数据，保证 $1 \\leq T \\leq 100$，$A$ 和 $B$ 的长度不超过 $50$，仅含小写字母。",
+  "time_limit": 1000,
+  "memory_limit": 128,
+  "level": 4,
+  "publish_date": "2024-03-01",
+  "samples": [
+    {
+      "input": "5\r\napple applee\r\napple appe\r\napple bpple\r\napplee bpple\r\napple apple",
+      "output": "similar\r\nsimilar\r\nsimilar\r\nnot similar\r\nsimilar",
+      "explanation": "样例",
+      "is_hidden": false,
+      "sort_order": 1
+    },
+    {
+      "input": "5\napple applee\napple appe\napple bpple\napplee bpple\napple apple",
+      "output": "similar\nsimilar\nsimilar\nnot similar\nsimilar",
+      "explanation": "test",
+      "is_hidden": true,
+      "sort_order": 2
+    },
+    {
+      "input": "3\ncat cut\ncat cats\ncat at",
+      "output": "similar\nsimilar\nsimilar",
+      "explanation": "test_1",
+      "is_hidden": true,
+      "sort_order": 3
+    },
+    {
+      "input": "4\ntest testing\ntest tes\ntest tess\ntest text",
+      "output": "not similar\nsimilar\nsimilar\nsimilar",
+      "explanation": "test_2",
+      "is_hidden": true,
+      "sort_order": 4
+    },
+    {
+      "input": "2\na b\na aa",
+      "output": "similar\nsimilar",
+      "explanation": "test_3",
+      "is_hidden": true,
+      "sort_order": 5
+    },
+    {
+      "input": "5\nhello hellow\nhello hell\nhello hallo\nhello helo\nhello hillo",
+      "output": "similar\nsimilar\nsimilar\nsimilar\nsimilar",
+      "explanation": "test_4",
+      "is_hidden": true,
+      "sort_order": 6
+    },
+    {
+      "input": "3\nabc def\nabc abcd\nabc abd",
+      "output": "not similar\nsimilar\nsimilar",
+      "explanation": "test_5",
+      "is_hidden": true,
+      "sort_order": 7
+    },
+    {
+      "input": "4\nxyz xyz\nxyz xya\nxyz xy\nxyz xyzw",
+      "output": "similar\nsimilar\nsimilar\nsimilar",
+      "explanation": "test_6",
+      "is_hidden": true,
+      "sort_order": 8
+    },
+    {
+      "input": "2\nabcd abcde\nabcd abce",
+      "output": "similar\nsimilar",
+      "explanation": "test_7",
+      "is_hidden": true,
+      "sort_order": 9
+    },
+    {
+      "input": "3\njava javascript\njava jav\njava jvaa",
+      "output": "not similar\nsimilar\nnot similar",
+      "explanation": "test_8",
+      "is_hidden": true,
+      "sort_order": 10
+    },
+    {
+      "input": "4\ncode cod\ncode codes\ncode cade\ncode codex",
+      "output": "similar\nsimilar\nsimilar\nsimilar",
+      "explanation": "test_9",
+      "is_hidden": true,
+      "sort_order": 11
+    }
+  ]
+}

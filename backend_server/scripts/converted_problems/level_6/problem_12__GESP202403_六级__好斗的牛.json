@@ -1,0 +1,90 @@
+{
+  "title": "[GESP202403 六级] 好斗的牛",
+  "description": "你有 $10^9$ 个牛棚，从左到右一字排开。你希望把 $n$ 头牛安置到牛棚里。麻烦的是，你的牛很好斗，如果他们附近有其他的牛，他们就会不安分地去挑事。其中，第 $i$ 头牛的攻击范围是 $(a_i, b_i)$，这意味着，如果他的左边 $a_i$ 个牛棚或者右边 $b_i$ 个牛棚有其他牛，它就会去挑事。\r\n\n\t    你想留下一段连续的牛棚，并把其他牛棚都卖掉。请问您最少需要留下多少牛棚，才能保证至少存在一种方案能够把所有的 $n$ 头牛都安置进剩余的牛棚里，且没有牛会挑事？",
+  "input_format": "第一行一个正整数 $n$。  \r\n\n\t    第二行 $n$ 个正整数 $a_1, a_2, \\dots a_n$。  \r\n\n\t    第三行 $n$ 个正整数 $b_1, b_2, \\dots b_n$。",
+  "output_format": "输出一行一个整数表示答案。",
+  "data_range": "样例 1 解释\r\n\n\t留下第 1、2、3、4 个牛棚，并在第 $1$、$4$ 两个牛棚分别放下两头牛。\r\n\n\t输入样例2\r\n\n3\r\n1 2 3\r\n3 2 1\r\n\n\t样例2输出\r\n\n7\r\n\n\t数据规模与约定\r\n\n\t\t\t对 $20\\%$ 的数据，保证 $n = 2$。\r\n\n\t\t\t另有 $20\\%$ 的数据，保证 $n = 3$。\r\n\n\t\t\t对 $80\\%$ 的数据，保证 $n \\leq 8$。\r\n\n\t\t\t对于所有的测试数据，保证 $1 \\leq n \\leq 9$，$1 \\leq a_i, b_i \\leq 10^3$。",
+  "time_limit": 1000,
+  "memory_limit": 128,
+  "level": 6,
+  "publish_date": "2024-03-01",
+  "samples": [
+    {
+      "input": "2\r\n1 2\r\n1 2",
+      "output": "4",
+      "explanation": "样例",
+      "is_hidden": false,
+      "sort_order": 1
+    },
+    {
+      "input": "3\n1 2 3\n3 2 1",
+      "output": "7",
+      "explanation": "test",
+      "is_hidden": true,
+      "sort_order": 2
+    },
+    {
+      "input": "1\n5\n7",
+      "output": "1",
+      "explanation": "test_1",
+      "is_hidden": true,
+      "sort_order": 3
+    },
+    {
+      "input": "4\n2 1 3 4\n3 4 2 1",
+      "output": "11",
+      "explanation": "test_2",
+      "is_hidden": true,
+      "sort_order": 4
+    },
+    {
+      "input": "5\n1 1 1 1 1\n1 1 1 1 1",
+      "output": "9",
+      "explanation": "test_3",
+      "is_hidden": true,
+      "sort_order": 5
+    },
+    {
+      "input": "6\n3 2 5 4 1 6\n6 1 4 5 2 3",
+      "output": "23",
+      "explanation": "test_4",
+      "is_hidden": true,
+      "sort_order": 6
+    },
+    {
+      "input": "7\n10 20 30 40 50 60 70\n70 60 50 40 30 20 10",
+      "output": "247",
+      "explanation": "test_5",
+      "is_hidden": true,
+      "sort_order": 7
+    },
+    {
+      "input": "8\n5 5 5 5 5 5 5 5\n5 5 5 5 5 5 5 5",
+      "output": "43",
+      "explanation": "test_6",
+      "is_hidden": true,
+      "sort_order": 8
+    },
+    {
+      "input": "9\n1 2 3 4 5 6 7 8 9\n9 8 7 6 5 4 3 2 1",
+      "output": "49",
+      "explanation": "test_7",
+      "is_hidden": true,
+      "sort_order": 9
+    },
+    {
+      "input": "2\n1000 1000\n1000 1000",
+      "output": "1002",
+      "explanation": "test_8",
+      "is_hidden": true,
+      "sort_order": 10
+    },
+    {
+      "input": "4\n10 1 10 1\n1 10 1 10",
+      "output": "16",
+      "explanation": "test_9",
+      "is_hidden": true,
+      "sort_order": 11
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+{
+  "title": "[GESP202312 四级] 小杨的字典",
+  "description": "在遥远的星球，有两个国家 A 国和 B 国，他们使用着不同的语言：A 语言和 B 语言。小杨是 B 国的翻译官，他的工作是将 A 语言的文章翻译成 B 语言的文章。\r\n\n\t    为了顺利完成工作，小杨制作了一本字典，里面记录了 $N$ 个 A 语言单词对应的 B 语言单词，巧合的是，这些单词都\r\n\n\t由地球上的 26 个小写英文字母组成。\r\n\n\t    小杨希望你写一个程序，帮助他根据这本字典翻译一段 A 语言文章。这段文章由标点符号 `!()-.[].{}\\|;:'\",./?<>` 和一些 A 语言单词构成，每个单词之间必定由至少一个标点符号分割，你的程序需要把这段话中的所有 A 语言单词替换成它的 B 语言翻译。特别地，如果遇到不在字典中的单词，请使用大写 UNK 来替换它。\r\n\n\t    例如，小杨的字典中包含 $2$ 个 A 语言单词 `abc` 和 `d`，它们的 B 语言翻译分别为 `a` 和 `def`，那么我们可以把 A 语言文章 `abc.d.d.abc.abcd.` 翻译成 B 语言文章 `a.def.def.a.UNK.` 其中，单词 `abcd` 不在词典内，因此我们需要使用 UNK 来替换它。",
+  "input_format": "第一行一个整数 $N$，表示词典中的条目数。保证  $N \\le 100$。\r\n\n\t    接下来  $N$ 行，每行两个用单个空格隔开的字符串  $A$， $B$ ,分别表示字典中的一个 A 语言单词以及它对应的 B 语言翻译。保证所有 $A$ 不重复；保证 $A$ 和 $B$ 的长度不超过 $10$。\r\n\n\t    最后一行一个字符串 $S$ ，表示需要翻译的 A 语言文章。保证字符串 $S$ 的长度不超过 $1000$，保证字符串 $S$ 只包含小写字母以及标点符号 `!()-.[].{}\\|;:'\",./?<>` 。",
+  "output_format": "输出一行，表示翻译后的结果。",
+  "data_range": "输入样例2：\n\r\n1\r\nabcdefghij klmnopqrst\r\n!()-[]{}\\|;:'\",./?<>abcdefghijklmnopqrstuvwxyz\r\n\n\t输出样例2：\r\n\n!()-[]{}\\|;:'\",./?<>UNK",
+  "time_limit": 1000,
+  "memory_limit": 128,
+  "level": 4,
+  "publish_date": "2023-12-01",
+  "samples": [
+    {
+      "input": "2\r\nabc a\r\nd def\r\nabc.d.d.abc.abcd",
+      "output": "a.def.def.a.UNK",
+      "explanation": "样例",
+      "is_hidden": false,
+      "sort_order": 1
+    },
+    {
+      "input": "3\nabc a\nd def\nabcd xxxx\nabc,(d)d!-abc?abcd",
+      "output": "a,(def)def!-a?xxxx",
+      "explanation": "test",
+      "is_hidden": true,
+      "sort_order": 2
+    },
+    {
+      "input": "3\nhello world\nhi hey\ngood well\nhello,hi!good.goodbye",
+      "output": "world,hey!well.UNK",
+      "explanation": "test_1",
+      "is_hidden": true,
+      "sort_order": 3
+    },
+    {
+      "input": "1\ntest example\nThis is a test;test case.",
+      "output": "TUNK",
+      "explanation": "test_2",
+      "is_hidden": true,
+      "sort_order": 4
+    },
+    {
+      "input": "4\na x\nb y\nc z\nd w\na.b-c+d=UNK?",
+      "output": "x.y-z+w=UNK?",
+      "explanation": "test_3",
+      "is_hidden": true,
+      "sort_order": 5
+    },
+    {
+      "input": "0\nhello.world!how are you?",
+      "output": "UNK.UNK!UNK",
+      "explanation": "test_4",
+      "is_hidden": true,
+      "sort_order": 6
+    },
+    {
+      "input": "3\napple fruit\nbanana yellow\norange juice\napple,banana;orange.orangeapple",
+      "output": "fruit,yellow;juice.UNK",
+      "explanation": "test_5",
+      "is_hidden": true,
+      "sort_order": 7
+    },
+    {
+      "input": "2\none 1\ntwo 2\none+two=three;two-one=UNK",
+      "output": "1+2=UNK;2-1=UNK",
+      "explanation": "test_6",
+      "is_hidden": true,
+      "sort_order": 8
+    },
+    {
+      "input": "5\ni 我\nyou 你\nhe 他\nshe 她\nit 它\ni(you)he.she!it,unknown",
+      "output": "我(你)他.她!它,UNK",
+      "explanation": "test_7",
+      "is_hidden": true,
+      "sort_order": 9
+    },
+    {
+      "input": "3\nabc 123\ndef 456\nghi 789\nabcdef.ghi?def!",
+      "output": "UNK.789?456!",
+      "explanation": "test_8",
+      "is_hidden": true,
+      "sort_order": 10
+    },
+    {
+      "input": "2\nyes 是\nno 否\nyes-no;no=yes?yesno",
+      "output": "是-否;否=是?UNK",
+      "explanation": "test_9",
+      "is_hidden": true,
+      "sort_order": 11
+    }
+  ]
+}

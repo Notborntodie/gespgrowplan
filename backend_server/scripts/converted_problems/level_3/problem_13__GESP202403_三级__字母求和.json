@@ -1,0 +1,55 @@
+{
+  "title": "[GESP202403 三级] 字母求和",
+  "description": "小杨同学发明了一种新型密码，对于每一个小写英文字母，该小写字母代表了一个正整数，即该字母在字母顺序中的位置，例如字母 a 代表了正整数 $1$，字母 b 代表了正整数 $2$；对于每一个大写英文字母，该大写字母代表了一个负整数，即该字母的 ASCII 码的相反数，例如字母 A 代表了负整数 $-65$。小杨同学利用这种放缩对一个整数进行了加密并得到了一个由大写字母和小写字母组成的字符串，该字符串中每个字母所代表数字的总和即为加密前的整数，例如 aAc 对应的加密前的整数为 $1+(-65)+3=-61$。\r\n\n\t    对于给定的字符串，请你计算出它对应的加密前的整数是多少。",
+  "input_format": "第一行一个正整数 $n$，表示字符串中字母的个数。  \r\n\n\t    第二行一个由大写字母和小写字母的字符串 T，代表加密后得到的字符串。",
+  "output_format": "输出一行一个整数，代表加密前的整数。",
+  "data_range": "对全部的测试数据，保证 $1 \\leq n \\leq 10^5$。",
+  "time_limit": 1000,
+  "memory_limit": 128,
+  "level": 3,
+  "publish_date": "2024-03-01",
+  "samples": [
+    {
+      "input": "3\r\naAc",
+      "output": "-61",
+      "explanation": "样例",
+      "is_hidden": false,
+      "sort_order": 1
+    },
+    {
+      "input": "3\naAc",
+      "output": "-61",
+      "explanation": "test",
+      "is_hidden": true,
+      "sort_order": 2
+    },
+    {
+      "input": "5\nAGsdt",
+      "output": "-93",
+      "explanation": "test_1",
+      "is_hidden": true,
+      "sort_order": 3
+    },
+    {
+      "input": "4\nYHEA",
+      "output": "-295",
+      "explanation": "test_2",
+      "is_hidden": true,
+      "sort_order": 4
+    },
+    {
+      "input": "5\nGJJwe",
+      "output": "-191",
+      "explanation": "test_3",
+      "is_hidden": true,
+      "sort_order": 5
+    },
+    {
+      "input": "10\nHHHEFSDVaw",
+      "output": "-568",
+      "explanation": "test_4",
+      "is_hidden": true,
+      "sort_order": 6
+    }
+  ]
+}

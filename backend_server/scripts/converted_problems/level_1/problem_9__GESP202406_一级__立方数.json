@@ -1,0 +1,69 @@
+{
+  "title": "[GESP202406 一级] 立方数",
+  "description": "小杨有一个正整数 $n$，他想知道 $n$ 是否是一个立方数。一个正整数 $n$ 是立方数当且仅当存在一个正整数 $x$ 满足 $x\\times x\\times x=n$ 。",
+  "input_format": "第一行包含一个正整数 $n$。",
+  "output_format": "如果正整数 $n$ 是一个立方数，输出 `Yes`，否则输出 `No`。",
+  "data_range": "对于样例 1，存在正整数 $2$ 使得 $8=2\\times 2\\times 2$ ，因此 $8$ 为立方数。\r\n\n\t    对于样例 $2$，不存在满足条件的正整数，因此 $9$ 不为立方数。\r\n\n\t    对于全部数据，保证有 $1 \\le n \\le 1000$。",
+  "time_limit": 1000,
+  "memory_limit": 128,
+  "level": 1,
+  "publish_date": "2024-06-01",
+  "samples": [
+    {
+      "input": "8",
+      "output": "Yes",
+      "explanation": "样例",
+      "is_hidden": false,
+      "sort_order": 1
+    },
+    {
+      "input": "9",
+      "output": "No",
+      "explanation": "test",
+      "is_hidden": true,
+      "sort_order": 2
+    },
+    {
+      "input": "567",
+      "output": "No",
+      "explanation": "test1",
+      "is_hidden": true,
+      "sort_order": 3
+    },
+    {
+      "input": "333",
+      "output": "No",
+      "explanation": "test2",
+      "is_hidden": true,
+      "sort_order": 4
+    },
+    {
+      "input": "897",
+      "output": "No",
+      "explanation": "test3",
+      "is_hidden": true,
+      "sort_order": 5
+    },
+    {
+      "input": "999",
+      "output": "No",
+      "explanation": "test4",
+      "is_hidden": true,
+      "sort_order": 6
+    },
+    {
+      "input": "378",
+      "output": "No",
+      "explanation": "test5",
+      "is_hidden": true,
+      "sort_order": 7
+    },
+    {
+      "input": "573",
+      "output": "No",
+      "explanation": "test6",
+      "is_hidden": true,
+      "sort_order": 8
+    }
+  ]
+}

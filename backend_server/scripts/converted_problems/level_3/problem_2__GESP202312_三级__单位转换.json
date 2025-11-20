@@ -1,0 +1,55 @@
+{
+  "title": "[GESP202312 三级] 单位转换",
+  "description": "小杨这周的数学作业是做单位转换，喜欢编程的小杨决定编程帮他解决这些问题。\r\n\n\t    小杨只学了长度单位和重量单位，具体来说：长度单位包括千米（km）、米（m）、毫米（mm），它们之间的关系是：$1\\text{km} = 1000\\text{m} = 1000000\\text{mm}$。重量单位包括千克（kg）、克（g）、毫克（mg），它们之间的关系是：$1\\text{kg} = 1000\\text{g} = 1000000\\text{mg}$。小杨的作业只涉及将更大的单位转换为更小的单位，也就是说，小杨的作业只会包含如下题型：米转换为毫米，千米转换为毫米，千米转换为米，克转换为毫克，千克转换为毫克，千克转换为克。\r\n\n\t    现在，请你帮忙完成单位转换的程序。",
+  "input_format": "输入的第一行为一个整数，表示题目数量。接下来 $N$ 行，每行一个字符串，表示转换单位的题目，格式为 $x$ 单位 $1 = ?$ 单位 $2$。其中，$x$ 为一个不超过 $1000$ 的非负整数， 单位 $1$ 和 单位 $2$ 分别为两个单位的英文缩写，保证它们都是长度单位或都是重量单位，且 单位 1 比 单位 2 更大。\r\n\n\t    接下来 $N$ 行，每行一个字符串，表示转换单位的题目，格式为 $x$ 单位 $1 = ?$ 单位 $2$。其中，$x$ 为一个不超过 $1000$ 的非负整数， 单位 $1$ 和 单位 $2$ 分别为两个单位的英文缩写，保证它们都是长度单位或都是重量单位，且 单位 1 比 单位 2 更大。\r\n\n\t    例如，如果题目需要你将 $1\\text{km}$ 转换为 $\\text{mm}$，则输入为 1 km = ? mm。\r\n\n\t保证 $1\\le N \\le 1000$。",
+  "output_format": "输出 $N$ 行，依次输出所有题目的答案，输出时，只需要将输入中的 $?$ 代入答案，其余部分一字不差地输出即可。由于小杨的题目只涉及将更大的单位转换为更小的单位，并且输入的 $x$ 是整数，因此答案一定也是整数。\r\n\n\t    例如，如果题目需要你将 $1\\text{km}$ 转换为 $\\text{mm}$，则输入为 1 km = ? mm。则你需要输出 1 km = 1000000 mm。",
+  "data_range": "",
+  "time_limit": 1000,
+  "memory_limit": 128,
+  "level": 3,
+  "publish_date": "2023-12-01",
+  "samples": [
+    {
+      "input": "2\r\n1 km = ? mm\r\n1 m = ? mm",
+      "output": "1 km = 1000000 mm\r\n1 m = 1000 mm",
+      "explanation": "样例",
+      "is_hidden": false,
+      "sort_order": 1
+    },
+    {
+      "input": "5\n100 m = ? mm\n1000 km = ? m\n20 kg = ? g\n200 g = ? mg\n0 kg = ? mg",
+      "output": "100 m = 100000 mm\n1000 km = 1000000 m\n20 kg = 20000 g\n200 g = 200000 mg\n0 kg = 0 mg",
+      "explanation": "test",
+      "is_hidden": true,
+      "sort_order": 2
+    },
+    {
+      "input": "5\n1234 m = ? mm\n1340 km = ? m\n90 kg = ? g\n1230 g = ? mg\n32 kg = ? mg",
+      "output": "1234 m = 1234000 mm\n1340 km = 1340000 m\n90 kg = 90000 g\n1230 g = 1230000 mg\n32 kg = 32000000 mg",
+      "explanation": "test_1",
+      "is_hidden": true,
+      "sort_order": 3
+    },
+    {
+      "input": "10\n10 m = ? mm\n23423 km = ? m\n22 kg = ? g\n23 g = ? mg\n0 kg = ? mg\n523 m = ? mm\n23 km = ? m\n1234 kg = ? g\n234 g = ? mg\n555 kg = ? mg",
+      "output": "10 m = 10000 mm\n23423 km = 23423000 m\n22 kg = 22000 g\n23 g = 23000 mg\n0 kg = 0 mg\n523 m = 523000 mm\n23 km = 23000 m\n1234 kg = 1234000 g\n234 g = 234000 mg\n555 kg = 555000000 mg",
+      "explanation": "test_2",
+      "is_hidden": true,
+      "sort_order": 4
+    },
+    {
+      "input": "5\n435 m = ? mm\n23425 km = ? m\n342 kg = ? g\n23421 g = ? mg\n222 kg = ? mg",
+      "output": "435 m = 435000 mm\n23425 km = 23425000 m\n342 kg = 342000 g\n23421 g = 23421000 mg\n222 kg = 222000000 mg",
+      "explanation": "test_3",
+      "is_hidden": true,
+      "sort_order": 5
+    },
+    {
+      "input": "5\n4563 m = ? mm\n5234 km = ? m\n208 kg = ? g\n34 g = ? mg\n2 kg = ? mg",
+      "output": "4563 m = 4563000 mm\n5234 km = 5234000 m\n208 kg = 208000 g\n34 g = 34000 mg\n2 kg = 2000000 mg",
+      "explanation": "test_4",
+      "is_hidden": true,
+      "sort_order": 6
+    }
+  ]
+}

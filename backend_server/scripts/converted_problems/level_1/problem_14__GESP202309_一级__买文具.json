@@ -1,0 +1,62 @@
+{
+  "title": "[GESP202309 一级] 买文具",
+  "description": "开学了，小明来到文具店选购文具。签字笔 $2$ 元一支，他需要 $X$ 支；记事本 $5$ 元一本，他需要 $Y$ 本；直尺 $3$ 元一把，他需要 $Z$ 把。小明手里有 $Q$ 元钱。请你通过编程帮小明算算，他手里的钱是否够买他需要的文具。",
+  "input_format": "第一行包含一个正整数，是小明购买签字笔的数量。约定 $1 \\le X \\le 10$。\r\n\n\t    第二行包含一个正整数，是小明购买记事本的数量。约定 $1 \\le Y \\le 10$。\r\n\n\t    第三行包含一个正整数，是小明购买直尺的数量。约定 $1 \\le Z \\le 10$。\r\n\n\t    第四行包含一个正整数 $Q$，是小明手里的钱数（单位：元）。",
+  "output_format": "输出 $2$ 行。如果小明手里的钱够买他需要的文具，则第一行输出 Yes，第二行输出小明会剩下的钱数（单位：元）；否则，第一行输出 No，第二行输出小明缺少的钱数（单位：元）。",
+  "data_range": "",
+  "time_limit": 1000,
+  "memory_limit": 128,
+  "level": 1,
+  "publish_date": "2023-09-01",
+  "samples": [
+    {
+      "input": "1\r\n1\r\n1\r\n20",
+      "output": "Yes\r\n10",
+      "explanation": "样例",
+      "is_hidden": false,
+      "sort_order": 1
+    },
+    {
+      "input": "1\n1\n1\n5",
+      "output": "No\n5",
+      "explanation": "test",
+      "is_hidden": true,
+      "sort_order": 2
+    },
+    {
+      "input": "2\n3\n4\n30",
+      "output": "No\n1",
+      "explanation": "test_1",
+      "is_hidden": true,
+      "sort_order": 3
+    },
+    {
+      "input": "5\n2\n1\n20",
+      "output": "No\n3",
+      "explanation": "test_2",
+      "is_hidden": true,
+      "sort_order": 4
+    },
+    {
+      "input": "10\n10\n10\n100",
+      "output": "Yes\n0",
+      "explanation": "test_3",
+      "is_hidden": true,
+      "sort_order": 5
+    },
+    {
+      "input": "3\n1\n2\n15",
+      "output": "No\n2",
+      "explanation": "test_4",
+      "is_hidden": true,
+      "sort_order": 6
+    },
+    {
+      "input": "1\n2\n3\n25",
+      "output": "Yes\n4",
+      "explanation": "test_5",
+      "is_hidden": true,
+      "sort_order": 7
+    }
+  ]
+}

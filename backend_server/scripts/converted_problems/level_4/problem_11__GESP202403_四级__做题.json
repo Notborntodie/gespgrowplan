@@ -1,0 +1,90 @@
+{
+  "title": "[GESP202403 四级] 做题",
+  "description": "小杨同学为了提高自己的实力制定了做题计划，在第 $k$ 天时，他必须要完成 $k$ 道题，否则他就会偷懒。\r\n\n\t    小杨同学现在找到了一个题库，一共有 $n$ 套题单，每一套题单中有一定数量的题目。但是他十分挑剔，每套题单他只会使用一次，每一天也只能使用一套题单里的题目，之后那套题单就会弃之不用。对于每套题单，他不必完成题单内所有的题。\r\n\n\t    那么问题来了，小杨同学最多做题几天才偷懒呢？",
+  "input_format": "第一行，一个整数为 $n$，表示有多少套题单。  \r\n\n\t    第二行 $n$ 个整数 $a_1, a_2, \\dots a_n$，分别表示每套题单有多少道题。",
+  "output_format": "输出一行一个整数表示答案。",
+  "data_range": "数据规模与约定\r\n\n\t    对全部的测试数据，保证 $1 \\leq n \\leq 10^6$，$1 \\leq a_i \\leq 10^9$。",
+  "time_limit": 1000,
+  "memory_limit": 128,
+  "level": 4,
+  "publish_date": "2024-03-01",
+  "samples": [
+    {
+      "input": "4\r\n3 1 4 1",
+      "output": "3",
+      "explanation": "样例",
+      "is_hidden": false,
+      "sort_order": 1
+    },
+    {
+      "input": "4\n3 1 4 1",
+      "output": "3",
+      "explanation": "test",
+      "is_hidden": true,
+      "sort_order": 2
+    },
+    {
+      "input": "5\n2 5 3 1 4",
+      "output": "5",
+      "explanation": "test_1",
+      "is_hidden": true,
+      "sort_order": 3
+    },
+    {
+      "input": "6\n1 1 1 1 1 1",
+      "output": "1",
+      "explanation": "test_2",
+      "is_hidden": true,
+      "sort_order": 4
+    },
+    {
+      "input": "7\n10 9 8 7 6 5 4",
+      "output": "7",
+      "explanation": "test_3",
+      "is_hidden": true,
+      "sort_order": 5
+    },
+    {
+      "input": "3\n5 5 5",
+      "output": "3",
+      "explanation": "test_4",
+      "is_hidden": true,
+      "sort_order": 6
+    },
+    {
+      "input": "8\n1 2 3 4 5 6 7 8",
+      "output": "8",
+      "explanation": "test_5",
+      "is_hidden": true,
+      "sort_order": 7
+    },
+    {
+      "input": "4\n7 3 2 9",
+      "output": "4",
+      "explanation": "test_6",
+      "is_hidden": true,
+      "sort_order": 8
+    },
+    {
+      "input": "5\n1 3 5 7 9",
+      "output": "5",
+      "explanation": "test_7",
+      "is_hidden": true,
+      "sort_order": 9
+    },
+    {
+      "input": "6\n2 2 3 3 4 4",
+      "output": "4",
+      "explanation": "test_8",
+      "is_hidden": true,
+      "sort_order": 10
+    },
+    {
+      "input": "1\n1",
+      "output": "1",
+      "explanation": "test_9",
+      "is_hidden": true,
+      "sort_order": 11
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "title": "[GESP202312 二级] 小杨做题",
+  "description": "为了准备考试，小杨每天都要做题。第 $1$ 天，小杨做了 $a$ 道题；第 $2$ 天，小杨做了 $b$ 道题；从第 $3$ 天起，小杨每天做的题目数量是前两天的总和。\r\n\n\t    此外，小杨还规定，当自己某一天做了大于或等于 $m$ 题时，接下来的所有日子里，他就再也不做题了。\r\n\n\t    请问，到了第 $N$ 天，小杨总共做了多少题呢？",
+  "input_format": "总共 $4$ 行。第一行一个整数 $a$，第二行一个整数 $b$，第三行一个整数 $m$，第四行一个整数 $N$。\n\n\t    保证 $0 \\le a,b \\le 10$；$a,b<m<1,000,000$；$3 \\le N \\le 364$。",
+  "output_format": "一行一个整数，表示小杨 $N$ 天里总共做了多少题目。",
+  "data_range": "样例解释：\r\n\n\t小杨第一天做 $1$ 题，第二天做 $2$ 题，第三天做 $1+2=3$ 题，第四天做 $2+3=5$ 题，第五天做 $3+5=8$ 题。因此他总共做了 $1+2+3+5+8=19$ 题。",
+  "time_limit": 1000,
+  "memory_limit": 128,
+  "level": 2,
+  "publish_date": "2023-12-01",
+  "samples": [
+    {
+      "input": "1\r\n2\r\n10\r\n5",
+      "output": "19",
+      "explanation": "样例",
+      "is_hidden": false,
+      "sort_order": 1
+    },
+    {
+      "input": "1\n1\n5\n8",
+      "output": "12",
+      "explanation": "test",
+      "is_hidden": true,
+      "sort_order": 2
+    },
+    {
+      "input": "4 5 3 3",
+      "output": "18",
+      "explanation": "test1",
+      "is_hidden": true,
+      "sort_order": 3
+    },
+    {
+      "input": "2\n3\n20\n6",
+      "output": "52",
+      "explanation": "test_1",
+      "is_hidden": true,
+      "sort_order": 4
+    },
+    {
+      "input": "0\n1\n10\n7",
+      "output": "20",
+      "explanation": "test_2",
+      "is_hidden": true,
+      "sort_order": 5
+    },
+    {
+      "input": "0\n2\n15\n8",
+      "output": "40",
+      "explanation": "test_3",
+      "is_hidden": true,
+      "sort_order": 6
+    },
+    {
+      "input": "3\n4\n25\n6",
+      "output": "72",
+      "explanation": "test_4",
+      "is_hidden": true,
+      "sort_order": 7
+    }
+  ]
+}

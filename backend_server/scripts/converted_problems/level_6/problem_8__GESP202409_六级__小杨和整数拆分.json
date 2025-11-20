@@ -1,0 +1,90 @@
+{
+  "title": "[GESP202409 六级] 小杨和整数拆分",
+  "description": "小杨有一个正整数 $n$，小杨想将它拆分成若干完全平方数的和，同时小杨希望拆分的数量越少越好。\r\n\n\t    编程计算总和为 $n$ 的完全平方数的最小数量。",
+  "input_format": "输入只有一行一个正整数 $n$。",
+  "output_format": "输出一行一个整数表示答案。",
+  "data_range": "对全部的测试数据，保证 $1 \\leq n \\leq 10^5$。",
+  "time_limit": 1000,
+  "memory_limit": 128,
+  "level": 6,
+  "publish_date": "2024-09-01",
+  "samples": [
+    {
+      "input": "18",
+      "output": "2",
+      "explanation": "样例",
+      "is_hidden": false,
+      "sort_order": 1
+    },
+    {
+      "input": "18",
+      "output": "2",
+      "explanation": "test",
+      "is_hidden": true,
+      "sort_order": 2
+    },
+    {
+      "input": "1",
+      "output": "1",
+      "explanation": "test_1",
+      "is_hidden": true,
+      "sort_order": 3
+    },
+    {
+      "input": "2",
+      "output": "2",
+      "explanation": "test_2",
+      "is_hidden": true,
+      "sort_order": 4
+    },
+    {
+      "input": "3",
+      "output": "3",
+      "explanation": "test_3",
+      "is_hidden": true,
+      "sort_order": 5
+    },
+    {
+      "input": "30",
+      "output": "3",
+      "explanation": "test_4",
+      "is_hidden": true,
+      "sort_order": 6
+    },
+    {
+      "input": "99",
+      "output": "3",
+      "explanation": "test_5",
+      "is_hidden": true,
+      "sort_order": 7
+    },
+    {
+      "input": "100000",
+      "output": "2",
+      "explanation": "test_6",
+      "is_hidden": true,
+      "sort_order": 8
+    },
+    {
+      "input": "99999",
+      "output": "4",
+      "explanation": "test_7",
+      "is_hidden": true,
+      "sort_order": 9
+    },
+    {
+      "input": "63456",
+      "output": "3",
+      "explanation": "test_8",
+      "is_hidden": true,
+      "sort_order": 10
+    },
+    {
+      "input": "12445",
+      "output": "3",
+      "explanation": "test_9",
+      "is_hidden": true,
+      "sort_order": 11
+    }
+  ]
+}

@@ -1,16 +1,17 @@
 const mysql = require('mysql2/promise');
 
-// 数据库连接池配置
+// 数据库连接池配置（从环境变量读取，如果没有则使用默认值）
 const dbConfig = {
-  host: '106.14.143.27',
-  user: 'gesp_user',
-  password: 'Gesp@2025!',
-  database: 'gesp_practice_system',
+  host: process.env.DB_HOST,
+  port: parseInt(process.env.DB_PORT),
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME ,
   charset: 'utf8mb4',
   // 连接池优化配置
-  connectionLimit: 20,           // 连接池大小
-  acquireTimeout: 60000,         // 获取连接超时时间
-  timeout: 60000,               // 查询超时时间
+  connectionLimit: parseInt(process.env.DB_CONNECTION_LIMIT) || 20,  // 连接池大小
+  acquireTimeout: parseInt(process.env.DB_ACQUIRE_TIMEOUT) || 60000, // 获取连接超时时间
+  timeout: parseInt(process.env.DB_TIMEOUT) || 60000,                // 查询超时时间
   reconnect: true,              // 自动重连
   queueLimit: 0,                // 队列限制（0表示无限制）
   enableKeepAlive: true,        // 启用连接保活
@@ -21,15 +22,9 @@ const dbConfig = {
   supportBigNumbers: true,      // 支持大数字
   bigNumberStrings: true,       // 大数字作为字符串
   // 连接池监控
-  acquireTimeout: 60000,
   waitForConnections: true,
-  connectionLimit: 20,
-  queueLimit: 0,
-  maxIdle: 60000,               // 最大空闲时间
-  idleTimeout: 60000,           // 空闲超时
-  // 错误处理
-  enableKeepAlive: true,
-  keepAliveInitialDelay: 0
+  maxIdle: parseInt(process.env.DB_MAX_IDLE) || 60000,      // 最大空闲时间
+  idleTimeout: parseInt(process.env.DB_IDLE_TIMEOUT) || 60000  // 空闲超时
 };
 
 // 创建连接池

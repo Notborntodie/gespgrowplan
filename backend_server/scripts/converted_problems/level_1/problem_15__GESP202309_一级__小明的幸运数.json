@@ -1,0 +1,62 @@
+{
+  "title": "[GESP202309 一级] 小明的幸运数",
+  "description": "所有个位数为 $k$ 的正整数，以及所有 $k$ 的倍数，都被小明称为“ $k$ 幸运数”。小明想知道正整数 $L$ 和 $R$ 之间（包括 $L$ 和 $R$）所有 $k$ 幸运数的和，你能帮帮他吗？",
+  "input_format": "输入 $3$ 行。第一行包含一个正整数 $k$，第二行包含一个正整数 $L$，第三行包含一个正整数 $R$。约定 $2 \\le k \\le 9$，$1 \\le L \\le R \\le 1000$。",
+  "output_format": "输出 $1$ 行，符合题意的幸运数之和。",
+  "data_range": "样例解释 ：\r\n\n\t    $1$ 和 $10$ 之间共有 $1$ 个 $7$ 幸运数：$7$。因为 $7$ 既是 $7$ 的倍数，个位数又为 $7$。因此，结果为 $7$。",
+  "time_limit": 1000,
+  "memory_limit": 128,
+  "level": 1,
+  "publish_date": "2023-09-01",
+  "samples": [
+    {
+      "input": "7\r\n1\r\n10",
+      "output": "7",
+      "explanation": "样例",
+      "is_hidden": false,
+      "sort_order": 1
+    },
+    {
+      "input": "7\n10\n20",
+      "output": "31",
+      "explanation": "test",
+      "is_hidden": true,
+      "sort_order": 2
+    },
+    {
+      "input": "3\n2\n4\n50",
+      "output": "3",
+      "explanation": "test_1",
+      "is_hidden": true,
+      "sort_order": 3
+    },
+    {
+      "input": "5\n5\n5\n60",
+      "output": "5",
+      "explanation": "test_2",
+      "is_hidden": true,
+      "sort_order": 4
+    },
+    {
+      "input": "2\n3\n1\n25",
+      "output": "0",
+      "explanation": "test_3",
+      "is_hidden": true,
+      "sort_order": 5
+    },
+    {
+      "input": "10\n10\n10\n100",
+      "output": "10",
+      "explanation": "test_4",
+      "is_hidden": true,
+      "sort_order": 6
+    },
+    {
+      "input": "1\n2\n3\n20",
+      "output": "5",
+      "explanation": "test_5",
+      "is_hidden": true,
+      "sort_order": 7
+    }
+  ]
+}

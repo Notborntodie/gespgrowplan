@@ -1,0 +1,90 @@
+{
+  "title": "[GESP202406 五级] 小杨的幸运数字",
+  "description": "小杨认为他的幸运数字应该恰好有两种不同的质因子，例如，$12=2\\times 2\\times 3$ 的质因子有 $2,3$，恰好为两种不同的质因子，因此 $12$ 是幸运数字，而 $30=2\\times3\\times5$ 的质因子有 $2,3,5$，不符合要求，不为幸运数字。\r\n\n\t    小杨现在有 $n$ 个正整数，他想知道每个正整数是否是他的幸运数字。",
+  "input_format": "第一行包含一个正整数 $n$，代表正整数个数。\r\n\n\t    之后 $n$ 行，每行一个正整数。",
+  "output_format": "输出 $n$ 行，对于每个正整数，如果是幸运数字，输出 $1$，否则输出 $0$。",
+  "data_range": "样例解释\r\n\n\t$7$ 的质因子有 $7$，只有一种。\r\n\n\t$12$ 的质因子有 $2,3$，恰好有两种。\r\n\n\t$30$ 的质因子有 $2,3,5$，有三种。\r\n\n\t数据范围\r\n\n\t   对于全部数据，保证有 $1\\leq n\\leq 10^4$，每个正整数 $a_i$ 满足 $2\\leq a_i\\leq 10^6$。\r\n\n\t\t\t\t\t子任务编号\n\n\t\t\t\t\t数据点占比\n\n\t\t\t\t\t$n$\n\n\t\t\t\t\t正整数值域\n\n\t\t\t\t\t$1$\n\n\t\t\t\t\t$40\\%$\n\n\t\t\t\t\t$\\leq 100$\n\n\t\t\t\t\t$\\leq 10^5$\n\n\t\t\t\t\t$2$\n\n\t\t\t\t\t$60\\%$\n\n\t\t\t\t\t$\\leq 10^4$\n\n\t\t\t\t\t$\\leq 10^6$",
+  "time_limit": 1000,
+  "memory_limit": 128,
+  "level": 5,
+  "publish_date": "2024-06-01",
+  "samples": [
+    {
+      "input": "3\r\n7\r\n12\r\n30",
+      "output": "0\r\n1\r\n0",
+      "explanation": "样例",
+      "is_hidden": false,
+      "sort_order": 1
+    },
+    {
+      "input": "3\n7\n12\n30",
+      "output": "0\n1\n0",
+      "explanation": "test",
+      "is_hidden": true,
+      "sort_order": 2
+    },
+    {
+      "input": "5\n2\n3\n4\n6\n12",
+      "output": "0\n0\n0\n1\n1",
+      "explanation": "test_1",
+      "is_hidden": true,
+      "sort_order": 3
+    },
+    {
+      "input": "4\n30\n105\n210\n1155",
+      "output": "0\n0\n0\n0",
+      "explanation": "test_2",
+      "is_hidden": true,
+      "sort_order": 4
+    },
+    {
+      "input": "6\n16\n36\n100\n144\n225\n256",
+      "output": "0\n1\n1\n1\n1\n0",
+      "explanation": "test_3",
+      "is_hidden": true,
+      "sort_order": 5
+    },
+    {
+      "input": "5\n999983\n999979\n999961\n999943\n999919",
+      "output": "0\n0\n0\n1\n1",
+      "explanation": "test_4",
+      "is_hidden": true,
+      "sort_order": 6
+    },
+    {
+      "input": "7\n12\n18\n20\n28\n44\n45\n50",
+      "output": "1\n1\n1\n1\n1\n1\n1",
+      "explanation": "test_5",
+      "is_hidden": true,
+      "sort_order": 7
+    },
+    {
+      "input": "6\n231\n323\n391\n551\n899\n943",
+      "output": "0\n1\n1\n1\n1\n1",
+      "explanation": "test_6",
+      "is_hidden": true,
+      "sort_order": 8
+    },
+    {
+      "input": "5\n999982\n999999\n1000000\n999977\n999953",
+      "output": "0\n0\n1\n1\n0",
+      "explanation": "test_7",
+      "is_hidden": true,
+      "sort_order": 9
+    },
+    {
+      "input": "10\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19",
+      "output": "1\n0\n1\n0\n1\n1\n0\n0\n1\n0",
+      "explanation": "test_8",
+      "is_hidden": true,
+      "sort_order": 10
+    },
+    {
+      "input": "6\n999967\n999974\n999982\n999994\n999999\n1000000",
+      "output": "1\n0\n0\n0\n0\n1",
+      "explanation": "test_9",
+      "is_hidden": true,
+      "sort_order": 11
+    }
+  ]
+}

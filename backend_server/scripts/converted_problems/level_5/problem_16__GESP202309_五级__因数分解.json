@@ -1,0 +1,90 @@
+{
+  "title": "[GESP202309 五级] 因数分解",
+  "description": "每个正整数都可以分解成素数的乘积，例如： $6=2\\times 3$，$20=2^2\\times5$。\r\n\n\t    现在，给定一个正整数，请按要求输出它的因数分解式。",
+  "input_format": "输入第一行，包含一个正整数 $N$。约定 $2 \\le N \\le 10^{12}$。",
+  "output_format": "输出一行，为的因数分解式。要求按质因数由小到大排列，乘号用星号 `*` 表示，且左右各空一格。当且仅当一个素数出现多次时，将它们合并为指数形式，用上箭头 `^` 表示，且左右不空格。",
+  "data_range": "测试样例2\r\n\n20\r\n\n\t样例2输出\r\n\n2^2 * 5\r\n\n\t测试样例3\r\n\n23\r\n\n\t样例3输出\r\n\n23",
+  "time_limit": 1000,
+  "memory_limit": 128,
+  "level": 5,
+  "publish_date": "2023-09-01",
+  "samples": [
+    {
+      "input": "6",
+      "output": "2 * 3",
+      "explanation": "样例",
+      "is_hidden": false,
+      "sort_order": 1
+    },
+    {
+      "input": "20",
+      "output": "2^2 * 5",
+      "explanation": "test",
+      "is_hidden": true,
+      "sort_order": 2
+    },
+    {
+      "input": "120",
+      "output": "2^3 * 3 * 5",
+      "explanation": "test_1",
+      "is_hidden": true,
+      "sort_order": 3
+    },
+    {
+      "input": "625",
+      "output": "5^4",
+      "explanation": "test_2",
+      "is_hidden": true,
+      "sort_order": 4
+    },
+    {
+      "input": "999999937",
+      "output": "999999937",
+      "explanation": "test_3",
+      "is_hidden": true,
+      "sort_order": 5
+    },
+    {
+      "input": "1024",
+      "output": "2^10",
+      "explanation": "test_4",
+      "is_hidden": true,
+      "sort_order": 6
+    },
+    {
+      "input": "2520",
+      "output": "2^3 * 3^2 * 5 * 7",
+      "explanation": "test_5",
+      "is_hidden": true,
+      "sort_order": 7
+    },
+    {
+      "input": "999999936",
+      "output": "2^6 * 3^2 * 13 * 83 * 1609",
+      "explanation": "test_6",
+      "is_hidden": true,
+      "sort_order": 8
+    },
+    {
+      "input": "1000000000000",
+      "output": "2^12 * 5^12",
+      "explanation": "test_7",
+      "is_hidden": true,
+      "sort_order": 9
+    },
+    {
+      "input": "5040",
+      "output": "2^4 * 3^2 * 5 * 7",
+      "explanation": "test_8",
+      "is_hidden": true,
+      "sort_order": 10
+    },
+    {
+      "input": "987654321",
+      "output": "3^2 * 17^2 * 379721",
+      "explanation": "test_9",
+      "is_hidden": true,
+      "sort_order": 11
+    }
+  ]
+}

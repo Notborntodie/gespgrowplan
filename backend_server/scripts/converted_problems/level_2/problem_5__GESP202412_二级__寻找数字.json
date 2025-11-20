@@ -1,0 +1,62 @@
+{
+  "title": "[GESP202412 二级] 寻找数字",
+  "description": "小杨有一个正整数 $a$，小杨想知道是否存在一个正整数 $b$ 满足 $a=b^4$",
+  "input_format": "第一行包含一个正整数 $t$，代表测试数据组数。\r\n\n\t    对于每组测试数据，第一行包含一个正整数代表 $a$。",
+  "output_format": "对于每组测试数据，如果存在满足条件的正整数 $b$，则输出 $b$，否则输出 $-1$。",
+  "data_range": "对于全部数据，保证有 $1\\leq t\\leq 10^5$，$1\\leq a_i\\leq 10^8$。",
+  "time_limit": 5000,
+  "memory_limit": 128,
+  "level": 2,
+  "publish_date": "2024-12-01",
+  "samples": [
+    {
+      "input": "3\r\n16\r\n81\r\n10",
+      "output": "2\r\n3\r\n-1",
+      "explanation": "样例",
+      "is_hidden": false,
+      "sort_order": 1
+    },
+    {
+      "input": "3\n16\n81\n10",
+      "output": "2\n3\n-1",
+      "explanation": "test",
+      "is_hidden": true,
+      "sort_order": 2
+    },
+    {
+      "input": "5\n54567\n3452\n3465\n5783545\n81",
+      "output": "-1\n-1\n-1\n-1\n3",
+      "explanation": "test1",
+      "is_hidden": true,
+      "sort_order": 3
+    },
+    {
+      "input": "5\n1\n2\n625\n100\n100000000",
+      "output": "-1\n-1\n5\n-1\n100",
+      "explanation": "test_1",
+      "is_hidden": true,
+      "sort_order": 4
+    },
+    {
+      "input": "5\n810000\n1296\n7\n256\n99999999",
+      "output": "30\n6\n-1\n4\n-1",
+      "explanation": "test_2",
+      "is_hidden": true,
+      "sort_order": 5
+    },
+    {
+      "input": "5\n65536\n15\n2401\n1000\n1679616",
+      "output": "16\n-1\n7\n-1\n36",
+      "explanation": "test_3",
+      "is_hidden": true,
+      "sort_order": 6
+    },
+    {
+      "input": "5\n104976\n30\n6561\n500\n7311616",
+      "output": "18\n-1\n9\n-1\n52",
+      "explanation": "test_4",
+      "is_hidden": true,
+      "sort_order": 7
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "title": "[GESP202503 一级] 图书馆里的老鼠",
+  "description": "图书馆里有 $n$ 本书，不幸的是，还混入了一只老鼠，老鼠每 $x$ 小时能啃光一本书，假设老鼠在啃光一本书之前，不会啃另一本。请问 $y$ 小时后图书馆里还剩下多少本完整的书。",
+  "input_format": "三行，第一行一个正整数 $n$，表示图书馆里书的数量；\r\n\n\t    第二行，一个正整数 $x$，表示老鼠啃光一本书需要的时间；\r\n\n\t    第三行，一个正整数 $y$，表示经过的总时间；\r\n\n\t    输入数据保证 $y$ 小时后至少会剩下一本完整的书。",
+  "output_format": "一行，一个整数，表示 $y$ 小时后图书馆里还剩下多少本完整的书。",
+  "data_range": "对于所有测试点，保证 $1\\leq n,x,y\\leq 1000$，保证 $y$ 小时后至少会剩下⼀本完整的书。",
+  "time_limit": 1000,
+  "memory_limit": 128,
+  "level": 1,
+  "publish_date": "2025-03-01",
+  "samples": [
+    {
+      "input": "10\r\n2\r\n3",
+      "output": "8",
+      "explanation": "样例",
+      "is_hidden": false,
+      "sort_order": 1
+    },
+    {
+      "input": "5\n2\n4",
+      "output": "3",
+      "explanation": "test",
+      "is_hidden": true,
+      "sort_order": 2
+    },
+    {
+      "input": "999\n23\n444",
+      "output": "979",
+      "explanation": "test1",
+      "is_hidden": true,
+      "sort_order": 3
+    },
+    {
+      "input": "834\n123\n11",
+      "output": "833",
+      "explanation": "test2",
+      "is_hidden": true,
+      "sort_order": 4
+    },
+    {
+      "input": "284\n111\n44",
+      "output": "283",
+      "explanation": "test3",
+      "is_hidden": true,
+      "sort_order": 5
+    },
+    {
+      "input": "912\n321\n123",
+      "output": "911",
+      "explanation": "test4",
+      "is_hidden": true,
+      "sort_order": 6
+    }
+  ]
+}

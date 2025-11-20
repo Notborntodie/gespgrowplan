@@ -1,0 +1,90 @@
+{
+  "title": "[GESP202309 六级] 小杨的握手问题",
+  "description": "小杨的班级里共有 $N$ 名同学，学号从 $0$ 至 $N-1$。\r\n\n\t    某节课上，老师安排全班同学进行一次握手游戏，具体规则如下：老师安排了一个顺序，让全班 $N$ 名同学依次进入教室。每位同学进入教室时，需要和 **已经在教室内** 且 **学号小于自己** 的同学握手。\r\n\n\t    现在，小杨想知道，整个班级总共会进行多少次握手。\r\n\n\t提示：可以考虑使用归并排序进行降序排序，并在此过程中求解。",
+  "input_format": "输入包含 $2$ 行。第一行一个整数 $N$ ，表示同学的个数；第二行 $N$ 个用单个空格隔开的整数，依次描述同学们进入教室的顺序，每个整数在 $0 \\sim N-1$ 之间，表示该同学的学号。\r\n\n\t    保证每位同学会且只会进入教室一次。",
+  "output_format": "输出一行一个整数，表示全班握手的总次数。",
+  "data_range": "样例解释 1：\r\n\n\t$2$ 号同学进入教室，此时教室里没有其他同学。\r\n\n\t$1$ 号同学进入教室，此时教室里有 $2$ 号同学。$1$ 号同学的学号小于 $2$ 号同学，因此他们之间不需要握手。\r\n\n\t$3$ 号同学进入教室，此时教室里有 $1,2$ 号同学。$3$ 号同学的学号比他们都大，因此 $3$ 号同学需要分别和另外两位同学握手。\r\n\n\t$0$ 号同学进入教室，此时教室里有 $1,2,3$ 号同学。$0$ 号同学的学号比他们都小，因此 $0$ 号同学不需要与其他同学握手。\r\n\n\t样例输入2\r\n\n6\r\n0 1 2 3 4 5\r\n\n\t样例2输出\r\n\n15\r\n\n\t样例解释2：\r\n\n\t全班所有同学之间都会进行握手，因为每位同学来到教室时，都会发现他的学号是当前教室里最大的，所以他需要和教室里的每位其他同学进行握手。\r\n\n\t对于 $30\\%$ 的测试点，保证 $N\\le100$。\r\n\n\t对于所有测试点，保证 $2\\le N\\le3\\times10^5$。",
+  "time_limit": 1000,
+  "memory_limit": 128,
+  "level": 6,
+  "publish_date": "2023-09-01",
+  "samples": [
+    {
+      "input": "4\r\n2 1 3 0",
+      "output": "2",
+      "explanation": "样例",
+      "is_hidden": false,
+      "sort_order": 1
+    },
+    {
+      "input": "6\n0 1 2 3 4 5",
+      "output": "15",
+      "explanation": "test",
+      "is_hidden": true,
+      "sort_order": 2
+    },
+    {
+      "input": "5\n4 3 2 1 0",
+      "output": "0",
+      "explanation": "test_1",
+      "is_hidden": true,
+      "sort_order": 3
+    },
+    {
+      "input": "3\n1 0 2",
+      "output": "2",
+      "explanation": "test_2",
+      "is_hidden": true,
+      "sort_order": 4
+    },
+    {
+      "input": "7\n3 5 1 6 2 0 4",
+      "output": "9",
+      "explanation": "test_3",
+      "is_hidden": true,
+      "sort_order": 5
+    },
+    {
+      "input": "2\n1 0",
+      "output": "0",
+      "explanation": "test_4",
+      "is_hidden": true,
+      "sort_order": 6
+    },
+    {
+      "input": "8\n5 0 7 2 6 3 1 4",
+      "output": "13",
+      "explanation": "test_5",
+      "is_hidden": true,
+      "sort_order": 7
+    },
+    {
+      "input": "10\n9 8 7 6 5 4 3 2 1 0",
+      "output": "0",
+      "explanation": "test_6",
+      "is_hidden": true,
+      "sort_order": 8
+    },
+    {
+      "input": "6\n2 5 0 3 1 4",
+      "output": "8",
+      "explanation": "test_7",
+      "is_hidden": true,
+      "sort_order": 9
+    },
+    {
+      "input": "9\n0 2 4 6 8 1 3 5 7",
+      "output": "26",
+      "explanation": "test_8",
+      "is_hidden": true,
+      "sort_order": 10
+    },
+    {
+      "input": "7\n6 4 2 0 5 3 1",
+      "output": "6",
+      "explanation": "test_9",
+      "is_hidden": true,
+      "sort_order": 11
+    }
+  ]
+}

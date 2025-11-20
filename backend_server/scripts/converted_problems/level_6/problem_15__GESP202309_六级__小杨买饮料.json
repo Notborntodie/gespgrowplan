@@ -1,0 +1,90 @@
+{
+  "title": "[GESP202309 六级] 小杨买饮料",
+  "description": "小杨来到了一家商店，打算购买一些饮料。这家商店总共出售 $N$ 种饮料，编号从 $0$ 至 $N-1$，其中编号为 $i$ 的饮料售价 $c_i$ 元，容量 $l_i$ 毫升。\r\n\n\t    小杨的需求有如下几点：\r\n\n\t\t小杨想要尽可能尝试不同种类的饮料，因此他希望每种饮料至多购买 $1$ 瓶；\r\n\n\t\t小杨很渴，所以他想要购买总容量不低于 $L$ 的饮料；\r\n\n\t\t小杨勤俭节约，所以在 $1$ 和 $2$ 的前提下，他希望使用尽可能少的费用。\r\n\n\t    方便起见，你只需要输出最少花费的费用即可。特别地，如果不能满足小杨的要求，则输出 `no solution`。",
+  "input_format": "第一行两个整数 $N,L$。\r\n\n\t    接下来 $N$行，依次描述第 $i=0,1,\\cdots,N-1$ 种饮料：每行两个整数 $c_i,l_i$。",
+  "output_format": "输出一行一个整数，表示最少需要花费多少钱，才能满足小杨的要求。特别地，如果不能满足要求，则输出 `no solution`。",
+  "data_range": "样例 1 解释\r\n\n\t小杨可以购买 $2,3,5$ 号饮料，总计获得 $50+40+20=110$ 毫升饮料，花费 $2+4+3=9$ 元。\r\n\n\t如果只考虑前两项需求，小杨也可以购买 $2,4,5$ 号饮料，它们的容量总和为 $50+30+20=100$ 毫升，恰好可以满足需求。但遗憾的是，这个方案需要花费 $2+5+3=10$ 元。\r\n\n\t输入样例2\r\n\n5 141\r\n100 2000\r\n2 50\r\n4 40\r\n5 30\r\n3 20\r\n\n\t样例2输出\r\n\n100\r\n\n\t\t样例 2 解释\r\n\n\t\t$1,2,3,4$ 号饮料总计 $140$ 毫升，如每种饮料至多购买 $1$ 瓶，则恰好无法满足需求，因此只能花费 $100$ 元购买 $0$ 号饮料。\r\n\n\t输入样例3\r\n\n4 141\r\n2 50\r\n4 40\r\n5 30\r\n3 20\r\n\n\t样例3输出\r\n\nno solution\r\n\n\t数据规模\r\n\n\t对于 $40\\%$ 的测试点，保证 $N \\le 20;1\\le L \\le 100; l_i \\le 100$。\r\n\n\t对于 $70\\%$ 的测试点，保证 $l_i \\le 100$。\r\n\n\t对于 $100\\%$ 的测试点，保证 $1\\le N \\le 500;1\\le L \\le 2000; 1\\le c_i,l_i \\le 10^6$。",
+  "time_limit": 1000,
+  "memory_limit": 128,
+  "level": 6,
+  "publish_date": "2023-09-01",
+  "samples": [
+    {
+      "input": "5 100\r\n100 2000\r\n2 50\r\n4 40\r\n5 30\r\n3 20",
+      "output": "9",
+      "explanation": "样例",
+      "is_hidden": false,
+      "sort_order": 1
+    },
+    {
+      "input": "5 141\n100 2000\n2 50\n4 40\n5 30\n3 20",
+      "output": "100",
+      "explanation": "test",
+      "is_hidden": true,
+      "sort_order": 2
+    },
+    {
+      "input": "4 141\n2 50\n4 40\n5 30\n3 20",
+      "output": "no solution",
+      "explanation": "test_1",
+      "is_hidden": true,
+      "sort_order": 3
+    },
+    {
+      "input": "3 10\n5 6\n3 5\n4 5",
+      "output": "7",
+      "explanation": "test_2",
+      "is_hidden": true,
+      "sort_order": 4
+    },
+    {
+      "input": "6 25\n1 3\n2 4\n3 5\n4 6\n5 7\n6 8",
+      "output": "15",
+      "explanation": "test_3",
+      "is_hidden": true,
+      "sort_order": 5
+    },
+    {
+      "input": "2 10\n10 9\n10 9",
+      "output": "20",
+      "explanation": "test_4",
+      "is_hidden": true,
+      "sort_order": 6
+    },
+    {
+      "input": "7 50\n10 20\n8 15\n5 10\n3 8\n2 5\n1 3\n100 60",
+      "output": "24",
+      "explanation": "test_5",
+      "is_hidden": true,
+      "sort_order": 7
+    },
+    {
+      "input": "4 1000\n500 500\n500 500\n500 500\n900 1000",
+      "output": "900",
+      "explanation": "test_6",
+      "is_hidden": true,
+      "sort_order": 8
+    },
+    {
+      "input": "5 30\n7 10\n6 10\n5 10\n4 10\n3 10",
+      "output": "12",
+      "explanation": "test_7",
+      "is_hidden": true,
+      "sort_order": 9
+    },
+    {
+      "input": "8 100\n1 1\n2 2\n3 3\n4 4\n5 5\n6 6\n7 7\n100 100",
+      "output": "100",
+      "explanation": "test_8",
+      "is_hidden": true,
+      "sort_order": 10
+    },
+    {
+      "input": "6 40\n5 8\n6 9\n7 10\n8 11\n9 12\n10 13",
+      "output": "28",
+      "explanation": "test_9",
+      "is_hidden": true,
+      "sort_order": 11
+    }
+  ]
+}

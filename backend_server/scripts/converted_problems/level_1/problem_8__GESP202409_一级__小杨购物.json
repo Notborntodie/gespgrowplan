@@ -1,0 +1,62 @@
+{
+  "title": "[GESP202409 一级] 小杨购物",
+  "description": "小杨有 $n$ 元钱用于购物。商品 A 的单价是 $a$ 元，商品 B 的单价是 $b$ 元。小杨想购买相同数量的商品 A 和商品 B。\r\n\n\t    请你编写程序帮助小杨计算出他最多能够购买多少个商品 A 和商品 B。",
+  "input_format": "第一行包含一个正整数 $n$，代表小杨用于购物的金额。\r\n\n\t    第二行包含一个正整数 $a$，代表商品 A 的单价。\r\n\n\t    第三行包含一个正整数 $b$，代表商品 B 的单价。",
+  "output_format": "输出一行，包含一个整数，代表小杨最多能够购买的商品 A 和商品 B 的数量。",
+  "data_range": "样例 1 解释\r\n\n\t    对于样例 1，由于需要购买相同数量的两种商品，因此⼩杨最多能够购买 $4$  件商品 $A$ 和 $4$ 件商品 $B$，共花费 $1 \\times 4 + 2 \\times 4 = 12$ 元。因此，样例 1 的答案为 $4$。\r\n\n\t样例 2 解释\r\n\n\t对于输入：\r\n\n13\r\n1\r\n2\r\n应该输出：\r\n\n4\r\n\n\t    对于样例 1，由于需要购买相同数量的两种商品，因此⼩杨最多能够购买 $4$  件商品 $A$ 和 $4$ 件商品 $B$，共花费 $1 \\times 4 + 2 \\times 4 = 12$ 元。因此，样例 1 的答案为 $4$。如果小杨想购买 $5$ 件商品 $A$ 和商品 $B$，则需要花费 $1 \\times 5 + 2 \\times 5 = 15$ 元，超过了小样的预算 $13$ 元。因此，样例 2 答案为 $4$。\r\n\n\t数据规模与约定\r\n\n\t    对全部的测试数据，保证 $1 \\leq n,a,b \\leq 10^5$。",
+  "time_limit": 1000,
+  "memory_limit": 128,
+  "level": 1,
+  "publish_date": "2024-09-01",
+  "samples": [
+    {
+      "input": "12\r\n1\r\n2",
+      "output": "4",
+      "explanation": "样例",
+      "is_hidden": false,
+      "sort_order": 1
+    },
+    {
+      "input": "13\n1\n2",
+      "output": "4",
+      "explanation": "test",
+      "is_hidden": true,
+      "sort_order": 2
+    },
+    {
+      "input": "1765 34 52",
+      "output": "20",
+      "explanation": "test1",
+      "is_hidden": true,
+      "sort_order": 3
+    },
+    {
+      "input": "4353 22 2",
+      "output": "181",
+      "explanation": "test2",
+      "is_hidden": true,
+      "sort_order": 4
+    },
+    {
+      "input": "100\n5\n5",
+      "output": "10",
+      "explanation": "test3",
+      "is_hidden": true,
+      "sort_order": 5
+    },
+    {
+      "input": "25\n3\n4",
+      "output": "3",
+      "explanation": "test4",
+      "is_hidden": true,
+      "sort_order": 6
+    },
+    {
+      "input": "100000\n100000\n100000",
+      "output": "0",
+      "explanation": "test5",
+      "is_hidden": true,
+      "sort_order": 7
+    }
+  ]
+}

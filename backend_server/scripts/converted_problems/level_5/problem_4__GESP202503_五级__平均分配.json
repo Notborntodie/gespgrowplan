@@ -1,0 +1,90 @@
+{
+  "title": "[GESP202503 五级] 平均分配",
+  "description": "小 A 有 $2n$ 件物品，小 B 和小 C 想从小 A 手上买走这些物品。对于第 $i$ 件物品，小 B 会以 $b_i$ 的价格购买，而小 C 会以 $c_i$ 的价格购买。为了平均分配这 $2n$ 件物品，小 A 决定小 B 和小 C 各自只能买走恰好 $n$ 件物品。你能帮小 A 求出他卖出这 $2n$ 件物品所能获得的最大收入吗？",
+  "input_format": "第一行，一个正整数 $n$。\r\n\n\t    第二行，$2n$ 个整数 $b_1,b_2,\\dots,b_{2n}$。\r\n\n\t    第三行，$2n$ 个整数 $c_1,c_2,\\dots,c_{2n}$。",
+  "output_format": "一行，一个整数，表示答案。",
+  "data_range": "数据范围\r\n\n\t对于 $20\\%$ 的测试点，保证 $1\\le n\\le8$。\r\n\n\t对于另外 $20\\%$ 的测试点，保证 $0\\le b_i\\le1$，$0\\le  c_i\\le1$。\r\n\n\t对于所有测试点，保证 $1\\le n\\le10^5$，$0\\le b_i\\le10^9$，$0\\le c_i\\le10^9$。",
+  "time_limit": 1000,
+  "memory_limit": 128,
+  "level": 5,
+  "publish_date": "2025-03-01",
+  "samples": [
+    {
+      "input": "3\r\n1 3 5 6 8 10\r\n2 4 6 7 9 11",
+      "output": "36",
+      "explanation": "样例",
+      "is_hidden": false,
+      "sort_order": 1
+    },
+    {
+      "input": "2\n6 7 9 9\n1 2 10 12",
+      "output": "35",
+      "explanation": "test",
+      "is_hidden": true,
+      "sort_order": 2
+    },
+    {
+      "input": "3\n1 3 5 6 8 10\n2 4 6 7 9 11",
+      "output": "36",
+      "explanation": "test_1",
+      "is_hidden": true,
+      "sort_order": 3
+    },
+    {
+      "input": "2\n6 7 9 9\n1 2 10 12",
+      "output": "35",
+      "explanation": "test_2",
+      "is_hidden": true,
+      "sort_order": 4
+    },
+    {
+      "input": "1\n10\n20",
+      "output": "20",
+      "explanation": "test_3",
+      "is_hidden": true,
+      "sort_order": 5
+    },
+    {
+      "input": "2\n10 20 30 40\n1 2 3 4",
+      "output": "73",
+      "explanation": "test_4",
+      "is_hidden": true,
+      "sort_order": 6
+    },
+    {
+      "input": "2\n1 2 3 4\n10 20 30 40",
+      "output": "73",
+      "explanation": "test_5",
+      "is_hidden": true,
+      "sort_order": 7
+    },
+    {
+      "input": "4\n5 3 8 2 7 1 9 4\n6 4 7 3 8 2 10 5",
+      "output": "43",
+      "explanation": "test_6",
+      "is_hidden": true,
+      "sort_order": 8
+    },
+    {
+      "input": "3\n5 5 5 5 5 5\n5 5 5 5 5 5",
+      "output": "30",
+      "explanation": "test_7",
+      "is_hidden": true,
+      "sort_order": 9
+    },
+    {
+      "input": "4\n100 100 100 100 1 1 1 1\n1 1 1 1 100 100 100 100",
+      "output": "800",
+      "explanation": "test_8",
+      "is_hidden": true,
+      "sort_order": 10
+    },
+    {
+      "input": "5\n3 17 9 25 12 8 21 5 19 7\n15 4 20 10 6 23 11 18 2 14",
+      "output": "184",
+      "explanation": "test_9",
+      "is_hidden": true,
+      "sort_order": 11
+    }
+  ]
+}

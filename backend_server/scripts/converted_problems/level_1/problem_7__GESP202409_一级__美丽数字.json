@@ -1,0 +1,62 @@
+{
+  "title": "[GESP202409 一级] 美丽数字",
+  "description": "小杨有 $n$ 个正整数，他认为一个正整数是美丽数字当且仅当该正整数是 $9$ 的倍数但不是 $8$ 的倍数。\r\n\n\t    小杨想请你编写一个程序计算 $n$ 个正整数中美丽数字的数量。",
+  "input_format": "第一行包含一个整数 $n$，代表正整数个数。  \r\n\n\t    第二行有 $n$ 个正整数 $a_1, a_2, \\dots a_n$。",
+  "output_format": "输出一个整数，表示其中美丽数字的数量。",
+  "data_range": "样例 1 解释\r\n\n\t1.  $1$ 既不是 $9$ 的倍数也不是 $8$ 的倍数。\r\n\n\t2.  $9$ 是 $9$ 的倍数不是 $8$ 的倍数。\r\n\n\t3.  $72$ 既是 $9$ 的倍数又是 $8$ 的倍数。\r\n\n\t数据规模与约定\r\n\n\t对全部的测试数据，保证 $1 \\leq n, a_i \\leq 10^5$。",
+  "time_limit": 1000,
+  "memory_limit": 128,
+  "level": 1,
+  "publish_date": "2024-09-01",
+  "samples": [
+    {
+      "input": "3\r\n1 9 72",
+      "output": "1",
+      "explanation": "样例",
+      "is_hidden": false,
+      "sort_order": 1
+    },
+    {
+      "input": "5\n1 8 23 543 23463",
+      "output": "1",
+      "explanation": "test1",
+      "is_hidden": true,
+      "sort_order": 2
+    },
+    {
+      "input": "3\n5646 2342 7643",
+      "output": "0",
+      "explanation": "test2",
+      "is_hidden": true,
+      "sort_order": 3
+    },
+    {
+      "input": "4\n22 33 44 55",
+      "output": "0",
+      "explanation": "test3",
+      "is_hidden": true,
+      "sort_order": 4
+    },
+    {
+      "input": "6\n9 18 27 36 45 54",
+      "output": "6",
+      "explanation": "test4",
+      "is_hidden": true,
+      "sort_order": 5
+    },
+    {
+      "input": "4\n8 16 72 144",
+      "output": "0",
+      "explanation": "test5",
+      "is_hidden": true,
+      "sort_order": 6
+    },
+    {
+      "input": "7\n99999 100000 12345 67890 9999 8888 7272",
+      "output": "2",
+      "explanation": "test6",
+      "is_hidden": true,
+      "sort_order": 7
+    }
+  ]
+}

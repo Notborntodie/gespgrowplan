@@ -1,0 +1,1759 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE fps PUBLIC 
+  "-//freeproblemset//An opensource XML standard for Algorithm Contest Problem Set//EN"
+  "http://hustoj.com/fps.current.dtd" >
+
+<fps version="1.5" url="https://github.com/zhblue/freeproblemset/">
+  <generator name="HUSTOJ" url="https://github.com/zhblue/hustoj/" />
+  
+  <item>
+    <title><![CDATA[[GESP202506 一级] 假期阅读]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4731]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select">
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小 A 有一本厚厚的书。这本书总共有 $n$ 页，小 A 一天中最多只能阅读完其中的 $k$ 页。小 A 的假期总共有 $t$ 天，他想知道在假期中最多能阅读完这本书的多少页。
+</p>
+</span>]]></description>
+    <input><![CDATA[<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;第一行，一个正整数 $n$，表示书的页数。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;第二行，一个正整数 $k$，表示小 A 每天最多阅读的页数。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;第三行，一个正整数 $t$，表示小 A 假期的天数。
+</p>]]></input> 
+    <output><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;一行，一个整数，表示假期中所能阅读的最多页数。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[8
+3
+2]]></sample_input>
+    <sample_output><![CDATA[6]]></sample_output>
+    <test_input name="test"><![CDATA[19
+3
+30]]></test_input>
+<test_output name="test"><![CDATA[19]]></test_output>
+<test_input name="test1"><![CDATA[723
+33
+12]]></test_input>
+<test_output name="test1"><![CDATA[396]]></test_output>
+<test_input name="test2"><![CDATA[123
+21
+4]]></test_input>
+<test_output name="test2"><![CDATA[84]]></test_output>
+<test_input name="test3"><![CDATA[87
+11
+2]]></test_input>
+<test_output name="test3"><![CDATA[22]]></test_output>
+<test_input name="test4"><![CDATA[8
+3
+2]]></test_input>
+<test_output name="test4"><![CDATA[6]]></test_output>
+<test_input name="test5"><![CDATA[1000
+1000
+1]]></test_input>
+<test_output name="test5"><![CDATA[1000]]></test_output>
+<test_input name="test6"><![CDATA[1
+1
+1]]></test_input>
+<test_output name="test6"><![CDATA[1]]></test_output>
+    <hint><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;对于所有测试点，保证 $n&#44;k&#44;t$ 均不超过 $1000$。<span class="md"> </span>]]></hint>
+    <source><![CDATA[GESP一级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include<bits/stdc++.h>
+using namespace std;
+int main()
+{
+	int n,k,t;
+	cin>>n>>k>>t;
+	if(k*t>n){
+		cout<<n;
+	}
+	else cout<<k*t;
+	return 0;
+}]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202506 一级] 值日]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4732]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select">
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小杨和小红是值日生，负责打扫教室。小杨每 $m$ 天值日一次，小红每 $n$ 天值日一次。今天他们两个一起值日，请问至少多少天后，他们会再次同一天值日？
+</p>
+</span>]]></description>
+    <input><![CDATA[<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;第一行，一个正整数 $m$，表示小杨的值日周期；
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;第二行，一个正整数 $n$，表示小红的值日周期。
+</p>]]></input> 
+    <output><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;一行，一个整数，表示至少多少天后他们会再次同一天值日。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[4
+6]]></sample_input>
+    <sample_output><![CDATA[12]]></sample_output>
+    <test_input name="test"><![CDATA[4
+6]]></test_input>
+<test_output name="test"><![CDATA[12]]></test_output>
+<test_input name="test1"><![CDATA[12
+24]]></test_input>
+<test_output name="test1"><![CDATA[24]]></test_output>
+<test_input name="test2"><![CDATA[52
+12]]></test_input>
+<test_output name="test2"><![CDATA[156]]></test_output>
+<test_input name="test3"><![CDATA[86
+44]]></test_input>
+<test_output name="test3"><![CDATA[1892]]></test_output>
+<test_input name="test4"><![CDATA[6 77]]></test_input>
+<test_output name="test4"><![CDATA[462]]></test_output>
+<test_input name="test5"><![CDATA[99 99]]></test_input>
+<test_output name="test5"><![CDATA[99]]></test_output>
+    <hint><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;对于所有测试点，保证 $1 \leq m&#44; n \leq 100$。<span class="md"> </span>]]></hint>
+    <source><![CDATA[GESP一级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include<bits/stdc++.h>
+using namespace std;
+int main(){
+	int m,n;
+	cin>>m>>n;
+	for(int i=1;i<=m*n;i++){
+		if(i>=m&&i>=n){
+			if(i%m==0&&i%n==0){
+				cout<<i;
+				break;
+			}
+		}
+	}
+	return 0;
+}]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202503 一级] 四舍五入]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4747]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select">
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;四舍五入是一种常见的近似计算方法。现在，给定 $n$ 个整数，你需要将每个整数四舍五入到最接近的整十数。例如，$43$ 四舍五入后为 $40$，$58$ 四舍五入后为 $60$。
+</p>
+</span>]]></description>
+    <input><![CDATA[<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;共 $n+1$ 行，第一行，一个整数 $n$，表示接下来输入的整数个数。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;接下来 $n$ 行，每行一个整数 $a_1&#44; \cdots&#44; a_n$，表示需要四舍五入的整数。
+</p>]]></input> 
+    <output><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;$n$ 行，每行一个整数，表示每个整数四舍五入后的结果。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[5
+43
+58
+25
+67
+90]]></sample_input>
+    <sample_output><![CDATA[40
+60
+30
+70
+90]]></sample_output>
+    <test_input name="test"><![CDATA[5
+43
+58
+25
+67
+90]]></test_input>
+<test_output name="test"><![CDATA[40
+60
+30
+70
+90]]></test_output>
+<test_input name="test1"><![CDATA[10
+3
+54
+33
+45
+23
+53
+12
+94
+1
+37
+]]></test_input>
+<test_output name="test1"><![CDATA[0
+50
+30
+50
+20
+50
+10
+90
+0
+40]]></test_output>
+<test_input name="test2"><![CDATA[5
+123
+3452
+2342
+5342
+23
+]]></test_input>
+<test_output name="test2"><![CDATA[120
+3450
+2340
+5340
+20]]></test_output>
+<test_input name="test3"><![CDATA[2
+9999
+10000]]></test_input>
+<test_output name="test3"><![CDATA[10000
+10000]]></test_output>
+<test_input name="test4"><![CDATA[6
+5
+14
+25
+36
+49
+50]]></test_input>
+<test_output name="test4"><![CDATA[10
+10
+30
+40
+50
+50]]></test_output>
+<test_input name="test5"><![CDATA[4
+995
+999
+1001
+1005]]></test_input>
+<test_output name="test5"><![CDATA[1000
+1000
+1000
+1010]]></test_output>
+<test_input name="test6"><![CDATA[3
+12
+15
+18]]></test_input>
+<test_output name="test6"><![CDATA[10
+20
+20]]></test_output>
+    <hint><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;对于所有测试点，保证 $1\leq n\leq 100$，$1\leq a_i\leq 10000$。<span class="md"> </span>]]></hint>
+    <source><![CDATA[GESP一级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include <bits/stdc++.h>
+using namespace std;
+int main(){
+	int n,a,s;
+	cin>>n;
+	for(int i=1;i<=n;i++){
+		cin>>a;
+		s=a%10;
+		if(s>=0&&s<=4){
+			cout<<a-s<<endl;
+		}else{
+			cout<<a+10-s<<endl;
+		}
+	}
+	return 0;	
+}]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202503 一级] 图书馆里的老鼠]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4748]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select">
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;图书馆里有 $n$ 本书，不幸的是，还混入了一只老鼠，老鼠每 $x$ 小时能啃光一本书，假设老鼠在啃光一本书之前，不会啃另一本。请问 $y$ 小时后图书馆里还剩下多少本完整的书。
+</p>
+</span>]]></description>
+    <input><![CDATA[<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;三行，第一行一个正整数 $n$，表示图书馆里书的数量；
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;第二行，一个正整数 $x$，表示老鼠啃光一本书需要的时间；
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;第三行，一个正整数 $y$，表示经过的总时间；
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;输入数据保证 $y$ 小时后至少会剩下一本完整的书。
+</p>]]></input> 
+    <output><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;一行，一个整数，表示 $y$ 小时后图书馆里还剩下多少本完整的书。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[10
+2
+3]]></sample_input>
+    <sample_output><![CDATA[8]]></sample_output>
+    <test_input name="test"><![CDATA[5
+2
+4]]></test_input>
+<test_output name="test"><![CDATA[3]]></test_output>
+<test_input name="test1"><![CDATA[999
+23
+444]]></test_input>
+<test_output name="test1"><![CDATA[979]]></test_output>
+<test_input name="test2"><![CDATA[834
+123
+11]]></test_input>
+<test_output name="test2"><![CDATA[833]]></test_output>
+<test_input name="test3"><![CDATA[284
+111
+44]]></test_input>
+<test_output name="test3"><![CDATA[283]]></test_output>
+<test_input name="test4"><![CDATA[912
+321
+123]]></test_input>
+<test_output name="test4"><![CDATA[911]]></test_output>
+    <hint><![CDATA[<span class="md">&nbsp;&nbsp;&nbsp;&nbsp;对于所有测试点，保证 $1\leq n&#44;x&#44;y\leq 1000$，保证 $y$ 小时后至少会剩下⼀本完整的书。 </span>]]></hint>
+    <source><![CDATA[GESP一级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include<bits/stdc++.h>
+using namespace std;
+int main(){
+	int n,x,y;
+	cin>>n>>x>>y;
+	int a=y%x,b=y/x;
+	if(a!=0) b++;
+	cout<<n-b;
+	return 0;
+}]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202412 一级] 温度转换]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4749]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select"> 
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小杨最近学习了开尔文温度、摄氏温度和华氏温度的转换。令符号 $K$ 表开尔文温度，符号 $C$ 表摄氏温度，符号 $F$ 表华氏温度，这三者的转换公式如下：
+</p>
+<p>
+	$$C=K-273.15\\$$
+</p>
+<p>
+	$$F=C\times 1.8+32$$
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;现在小杨想编写一个程序计算某一开尔文温度对应的摄氏温度和华氏温度，你能帮帮他吗?
+</p>
+</span>]]></description>
+    <input><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;一行，一个实数 $K$，表示开尔文温度。<span class="md"> </span>]]></input> 
+    <output><![CDATA[<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;一行，若输入开尔文温度对应的华氏温度高于 $212$，输出 Temperature is too high!；
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;否则，输出两个由空格分隔的实数 $C$ 和 $F$，分别表示摄氏温度和华氏度，保留两位小数。
+</p>]]></output>
+    <sample_input><![CDATA[412.00]]></sample_input>
+    <sample_output><![CDATA[Temperature is too high!]]></sample_output>
+    <test_input name="test"><![CDATA[173.56]]></test_input>
+<test_output name="test"><![CDATA[-99.59 -147.26]]></test_output>
+<test_input name="test1"><![CDATA[123]]></test_input>
+<test_output name="test1"><![CDATA[-150.15 -238.27]]></test_output>
+<test_input name="test2"><![CDATA[213]]></test_input>
+<test_output name="test2"><![CDATA[-60.15 -76.27]]></test_output>
+<test_input name="test3"><![CDATA[111]]></test_input>
+<test_output name="test3"><![CDATA[-162.15 -259.87]]></test_output>
+<test_input name="test4"><![CDATA[199]]></test_input>
+<test_output name="test4"><![CDATA[-74.15 -101.47]]></test_output>
+    <hint><![CDATA[$0&lt;K&lt;10^5$。<span class="md"> </span>]]></hint>
+    <source><![CDATA[GESP一级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include<bits/stdc++.h>
+using namespace std;
+int main(){
+    double k;
+    cin>>k;
+    double c=k-273.15;
+    double f=c*1.8+32;
+    if(f>212){
+        cout<<"Temperature is too high!";
+        return 0;
+    }
+    printf("%.2f %.2f",c,f);
+    return 0;
+}]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202412 一级] 奇数和偶数]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4750]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select">
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小杨有 $n$ 个正整数，他想知道其中的奇数有多少个，偶数有多少个。
+</p>
+</span>]]></description>
+    <input><![CDATA[<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;第一行包含一个正整数 $n$，代表正整数个数。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;之后 $n$ 行，每行包含一个正整数。
+</p>]]></input> 
+    <output><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;输出两个正整数（英文空格间隔），代表奇数的个数和偶数的个数。如奇数或偶数的个数为 $0$，则对应输出 $0$。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[5
+1
+2
+3
+4
+5]]></sample_input>
+    <sample_output><![CDATA[3 2]]></sample_output>
+    <test_input name="test"><![CDATA[5
+1
+2
+3
+4
+5]]></test_input>
+<test_output name="test"><![CDATA[3 2]]></test_output>
+<test_input name="test1"><![CDATA[10
+23
+42
+63
+12
+54
+23
+16
+73
+444
+634]]></test_input>
+<test_output name="test1"><![CDATA[4 6]]></test_output>
+<test_input name="test2"><![CDATA[3
+111
+5435
+7332]]></test_input>
+<test_output name="test2"><![CDATA[2 1]]></test_output>
+<test_input name="test3"><![CDATA[4
+999
+222
+4444
+6345]]></test_input>
+<test_output name="test3"><![CDATA[2 2]]></test_output>
+<test_input name="test4"><![CDATA[3
+10
+20
+30]]></test_input>
+<test_output name="test4"><![CDATA[0 3]]></test_output>
+<test_input name="test5"><![CDATA[4
+7
+13
+29
+45]]></test_input>
+<test_output name="test5"><![CDATA[4 0]]></test_output>
+<test_input name="test6"><![CDATA[7
+99999
+100000
+12345
+67890
+111
+222
+333]]></test_input>
+<test_output name="test6"><![CDATA[4 3]]></test_output>
+    <hint><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;对于全部数据，保证有 $1\leq n\leq 10^5$ 且正整数不超过 $10^5$。<span class="md"> </span>]]></hint>
+    <source><![CDATA[GESP一级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include<bits/stdc++.h>
+using namespace std;
+int main() {
+    int n;
+    cin>>n;
+    int js=0;
+    int os=0;
+    for(int i=0;i<n;i++){
+        int t;
+        cin>>t;
+
+        if(t%2==0){
+            js++;
+        }else{
+            os++;
+        }
+    }
+    cout<<os<<" "<<js;
+    return 0;
+}]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202409 一级] 美丽数字]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4751]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select">
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小杨有 $n$ 个正整数，他认为一个正整数是美丽数字当且仅当该正整数是 $9$ 的倍数但不是 $8$ 的倍数。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小杨想请你编写一个程序计算 $n$ 个正整数中美丽数字的数量。
+</p>
+</span>]]></description>
+    <input><![CDATA[<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;第一行包含一个整数 $n$，代表正整数个数。&nbsp;&nbsp;
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;第二行有 $n$ 个正整数 $a_1&#44; a_2&#44; \dots a_n$。
+</p>]]></input> 
+    <output><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;输出一个整数，表示其中美丽数字的数量。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[3
+1 9 72]]></sample_input>
+    <sample_output><![CDATA[1]]></sample_output>
+    <test_input name="test1"><![CDATA[5
+1 8 23 543 23463]]></test_input>
+<test_output name="test1"><![CDATA[1]]></test_output>
+<test_input name="test2"><![CDATA[3
+5646 2342 7643]]></test_input>
+<test_output name="test2"><![CDATA[0]]></test_output>
+<test_input name="test3"><![CDATA[4
+22 33 44 55]]></test_input>
+<test_output name="test3"><![CDATA[0]]></test_output>
+<test_input name="test4"><![CDATA[6
+9 18 27 36 45 54]]></test_input>
+<test_output name="test4"><![CDATA[6]]></test_output>
+<test_input name="test5"><![CDATA[4
+8 16 72 144]]></test_input>
+<test_output name="test5"><![CDATA[0]]></test_output>
+<test_input name="test6"><![CDATA[7
+99999 100000 12345 67890 9999 8888 7272]]></test_input>
+<test_output name="test6"><![CDATA[2]]></test_output>
+    <hint><![CDATA[<p>
+	<strong>样例 1 解释</strong>
+</p>
+<p>
+	1.&nbsp; $1$ 既不是 $9$ 的倍数也不是 $8$ 的倍数。
+</p>
+<p>
+	2.&nbsp; $9$ 是 $9$ 的倍数不是 $8$ 的倍数。
+</p>
+<p>
+	3.&nbsp; $72$ 既是 $9$ 的倍数又是 $8$ 的倍数。
+</p>
+<p>
+	<strong>数据规模与约定</strong>
+</p>
+<p>
+	对全部的测试数据，保证 $1 \leq n&#44; a_i \leq 10^5$。
+</p>]]></hint>
+    <source><![CDATA[GESP一级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include<bits/stdc++.h>
+using namespace std;
+int main() {
+    int n; 
+    cin>>n; 
+    int k=0; 
+    int a; 
+    for (int i=1;i<=n;i++) { 
+        cin>>a; 
+        if(a%8!=0&&a%9==0){ 
+            k+=1;
+        }
+    }
+    cout<<k;
+    return 0;
+}]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202409 一级] 小杨购物]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4752]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select">
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小杨有 $n$ 元钱用于购物。商品 A 的单价是 $a$ 元，商品 B 的单价是 $b$ 元。小杨想购买<strong>相同数量</strong>的商品 A 和商品 B。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;请你编写程序帮助小杨计算出他最多能够购买多少个商品 A 和商品 B。
+</p>
+</span>]]></description>
+    <input><![CDATA[<span class="md">&nbsp;&nbsp;&nbsp;&nbsp;第一行包含一个正整数 $n$，代表小杨用于购物的金额。
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;第二行包含一个正整数 $a$，代表商品 A 的单价。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;第三行包含一个正整数 $b$，代表商品 B 的单价。
+</p>
+</span>]]></input> 
+    <output><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;输出一行，包含一个整数，代表小杨最多能够购买的商品 A 和商品 B 的数量。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[12
+1
+2]]></sample_input>
+    <sample_output><![CDATA[4]]></sample_output>
+    <test_input name="test"><![CDATA[13
+1
+2]]></test_input>
+<test_output name="test"><![CDATA[4]]></test_output>
+<test_input name="test1"><![CDATA[1765 34 52]]></test_input>
+<test_output name="test1"><![CDATA[20]]></test_output>
+<test_input name="test2"><![CDATA[4353 22 2]]></test_input>
+<test_output name="test2"><![CDATA[181]]></test_output>
+<test_input name="test3"><![CDATA[100
+5
+5]]></test_input>
+<test_output name="test3"><![CDATA[10]]></test_output>
+<test_input name="test4"><![CDATA[25
+3
+4]]></test_input>
+<test_output name="test4"><![CDATA[3]]></test_output>
+<test_input name="test5"><![CDATA[100000
+100000
+100000]]></test_input>
+<test_output name="test5"><![CDATA[0]]></test_output>
+    <hint><![CDATA[<span class="md">
+<p>
+	<strong>样例 1 解释</strong>
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;对于样例 1，由于需要购买相同数量的两种商品，因此⼩杨最多能够购买 $4$ &nbsp;件商品 $A$ 和 $4$ 件商品 $B$，共花费 $1 \times 4 + 2 \times 4 = 12$ 元。因此，样例 1 的答案为 $4$。
+</p>
+<p>
+	<strong>样例 2 解释</strong>
+</p>
+<p>
+	<strong>对于输入：</strong>
+</p>
+<p>
+	<strong>
+	<p>
+		<strong>
+<pre class="prettyprint">13
+1
+2</pre>
+应该输出：</strong>
+	</p>
+	<p>
+		<strong>
+<pre class="prettyprint">4</pre>
+</strong>
+	</p>
+</strong>
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;对于样例 1，由于需要购买相同数量的两种商品，因此⼩杨最多能够购买 $4$ &nbsp;件商品 $A$ 和 $4$ 件商品 $B$，共花费 $1 \times 4 + 2 \times 4 = 12$ 元。因此，样例 1 的答案为 $4$。如果小杨想购买 $5$ 件商品 $A$ 和商品 $B$，则需要花费 $1 \times 5 + 2 \times 5 = 15$ 元，超过了小样的预算 $13$ 元。因此，样例 2 答案为 $4$。
+</p>
+<p>
+	<strong>数据规模与约定</strong>
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;对全部的测试数据，保证 $1 \leq n&#44;a&#44;b \leq 10^5$。
+</p>
+</span>]]></hint>
+    <source><![CDATA[GESP一级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include <bits/stdc++.h>
+using namespace std;
+int main() {
+    int n, a, b; 
+    cin>>n>>a>>b; 
+    cout<<n/(a+b); 
+    return 0; 
+}]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202406 一级] 立方数]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4753]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select">
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小杨有一个正整数 $n$，他想知道 $n$ 是否是一个立方数。一个正整数 $n$ 是立方数当且仅当存在一个正整数 $x$ 满足 $x\times x\times x=n$ 。
+</p>
+</span>]]></description>
+    <input><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;第一行包含一个正整数 $n$。<span class="md"> </span>]]></input> 
+    <output><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;如果正整数 $n$ 是一个立方数，输出 `Yes`，否则输出 `No`。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[8]]></sample_input>
+    <sample_output><![CDATA[Yes]]></sample_output>
+    <test_input name="test"><![CDATA[9]]></test_input>
+<test_output name="test"><![CDATA[No]]></test_output>
+<test_input name="test1"><![CDATA[567]]></test_input>
+<test_output name="test1"><![CDATA[No]]></test_output>
+<test_input name="test2"><![CDATA[333]]></test_input>
+<test_output name="test2"><![CDATA[No]]></test_output>
+<test_input name="test3"><![CDATA[897]]></test_input>
+<test_output name="test3"><![CDATA[No]]></test_output>
+<test_input name="test4"><![CDATA[999]]></test_input>
+<test_output name="test4"><![CDATA[No]]></test_output>
+<test_input name="test5"><![CDATA[378]]></test_input>
+<test_output name="test5"><![CDATA[No]]></test_output>
+<test_input name="test6"><![CDATA[573]]></test_input>
+<test_output name="test6"><![CDATA[No]]></test_output>
+    <hint><![CDATA[<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;对于样例 1，存在正整数 $2$ 使得 $8=2\times 2\times 2$ ，因此 $8$ 为立方数。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;对于样例 $2$，不存在满足条件的正整数，因此 $9$ 不为立方数。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;对于全部数据，保证有 $1 \le n \le 1000$。
+</p>]]></hint>
+    <source><![CDATA[GESP一级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include<bits/stdc++.h> 
+using namespace std;
+int main(){
+	int n;
+	cin>>n;
+	for(int i=1;i<=n;i++){
+		if(i*i*i==n){
+			cout<<"Yes";
+			return 0;
+		}
+	}
+	cout<<"No";
+}]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202406 一级] 休息时间]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4754]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select">
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小杨计划在某个时刻开始学习，并决定在学习 $k$ 秒后开始休息。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小杨想知道自己开始休息的时刻是多少。
+</p>
+<p>
+	<br />
+</p>
+</span>]]></description>
+    <input><![CDATA[<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;前三行每行包含一个整数，分别表示小杨开始学习时刻的时 $h$、分 $m$、秒 $s$（$h&#44;m&#44; s$ 的值符合
+</p>
+<p>
+	$1 \le h \le 12&#44;0 \le m\le 59&#44;0 \le s\le59$）。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;第四行包含一个整数 $k$，表示小杨学习的总秒数（注：$k$ 的值符合 $1 \le k \le 3600$）。
+</p>]]></input> 
+    <output><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;输出一行，包含三个整数，分别表示小杨开始休息时刻的时、分、秒。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[12
+59
+59
+10]]></sample_input>
+    <sample_output><![CDATA[13 0 9]]></sample_output>
+    <test_input name="test_1"><![CDATA[9
+30
+45
+1200]]></test_input>
+<test_output name="test_1"><![CDATA[9 50 45]]></test_output>
+<test_input name="test_2"><![CDATA[12
+59
+59
+3600]]></test_input>
+<test_output name="test_2"><![CDATA[13 59 59]]></test_output>
+<test_input name="test_3"><![CDATA[1
+0
+0
+1800]]></test_input>
+<test_output name="test_3"><![CDATA[1 30 0]]></test_output>
+<test_input name="test_4"><![CDATA[6
+45
+15
+900]]></test_input>
+<test_output name="test_4"><![CDATA[7 0 15]]></test_output>
+<test_input name="test_5"><![CDATA[11
+11
+11
+1]]></test_input>
+<test_output name="test_5"><![CDATA[11 11 12]]></test_output>
+    <hint><![CDATA[<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小杨在时刻 12:59:59 开始学习，学习 10 秒后开始休息，即在 13:0:9 时刻开始休息。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;对于全部数据，保证有 &nbsp;$1 \le h \le 12$，$0 \le m\le 59$，$0 \le s\le 59$，$1 \le k \le 3600$。
+</p>]]></hint>
+    <source><![CDATA[GESP一级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include<bits/stdc++.h>
+using namespace std;
+int main(){
+	int h,m,s,k;
+	cin>>h>>m>>s>>k;
+	if(s+k>=60){
+		s = s+k-60;
+		m++;
+	}
+	else s = s+k;
+	if(m>=60){
+		m = m-60;
+		h++;
+	}
+	cout<<h<<' '<<m<<' '<<s;
+	return 0;
+}]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202403 一级] 找因数]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4755]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select">
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小 A 最近刚刚学习了因数的概念，具体来说，如果一个正整数 $a$ 可以被另一个正整数 $b$ 整除，那么我们就说 $b$ 是 $a$ 的因数。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;请你帮忙写一个程序，从小到大输出正整数 $a$ 的所有因数。
+</p>
+</span>]]></description>
+    <input><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;输入一行一个正整数 $a$。保证 $a\leq1000$。<span class="md"> </span>]]></input> 
+    <output><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;输出若干行，为 $a$ 的所有约数，从小到大排序。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[10]]></sample_input>
+    <sample_output><![CDATA[1
+2
+5
+10]]></sample_output>
+    <test_input name="test"><![CDATA[6]]></test_input>
+<test_output name="test"><![CDATA[1
+2
+3
+6]]></test_output>
+<test_input name="test_1"><![CDATA[999]]></test_input>
+<test_output name="test_1"><![CDATA[1
+3
+9
+27
+37
+111
+333
+999]]></test_output>
+<test_input name="test_2"><![CDATA[457]]></test_input>
+<test_output name="test_2"><![CDATA[1
+457]]></test_output>
+<test_input name="test_3"><![CDATA[745]]></test_input>
+<test_output name="test_3"><![CDATA[1
+5
+149
+745]]></test_output>
+<test_input name="test_4"><![CDATA[252]]></test_input>
+<test_output name="test_4"><![CDATA[1
+2
+3
+4
+6
+7
+9
+12
+14
+18
+21
+28
+36
+42
+63
+84
+126
+252]]></test_output>
+<test_input name="test_5"><![CDATA[834]]></test_input>
+<test_output name="test_5"><![CDATA[1
+2
+3
+6
+139
+278
+417
+834]]></test_output>
+    <hint><![CDATA[<span class='md'>
+</span>]]></hint>
+    <source><![CDATA[GESP一级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include <iostream>
+using namespace std;
+int main() {
+    int a;
+    cin >> a;
+    for (int i = 1; i <= a; i++) {
+        if (a % i == 0) {
+            cout << i << endl;
+        }
+    }
+}]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202312 一级] 小杨报数]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4756]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select">
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小杨需要从 $1$ 到 $N$ 报数。在报数过程中，小杨希望跳过 $M$ 的倍数。例如，如果 $N=5$， $M=2$ ，那么小杨就需要依次报出 $1$、$3$、$5$。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;现在，请你依次输出小杨报的数。
+</p>
+</span>]]></description>
+    <input><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;输入 $2$ 行，第一行一个整数 $N（1 \le N \le 1&#44;000）$；第二行一个整数 $M（2 \le M \le 100）$。<span class="md"> </span>]]></input> 
+    <output><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;输出若干行，依次表示小杨报的数。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[5
+2]]></sample_input>
+    <sample_output><![CDATA[1
+3
+5]]></sample_output>
+    <test_input name="test"><![CDATA[10
+3]]></test_input>
+<test_output name="test"><![CDATA[1
+2
+4
+5
+7
+8
+10]]></test_output>
+<test_input name="test_1"><![CDATA[5
+2]]></test_input>
+<test_output name="test_1"><![CDATA[1
+3
+5]]></test_output>
+<test_input name="test_2"><![CDATA[10
+3]]></test_input>
+<test_output name="test_2"><![CDATA[1
+2
+4
+5
+7
+8
+10]]></test_output>
+<test_input name="test_3"><![CDATA[15
+5]]></test_input>
+<test_output name="test_3"><![CDATA[1
+2
+3
+4
+6
+7
+8
+9
+11
+12
+13
+14]]></test_output>
+<test_input name="test_4"><![CDATA[7
+7]]></test_input>
+<test_output name="test_4"><![CDATA[1
+2
+3
+4
+5
+6]]></test_output>
+<test_input name="test_5"><![CDATA[20
+4]]></test_input>
+<test_output name="test_5"><![CDATA[1
+2
+3
+5
+6
+7
+9
+10
+11
+13
+14
+15
+17
+18
+19]]></test_output>
+    <hint><![CDATA[<span class='md'>
+</span>]]></hint>
+    <source><![CDATA[GESP一级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include<bits/stdc++.h> 
+using namespace std;
+int main()
+{
+	int n,m;
+	cin>>n>>m;
+	for(int i=1;i<=n;i++){
+		if(i%m==0) continue;
+		cout<<i<<endl;
+	}
+	return 0;
+}
+]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202312 一级] 小杨的考试]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4757]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select">
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;今天是星期 $X$，小杨还有 $N$ 天就要考试了，你能推算出小杨考试那天是星期几吗？（本题中使用 $7$ 表示星期日）
+</p>
+</span>]]></description>
+    <input><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;输入 $2$ 行，第一行一个整数 $X(1\le X \le 7)$；第二行一个整数 $N(1≤N≤364)$。<span class="md"> </span>]]></input> 
+    <output><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;输出一个整数，表示小杨考试那天是星期几。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[1
+6]]></sample_input>
+    <sample_output><![CDATA[7]]></sample_output>
+    <test_input name="test"><![CDATA[5
+3]]></test_input>
+<test_output name="test"><![CDATA[1]]></test_output>
+<test_input name="test_1"><![CDATA[5
+2]]></test_input>
+<test_output name="test_1"><![CDATA[7]]></test_output>
+<test_input name="test_2"><![CDATA[10
+3]]></test_input>
+<test_output name="test_2"><![CDATA[6]]></test_output>
+<test_input name="test_3"><![CDATA[15
+5]]></test_input>
+<test_output name="test_3"><![CDATA[6]]></test_output>
+<test_input name="test_4"><![CDATA[7
+7]]></test_input>
+<test_output name="test_4"><![CDATA[7]]></test_output>
+<test_input name="test_5"><![CDATA[20
+4]]></test_input>
+<test_output name="test_5"><![CDATA[3]]></test_output>
+    <hint><![CDATA[<p>
+	<strong>样例解释</strong>
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;今天是星期 1，那么 6 天后就是星期日，星期日在本题中用 $7$ 表示。
+</p>]]></hint>
+    <source><![CDATA[GESP一级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include<bits/stdc++.h> 
+using namespace std;
+int main()
+{
+	int x,n;
+	cin>>x>>n;
+	int t=(x+n)%7;
+	if(t==0) t=7;
+	cout<<t; 
+	return 0;
+}
+]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202309 一级] 买文具]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4758]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select">
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;开学了，小明来到文具店选购文具。签字笔 $2$ 元一支，他需要 $X$ 支；记事本 $5$ 元一本，他需要 $Y$ 本；直尺 $3$ 元一把，他需要 $Z$ 把。小明手里有 $Q$ 元钱。请你通过编程帮小明算算，他手里的钱是否够买他需要的文具。
+</p>
+</span>]]></description>
+    <input><![CDATA[<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;第一行包含一个正整数，是小明购买签字笔的数量。约定 $1 \le X \le 10$。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;第二行包含一个正整数，是小明购买记事本的数量。约定 $1 \le Y \le 10$。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;第三行包含一个正整数，是小明购买直尺的数量。约定 $1 \le Z \le 10$。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;第四行包含一个正整数 $Q$，是小明手里的钱数（单位：元）。
+</p>]]></input> 
+    <output><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;输出 $2$ 行。如果小明手里的钱够买他需要的文具，则第一行输出 Yes，第二行输出小明会剩下的钱数（单位：元）；否则，第一行输出 No，第二行输出小明缺少的钱数（单位：元）。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[1
+1
+1
+20]]></sample_input>
+    <sample_output><![CDATA[Yes
+10]]></sample_output>
+    <test_input name="test"><![CDATA[1
+1
+1
+5]]></test_input>
+<test_output name="test"><![CDATA[No
+5]]></test_output>
+<test_input name="test_1"><![CDATA[2
+3
+4
+30]]></test_input>
+<test_output name="test_1"><![CDATA[No
+1]]></test_output>
+<test_input name="test_2"><![CDATA[5
+2
+1
+20]]></test_input>
+<test_output name="test_2"><![CDATA[No
+3]]></test_output>
+<test_input name="test_3"><![CDATA[10
+10
+10
+100]]></test_input>
+<test_output name="test_3"><![CDATA[Yes
+0]]></test_output>
+<test_input name="test_4"><![CDATA[3
+1
+2
+15]]></test_input>
+<test_output name="test_4"><![CDATA[No
+2]]></test_output>
+<test_input name="test_5"><![CDATA[1
+2
+3
+25]]></test_input>
+<test_output name="test_5"><![CDATA[Yes
+4]]></test_output>
+    <hint><![CDATA[<span class='md'>
+</span>]]></hint>
+    <source><![CDATA[GESP一级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include<bits/stdc++.h> 
+using namespace std;
+int main()
+{
+	int x,y,z,n;
+	cin>>x>>y>>z>>n;
+	int s=x*2+y*5+z*3;
+	if(s>n) cout<<"No"<<endl<<s-n;
+	else cout<<"Yes"<<endl<<n-s;
+	return 0;
+}
+]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202309 一级] 小明的幸运数]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4759]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select">
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;所有个位数为 $k$ 的正整数，以及所有 $k$ 的倍数，都被小明称为“ $k$ 幸运数”。小明想知道正整数 $L$ 和 $R$ 之间（包括 $L$ 和 $R$）所有 $k$ 幸运数的和，你能帮帮他吗？
+</p>
+</span>]]></description>
+    <input><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;输入 $3$ 行。第一行包含一个正整数 $k$，第二行包含一个正整数 $L$，第三行包含一个正整数 $R$。约定 $2 \le k \le 9$，$1 \le L \le R \le 1000$。<span class="md"> </span>]]></input> 
+    <output><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;输出 $1$ 行，符合题意的幸运数之和。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[7
+1
+10]]></sample_input>
+    <sample_output><![CDATA[7]]></sample_output>
+    <test_input name="test"><![CDATA[7
+10
+20]]></test_input>
+<test_output name="test"><![CDATA[31]]></test_output>
+<test_input name="test_1"><![CDATA[3
+2
+4
+50]]></test_input>
+<test_output name="test_1"><![CDATA[3]]></test_output>
+<test_input name="test_2"><![CDATA[5
+5
+5
+60]]></test_input>
+<test_output name="test_2"><![CDATA[5]]></test_output>
+<test_input name="test_3"><![CDATA[2
+3
+1
+25]]></test_input>
+<test_output name="test_3"><![CDATA[0]]></test_output>
+<test_input name="test_4"><![CDATA[10
+10
+10
+100]]></test_input>
+<test_output name="test_4"><![CDATA[10]]></test_output>
+<test_input name="test_5"><![CDATA[1
+2
+3
+20]]></test_input>
+<test_output name="test_5"><![CDATA[5]]></test_output>
+    <hint><![CDATA[<p>
+	<strong>样例解释 ：</strong>
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;$1$ 和 $10$ 之间共有 $1$ 个 $7$ 幸运数：$7$。因为 $7$ 既是 $7$ 的倍数，个位数又为 $7$。因此，结果为 $7$。
+</p>]]></hint>
+    <source><![CDATA[GESP一级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include <iostream>
+using namespace std;
+int main() {
+    int k,a,b;
+    cin>>k>>a>>b;
+    int s=0;
+    for (int i=a;i<=b;i++) {
+        if (i%10==k||i%k==0) {
+            s+=i;
+   		}
+	}
+    cout<<s;
+    return 0;
+}]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202306 一级] 时间规划]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4760]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select">
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小明在为自己规划学习时间。现在他想知道两个时刻之间有多少分钟，你能通过编程帮他做到吗？
+</p>
+</span>]]></description>
+    <input><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;输入 $4$ 行，第一行为开始时刻的小时，第二行为开始时刻的分钟，第三行为结束时刻的小时，第四行为结束时刻的分钟。输入保证两个时刻是同一天，开始时刻一定在结束时刻之前。时刻使用 $24$ 小时制，即小时在 $0$ 到 $23$ 之间，分钟在 $0$ 到 $59$ 之间。<span class="md"> </span>]]></input> 
+    <output><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;输出一行，包含一个整数，从开始时刻到结束时刻之间有多少分钟。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[9
+5
+9
+6]]></sample_input>
+    <sample_output><![CDATA[1]]></sample_output>
+    <test_input name="test"><![CDATA[9
+5
+10
+0]]></test_input>
+<test_output name="test"><![CDATA[55]]></test_output>
+<test_input name="test_1"><![CDATA[5
+20
+35]]></test_input>
+<test_output name="test_1"><![CDATA[1780]]></test_output>
+<test_input name="test_2"><![CDATA[3
+1
+15]]></test_input>
+<test_output name="test_2"><![CDATA[719]]></test_output>
+<test_input name="test_3"><![CDATA[8
+50
+70]]></test_input>
+<test_output name="test_3"><![CDATA[3670]]></test_output>
+<test_input name="test_4"><![CDATA[2
+100
+110]]></test_input>
+<test_output name="test_4"><![CDATA[6380]]></test_output>
+<test_input name="test_5"><![CDATA[9
+80
+95]]></test_input>
+<test_output name="test_5"><![CDATA[5080]]></test_output>
+    <hint><![CDATA[<span class='md'>
+</span>]]></hint>
+    <source><![CDATA[GESP一级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include<bits/stdc++.h>
+using namespace std;
+int main(){
+	int sh,sm,eh,em;
+	cin>>sh>>sm>>eh>>em;
+	int t = 0;
+	t = (eh-sh)*60+em-sm;
+	cout<<t;
+	return 0;
+}]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202306 一级] 累计相加]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4761]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select">
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;输入一个正整数 $n$，求形如：
+</p>
+<p>
+	$1+(1+2)+(1+2+3)+(1+2+3+4)+ \cdots &nbsp;+(1+2+3+4+5+ \cdots &nbsp;+n)$ 的累计相加。
+</p>
+</span>]]></description>
+    <input><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;输入一个正整数 $n$。约定 $1&lt;n \le 100$。<span class="md"> </span>]]></input> 
+    <output><![CDATA[<span class="md">&nbsp;&nbsp;&nbsp;&nbsp;输出累计相加的结果。 </span>]]></output>
+    <sample_input><![CDATA[3]]></sample_input>
+    <sample_output><![CDATA[10]]></sample_output>
+    <test_input name="test"><![CDATA[4]]></test_input>
+<test_output name="test"><![CDATA[20]]></test_output>
+<test_input name="test_1"><![CDATA[99]]></test_input>
+<test_output name="test_1"><![CDATA[166650]]></test_output>
+<test_input name="test_2"><![CDATA[54]]></test_input>
+<test_output name="test_2"><![CDATA[27720]]></test_output>
+<test_input name="test_3"><![CDATA[8]]></test_input>
+<test_output name="test_3"><![CDATA[120]]></test_output>
+<test_input name="test_4"><![CDATA[26]]></test_input>
+<test_output name="test_4"><![CDATA[3276]]></test_output>
+<test_input name="test_5"><![CDATA[75]]></test_input>
+<test_output name="test_5"><![CDATA[73150]]></test_output>
+    <hint><![CDATA[<span class='md'>
+</span>]]></hint>
+    <source><![CDATA[GESP一级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include<bits/stdc++.h>
+using namespace std;
+int c(int n){
+	if(n==1){
+		return 1;
+	}
+	return n+c(n-1);
+}
+int main(){
+	int cnt = 0,n;
+	cin>>n;
+	for(int i=1;i<=n;i++){
+		cnt += c(i);
+	}
+	cout<<cnt;
+}]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202303 一级] 每月天数]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4762]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select">
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小明刚刚学习了每月有多少天，以及如何判断平年和闰年，想到可以使用编程方法求出给定的月份有多少天。你能做到吗？
+</p>
+</span>]]></description>
+    <input><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;输入一行，包含两个整数 $A&#44; B$，分别表示一个日期的年、月。约定 $2000 \leq A \leq 3000$，$1 \leq B \leq 12$。<span class="md"> </span>]]></input> 
+    <output><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;输出一行，包含一个整数，表示输入月份有多少天。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[2022 1]]></sample_input>
+    <sample_output><![CDATA[31]]></sample_output>
+    <test_input name="test"><![CDATA[2020 2]]></test_input>
+<test_output name="test"><![CDATA[29]]></test_output>
+<test_input name="test_1"><![CDATA[2023 2]]></test_input>
+<test_output name="test_1"><![CDATA[28]]></test_output>
+<test_input name="test_2"><![CDATA[2100 2]]></test_input>
+<test_output name="test_2"><![CDATA[28]]></test_output>
+<test_input name="test_3"><![CDATA[2412 1]]></test_input>
+<test_output name="test_3"><![CDATA[31]]></test_output>
+<test_input name="test_4"><![CDATA[2015 12]]></test_input>
+<test_output name="test_4"><![CDATA[31]]></test_output>
+<test_input name="test_5"><![CDATA[2019 3]]></test_input>
+<test_output name="test_5"><![CDATA[31]]></test_output>
+    <hint><![CDATA[<span class='md'>
+</span>]]></hint>
+    <source><![CDATA[GESP一级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include <bits/stdc++.h>
+using namespace std;
+int main() {
+    int year, month;
+    cin >> year >> month;
+    if (month == 1 || month == 3 || month == 5 || month == 7 || month == 8 ||
+        month == 10 || month == 12) {
+        cout << 31;
+    } else if (month == 4 || month == 6 || month == 9 || month == 11) {
+        cout << 30;
+    } else if (month == 2) {
+        if ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0) {
+            cout << 29;
+        } else {
+            cout << 28;
+        }
+    }
+    return 0;
+}]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202303 一级] 长方形面积]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4763]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select">
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小明刚刚学习了如何计算长方形面积。他发现，如果一个长方形的长和宽都是整数，它的面积一定也是整数。现在，小明想知道如果给定长方形的面积，有多少种可能的长方形，满足长和宽都是整数？如果两个长方形的长相等、宽也相等，则认为是同一种长方形。约定长方形的长大于等于宽。正方形是长方形的特例，即长方形的长和宽可以相等。
+</p>
+</span>]]></description>
+    <input><![CDATA[<span class="md">
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;输入一行，包含一个整数 $A$，表示长方形的面积。约定 $2 \leq A \leq 1000$。
+</p>
+</span>]]></input> 
+    <output><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;输出一行，包含一个整数 $C$，表示有 $C$ 种可能的长方形。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[4]]></sample_input>
+    <sample_output><![CDATA[2]]></sample_output>
+    <test_input name="test"><![CDATA[6]]></test_input>
+<test_output name="test"><![CDATA[2]]></test_output>
+<test_input name="test_1"><![CDATA[12]]></test_input>
+<test_output name="test_1"><![CDATA[3]]></test_output>
+<test_input name="test_2"><![CDATA[55]]></test_input>
+<test_output name="test_2"><![CDATA[2]]></test_output>
+<test_input name="test_3"><![CDATA[78]]></test_input>
+<test_output name="test_3"><![CDATA[4]]></test_output>
+<test_input name="test_4"><![CDATA[99]]></test_input>
+<test_output name="test_4"><![CDATA[3]]></test_output>
+<test_input name="test_5"><![CDATA[100]]></test_input>
+<test_output name="test_5"><![CDATA[5]]></test_output>
+    <hint><![CDATA[<p>
+	【样例 1 解释】
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;有 $2$ 种长方形面积为 $4$，它们的长宽分别为 $2 \times 2$，$4 \times 1$。
+</p>]]></hint>
+    <source><![CDATA[GESP一级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include<bits/stdc++.h>
+using namespace std;
+int main(){
+    int b;
+    cin>>b;
+    int a=0;
+    for (int i=1; i*i<=b;i++) {
+        if (b%i==0){
+            a+=1;
+        }
+    }
+    cout<<a;
+}]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202403 一级] 小杨买书]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4844]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select">
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小杨同学积攒了一部分零用钱想要用来购买书籍，已知一本书的单价是 $13$ 元，请根据小杨零用钱的金额，编写程序计算可以购买多少本书，还剩多少零用钱。
+</p>
+</span>]]></description>
+    <input><![CDATA[输入一个正整数 $m$，表示小杨拥有的零用钱数。<span class="md"> </span>]]></input> 
+    <output><![CDATA[输出包含两行，第一行，购买图书的本数；第二行，剩余的零用钱数。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[100]]></sample_input>
+    <sample_output><![CDATA[7
+9]]></sample_output>
+    <test_input name="test"><![CDATA[199]]></test_input>
+<test_output name="test"><![CDATA[15
+4]]></test_output>
+<test_input name="test_1"><![CDATA[29]]></test_input>
+<test_output name="test_1"><![CDATA[2
+3]]></test_output>
+<test_input name="test_2"><![CDATA[67]]></test_input>
+<test_output name="test_2"><![CDATA[5
+2]]></test_output>
+<test_input name="test_3"><![CDATA[109]]></test_input>
+<test_output name="test_3"><![CDATA[8
+5]]></test_output>
+<test_input name="test_4"><![CDATA[199]]></test_input>
+<test_output name="test_4"><![CDATA[15
+4]]></test_output>
+<test_input name="test_5"><![CDATA[100]]></test_input>
+<test_output name="test_5"><![CDATA[7
+9]]></test_output>
+    <hint><![CDATA[<b>输入样例2：</b><br />
+<p>
+	100
+</p>
+<p>
+	<b>样例2输出：</b>
+</p>
+<p>
+	7
+</p>
+<p>
+	9
+</p>
+<p>
+	对全部的测试数据，保证 $0 &lt; m &lt; 200$。
+</p>]]></hint>
+    <source><![CDATA[GESP一级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include<bits/stdc++.h>
+using namespace std;
+int main(){
+    int m;
+    cin>>m;
+    cout<<m/13<<endl<<m%13;
+    return 0;
+}]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202509 一级] 金字塔]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4845]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select">
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;金字塔由 $n$ 层石块垒成。从塔底向上，每层依次需要 $n \times n&#44; (n-1) \times (n-1)&#44; \cdots&#44; 2 \times 2&#44; 1 \times 1$ 块石块。请问搭建金字塔总共需要多少块石块？
+</p>
+</span>]]></description>
+    <input><![CDATA[一行，一个正整数 $n$，表示金字塔的层数。<span class="md"> </span>]]></input> 
+    <output><![CDATA[一行，一个正整数，表示搭建金字塔所需的石块数量。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[2]]></sample_input>
+    <sample_output><![CDATA[5]]></sample_output>
+    <test_input name="test"><![CDATA[5]]></test_input>
+<test_output name="test"><![CDATA[55]]></test_output>
+<test_input name="test_1"><![CDATA[50]]></test_input>
+<test_output name="test_1"><![CDATA[42925]]></test_output>
+<test_input name="test_2"><![CDATA[20]]></test_input>
+<test_output name="test_2"><![CDATA[2870]]></test_output>
+<test_input name="test_3"><![CDATA[40]]></test_input>
+<test_output name="test_3"><![CDATA[22140]]></test_output>
+<test_input name="test_4"><![CDATA[30]]></test_input>
+<test_output name="test_4"><![CDATA[9455]]></test_output>
+<test_input name="test_5"><![CDATA[10]]></test_input>
+<test_output name="test_5"><![CDATA[385]]></test_output>
+<test_input name="test_6"><![CDATA[33]]></test_input>
+<test_output name="test_6"><![CDATA[12529]]></test_output>
+    <hint><![CDATA[测试样例2：<br />
+<p>
+<pre class="prettyprint lang-cpp">5</pre>
+</p>
+<p>
+	样例2输出：
+</p>
+<p>
+<pre class="prettyprint lang-cpp">55</pre>
+</p>
+<p>
+	对于所有测试点，保证 $1 \leq n \leq 50$。<span class="md"> </span>
+</p>]]></hint>
+    <source><![CDATA[GESP一级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;  // 读取金字塔的层数
+    
+    // 计算1² + 2² + ... + n²的和，使用公式n(n+1)(2n+1)/6
+    int total = n * (n + 1) * (2 * n + 1) / 6;
+    
+    cout << total << endl;  // 输出总石块数
+    return 0;
+}]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202509 一级] 商店折扣]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4846]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select">
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;商店正在开展促销活动，给出了两种方案的折扣优惠。第一种方案是购物满 $x$ 元减 $y$ 元；第二种方案是直接打 $n$ 折，也就是说价格变为原先的 $n/10$。这里的 $x&#44; y&#44; n$ 均是正整数，并且 $1 \leq y &lt; x$，$1 \leq n &lt; 10$。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;需要注意的是，第一种方案中满减优惠只能使用一次。例如购物满 $10$ 元减 $3$ 元时，若挑选了价格总和为 $33$ 元的物品，只能减免 $3$ 元，需要支付 $30$ 元。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小明在商店挑选了价格总和为 $p$ 元的物品，结账时只能使用一种优惠方案。小明最少需要支付多少钱呢？
+</p>
+</span>]]></description>
+    <input><![CDATA[四行，四个正整数 $x&#44; y&#44; n&#44; p$，含义见题目描述。<span class="md"> </span>]]></input> 
+    <output><![CDATA[一行，一个小数，表示小明最少需要支付多少钱，保留两位小数。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[8
+7
+9
+10]]></sample_input>
+    <sample_output><![CDATA[3.00]]></sample_output>
+    <test_input name="test"><![CDATA[8
+7
+2
+11]]></test_input>
+<test_output name="test"><![CDATA[2.20]]></test_output>
+<test_input name="test_1"><![CDATA[5
+2
+8
+3]]></test_input>
+<test_output name="test_1"><![CDATA[2.40]]></test_output>
+<test_input name="test_2"><![CDATA[10
+3
+7
+15]]></test_input>
+<test_output name="test_2"><![CDATA[10.50]]></test_output>
+<test_input name="test_3"><![CDATA[20
+5
+8
+25]]></test_input>
+<test_output name="test_3"><![CDATA[20.00]]></test_output>
+<test_input name="test_4"><![CDATA[15
+4
+9
+12]]></test_input>
+<test_output name="test_4"><![CDATA[10.80]]></test_output>
+<test_input name="test_5"><![CDATA[30
+10
+6
+40]]></test_input>
+<test_output name="test_5"><![CDATA[24.00]]></test_output>
+    <hint><![CDATA[输入样例2：
+<p>
+<pre class="prettyprint lang-cpp">8
+7
+2
+11</pre>
+</p>
+<p>
+	样例2输出：
+</p>
+<p>
+<pre class="prettyprint lang-cpp">2.20</pre>
+</p>
+<p>
+	对于所有测试点，保证 $1 \leq y &lt; x \leq 100$，$1 \leq n &lt; 10$，$1 \leq p \leq 100$。<span class="md"> </span>
+</p>]]></hint>
+    <source><![CDATA[GESP一级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include <algorithm>
+#include <cstdio>
+using namespace std;
+	int x, y, n, p;
+	double a1, a2;
+	int main() {
+	scanf("%d%d%d%d", &x, &y, &n, &p);
+	a1 = p;
+	if (a1 >= x) a1 -= y;
+	a2 = p * 0.1 * n;
+	printf("%.2lf\n", min(a1, a2));
+	return 0;
+}]]></solution>
+    
+</item>
+
+</fps>

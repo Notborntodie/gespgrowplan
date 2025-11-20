@@ -1,0 +1,90 @@
+{
+  "title": "B3929 [GESP202312 五级] 小杨的幸运数",
+  "description": "小杨认为，所有大于等于 $a$ 的完全平方数都是他的超级幸运数。\r\n\n\t    小杨还认为，所有超级幸运数的倍数都是他的幸运数。自然地，小杨的所有超级幸运数也都是幸运数。\r\n\n\t    对于一个非幸运数，小杨规定，可以将它一直 $+1$，直到它变成一个幸运数。我们把这个过程叫做幸运化。例如，如果$a=4$，那么 $4$ 是最小的幸运数，而 $1$ 不是，但我们可以连续对 $1$ 做 $3$ 次 $+1$ 操作，使其变为 $4$，所以我们可以说， $1$幸运化后的结果是 $4$。\r\n\n\t    现在，小杨给出 $N$ 个数，请你首先判断它们是不是幸运数；接着，对于非幸运数，请你将它们幸运化。",
+  "input_format": "第一行 $2$ 个正整数 $a, N$。\r\n\n\t    接下来 $N$ 行，每行一个正整数 $x$ ，表示需要判断（幸运化）的数。",
+  "output_format": "输出 $N$ 行，对于每个给定的 $x$ ，如果它是幸运数，请输出 `lucky`，否则请输出将其幸运化后的结果。",
+  "data_range": "样例解释1\r\n\n\t$1$ 虽然是完全平方数，但它小于 $a$，因此它并不是超级幸运数，也不是幸运数。将其进行 $3$ 次 $+1$ 操作后，最终得到幸运数 $4$。$4$ 是幸运数，因此直接输出 `lucky` 。\r\n\n\t$5$ 不是幸运数，将其进行 $3$ 次 $+1$ 操作后，最终得到幸运数 $8$。\r\n\n\t$9$ 是幸运数，因此直接输出 `lucky` 。\r\n\n\t样例输入2\r\n\n16 11 \r\n1 \r\n2 \r\n4 \r\n8 \r\n16 \r\n32 \r\n64 \r\n128 \r\n256 \r\n512\r\n1024\r\n\n\t样例输出2\r\n\n16 \r\n16 \r\n16 \r\n16 \r\nlucky \r\nlucky \r\nlucky \r\nlucky \r\nlucky \r\nlucky \r\nlucky\r\n\n\t数据规模\r\n\n\t对于 $30\\%$ 的测试点，保证 $a,x \\le 100,N \\le 100$。\r\n\n\t对于 $60\\%$ 的测试点，保证 $a,x \\le 10^6$。\r\n\n\t对于所有测试点，保证 $a \\le 1,000,000$；保证 $N \\le 2 \\times 10^5$；保证 $1 \\le x \\le 1,000,001$。",
+  "time_limit": 1000,
+  "memory_limit": 128,
+  "level": 5,
+  "publish_date": "2023-12-01",
+  "samples": [
+    {
+      "input": "2 4\r\n1\r\n4\r\n5\r\n9",
+      "output": "4\r\nlucky\r\n8\r\nlucky",
+      "explanation": "样例",
+      "is_hidden": false,
+      "sort_order": 1
+    },
+    {
+      "input": "16 11\n1\n2\n4\n8\n16\n32\n64\n128\n256\n512\n1024",
+      "output": "16\n16\n16\n16\nlucky\nlucky\nlucky\nlucky\nlucky\nlucky\nlucky",
+      "explanation": "test",
+      "is_hidden": true,
+      "sort_order": 2
+    },
+    {
+      "input": "9 5\n5\n9\n10\n18\n27",
+      "output": "9\nlucky\n16\nlucky\nlucky",
+      "explanation": "test_1",
+      "is_hidden": true,
+      "sort_order": 3
+    },
+    {
+      "input": "10 3\n25\n36\n49",
+      "output": "lucky\nlucky\nlucky",
+      "explanation": "test_2",
+      "is_hidden": true,
+      "sort_order": 4
+    },
+    {
+      "input": "3 5\n4\n8\n12\n16\n20",
+      "output": "lucky\nlucky\nlucky\nlucky\nlucky",
+      "explanation": "test_3",
+      "is_hidden": true,
+      "sort_order": 5
+    },
+    {
+      "input": "1 3\n1\n2\n3",
+      "output": "lucky\nlucky\nlucky",
+      "explanation": "test_4",
+      "is_hidden": true,
+      "sort_order": 6
+    },
+    {
+      "input": "10000 3\n9999\n10000\n10001",
+      "output": "10000\nlucky\n10201",
+      "explanation": "test_5",
+      "is_hidden": true,
+      "sort_order": 7
+    },
+    {
+      "input": "999999 4\n999998\n999999\n1000000\n1000001",
+      "output": "1000000\n1000000\nlucky\n1002001",
+      "explanation": "test_6",
+      "is_hidden": true,
+      "sort_order": 8
+    },
+    {
+      "input": "7 6\n1\n6\n7\n49\n50\n100",
+      "output": "9\n9\n9\nlucky\nlucky\nlucky",
+      "explanation": "test_7",
+      "is_hidden": true,
+      "sort_order": 9
+    },
+    {
+      "input": "10 5\n25\n26\n49\n50\n75",
+      "output": "lucky\n32\nlucky\nlucky\nlucky",
+      "explanation": "test_8",
+      "is_hidden": true,
+      "sort_order": 10
+    },
+    {
+      "input": "36 4\n35\n36\n37\n72",
+      "output": "36\nlucky\n49\nlucky",
+      "explanation": "test_9",
+      "is_hidden": true,
+      "sort_order": 11
+    }
+  ]
+}

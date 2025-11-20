@@ -1,0 +1,62 @@
+{
+  "title": "[GESP202503 二级] 时间跨越",
+  "description": "假设现在是 $y$ 年 $m$ 月 $d$ 日 $h$ 时而 $k$ 小时后是 $y'$ 年 $m'$ 月 $d'$ 日 $h'$ 时，对于给定的 $y, m, d, h, k$，小杨想请你帮他计算出对应的 $y', m', d', h'$ 是多少。",
+  "input_format": "输入包含五行，每行一个正整数，分别代表 $y, m, d, h, k$。",
+  "output_format": "输出四个正整数，代表 $y', m', d', h'$。",
+  "data_range": "对于全部数据，保证有 $2000 \\leq y \\leq 3000$，$1 \\leq m \\leq 12$，$1 \\leq d \\leq 31$，$0 \\leq h \\leq 23$，$1 \\leq k \\leq 24$。数据保证为合法时间。\r\n\n\t闰年判断规则\r\n\n\t1. 普通闰年：年份能被 $4$ 整除，但不能被 $100$ 整除。\r\n\n\t2. 世纪闰年：年份能被 $400$ 整除。\r\n\n\t满足以上任意一条规则的年份就是闰年，否则是平年。",
+  "time_limit": 1000,
+  "memory_limit": 128,
+  "level": 2,
+  "publish_date": "2025-03-01",
+  "samples": [
+    {
+      "input": "2008\r\n2\r\n28\r\n23\r\n1",
+      "output": "2008 2 29 0",
+      "explanation": "样例",
+      "is_hidden": false,
+      "sort_order": 1
+    },
+    {
+      "input": "2008\n2\n28\n23\n1",
+      "output": "2008 2 29 0",
+      "explanation": "test",
+      "is_hidden": true,
+      "sort_order": 2
+    },
+    {
+      "input": "2019\n3\n1\n15\n17",
+      "output": "2019 3 2 8",
+      "explanation": "test_1",
+      "is_hidden": true,
+      "sort_order": 3
+    },
+    {
+      "input": "1999\n12\n28\n5\n21",
+      "output": "1999 12 29 2",
+      "explanation": "test_2",
+      "is_hidden": true,
+      "sort_order": 4
+    },
+    {
+      "input": "2004\n2\n29\n21\n16",
+      "output": "2004 3 1 13",
+      "explanation": "test_3",
+      "is_hidden": true,
+      "sort_order": 5
+    },
+    {
+      "input": "2008\n2\n28\n23\n12",
+      "output": "2008 2 29 11",
+      "explanation": "test_4",
+      "is_hidden": true,
+      "sort_order": 6
+    },
+    {
+      "input": "2025\n2\n22\n19\n23",
+      "output": "2025 2 23 18",
+      "explanation": "test_5",
+      "is_hidden": true,
+      "sort_order": 7
+    }
+  ]
+}

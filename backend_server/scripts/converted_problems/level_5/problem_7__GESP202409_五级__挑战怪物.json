@@ -1,0 +1,90 @@
+{
+  "title": "[GESP202409 五级] 挑战怪物",
+  "description": "小杨正在和一个怪物战斗，怪物的血量为 $h$，只有当怪物的血量**恰好**为 $0$ 时小杨才能够成功击败怪物。\r\n\n\t    小杨有两种攻击怪物的方式：\r\n\n\t\t\t物理攻击。假设当前为小杨第  $i$ 次使用物理攻击，则会对怪物造成 $2^{i - 1}$ 点伤害。\r\n\n\t\t\t魔法攻击。小杨选择任意一个质数 $x$（ 不能超过怪物当前血量），对怪物造成 $x$ 点伤害。由于小杨并不擅长魔法，他只能使用**至多一次**魔法攻击。\r\n\n\t    小杨想知道自己能否击败怪物，如果能，小杨想知道自己最少需要多少次攻击。",
+  "input_format": "本题单个测试点内有多组测试数据。第一行包含一个正整数 $t$，代表测试用例组数。\r\n\n\t    接下来是 $t$ 组测试用例。对于每组测试用例，只有一行一个整数 $h$，代表怪物血量。",
+  "output_format": "对于每组测试用例，如果小杨能够击败怪物，输出一个整数，代表小杨需要的最少攻击次数，如果不能击败怪物，\r\n\n\t    输出 $-1$。",
+  "data_range": "样例 1 解释\r\n\n\t    对于第一组测试用例，一种可能的最优方案为，小杨先对怪物使用魔法攻击，选择质数 $5$ 造成 $5$ 点伤害，之后对怪\r\n\n\t    物使用第 $1$ 次物理攻击，造成 $2^{1 - 1} = 1$ 点伤害，怪物血量恰好为 $0$，小杨成功击败怪物。\r\n\n\t数据规模与约定\r\n\n\t\t\t\t\t子任务编号\n\n\t\t\t\t\t分数占比\n\n\t\t\t\t\t$t$\n\n\t\t\t\t\t$h$\n\n\t\t\t\t\t$1$\n\n\t\t\t\t\t$20\\%$\n\n\t\t\t\t\t$\\leq 5$\n\n\t\t\t\t\t$\\leq 10$\n\n\t\t\t\t\t$2$\n\n\t\t\t\t\t$20\\%$\n\n\t\t\t\t\t$\\leq 10$\n\n\t\t\t\t\t$\\leq 100$\n\n\t\t\t\t\t$3$\n\n\t\t\t\t\t$60\\%$\n\n\t\t\t\t\t$\\leq 10$\n\n\t\t\t\t\t$\\leq 10^5$\n\n\t    对于全部的测试数据，保证 $1 \\leq t \\leq 10$，$1 \\leq h \\leq 10^5$。",
+  "time_limit": 1000,
+  "memory_limit": 128,
+  "level": 5,
+  "publish_date": "2024-09-01",
+  "samples": [
+    {
+      "input": "3\r\n6\r\n188\r\n9999",
+      "output": "2\r\n4\r\n-1",
+      "explanation": "样例",
+      "is_hidden": false,
+      "sort_order": 1
+    },
+    {
+      "input": "3\n6\n188\n9999",
+      "output": "2\n4\n-1",
+      "explanation": "test",
+      "is_hidden": true,
+      "sort_order": 2
+    },
+    {
+      "input": "2\n1\n3",
+      "output": "1\n1",
+      "explanation": "test_1",
+      "is_hidden": true,
+      "sort_order": 3
+    },
+    {
+      "input": "2\n5\n7",
+      "output": "1\n1",
+      "explanation": "test_2",
+      "is_hidden": true,
+      "sort_order": 4
+    },
+    {
+      "input": "3\n4\n11\n23",
+      "output": "2\n1\n1",
+      "explanation": "test_3",
+      "is_hidden": true,
+      "sort_order": 5
+    },
+    {
+      "input": "2\n9\n15",
+      "output": "4\n4",
+      "explanation": "test_4",
+      "is_hidden": true,
+      "sort_order": 6
+    },
+    {
+      "input": "2\n100000\n99999",
+      "output": "15\n-1",
+      "explanation": "test_5",
+      "is_hidden": true,
+      "sort_order": 7
+    },
+    {
+      "input": "3\n2\n4\n6",
+      "output": "1\n2\n2",
+      "explanation": "test_6",
+      "is_hidden": true,
+      "sort_order": 8
+    },
+    {
+      "input": "2\n14\n20",
+      "output": "2\n2",
+      "explanation": "test_7",
+      "is_hidden": true,
+      "sort_order": 9
+    },
+    {
+      "input": "2\n3\n5",
+      "output": "1\n1",
+      "explanation": "test_8",
+      "is_hidden": true,
+      "sort_order": 10
+    },
+    {
+      "input": "2\n100000\n99998",
+      "output": "15\n4",
+      "explanation": "test_9",
+      "is_hidden": true,
+      "sort_order": 11
+    }
+  ]
+}

@@ -1,0 +1,2933 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE fps PUBLIC 
+  "-//freeproblemset//An opensource XML standard for Algorithm Contest Problem Set//EN"
+  "http://hustoj.com/fps.current.dtd" >
+
+<fps version="1.5" url="https://github.com/zhblue/freeproblemset/">
+  <generator name="HUSTOJ" url="https://github.com/zhblue/hustoj/" />
+  
+  <item>
+    <title><![CDATA[[GESP202506 六级] 学习小组]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4799]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select">
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;班主任计划将班级里的 $ n $ 名同学划分为若干个学习小组，每名同学都需要分入某一个学习小组中。观察发现，如果一个学习小组中恰好包含 $ k $ 名同学，则该学习小组的讨论积极度为 $ a_k $。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;给定讨论积极度 $ a_1&#44; a_2&#44; \ldots&#44; a_n $，请你计算将这 $ n $ 名同学划分为学习小组的所有可能方案中，讨论积极度之和的最大值。
+</p>
+</span>]]></description>
+    <input><![CDATA[<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;第一行，一个正整数 $ n $，表示班级人数。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;第二行，$ n $ 个非负整数 $ a_1&#44; a_2&#44; \ldots&#44; a_n $，表示不同人数学习小组的讨论积极度。
+</p>]]></input> 
+    <output><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;输出共一行，一个整数，表示所有划分方案中，学习小组讨论积极度之和的最大值。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[4
+1 5 6 3]]></sample_input>
+    <sample_output><![CDATA[10]]></sample_output>
+    <test_input name="test"><![CDATA[8
+0 2 5 6 4 3 3 4]]></test_input>
+<test_output name="test"><![CDATA[12]]></test_output>
+<test_input name="test_1"><![CDATA[8
+0 2 5 6 4 3 3 4]]></test_input>
+<test_output name="test_1"><![CDATA[12]]></test_output>
+<test_input name="test_2"><![CDATA[1
+10]]></test_input>
+<test_output name="test_2"><![CDATA[10]]></test_output>
+<test_input name="test_3"><![CDATA[5
+3 3 3 3 3]]></test_input>
+<test_output name="test_3"><![CDATA[15]]></test_output>
+<test_input name="test_4"><![CDATA[6
+5 0 0 0 0 0]]></test_input>
+<test_output name="test_4"><![CDATA[30]]></test_output>
+<test_input name="test_5"><![CDATA[7
+2 5 7 10 0 0 0]]></test_input>
+<test_output name="test_5"><![CDATA[17]]></test_output>
+<test_input name="test_6"><![CDATA[10
+1 2 3 4 5 6 7 8 9 10]]></test_input>
+<test_output name="test_6"><![CDATA[10]]></test_output>
+<test_input name="test_7"><![CDATA[9
+10 1 1 1 1 1 1 1 1]]></test_input>
+<test_output name="test_7"><![CDATA[90]]></test_output>
+<test_input name="test_8"><![CDATA[7
+4 5 3 10 2 7 8]]></test_input>
+<test_output name="test_8"><![CDATA[28]]></test_output>
+<test_input name="test_9"><![CDATA[6
+3 7 2 10 5 8]]></test_input>
+<test_output name="test_9"><![CDATA[21]]></test_output>
+    <hint><![CDATA[<p>
+	测试样例2
+</p>
+<p>
+<pre class="prettyprint">8
+0 2 5 6 4 3 3 4</pre>
+</p>
+<p>
+	样例2输出
+</p>
+<p>
+<pre class="prettyprint">12</pre>
+</p>
+<p>
+	对于 $40\%$ 的测试点，保证 $1\le n\le 10$。
+</p>
+<p>
+	对于所有测试点，保证 $1\le n\le 1000$，$0\le a_i\le 10^4$。
+</p>]]></hint>
+    <source><![CDATA[GESP六级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include <bits/stdc++.h>
+using namespace std;
+int n;
+int a[1005];
+int dp[1005];//dp[i]表示i个人的最大积极度
+int main(){
+    cin>>n;
+    for(int i=1;i<=n;i++){
+        cin>>a[i];
+    }
+    //完全背包求最大值
+    for(int i=1;i<=n;i++){//外层循环每种分组人数
+        for(int j=i;j<=n;j++){//内层循环人数
+            dp[j]=max(dp[j],dp[j-i]+a[i]);
+        }
+    }
+    cout<<dp[n];
+	return 0;
+}
+
+]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202506 六级] 最大因数]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4800]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select">
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;给定一棵有 $10^9$ 个结点的有根树，这些结点依次以 $1&#44; 2&#44; \dots&#44; 10^9$ 编号，根结点的编号为 $1$。对于编号为 $k$（$2 \leq k \leq 10^9$）的结点，其父结点的编号为 $k$ 的因数中除 $k$ 以外最大的因数。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;现在有 $q$ 组询问，第 $i$（$1 \leq i \leq q$）组询问给定 $x_i&#44; y_i$，请你求出编号分别为 $x_i&#44; y_i$ 的两个结点在这棵树上的距离。两个结点之间的距离是连接这两个结点的简单路径所包含的边数。
+</p>
+</span>]]></description>
+    <input><![CDATA[<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;第一行，一个正整数 $q$，表示询问组数。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;接下来 $q$ 行，每行两个正整数 $x_i&#44; y_i$，表示询问结点的编号。
+</p>]]></input> 
+    <output><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;输出共 $q$ 行，每行一个整数，表示结点 $x_i&#44; y_i$ 之间的距离。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[3
+1 3
+2 5
+4 8]]></sample_input>
+    <sample_output><![CDATA[1
+2
+1]]></sample_output>
+    <test_input name="test"><![CDATA[1
+120 650]]></test_input>
+<test_output name="test"><![CDATA[9]]></test_output>
+<test_input name="test_1"><![CDATA[1
+120 650]]></test_input>
+<test_output name="test_1"><![CDATA[9]]></test_output>
+<test_input name="test_2"><![CDATA[2
+7 7
+100 100]]></test_input>
+<test_output name="test_2"><![CDATA[0
+0]]></test_output>
+<test_input name="test_3"><![CDATA[3
+1 1
+1 10
+1 97]]></test_input>
+<test_output name="test_3"><![CDATA[0
+2
+1]]></test_output>
+<test_input name="test_4"><![CDATA[2
+7 28
+13 39]]></test_input>
+<test_output name="test_4"><![CDATA[2
+1]]></test_output>
+<test_input name="test_5"><![CDATA[2
+8 64
+9 81]]></test_input>
+<test_output name="test_5"><![CDATA[3
+2]]></test_output>
+<test_input name="test_6"><![CDATA[2
+6 5
+12 7]]></test_input>
+<test_output name="test_6"><![CDATA[3
+4]]></test_output>
+<test_input name="test_7"><![CDATA[2
+16 256
+12 48]]></test_input>
+<test_output name="test_7"><![CDATA[4
+2]]></test_output>
+<test_input name="test_8"><![CDATA[5
+3 6
+5 10
+2 12
+15 21
+100 2000]]></test_input>
+<test_output name="test_8"><![CDATA[1
+1
+4
+4
+7]]></test_output>
+<test_input name="test_9"><![CDATA[4
+9  18
+17  51
+25  100
+49  343]]></test_input>
+<test_output name="test_9"><![CDATA[1
+1
+2
+1]]></test_output>
+    <hint><![CDATA[<p>
+	测试样例2
+</p>
+<p>
+<pre class="prettyprint">1
+120 650</pre>
+</p>
+<p>
+	样例2输出
+</p>
+<p>
+<pre class="prettyprint">9</pre>
+</p>
+<p>
+	对于 $60\%$ 的测试点，保证 $1 \leq x_i&#44; y_i \leq 1000$。
+</p>
+<p>
+	对于所有测试点，保证 $1 \leq q \leq 1000$，$1 \leq x_i&#44; y_i \leq 10^9$。
+</p>]]></hint>
+    <source><![CDATA[GESP六级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include <iostream>
+#include "bit"
+#include "vector"
+#include "unordered_set"
+#include "unordered_map"
+#include "set"
+#include "queue"
+#include "algorithm"
+#include "bitset"
+#include "cstring"
+#include "cmath"
+
+using namespace std;
+
+int n, x, y;
+
+int main() {
+    cin >> n;
+    while (n--) {
+        cin >> x >> y;
+        int c = 0;
+        while (true) {
+            if (x == y) {
+                cout << c << endl;
+                break;
+            }
+            if (x < y) swap(x, y);
+
+            int i = 2;
+            for (; i * i <= x; i++) {
+                if (x % i == 0) {
+                    break;
+                }
+            }
+            if (i * i > x) {
+                x = 1;
+            } else {
+                x /= i;
+            }
+            c++;
+        }
+    }
+}
+]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202503 六级] 环线]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4801]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select">
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小 A 喜欢坐地铁。地铁环线有 $n$ 个车站，依次以 $1&#44;2&#44;\cdots&#44;n$ 标号。车站 $i\ (1\leq i&lt;n)$ 的下一个车站是车站 $i+1$。特殊地，车站 $n$ 的下一个车站是车站 $1$。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小 A 会从某个车站出发，乘坐地铁环线到某个车站结束行程，这意味着小 A 至少会经过一个车站。小 A 不会经过一个车站多次。当小 A 乘坐地铁环线经过车站 $i$ 时，小 A 会获得 $a_i$ 点快乐值。请你安排小 A 的行程，选择出发车站与结束车站，使得获得的快乐值总和最大。
+</p>
+</span>]]></description>
+    <input><![CDATA[<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;第一行，一个正整数 $n$，表示车站的数量。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;第二行，$n$ 个整数 $a_i$，分别表示经过每个车站时获得的快乐值。
+</p>]]></input> 
+    <output><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;一行，一个整数，表示小 A 能获得的最大快乐值。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[4
+-1 2 3 0]]></sample_input>
+    <sample_output><![CDATA[5]]></sample_output>
+    <test_input name="test"><![CDATA[5
+-3 4 -5 1 3]]></test_input>
+<test_output name="test"><![CDATA[5]]></test_output>
+<test_input name="test_1"><![CDATA[3
+5 6 7]]></test_input>
+<test_output name="test_1"><![CDATA[18]]></test_output>
+<test_input name="test_2"><![CDATA[5
+-1 -3 -2 -5 -4]]></test_input>
+<test_output name="test_2"><![CDATA[-1]]></test_output>
+<test_input name="test_3"><![CDATA[6
+3 -1 3 -1 3 -1]]></test_input>
+<test_output name="test_3"><![CDATA[7]]></test_output>
+<test_input name="test_4"><![CDATA[4
+5 -10 5 5]]></test_input>
+<test_output name="test_4"><![CDATA[15]]></test_output>
+<test_input name="test_5"><![CDATA[6
+-2 3 -5 1 -4 -6]]></test_input>
+<test_output name="test_5"><![CDATA[3]]></test_output>
+<test_input name="test_6"><![CDATA[7
+2 -1 2 -1 2 -1 2]]></test_input>
+<test_output name="test_6"><![CDATA[6]]></test_output>
+<test_input name="test_7"><![CDATA[5
+4 -1 -1 -1 4]]></test_input>
+<test_output name="test_7"><![CDATA[8]]></test_output>
+<test_input name="test_8"><![CDATA[8
+-5 2 -3 5 -2 4 -1 3]]></test_input>
+<test_output name="test_8"><![CDATA[9]]></test_output>
+<test_input name="test_9"><![CDATA[7
+6 -2 7 -1 5 -3 4]]></test_input>
+<test_output name="test_9"><![CDATA[19]]></test_output>
+    <hint><![CDATA[<p>
+	测试样例2
+</p>
+<p>
+<pre class="prettyprint">5
+-3 4 -5 1 3</pre>
+</p>
+<p>
+	样例2输出
+</p>
+<p>
+<pre class="prettyprint">5</pre>
+</p>
+<p>
+	对于 $20\%$ 的测试点，保证 $1\leq n\leq 200$。
+</p>
+<p>
+	对于 $40\%$ 的测试点，保证 $1\leq n\leq 2000$。
+</p>
+<p>
+	对于所有测试点，保证 $1\leq n\leq 2\times 10^5$，$-10^9\leq a_i\leq 10^9$。
+</p>]]></hint>
+    <source><![CDATA[GESP六级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include<bits/stdc++.h>
+#define int long long
+using namespace std;
+int f1[200005],f2[2000005],a[200005];
+signed main(){
+    int n;
+    cin>>n;
+    for (int i=1;i<=n;i++)cin>>a[i];
+    int sum=0,maxn=-1e9;
+    for (int i=1;i<=n;i++) {
+        sum+=a[i];
+        maxn=max(maxn,sum);
+        f1[i]=maxn;
+    }
+    sum=0,maxn=-1e9;
+    for (int i=n;i>=1;i--) {
+        sum+=a[i];
+        maxn=max(maxn,sum);
+        f2[i]=maxn;
+    }
+    int cnt=-1e9; // 第一种情况的最大值
+    sum=0;
+    for (int i=1;i<=n;i++){
+        if (sum<0)sum=a[i];
+        else sum+=a[i];
+        cnt=max(cnt,sum);
+    }
+    int cnt2=-1e9; // 第二种情况的最大值
+    for (int i=1;i<=n;++i)
+        cnt2=max(max(cnt2,f1[i]+f2[i+1]),f1[i-1]+f2[i]);
+    cout<<max(cnt,cnt2);
+    return 0;
+}
+]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[GESP202503 六级] 树上漫步]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4802]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select">
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小 A 有一棵 $n$ 个结点的树，这些结点依次以 $1&#44;2&#44;\cdots&#44;n$ 标号。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小 A 想在这棵树上漫步。具体来说，小 A 会从树上的某个结点出发，每⼀步可以移动到与当前结点相邻的结点，并且小 A 只会在偶数步（可以是零步）后结束漫步。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;现在小 A 想知道，对于树上的每个结点，从这个结点出发开始漫步，经过偶数步能结束漫步的结点有多少个（可以经过重复的节点）。
+</p>
+</span>]]></description>
+    <input><![CDATA[<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;第一行，一个正整数 $n$。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;接下来 $n-1$ 行，每行两个整数 $u_i&#44;v_i$，表示树上有⼀条连接结点 $u_i$ 和结点 $v_i$ 的边。
+</p>]]></input> 
+    <output><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;一行，$n$ 个整数。第 $i$ 个整数表示从结点 $i$ 出发开始漫步，能结束漫步的结点数量。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[3
+1 3
+2 3]]></sample_input>
+    <sample_output><![CDATA[2 2 1]]></sample_output>
+    <test_input name="test"><![CDATA[4
+1 3
+3 2
+4 3]]></test_input>
+<test_output name="test"><![CDATA[3 3 1 3]]></test_output>
+<test_input name="test_1"><![CDATA[1]]></test_input>
+<test_output name="test_1"><![CDATA[1 ]]></test_output>
+<test_input name="test_2"><![CDATA[4
+1 2
+2 3
+3 4]]></test_input>
+<test_output name="test_2"><![CDATA[2 2 2 2 ]]></test_output>
+<test_input name="test_3"><![CDATA[5
+1 5
+2 5
+3 5
+4 5]]></test_input>
+<test_output name="test_3"><![CDATA[4 4 4 4 1 ]]></test_output>
+<test_input name="test_4"><![CDATA[5
+1 2
+2 3
+3 4
+4 5]]></test_input>
+<test_output name="test_4"><![CDATA[3 2 3 2 3 ]]></test_output>
+<test_input name="test_5"><![CDATA[6
+1 3
+2 3
+3 4
+4 5
+4 6]]></test_input>
+<test_output name="test_5"><![CDATA[3 3 3 3 3 3 ]]></test_output>
+<test_input name="test_6"><![CDATA[5
+1 2
+1 3
+2 4
+2 5]]></test_input>
+<test_output name="test_6"><![CDATA[3 2 2 3 3 ]]></test_output>
+<test_input name="test_7"><![CDATA[6
+1 2
+1 3
+1 4
+1 5
+1 6]]></test_input>
+<test_output name="test_7"><![CDATA[1 5 5 5 5 5 ]]></test_output>
+<test_input name="test_8"><![CDATA[10
+1 2
+2 3
+3 4
+4 5
+5 6
+6 7
+7 8
+8 9
+9 10]]></test_input>
+<test_output name="test_8"><![CDATA[5 5 5 5 5 5 5 5 5 5 ]]></test_output>
+<test_input name="test_9"><![CDATA[7
+1 2
+2 3
+3 4
+4 5
+5 6
+6 7]]></test_input>
+<test_output name="test_9"><![CDATA[4 3 4 3 4 3 4 ]]></test_output>
+    <hint><![CDATA[<p>
+	输入样例2
+</p>
+<p>
+<pre class="prettyprint">4
+1 3
+3 2
+4 3</pre>
+</p>
+<p>
+	样例2输出
+</p>
+<p>
+<pre class="prettyprint">3 3 1 3</pre>
+</p>
+<p>
+	对于 $40\%$ 的测试点，保证 $1\leq n\leq 10^3$。
+</p>
+<p>
+	对于所有测试点，保证 $1\leq n\leq 2\times 10^5$。
+</p>]]></hint>
+    <source><![CDATA[GESP六级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include <bits/stdc++.h>
+using namespace std;
+ 
+const int N=2e5+5;
+bool st[N];
+int e[N<<1],ne[N<<1],h[N],idx;
+int n,cnt;
+ 
+void add(int a,int b) {
+    e[idx]=b,ne[idx]=h[a],h[a]=idx++;
+}
+ 
+void dfs(int u,int step) {
+    if(st[u]) return;
+    if(step%2 == 0) {
+        st[u]=1;
+        cnt++;
+    }
+ 
+    for(int i=h[u]; i!=-1; i=ne[i]) {
+        int j=e[i];
+        dfs(j,step+1);
+    }
+}
+ 
+int main() {
+    cin>>n;
+    memset(h,-1,sizeof h);
+ 
+    for(int i=1; i<n; i++) {
+        int a,b;
+        cin>>a>>b;
+        add(a,b), add(b,a);
+    }
+ 
+    dfs(1,0);
+ 
+    for(int i=1; i<=n; i++) {
+        if(st[i]) cout<<cnt<<" ";
+        else cout<<n-cnt<<" ";
+    }
+    cout<<endl;
+ 
+    return 0;
+}
+ 
+/*
+in:
+3
+1 3
+2 3
+out:
+2 2 1
+*/]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202412 六级] 运送物资]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4803]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select">
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小杨管理着 $m$ 辆货车，每辆货车每天需要向 A 市和 B 市运送若干次物资。小杨同时拥有 $n$ 个运输站点，这些站点位于 A 市和 B 市之间。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;每次运送物资时，货车从初始运输站点出发，前往 A 市或 B 市，之后返回初始运输站点。A 市、B 市和运输站点的位置可以视作数轴上的三个点，其中 A 市的坐标为 $0$，B 市的坐标为 $x$，运输站点的坐标为 $p$ 且有 $0 \lt p \lt x$。货车每次去 A 市运送物资的总行驶路程为 $2p$，去 B 市运送物资的总行驶路程为 $2(x - p)$。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;对于第 $i$ 个运输站点，其位置为 $p_i$ 且至多作为 $c_i$ 辆车的初始运输站点。小杨想知道，在最优分配每辆货车的初始运输站点的情况下，所有货车每天的最短总行驶路程是多少。
+</p>
+</span>]]></description>
+    <input><![CDATA[<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;第一行包含三个正整数 $n&#44;m&#44;x$，代表运输站点数量、货车数量和两市距离。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;之后 $n$ 行，每行包含两个正整数 $p_i$ 和 $c_i$，代表第 $i$ 个运输站点的位置和最多容纳车辆数。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;之后 $m$ 行，每行包含两个正整数 $a_i$ 和 $b_i$，代表第 $i$ 辆货车每天需要向 A 市运送 $a_i$ 次物资，向 B 市运送 $b_i$ 次物资。
+</p>]]></input> 
+    <output><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;输出一个正整数，代表所有货车每天的最短总行驶路程。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[3 4 10
+1 1
+2 1
+8 3
+5 3
+7 2
+9 0
+1 10000]]></sample_input>
+    <sample_output><![CDATA[40186]]></sample_output>
+    <test_input name="test"><![CDATA[3 4 10
+1 1
+2 1
+8 3
+5 3
+7 2
+9 0
+1 10000]]></test_input>
+<test_output name="test"><![CDATA[40186]]></test_output>
+<test_input name="test_1"><![CDATA[1 5 20
+10 5
+3 2
+1 4
+0 5
+2 3
+4 1]]></test_input>
+<test_output name="test_1"><![CDATA[500]]></test_output>
+<test_input name="test_2"><![CDATA[2 3 100
+20 2
+80 2
+10 1
+1 10
+5 5]]></test_input>
+<test_output name="test_2"><![CDATA[2120]]></test_output>
+<test_input name="test_3"><![CDATA[2 5 50
+10 3
+40 3
+6 0
+6 0
+6 0
+0 6
+0 6]]></test_input>
+<test_output name="test_3"><![CDATA[600]]></test_output>
+<test_input name="test_4"><![CDATA[2 5 50
+10 3
+40 3
+6 0
+6 0
+6 0
+0 6
+0 6]]></test_input>
+<test_output name="test_4"><![CDATA[600]]></test_output>
+<test_input name="test_5"><![CDATA[3 10 10
+5 5
+3 3
+7 4
+2 3
+2 3
+2 3
+2 3
+2 3
+2 3
+2 3
+2 3
+2 3
+2 3]]></test_input>
+<test_output name="test_5"><![CDATA[488]]></test_output>
+<test_input name="test_6"><![CDATA[2 2 1000000
+1 1
+999999 1
+1000 1
+1 1000]]></test_input>
+<test_output name="test_6"><![CDATA[4003996]]></test_output>
+<test_input name="test_7"><![CDATA[1 3 50
+25 3
+0 0
+0 0
+0 0]]></test_input>
+<test_output name="test_7"><![CDATA[0]]></test_output>
+<test_input name="test_8"><![CDATA[3 6 20
+5 2
+10 2
+15 2
+3 2
+2 3
+1 4
+4 1
+5 0
+0 5]]></test_input>
+<test_output name="test_8"><![CDATA[440]]></test_output>
+<test_input name="test_9"><![CDATA[2 10 100
+10 6
+90 5
+100 1
+100 1
+100 1
+100 1
+100 1
+100 1
+100 1
+100 1
+100 1
+100 1]]></test_input>
+<test_output name="test_9"><![CDATA[85160]]></test_output>
+    <hint><![CDATA[<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;第 $1$ 辆车的初始运输站点为站点 $3$，第 $2$ 辆车的初始运输站点为站点 $2$。第 $3$ 辆车的初始运输站点为站点 $1$，第 $4$ 辆车的初始运输站点为站点 $3$。此时总驶路程最短，为 $40186$。
+</p>
+<p>
+	<span style="display:none;" id="__kindeditor_bookmark_start_74__"></span>
+	<table style="width:100%;" cellpadding="2" cellspacing="0" border="1" bordercolor="#000000">
+		<tbody>
+			<tr>
+				<td style="text-align:center;">
+					子任务编号<br />
+				</td>
+				<td style="text-align:center;">
+					数据点占比<br />
+				</td>
+				<td style="text-align:center;">
+					$n$<br />
+				</td>
+				<td style="text-align:center;">
+					$s$<br />
+				</td>
+				<td style="text-align:center;">
+					$c_i$<br />
+				</td>
+			</tr>
+			<tr>
+				<td style="text-align:center;">
+					$1$<br />
+				</td>
+				<td style="text-align:center;">
+					$20\%$<br />
+				</td>
+				<td style="text-align:center;">
+					$2$<br />
+				</td>
+				<td style="text-align:center;">
+					$2$<br />
+				</td>
+				<td style="text-align:center;">
+					$1$<br />
+				</td>
+			</tr>
+			<tr>
+				<td style="text-align:center;">
+					$2$<br />
+				</td>
+				<td style="text-align:center;">
+					$20\%$<br />
+				</td>
+				<td style="text-align:center;">
+					$\leq 10^5$<br />
+				</td>
+				<td style="text-align:center;">
+					$\leq 10^5$<br />
+				</td>
+				<td style="text-align:center;">
+					$1$<br />
+				</td>
+			</tr>
+			<tr>
+				<td style="text-align:center;">
+					$3$<br />
+				</td>
+				<td style="text-align:center;">
+					$60\%$<br />
+				</td>
+				<td style="text-align:center;">
+					$\leq 10^5$<br />
+				</td>
+				<td style="text-align:center;">
+					\leq 10^5$<br />
+				</td>
+				<td style="text-align:center;">
+					$\leq 10^5$<br />
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;对于全部数据，保证有 $1\leq n&#44;m\leq 10^5$，$2\leq x\leq 10^8$，$0\lt p_i\lt x$，$1\leq c_i\leq 10^5$，$0\leq a_i&#44;b_i\leq 10^5$。数据保证 $\sum c_i\geq m$。
+</p>]]></hint>
+    <source><![CDATA[GESP六级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include<bits/stdc++.h>
+using namespace std;
+#define ll long long
+/*思路：
+	对于一辆货车c(距离A为a,距离B为b),选择坐标为p的站点
+	其行驶路程为：2ap+2b(x-p)=2bx+2(a-b)p
+	要使行驶路程最短： 
+	1、a-b>0时,选择p较小的站点,且a-b越大优先选 
+	2、a-b<0时,选择p较大的站点,且a-b越小优先选 
+	3、a=b时，结果与p无关，固定为2bx 
+*/
+const int N=1e5+10;
+ll n,m,x;
+ll ans;
+struct sta{//站点 
+	ll p,c; 
+}s[N];//s数组存站点
+struct car{//货车 
+	ll a,b;
+}c[N];//c数组存货车 
+bool cmp1(sta x,sta y){
+	return x.p<y.p;
+}
+bool cmp2(car x,car y){
+	return (x.a-x.b)>(y.a-y.b);
+}
+int main(){
+	cin>>n>>m>>x;
+	for(int i=1;i<=n;i++){//站点 
+		cin>>s[i].p>>s[i].c;
+	}
+	for(int i=1;i<=m;i++){//货车 
+		cin>>c[i].a>>c[i].b;
+		ans+=2*c[i].b*x; //答案先加上固定值 
+	} 
+	sort(s+1,s+n+1,cmp1);//站点数组按p升序排序 
+	sort(c+1,c+m+1,cmp2);//货车数组按a-b降序排序
+	int left=1,right=n;//最左和最右站点 
+	for(int i=1;i<=m;i++){//从前往后遍历货车1到m 
+		if(c[i].a-c[i].b>0){//a-b>0的货车 
+			ans+=2*(c[i].a-c[i].b)*s[left].p;
+			s[left].c--;//当前站点容纳车辆数-1 
+			if(s[left].c==0) left++;//如果当前站点容纳车辆数减为0，切换到下个站点
+		}
+	} 
+	for(int i=m;i>=1;i--){//从后往前遍历货车m到1
+		if(c[i].a-c[i].b<0){//a-b<0的货车 
+			ans+=2*(c[i].a-c[i].b)*s[right].p;
+			s[right].c--;//当前站点容纳车辆数-1 
+			if(s[right].c==0) right--;//如果当前站点容纳车辆数减为0，切换到下个站点
+		}
+	}
+	cout<<ans;
+	return 0;
+}
+]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202412 六级] 树上游走]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4804]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select"> 
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小杨有一棵包含无穷节点的二叉树（即每个节点都有左儿子节点和右儿子节点；除根节点外，每个节点都有父节点），其中根节点的编号为 $1$，对于节点 $i$，其左儿子的编号为 $2\times i$，右儿子的编号为 $2\times i + 1$。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小杨会从节点 $s$ 开始在二叉树上移动，每次移动为以下三种移动方式的任意一种：
+</p>
+<strong>
+<ul>
+	<li>
+		<span class="md auto_select"><strong>第 1 种移动方式：如果当前节点存在父亲节点，向上移动到当前节点的父节点，否则不移动；</strong></span>
+	</li>
+	<li>
+		<span class="md auto_select"><strong>第 2 种移动方式：移动到当前节点的左儿子；</strong></span>
+	</li>
+	<li>
+		<span class="md auto_select"><strong>第 3 种移动方式：移动到当前节点的右儿子。</strong></span>
+	</li>
+</ul>
+</strong>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小杨想知道移动 $n$ 次后自己所处的节点编号。<b>数据保证最后所处的节点编号不超过 $10^{12}$</b>。
+</p>
+</span>]]></description>
+    <input><![CDATA[<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;第一行包含两个正整数 $n$ 和 $s$，代表移动次数和初始节点编号。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;第二行包含一个长度为 $n$ 且仅包含大写字母 $\tt{U}$、$\tt{L}$ 和 $\tt{R}$ 的字符串，代表每次移动的方式，其中 $\tt{U}$ 代表第 1 种移动方式，$\tt{L}$ 代表第 2 种移动方式，$\tt{R}$ 代表第 3 种移动方式。
+</p>]]></input> 
+    <output><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;输出一个正整数，代表最后所处的节点编号。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[3 2
+URR]]></sample_input>
+    <sample_output><![CDATA[7]]></sample_output>
+    <test_input name="test"><![CDATA[3 2
+URR]]></test_input>
+<test_output name="test"><![CDATA[7]]></test_output>
+<test_input name="test_1"><![CDATA[5 1
+LLRUR]]></test_input>
+<test_output name="test_1"><![CDATA[9]]></test_output>
+<test_input name="test_2"><![CDATA[1 1
+U]]></test_input>
+<test_output name="test_2"><![CDATA[1]]></test_output>
+<test_input name="test_3"><![CDATA[6 8
+UULLRR]]></test_input>
+<test_output name="test_3"><![CDATA[35]]></test_output>
+<test_input name="test_4"><![CDATA[10 16
+UUUUULLLLL]]></test_input>
+<test_output name="test_4"><![CDATA[32]]></test_output>
+<test_input name="test_5"><![CDATA[7 5
+RRRLLLU]]></test_input>
+<test_output name="test_5"><![CDATA[188]]></test_output>
+<test_input name="test_6"><![CDATA[4 3
+LURR]]></test_input>
+<test_output name="test_6"><![CDATA[15]]></test_output>
+<test_input name="test_7"><![CDATA[8 100
+ULLRRLUU]]></test_input>
+<test_output name="test_7"><![CDATA[401]]></test_output>
+<test_input name="test_8"><![CDATA[5 9
+RRRUU]]></test_input>
+<test_output name="test_8"><![CDATA[19]]></test_output>
+<test_input name="test_9"><![CDATA[6 7
+LULURR]]></test_input>
+<test_output name="test_9"><![CDATA[31]]></test_output>
+    <hint><![CDATA[<p>
+	小杨的移动路线为 $2 \to 1 \to 3 \to 7$。
+</p>
+<p>
+	<table style="width:100%;" cellpadding="2" cellspacing="0" border="1" bordercolor="#000000">
+		<tbody>
+			<tr>
+				<td style="text-align:center;">
+					子任务编号<br />
+				</td>
+				<td style="text-align:center;">
+					数据点占比<br />
+				</td>
+				<td style="text-align:center;">
+					$n$<br />
+				</td>
+				<td style="text-align:center;">
+					$s$<br />
+				</td>
+			</tr>
+			<tr>
+				<td style="text-align:center;">
+					$1$<br />
+				</td>
+				<td style="text-align:center;">
+					$20\%$<br />
+				</td>
+				<td style="text-align:center;">
+					$\leq 10$<br />
+				</td>
+				<td style="text-align:center;">
+					$\leq 2$<br />
+				</td>
+			</tr>
+			<tr>
+				<td style="text-align:center;">
+					$2$<br />
+				</td>
+				<td style="text-align:center;">
+					$20\%$<br />
+				</td>
+				<td style="text-align:center;">
+					$\leq 50$<br />
+				</td>
+				<td style="text-align:center;">
+					$\leq 10$<br />
+				</td>
+			</tr>
+			<tr>
+				<td style="text-align:center;">
+					$3$<br />
+				</td>
+				<td style="text-align:center;">
+					$60\%$<br />
+				</td>
+				<td style="text-align:center;">
+					$\leq 10^6$<br />
+				</td>
+				<td style="text-align:center;">
+					$\leq 10^{12}$<br />
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;对于全部数据，保证有 $1\leq n\leq 10^6$，$1\leq s\leq 10^{12}$。
+</p>]]></hint>
+    <source><![CDATA[GESP六级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include<bits/stdc++.h>
+using namespace std;
+ 
+typedef long long LL;
+const LL imx=1e12;
+LL n,id,cnt;
+char ch;
+ 
+int main() {
+    cin>>n>>id;
+    while(n--) {
+        cin>>ch;
+        if(ch=='U') {
+            if(cnt!=0) {
+                cnt--;
+                continue;
+            }
+            if(id!=1) id=id/2;
+        } 
+		else if(ch=='L') {
+            if(id*2>imx) cnt++;
+            else id=id*2;
+        } 
+		else {
+            if(id*2>imx) cnt++;
+            else id=id*2+1;
+        }
+    }
+    cout<<id<<endl;
+    return 0;
+}
+ 
+/*
+in:
+3 2
+URR
+out:
+7
+*/]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202409 六级] 算法学习]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4805]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select">
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小杨计划学习 $m$ 种算法，为此他找了 $n$ 道题目来帮助自己学习，每道题目最多学习一次。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小杨对于 $m$ 种算法的初始掌握程度均为 $0$。第 $i$ 道题目有对应的知识点 $a_i$，即学习第 $i$ 道题目可以令小杨对第 $a_i$ 种算法的掌握程度提高 $b_i$。小杨的学习目标是对于 $m$ 种算法的掌握程度均至少为 $k$。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小杨认为连续学习两道相同知识点的题目是不好的，小杨想请你编写程序帮他计算出他最少需要学习多少道题目才能使得他在完成学习目标的同时避免连续学习两道相同知识点的题目。
+</p>
+</span>]]></description>
+    <input><![CDATA[<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;第一行三个正整数 $m&#44; n&#44; k$，代表算法种类数，题目数和目标掌握程度。 &nbsp;
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;第二行 $n$ 个正整数 $a_1&#44; a_2&#44; ...&#44; a_n$，代表每道题目的知识点。&nbsp;&nbsp;
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;第二行 $n$ 个正整数 $b_1&#44; b_2&#44; ...&#44; b_n$，代表每道题目提升的掌握程度。
+</p>]]></input> 
+    <output><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;输出一个整数，代表小杨最少需要学习题目的数量，如果不存在满足条件的方案，输出 -1。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[3 5 10
+1 1 2 3 3
+9 1 10 10 1]]></sample_input>
+    <sample_output><![CDATA[4]]></sample_output>
+    <test_input name="test"><![CDATA[2 4 10
+1 1 1 2
+1 2 7 10]]></test_input>
+<test_output name="test"><![CDATA[-1]]></test_output>
+<test_input name="test_1"><![CDATA[2 4 10
+1 1 1 2
+1 2 7 10]]></test_input>
+<test_output name="test_1"><![CDATA[-1
+]]></test_output>
+<test_input name="test_2"><![CDATA[1 3 5
+1 1 1
+3 3 3]]></test_input>
+<test_output name="test_2"><![CDATA[-1]]></test_output>
+<test_input name="test_3"><![CDATA[2 5 5
+1 2 1 2 1
+3 3 3 3 3]]></test_input>
+<test_output name="test_3"><![CDATA[4]]></test_output>
+<test_input name="test_4"><![CDATA[2 6 7
+1 1 2 2 1 2
+5 3 5 3 3 3]]></test_input>
+<test_output name="test_4"><![CDATA[4
+]]></test_output>
+<test_input name="test_5"><![CDATA[4 8 6
+1 2 3 4 1 2 3 4
+5 5 5 5 2 2 2 2]]></test_input>
+<test_output name="test_5"><![CDATA[8]]></test_output>
+<test_input name="test_6"><![CDATA[3 7 8
+1 1 2 2 3 3 3
+6 3 6 3 6 3 3]]></test_input>
+<test_output name="test_6"><![CDATA[6]]></test_output>
+<test_input name="test_7"><![CDATA[2 5 10
+1 2 1 2 1
+6 6 6 6 6]]></test_input>
+<test_output name="test_7"><![CDATA[4]]></test_output>
+<test_input name="test_8"><![CDATA[3 6 5
+1 2 3 1 2 3
+4 4 4 2 2 2]]></test_input>
+<test_output name="test_8"><![CDATA[6]]></test_output>
+<test_input name="test_9"><![CDATA[5 10 4
+1 2 3 4 5 1 2 3 4 5
+3 3 3 3 3 2 2 2 2 2]]></test_input>
+<test_output name="test_9"><![CDATA[10]]></test_output>
+    <hint><![CDATA[<p>
+	<strong>样例 1 解释</strong>
+</p>
+<p>
+	一种最优学习顺序为第一道题，第三道题，第四道题，第二道题。
+</p>
+<p>
+	<strong>测试样例2</strong>
+</p>
+<pre class="prettyprint">2 4 10
+1 1 1 2
+1 2 7 10</pre>
+<p>
+	<strong>样例2输入</strong>
+</p>
+<pre class="prettyprint">-1</pre>
+<p>
+	<strong>数据规模与约定</strong>
+</p>
+<p>
+	对于全部数据，保证有 $1 \leq m&#44; n&#44; b_i&#44; k \leq 10^5$，$1 \leq a_i \leq m$。
+</p>
+<p>
+	<table style="width:100%;" cellpadding="2" cellspacing="0" border="1" bordercolor="#000000">
+		<tbody>
+			<tr>
+				<td style="text-align:center;">
+					子任务编号<br />
+				</td>
+				<td style="text-align:center;">
+					数据点占比<br />
+				</td>
+				<td style="text-align:center;">
+					$m$<br />
+				</td>
+				<td style="text-align:center;">
+					$n$<br />
+				</td>
+				<td style="text-align:center;">
+					$b_i$<br />
+				</td>
+				<td style="text-align:center;">
+					$k$<br />
+				</td>
+			</tr>
+			<tr>
+				<td style="text-align:center;">
+					$1$<br />
+				</td>
+				<td style="text-align:center;">
+					$30\%$<br />
+				</td>
+				<td style="text-align:center;">
+					$2$<br />
+				</td>
+				<td style="text-align:center;">
+					$\leq 9$<br />
+				</td>
+				<td style="text-align:center;">
+					$\leq 10$<br />
+				</td>
+				<td style="text-align:center;">
+					$\leq 10$<br />
+				</td>
+			</tr>
+			<tr>
+				<td style="text-align:center;">
+					$2$<br />
+				</td>
+				<td style="text-align:center;">
+					$30\%$<br />
+				</td>
+				<td style="text-align:center;">
+					$\leq 9$<br />
+				</td>
+				<td style="text-align:center;">
+					$\leq 9$<br />
+				</td>
+				<td style="text-align:center;">
+					$\leq 10$<br />
+				</td>
+				<td style="text-align:center;">
+					$\leq 10$<br />
+				</td>
+			</tr>
+			<tr>
+				<td style="text-align:center;">
+					$3$<br />
+				</td>
+				<td style="text-align:center;">
+					$40\%$<br />
+				</td>
+				<td style="text-align:center;">
+					$\leq 10^5$<br />
+				</td>
+				<td style="text-align:center;">
+					$\leq 10^5$<br />
+				</td>
+				<td style="text-align:center;">
+					$\leq 10^5$<br />
+				</td>
+				<td style="text-align:center;">
+					$\leq 10^5$<br />
+				</td>
+			</tr>
+		</tbody>
+	</table>
+<br />
+<span style="display:none;" id="__kindeditor_bookmark_start_70__"></span>
+</p>]]></hint>
+    <source><![CDATA[GESP六级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include <bits/stdc++.h>
+using namespace std;
+const int N = 1e5 + 5;
+vector<int> score[N + 2], a, b;
+bool cmp(int i, int j) {
+    return i > j;
+}
+int main() {
+    int m, n, k;
+    cin >> m >> n >> k;
+    a.resize(n), b.resize(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    for (int i = 0; i < n; i++) {
+        cin >> b[i];
+        score[a[i]].emplace_back(b[i]);
+    }
+    vector<int> need(m + 2);
+    int ans = 0, mx_meed = 0, mx_need_i = -1;
+    for (int i = 1; i <= m; i++) {
+        sort(score[i].begin(), score[i].end(), cmp);
+        int sum = 0;
+        for (int j = 0; j < (int)score[i].size(); j++) {
+            sum += score[i][j];
+            if (sum >= k) {
+                need[i] = j + 1;
+                break;
+            }
+        }
+        if (sum < k) {
+            puts("-1");
+            return 0;
+        }
+        ans += need[i];
+        if (need[i] > mx_meed) {
+            mx_meed = need[i], mx_need_i = i;
+        }
+    }
+    if (mx_meed - 1 <= ans - mx_meed) {
+        cout << ans << endl;
+        return 0;
+    }
+    int last = 0;
+    for (int i = 1; i <= m; i++)
+        if (i!= mx_need_i)
+            last += score[i].size() - need[i];
+    cout << (mx_meed - 1 <= ans - mx_meed - last? ans - last : -1) << endl;
+    return 0;
+}]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202409 六级] 小杨和整数拆分]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4806]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select">
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小杨有一个正整数 $n$，小杨想将它拆分成若干完全平方数的和，同时小杨希望拆分的数量越少越好。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;编程计算总和为 $n$ 的完全平方数的最小数量。
+</p>
+</span>]]></description>
+    <input><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;输入只有一行一个正整数 $n$。<span class="md"> </span>]]></input> 
+    <output><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;输出一行一个整数表示答案。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[18]]></sample_input>
+    <sample_output><![CDATA[2]]></sample_output>
+    <test_input name="test"><![CDATA[18]]></test_input>
+<test_output name="test"><![CDATA[2]]></test_output>
+<test_input name="test_1"><![CDATA[1]]></test_input>
+<test_output name="test_1"><![CDATA[1]]></test_output>
+<test_input name="test_2"><![CDATA[2]]></test_input>
+<test_output name="test_2"><![CDATA[2]]></test_output>
+<test_input name="test_3"><![CDATA[3]]></test_input>
+<test_output name="test_3"><![CDATA[3]]></test_output>
+<test_input name="test_4"><![CDATA[30]]></test_input>
+<test_output name="test_4"><![CDATA[3
+]]></test_output>
+<test_input name="test_5"><![CDATA[99]]></test_input>
+<test_output name="test_5"><![CDATA[3]]></test_output>
+<test_input name="test_6"><![CDATA[100000]]></test_input>
+<test_output name="test_6"><![CDATA[2
+]]></test_output>
+<test_input name="test_7"><![CDATA[99999]]></test_input>
+<test_output name="test_7"><![CDATA[4]]></test_output>
+<test_input name="test_8"><![CDATA[63456]]></test_input>
+<test_output name="test_8"><![CDATA[3]]></test_output>
+<test_input name="test_9"><![CDATA[12445]]></test_input>
+<test_output name="test_9"><![CDATA[3
+]]></test_output>
+    <hint><![CDATA[对全部的测试数据，保证 $1 \leq n \leq 10^5$。<span class="md"> </span>]]></hint>
+    <source><![CDATA[GESP六级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include<bits/stdc++.h>
+#define MAXN 1000005
+using namespace std;
+int n;
+int dp[MAXN];
+int main(){
+    cin>>n;
+    for(int i=1;i<=n;i++){
+        dp[i]=i;
+        for(int j=1;j<=sqrt(i);j++){
+            dp[i]=min(dp[i-j*j]+1,dp[i]);
+        }
+    }
+    cout<<dp[n];
+}]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202406 六级] 计算得分]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4807]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select">
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小杨想要计算由 $m$ 个小写字母组成的字符串的得分。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小杨设置了一个包含 $n$ 个正整数的计分序列 $A=[a_1&#44;a_2&#44;\ldots&#44;a_n]$，如果字符串的一个子串由 $k(1\leq k \leq n)$ 个 $\texttt{abc}$ 首尾相接组成，那么能够得到分数 $a_k$，并且字符串包含的字符不能够重复计算得分，整个字符串的得分是计分子串的总和。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;例如，假设 ，字符串 $\texttt{dabcabcabcabzabc}$ 的所有可能计分方式如下：
+</p>
+<p>
+	<ul>
+		<li>
+			$\texttt{d+abc+abcabc+abz+abc}$ 或者 $\texttt{d+abcabc+abc+abz+abc}$，其中 $\texttt{d}$ 和 $\texttt{abz}$ 不计算得分，总得分为 $a_1+a_2+a_1$。
+		</li>
+		<li>
+			$\texttt{d+abc+abc+abc+abz+abc}$，总得分为 $a_1+a_1+a_1+a_1$。
+		</li>
+		<li>
+			$\texttt{d+abcabcabc+abz+abc}$，总得分为 $a_3+a_1$。
+		</li>
+	</ul>
+</p>
+<p>
+	<br />
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小杨想知道对于给定的字符串，最大总得分是多少。
+</p>
+</span>]]></description>
+    <input><![CDATA[<p>
+	<p>
+		<p>
+			&nbsp;&nbsp;&nbsp;&nbsp;第一行包含一个正整数 $n$，代表计分序列 $A$ 的长度。<br />
+&nbsp;&nbsp;&nbsp;&nbsp;第二行包含 $n$ 个正整数，代表计分序列 $A$。<br />
+&nbsp;&nbsp;&nbsp;&nbsp;第三行包含一个正整数 $m$，代表字符串的长度。<br />
+&nbsp;&nbsp;&nbsp;&nbsp;第四行包含一个由 $m$ 个小写字母组成的字符串。
+		</p>
+	</p>
+</p>
+<span class="md"> </span>]]></input> 
+    <output><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;输出一个整数，代表给定字符串的最大总得分。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[3
+3 1 2
+13
+dabcabcabcabz]]></sample_input>
+    <sample_output><![CDATA[9]]></sample_output>
+    <test_input name="test"><![CDATA[3
+3 1 2
+13
+dabcabcabcabz]]></test_input>
+<test_output name="test"><![CDATA[9]]></test_output>
+<test_input name="test_1"><![CDATA[2
+5 9
+7
+abcabcx]]></test_input>
+<test_output name="test_1"><![CDATA[10]]></test_output>
+<test_input name="test_2"><![CDATA[1
+10
+3
+abc]]></test_input>
+<test_output name="test_2"><![CDATA[10]]></test_output>
+<test_input name="test_3"><![CDATA[4
+2 5 3 10
+15
+aabcabcabcabcab]]></test_input>
+<test_output name="test_3"><![CDATA[10]]></test_output>
+<test_input name="test_4"><![CDATA[3
+4 3 8
+12
+xxabcabcabcxx]]></test_input>
+<test_output name="test_4"><![CDATA[12]]></test_output>
+<test_input name="test_5"><![CDATA[5
+1 2 3 4 5
+20
+abcabcabcabcabcabc]]></test_input>
+<test_output name="test_5"><![CDATA[6]]></test_output>
+<test_input name="test_6"><![CDATA[2
+10 8
+6
+abcabc]]></test_input>
+<test_output name="test_6"><![CDATA[20]]></test_output>
+<test_input name="test_7"><![CDATA[3
+5 10 6
+18
+abcabcabcabcabc]]></test_input>
+<test_output name="test_7"><![CDATA[25]]></test_output>
+<test_input name="test_8"><![CDATA[4
+3 5 7 6
+9
+abcabcabc]]></test_input>
+<test_output name="test_8"><![CDATA[9]]></test_output>
+<test_input name="test_9"><![CDATA[2
+1 100
+12
+abcxabcabcabc]]></test_input>
+<test_output name="test_9"><![CDATA[101]]></test_output>
+    <hint><![CDATA[<p>
+	<strong>样例解释</strong>
+</p>
+<p>
+	最优的计分方式为 $\texttt{d+abc+abc+abc+abz}$，总得分为 $a_1+a_1+a_1$，共 $9$ 分。
+</p>
+<p>
+	<strong>数据范围</strong>
+</p>
+<p>
+	对于全部数据，保证有 $1\leq n\leq 20$，$1\leq m\leq 10^5$，$1\leq a_i\leq 1000$。
+</p>
+<p>
+	<table style="width:100%;" cellpadding="2" cellspacing="0" border="1" bordercolor="#000000">
+		<tbody>
+			<tr>
+				<td style="text-align:center;">
+					子任务编号<br />
+				</td>
+				<td style="text-align:center;">
+					数据点占比<br />
+				</td>
+				<td style="text-align:center;">
+					$n$<br />
+				</td>
+				<td style="text-align:center;">
+					$m$<br />
+				</td>
+				<td style="text-align:center;">
+					$a_i$<br />
+				</td>
+				<td style="text-align:center;">
+					特殊性质<br />
+				</td>
+			</tr>
+			<tr>
+				<td style="text-align:center;">
+					$1$<br />
+				</td>
+				<td style="text-align:center;">
+					$20\%$<br />
+				</td>
+				<td style="text-align:center;">
+					$\le 20$<br />
+				</td>
+				<td style="text-align:center;">
+					$\le 10^5$<br />
+				</td>
+				<td style="text-align:center;">
+					$\le 1000$<br />
+				</td>
+				<td style="text-align:center;">
+					对于所有的 $i(1 \le i \le n)$，存在 $a_i \ge a_{i+1}$<br />
+				</td>
+			</tr>
+			<tr>
+				<td style="text-align:center;">
+					$2$<br />
+				</td>
+				<td style="text-align:center;">
+					$40\%$<br />
+				</td>
+				<td style="text-align:center;">
+					$\le 3$<br />
+				</td>
+				<td style="text-align:center;">
+					$\le 10^5$<br />
+				</td>
+				<td style="text-align:center;">
+					$\le 1000$<br />
+				</td>
+				<td style="text-align:center;">
+					<br />
+				</td>
+			</tr>
+			<tr>
+				<td style="text-align:center;">
+					$3$<br />
+				</td>
+				<td style="text-align:center;">
+					$40\%$<br />
+				</td>
+				<td style="text-align:center;">
+					$\le 20$<br />
+				</td>
+				<td style="text-align:center;">
+					$\le 10^5$<br />
+				</td>
+				<td style="text-align:center;">
+					$\le 1000$<br />
+				</td>
+				<td style="text-align:center;">
+					<br />
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</p>]]></hint>
+    <source><![CDATA[GESP六级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include<bits/stdc++.h>
+using namespace std;
+const int N = 1e5+10;
+int a[30];
+string s;
+int dp[N];
+int main()
+{
+	int n;
+	cin>>n;
+	for(int i=1;i<=n;i++)
+	{
+		cin>>a[i];
+	}
+	int m;
+	cin>>m;
+	cin>>s;
+	for(int i=1;i<=m;i++)
+	{
+		dp[i]=dp[i-1];
+		for(int j=1;j<=n;j++)
+		{
+			if(i-3*j+1<=0)
+				break;
+			int l = i-3*j+1;
+			if(s.substr(l-1,3)=="abc")
+			{
+				dp[i]=max(dp[i],dp[l]+a[j]);
+			}
+			else 
+				break;
+		}
+	}
+	cout<<dp[m]<<"\n";
+}]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202406 六级] 二叉树]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4808]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select">
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小杨有一棵包含 $n$ 个节点的二叉树，且根节点的编号为 $1$。这棵二叉树任意一个节点要么是白色，要么是黑色。之后小杨会对这棵二叉树进行 $q$ 次操作，每次小杨会选择一个节点，将以这个节点为根的子树内所有节点的颜色反转，即黑色变成白色，白色变成黑色。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小杨想知道 $q$ 次操作全部完成之后每个节点的颜色。
+</p>
+</span>]]></description>
+    <input><![CDATA[<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;第一行一个正整数 $n$，表示二叉树的节点数量。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;第二行 $(n-1)$ 个正整数，第 $i$（$1\le i\le n-1$）个数表示编号为 $(i+1)$ 的节点的父亲节点编号，数据保证是一棵二叉树。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;第三行一个长度为 $n$ 的 $\texttt{01}$ 串，从左到右第 $i$（$1\le i\le n$）位如果为 $\texttt{0}$，表示编号为 $i$ 的节点颜色为白色，否则为黑色。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;第四行一个正整数 $q$，表示操作次数。
+</p>
+<p>
+	接下来 $q$ 行每行一个正整数 $a_i$（$1\le a_i\le n$），表示第 $i$ 次操作选择的节点编号。
+</p>]]></input> 
+    <output><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;输出一行一个长度为 $n$ 的 $\texttt{01}$ 串，表示 $q$ 次操作全部完成之后每个节点的颜色。从左到右第 $i$（$1\le i\le n$） 位如果为 $\texttt{0}$，表示编号为 $i$ 的节点颜色为白色，否则为黑色。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[6
+3 1 1 3 4
+100101
+3
+1
+3
+2]]></sample_input>
+    <sample_output><![CDATA[010000]]></sample_output>
+    <test_input name="test"><![CDATA[6
+3 1 1 3 4
+100101
+3
+1
+3
+2]]></test_input>
+<test_output name="test"><![CDATA[010000]]></test_output>
+<test_input name="test_1"><![CDATA[3
+1 1
+000
+2
+1
+2]]></test_input>
+<test_output name="test_1"><![CDATA[101
+]]></test_output>
+<test_input name="test_2"><![CDATA[1
+0
+1
+1]]></test_input>
+<test_output name="test_2"><![CDATA[1]]></test_output>
+<test_input name="test_3"><![CDATA[5
+1 2 2 1
+11111
+3
+3
+4
+5]]></test_input>
+<test_output name="test_3"><![CDATA[11000]]></test_output>
+<test_input name="test_4"><![CDATA[7
+1 1 2 2 3 3
+0101010
+4
+1
+2
+3
+4]]></test_input>
+<test_output name="test_4"><![CDATA[1100010]]></test_output>
+<test_input name="test_5"><![CDATA[4
+1 2 3
+0000
+5
+1
+2
+3
+4
+1]]></test_input>
+<test_output name="test_5"><![CDATA[0101]]></test_output>
+<test_input name="test_6"><![CDATA[8
+1 1 2 3 3 4 4
+10101010
+3
+2
+5
+7]]></test_input>
+<test_output name="test_6"><![CDATA[11110011]]></test_output>
+<test_input name="test_7"><![CDATA[2
+1
+01
+2
+1
+2]]></test_input>
+<test_output name="test_7"><![CDATA[11]]></test_output>
+<test_input name="test_8"><![CDATA[9
+1 1 2 2 5 5 3 3
+000000000
+6
+1
+5
+3
+7
+8
+9]]></test_input>
+<test_output name="test_8"><![CDATA[110100111]]></test_output>
+<test_input name="test_9"><![CDATA[5
+1 1 3 3
+00000
+5
+1
+1
+1
+1
+1]]></test_input>
+<test_output name="test_9"><![CDATA[11111]]></test_output>
+    <hint><![CDATA[<p>
+	<strong>样例解释</strong>
+</p>
+<p>
+	第一次操作后，节点颜色为：$\texttt{011010}$
+</p>
+<p>
+	第二次操作后，节点颜色为：$\texttt{000000}$
+</p>
+<p>
+	第三次操作后，节点颜色为：$\texttt{010000}$
+</p>
+<p>
+	<strong>数据范围</strong>
+</p>
+<p>
+	<table style="width:100%;" cellpadding="2" cellspacing="0" border="1" bordercolor="#000000">
+		<tbody>
+			<tr>
+				<td style="text-align:center;">
+					子任务编号<br />
+				</td>
+				<td style="text-align:center;">
+					得分<br />
+				</td>
+				<td style="text-align:center;">
+					$n$<br />
+				</td>
+				<td style="text-align:center;">
+					$q$<br />
+				</td>
+				<td>
+					<p style="text-align:center;">
+						特殊条件
+					</p>
+				</td>
+			</tr>
+			<tr>
+				<td style="text-align:center;">
+					$1$<br />
+				</td>
+				<td style="text-align:center;">
+					$20$<br />
+				</td>
+				<td style="text-align:center;">
+					$\le 10^5$<br />
+				</td>
+				<td style="text-align:center;">
+					$\le 10^5$<br />
+				</td>
+				<td style="text-align:center;">
+					对于所有 $i\ge 2$，节点 $i$ 的父亲节点编号为 $i-1$<br />
+				</td>
+			</tr>
+			<tr>
+				<td style="text-align:center;">
+					$2$<br />
+				</td>
+				<td style="text-align:center;">
+					$40$<br />
+				</td>
+				<td style="text-align:center;">
+					$\le 1000$<br />
+				</td>
+				<td style="text-align:center;">
+					$\le 1000$ <br />
+				</td>
+				<td style="text-align:center;">
+					<br />
+				</td>
+			</tr>
+			<tr>
+				<td style="text-align:center;">
+					$3$<br />
+				</td>
+				<td style="text-align:center;">
+					$40$<br />
+				</td>
+				<td style="text-align:center;">
+					$\le 10^5$<br />
+				</td>
+				<td style="text-align:center;">
+					$\le 10^5$<br />
+				</td>
+				<td style="text-align:center;">
+					<br />
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</p>]]></hint>
+    <source><![CDATA[GESP六级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include <bits/stdc++.h>
+using namespace std;
+const int MAX_N = 1e5 + 9;
+
+int n , q , f[MAX_N] , x , num[MAX_N] , sum;
+string color;
+vector<int>G[MAX_N];
+
+void dfs(int x)
+{
+    if(num[x])
+        sum++;
+    if(f[x] == 0)
+        return;
+    dfs(f[x]);
+}
+
+void dfs(int x , bool check)
+{
+    
+    if(check && num[x])   //check为父结点带来的影响  num[x]为本身是否需要操作
+        check = false;
+    else if(!check && num[x] || check && !num[x])
+        check = true;
+    
+    if(check)
+    {
+        if(color[x] == '1')
+            color[x] = '0';
+        else
+            color[x] = '1';
+    }
+
+    for(auto it : G[x])
+        dfs(it , check);
+}
+
+int main()
+{
+    cin >> n; //二叉树的结点个数
+    for(int i = 2; i <= n; i++)
+    {
+        cin >> f[i];  //f[i]:结点i的父亲结点的编号
+        G[f[i]].push_back(i);  //儿子存储法
+    }
+    
+    cin >> color;
+    color = ' ' + color;  //color[i]：编号为i的结点的颜色，color[i]=1为黑色 color[i]=0为白色
+
+    cin >> q;
+
+    while(q--)  //q次询问
+    {
+        cin >> x;  //选择编号为x的结点
+        num[x] = (num[x] + 1) % 2;  //记录根结点为x的子树操作的次数
+    }
+
+    dfs(1 , false);
+
+    for(int i = 1; i <= n; i++)
+        cout << color[i];
+    return 0;
+}
+]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202403 六级] 游戏]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4809]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select">
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;你有四个正整数 $n&#44;a&#44;b&#44;c$，并准备用它们玩一个简单的小游戏。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;在一轮游戏操作中，你可以选择将 $n$ 减去 $a$，或是将 $n$ 减去 $b$。游戏将会进行多轮操作，直到当 $n \leq c$ 时游戏结束。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;你想知道游戏结束时有多少种不同的游戏操作序列。两种游戏操作序列不同，当且仅当游戏操作轮数不同，或是某一轮游戏操作中，一种操作序列选择将 $n$ 减去 $a$，而另一种操作序列选择将 $n$ 减去 $b$。如果 $a=b$，也认为将 $n$ 减去 $a$ 与将 $n$ 减去 $b$ 是不同的操作。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;由于答案可能很大，你只需要求出答案对 $10^9 + 7$ 取模的结果。
+</p>
+</span>]]></description>
+    <input><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;一行四个整数 $n&#44;a&#44;b&#44;c$。<span class="md"> </span>]]></input> 
+    <output><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;输出一行一个整数表示答案。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[1 1 1 1]]></sample_input>
+    <sample_output><![CDATA[1]]></sample_output>
+    <test_input name="test"><![CDATA[114 51 4 1]]></test_input>
+<test_output name="test"><![CDATA[176]]></test_output>
+<test_input name="test_1"><![CDATA[114 51 4 1]]></test_input>
+<test_output name="test_1"><![CDATA[176]]></test_output>
+<test_input name="test_2"><![CDATA[114514 191 9 810]]></test_input>
+<test_output name="test_2"><![CDATA[384178446]]></test_output>
+<test_input name="test_3"><![CDATA[5 2 3 1]]></test_input>
+<test_output name="test_3"><![CDATA[4]]></test_output>
+<test_input name="test_4"><![CDATA[10 2 2 3]]></test_input>
+<test_output name="test_4"><![CDATA[16]]></test_output>
+<test_input name="test_5"><![CDATA[7 3 5 2]]></test_input>
+<test_output name="test_5"><![CDATA[3
+]]></test_output>
+<test_input name="test_6"><![CDATA[20 4 5 5]]></test_input>
+<test_output name="test_6"><![CDATA[15]]></test_output>
+<test_input name="test_7"><![CDATA[15 1 1 5]]></test_input>
+<test_output name="test_7"><![CDATA[1024]]></test_output>
+<test_input name="test_8"><![CDATA[100 10 20 30]]></test_input>
+<test_output name="test_8"><![CDATA[34]]></test_output>
+<test_input name="test_9"><![CDATA[200000 1 2 100000]]></test_input>
+<test_output name="test_9"><![CDATA[879053727]]></test_output>
+    <hint><![CDATA[<p>
+	<b>测试样例2</b>
+</p>
+<pre class="prettyprint">114 51 4 1</pre>
+<p>
+	<b>样例2输出</b>
+</p>
+<pre class="prettyprint">176</pre>
+<p>
+	<b>测试样例3</b>
+</p>
+<p>
+	<b> </b>
+</p>
+<pre class="prettyprint">114514 191 9 810</pre>
+<p>
+	<b>样例3输出</b>
+</p>
+<p>
+	<strong>数据规模与约定</strong>
+</p>
+<ul>
+	<li>
+		对 $20\%$ 的数据，$a=b=c=1$，$n \leq 30$。
+	</li>
+	<li>
+		对 $40\%$ 的数据，$c = 1$，$n \leq 10^3$。
+	</li>
+	<li>
+		对全部的测试数据，保证 $1 \leq a&#44;b&#44;c \leq n \leq 2 \times 10^5$。
+	</li>
+</ul>]]></hint>
+    <source><![CDATA[GESP六级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include <iostream>
+using namespace std;
+
+const int mod=1000000007;
+
+int n,a,b,c;
+int jiyi[200010];   //顾名思义，记忆化数组
+
+int baosou(int dangqiann)   //求n为dangqiann时有多少种操作序列
+{
+	if(dangqiann<=c)
+	{
+		return 1;
+	}
+	if(jiyi[dangqiann])
+	{
+		return jiyi[dangqiann];
+	}
+	return jiyi[dangqiann]=(baosou(dangqiann-a)+baosou(dangqiann-b))%mod;
+}
+
+int main()
+{
+	cin>>n>>a>>b>>c;
+	cout<<baosou(n);
+	return 0;
+}]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202403 六级] 好斗的牛]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4810]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select">
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;你有 $10^9$ 个牛棚，从左到右一字排开。你希望把 $n$ 头牛安置到牛棚里。麻烦的是，你的牛很好斗，如果他们附近有其他的牛，他们就会不安分地去挑事。其中，第 $i$ 头牛的攻击范围是 $(a_i&#44; b_i)$，这意味着，如果他的左边 $a_i$ 个牛棚或者右边 $b_i$ 个牛棚有其他牛，它就会去挑事。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;你想留下一段连续的牛棚，并把其他牛棚都卖掉。请问您最少需要留下多少牛棚，才能保证至少存在一种方案能够把所有的 $n$ 头牛都安置进剩余的牛棚里，且没有牛会挑事？
+</p>
+</span>]]></description>
+    <input><![CDATA[<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;第一行一个正整数 $n$。 &nbsp;
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;第二行 $n$ 个正整数 $a_1&#44; a_2&#44; \dots a_n$。&nbsp;&nbsp;
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;第三行 $n$ 个正整数 $b_1&#44; b_2&#44; \dots b_n$。
+</p>]]></input> 
+    <output><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;输出一行一个整数表示答案。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[2
+1 2
+1 2]]></sample_input>
+    <sample_output><![CDATA[4]]></sample_output>
+    <test_input name="test"><![CDATA[3
+1 2 3
+3 2 1]]></test_input>
+<test_output name="test"><![CDATA[7]]></test_output>
+<test_input name="test_1"><![CDATA[1
+5
+7]]></test_input>
+<test_output name="test_1"><![CDATA[1]]></test_output>
+<test_input name="test_2"><![CDATA[4
+2 1 3 4
+3 4 2 1]]></test_input>
+<test_output name="test_2"><![CDATA[11]]></test_output>
+<test_input name="test_3"><![CDATA[5
+1 1 1 1 1
+1 1 1 1 1]]></test_input>
+<test_output name="test_3"><![CDATA[9]]></test_output>
+<test_input name="test_4"><![CDATA[6
+3 2 5 4 1 6
+6 1 4 5 2 3]]></test_input>
+<test_output name="test_4"><![CDATA[23]]></test_output>
+<test_input name="test_5"><![CDATA[7
+10 20 30 40 50 60 70
+70 60 50 40 30 20 10]]></test_input>
+<test_output name="test_5"><![CDATA[247]]></test_output>
+<test_input name="test_6"><![CDATA[8
+5 5 5 5 5 5 5 5
+5 5 5 5 5 5 5 5]]></test_input>
+<test_output name="test_6"><![CDATA[43]]></test_output>
+<test_input name="test_7"><![CDATA[9
+1 2 3 4 5 6 7 8 9
+9 8 7 6 5 4 3 2 1]]></test_input>
+<test_output name="test_7"><![CDATA[49]]></test_output>
+<test_input name="test_8"><![CDATA[2
+1000 1000
+1000 1000]]></test_input>
+<test_output name="test_8"><![CDATA[1002]]></test_output>
+<test_input name="test_9"><![CDATA[4
+10 1 10 1
+1 10 1 10]]></test_input>
+<test_output name="test_9"><![CDATA[16]]></test_output>
+    <hint><![CDATA[<p>
+	<strong>样例 1 解释</strong>
+</p>
+<p>
+	留下第 1、2、3、4 个牛棚，并在第 $1$、$4$ 两个牛棚分别放下两头牛。
+</p>
+<p>
+	<strong>输入样例2</strong>
+</p>
+<p>
+<pre class="prettyprint">3
+1 2 3
+3 2 1</pre>
+</p>
+<p>
+	<strong>样例2输出</strong>
+</p>
+<p>
+<pre class="prettyprint">7</pre>
+</p>
+<p>
+	<strong>数据规模与约定</strong>
+</p>
+<p>
+	<ul>
+		<li>
+			对 $20\%$ 的数据，保证 $n = 2$。
+		</li>
+		<li>
+			另有 $20\%$ 的数据，保证 $n = 3$。
+		</li>
+		<li>
+			对 $80\%$ 的数据，保证 $n \leq 8$。
+		</li>
+		<li>
+			对于所有的测试数据，保证 $1 \leq n \leq 9$，$1 \leq a_i&#44; b_i \leq 10^3$。
+		</li>
+	</ul>
+</p>]]></hint>
+    <source><![CDATA[GESP六级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include <iostream>
+#include "bit"
+#include "vector"
+#include "unordered_set"
+#include "set"
+#include "queue"
+#include "algorithm"
+#include "bitset"
+
+using namespace std;
+const int N = 2e5 + 2;
+int n, a[10], b[10], c[10], ans = 1e9;
+
+void f(int i) {
+    if (i == n) {
+        int s = 1;
+        for(int j = 1; j < n; j++){
+            s += max(b[c[j - 1]], a[c[j]]) + 1;
+        }
+        ans = min(ans, s);
+        return;
+    }
+
+    for (int k = i; k < n; k++) {
+        swap(c[i], c[k]);
+        f(i + 1);
+        swap(c[i], c[k]);
+    }
+
+}
+
+
+int main() {
+    cin >> n;
+    for (int i = 0; i < n; i++) cin >> a[i];
+    for (int i = 0; i < n; i++) cin >> b[i], c[i] = i;
+    f(0);
+    cout << ans;
+
+}
+
+
+]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202312 六级] 闯关游戏]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4811]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select">
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;你来到了一个闯关游戏。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;这个游戏总共有 $N$ 关，每关都有 $M$ 个通道，你需要选择一个通道并通往后续关卡。其中，第 $i$ 个通道可以让你前进 $a_i$ 关，也就是说，如果你现在在第 $x$ 关，那么选择第 $i$ 个通道后，你将直接来到第 $x+a_i$ 关（特别地，如果 $x + a_i \geq N$，那么你就通关了）。此外，当你顺利离开第 $s$ 关时，你还将获得 $b_s$ 分。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;游戏开始时，你在第 $0$ 关。请问，你通关时最多能获得多少总分。
+</p>
+</span>]]></description>
+    <input><![CDATA[<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;第一行两个整数 $N$，$M$，分别表示关卡数量和每关的通道数量。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;接下来一行 $M$ 个用单个空格隔开的整数 $a_0&#44;a_1\cdots&#44;a_{M-1}$。保证 $1\le a_i \le N$。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;接下来一行 $N$ 个用单个空格隔开的整数 $b_0&#44;b_1\cdots&#44;b_{N-1}$。保证 $|b_i|\le 10^5$。
+</p>]]></input> 
+    <output><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;一行一个整数，表示你通关时最多能够获得的分数。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[6 2
+2 3
+1 0 30 100 30 30]]></sample_input>
+    <sample_output><![CDATA[131]]></sample_output>
+    <test_input name="test"><![CDATA[6 2
+2 3
+1 0 30 100 30 -1]]></test_input>
+<test_output name="test"><![CDATA[101]]></test_output>
+<test_input name="test_1"><![CDATA[3 1
+2
+5 -10 20]]></test_input>
+<test_output name="test_1"><![CDATA[25]]></test_output>
+<test_input name="test_2"><![CDATA[5 3
+1 2 3
+-5 10 -3 8 15]]></test_input>
+<test_output name="test_2"><![CDATA[28]]></test_output>
+<test_input name="test_3"><![CDATA[10 2
+3 5
+2 4 -1 5 3 -2 7 1 6 8]]></test_input>
+<test_output name="test_3"><![CDATA[22]]></test_output>
+<test_input name="test_4"><![CDATA[4 2
+1 4
+10 20 30 40]]></test_input>
+<test_output name="test_4"><![CDATA[100]]></test_output>
+<test_input name="test_5"><![CDATA[7 3
+2 2 2
+-1 -2 -3 -4 -5 -6 -7]]></test_input>
+<test_output name="test_5"><![CDATA[-16]]></test_output>
+<test_input name="test_6"><![CDATA[8 2
+1 3
+5 3 8 -2 7 1 4 6]]></test_input>
+<test_output name="test_6"><![CDATA[32]]></test_output>
+<test_input name="test_7"><![CDATA[1 5
+1 1 1 1 1
+100]]></test_input>
+<test_output name="test_7"><![CDATA[100]]></test_output>
+<test_input name="test_8"><![CDATA[9 4
+2 4 1 5
+3 -1 4 1 -5 9 2 6 5]]></test_input>
+<test_output name="test_8"><![CDATA[30]]></test_output>
+<test_input name="test_9"><![CDATA[5 2
+5 1
+-10 20 -30 40 -50]]></test_input>
+<test_output name="test_9"><![CDATA[20]]></test_output>
+    <hint><![CDATA[<p>
+	<strong>样例解释 1</strong>
+</p>
+<p>
+	你可以在第 $0$ 关选择第 $1$ 个通道，获得 $1$ 分并来到第 $3$ 关；随后再选择第 $0$ 个通道，获得 $100$ 分并来到第 $5$ 关；最后任选一个通道，都可以获得 $30$ 分并通关。如此，总得分为 $1+100+30=131$。
+</p>
+<p>
+	<strong>输入样例2</strong>
+</p>
+<p>
+<pre class="prettyprint">6 2
+2 3
+1 0 30 100 30 -1</pre>
+</p>
+<p>
+	<strong>样例2输出</strong>
+</p>
+<p>
+<pre class="prettyprint">101</pre>
+</p>
+<p>
+	<strong>样例解释 2</strong>
+</p>
+<p>
+	请注意，一些关卡的得分可能是负数。
+</p>
+<p>
+	<strong>数据范围</strong>
+</p>
+<p>
+	对于 $20\%$ 的测试点，保证 $M=1$。
+</p>
+<p>
+	对于 $40\%$ 的测试点，保证 $N \le 20$；保证 $M\le 2$。
+</p>
+<p>
+	对于所有测试点，保证 $1 \le N \le 10^4$；保证 $1 \le M\le 100$。
+</p>
+<span class="md"> </span>]]></hint>
+    <source><![CDATA[GESP六级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include <bits/stdc++.h>
+using namespace std;
+#define int long long 
+void read(int &p)
+{
+    p = 0;
+    int k = 1;
+    char c = getchar();
+    while(c < '0' || c > '9')
+    {
+        if(c == '-')
+        {
+            k = -1;
+        }
+        c = getchar();
+    }
+    while(c >= '0' && c <= '9')
+    {
+        p = p * 10 + c - '0';
+        c = getchar();
+    }
+    p *= k;
+    return ;
+}
+void write_(int x)
+{
+    if(x < 0)
+    {
+        putchar('-');
+        x = -x;
+    }
+    if(x > 9)
+    {
+        write_(x / 10);
+    }
+    putchar(x % 10 + '0');
+}
+void writesp(int x)
+{
+    write_(x);
+    putchar(' ');
+}
+void writeln(int x)
+{
+    write_(x);
+    puts("");
+}
+int n,m,a[1111],b[55555];
+int dp[51111];
+signed main()
+{
+    read(n),read(m);
+    for(int i = 1;i <= m;i++)
+    {
+        read(a[i]);
+    }
+    for(int i = 0; i < n;i++)
+    {
+        read(b[i]);
+    }
+    memset(dp,0xcf,sizeof(dp));
+    dp[0] = b[0];
+    for(int i = 0;i < n;i++)
+    {
+        for(int j = 1;j <= m;j++)
+        {
+            dp[min(n,i + a[j])] = max(dp[min(n,i + a[j])],dp[i] + b[min(n,i + a[j])]);
+        }
+    }
+    writeln(dp[n]);
+    return 0;
+}]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202312 六级] 工作沟通]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4812]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select">
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;某公司有 $N$ 名员工，编号从 $0$ 至 $N-1$。其中，除了 $0$ 号员工是老板，其余每名员工都有一个直接领导。我们假设编号为 $i$ 的员工的直接领导是 $f_i$。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;该公司有严格的管理制度，每位员工只能受到本人或直接领导或间接领导的管理。具体来说，规定员工 $x$ 可以管理员工 $y$，当且仅当 $x=y$，或 $x=f_y$，或 $x$ 可以管理 $f_y$。特别地，$0$ 号员工老板只能自我管理，无法由其他任何员工管理。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;现在，有一些同事要开展合作，他们希望找到一位同事来主持这场合作，这位同事必须能够管理参与合作的所有同事。如果有多名满足这一条件的员工，他们希望找到编号最大的员工。你能帮帮他们吗？
+</p>
+</span>]]></description>
+    <input><![CDATA[<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;第一行一个整数 $N$，表示员工的数量。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;第二行 $N - 1$ 个用空格隔开的正整数，依次为 $f_1&#44;f_2&#44;\dots f_{N−1}$。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;第三行一个整数 $Q$，表示共有 $Q$ 场合作需要安排。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;接下来 $Q$ 行，每行描述一场合作：开头是一个整数 $m$（$2 \le m \le N$），表示参与本次合作的员工数量；接着是 $m$ 个整数，依次表示参与本次合作的员工编号（保证编号合法且不重复）。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;保证公司结构合法，即不存在任意一名员工，其本人是自己的直接或间接领导。
+</p>]]></input> 
+    <output><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;输出 $Q$ 行，每行一个整数，依次为每场合作的主持人选。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[5
+0 0 2 2
+3
+2 3 4
+3 2 3 4
+2 1 4]]></sample_input>
+    <sample_output><![CDATA[2
+2
+0]]></sample_output>
+    <test_input name="test"><![CDATA[7
+0 1 0 2 1 2
+5
+2 4 6
+2 4 5
+3 4 5 6
+4 2 4 5 6
+2 3 4]]></test_input>
+<test_output name="test"><![CDATA[2
+1
+1
+1
+0]]></test_output>
+<test_input name="test_1"><![CDATA[3
+0 0
+2
+2 1 2
+2 0 1]]></test_input>
+<test_output name="test_1"><![CDATA[0
+0]]></test_output>
+<test_input name="test_2"><![CDATA[6
+0 1 2 3 4
+2
+3 1 3 5
+2 2 5]]></test_input>
+<test_output name="test_2"><![CDATA[1
+2]]></test_output>
+<test_input name="test_3"><![CDATA[8
+0 0 1 1 2 2 3
+3
+2 5 6
+3 3 5 7
+4 1 3 5 7]]></test_input>
+<test_output name="test_3"><![CDATA[2
+0
+0]]></test_output>
+<test_input name="test_4"><![CDATA[9
+0 0 0 1 1 2 2 3
+4
+2 4 5
+2 6 7
+3 4 6 8
+2 8 5]]></test_input>
+<test_output name="test_4"><![CDATA[1
+2
+0
+0]]></test_output>
+<test_input name="test_5"><![CDATA[4
+0 1 1
+2
+2 2 3
+3 0 2 3]]></test_input>
+<test_output name="test_5"><![CDATA[1
+0]]></test_output>
+<test_input name="test_6"><![CDATA[10
+0 0 2 2 4 4 6 6 8
+2
+5 1 3 5 7 9
+2 8 9]]></test_input>
+<test_output name="test_6"><![CDATA[0
+8]]></test_output>
+<test_input name="test_7"><![CDATA[6
+0 1 0 3 3
+3
+2 2 5
+3 1 2 5
+2 4 5]]></test_input>
+<test_output name="test_7"><![CDATA[0
+0
+3
+]]></test_output>
+<test_input name="test_8"><![CDATA[7
+0 0 0 0 0 0
+2
+4 1 2 3 4
+3 5 6 0]]></test_input>
+<test_output name="test_8"><![CDATA[0
+0]]></test_output>
+<test_input name="test_9"><![CDATA[8
+0 1 2 0 4 5 6
+3
+2 3 7
+2 4 7
+3 3 4 7]]></test_input>
+<test_output name="test_9"><![CDATA[0
+4
+0]]></test_output>
+    <hint><![CDATA[<p>
+	<strong>样例解释 1</strong>
+</p>
+<p>
+	对于第一场合作，员工$3&#44;4$ 有共同领导 $2$ ，可以主持合作。
+</p>
+<p>
+	对于第二场合作，员工 $2$ 本人即可以管理所有参与者。
+</p>
+<p>
+	对于第三场合作，只有 $0$ 号老板才能管理所有员工。
+</p>
+<p>
+	<strong>输入样例2</strong>
+</p>
+<p>
+<pre class="prettyprint">7
+0 1 0 2 1 2
+5
+2 4 6
+2 4 5
+3 4 5 6
+4 2 4 5 6
+2 3 4</pre>
+</p>
+<p>
+	<strong>样例2输出</strong>
+</p>
+<p>
+<pre class="prettyprint">2
+1
+1
+1
+0</pre>
+</p>
+<p>
+	<strong>数据范围</strong>
+</p>
+<p>
+	对于 $50\%$ 的测试点，保证 $N \leq 50$。
+</p>
+<p>
+	对于所有测试点，保证 $3 \leq N \leq 300$，$Q \leq 100$。
+</p>]]></hint>
+    <source><![CDATA[GESP六级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include <bits/stdc++.h>
+using namespace std;
+const int MAX_N = 3e2 + 9;
+
+int n, q, f[MAX_N], m, x, num[MAX_N];
+
+void dfs(int x)
+{
+    num[x]++; // num[i]：记录编号i访问的次数
+    if (f[x] == -1)  return;
+    dfs(f[x]);
+}
+int main()
+{
+    cin >> n;
+    f[0] = -1;   //根结点的直接领导
+    for (int i = 1; i <= n - 1; i++)
+        cin >> f[i]; // 编号为i的员工的直接领导为f[i]
+    cin >> q;
+    while (q--) // q场合作需要安排
+    {
+        cin >> m; // 合作的员工的数量
+        memset(num , 0 , sizeof(num));
+        for (int i = 1; i <= m; i++)
+        {
+            cin >> x; // 参与合作的员工编号
+            dfs(x);
+        }
+        for(int i = n - 1; i >= 0; i--)  //编号从大到小
+        {
+            if(num[i] == m)  //编号为i访问了m次 说明i能够管理者m个合作的员工
+            {
+                cout << i << endl;
+                break;
+            }
+        }
+    }
+    return 0;
+}
+]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202309 六级] 小杨买饮料]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4813]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select"> 
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小杨来到了一家商店，打算购买一些饮料。这家商店总共出售 $N$ 种饮料，编号从 $0$ 至 $N-1$，其中编号为 $i$ 的饮料售价 $c_i$ 元，容量 $l_i$ 毫升。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小杨的需求有如下几点：
+</p>
+<ol>
+	<li>
+		小杨想要尽可能尝试不同种类的饮料，因此他希望每种饮料至多购买 $1$ 瓶；
+	</li>
+	<li>
+		小杨很渴，所以他想要购买总容量不低于 $L$ 的饮料；
+	</li>
+	<li>
+		小杨勤俭节约，所以在 $1$ 和 $2$ 的前提下，他希望使用尽可能少的费用。
+	</li>
+</ol>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;方便起见，你只需要输出最少花费的费用即可。特别地，如果不能满足小杨的要求，则输出 `no solution`。
+</p>
+</span>]]></description>
+    <input><![CDATA[<span class="md">
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;第一行两个整数 $N&#44;L$。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;接下来 $N$行，依次描述第 $i=0&#44;1&#44;\cdots&#44;N-1$ 种饮料：每行两个整数 $c_i&#44;l_i$。
+</p>
+</span>]]></input> 
+    <output><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;输出一行一个整数，表示最少需要花费多少钱，才能满足小杨的要求。特别地，如果不能满足要求，则输出 `no solution`。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[5 100
+100 2000
+2 50
+4 40
+5 30
+3 20]]></sample_input>
+    <sample_output><![CDATA[9]]></sample_output>
+    <test_input name="test"><![CDATA[5 141
+100 2000
+2 50
+4 40
+5 30
+3 20]]></test_input>
+<test_output name="test"><![CDATA[100]]></test_output>
+<test_input name="test_1"><![CDATA[4 141
+2 50
+4 40
+5 30
+3 20]]></test_input>
+<test_output name="test_1"><![CDATA[no solution]]></test_output>
+<test_input name="test_2"><![CDATA[3 10
+5 6
+3 5
+4 5]]></test_input>
+<test_output name="test_2"><![CDATA[7]]></test_output>
+<test_input name="test_3"><![CDATA[6 25
+1 3
+2 4
+3 5
+4 6
+5 7
+6 8]]></test_input>
+<test_output name="test_3"><![CDATA[15]]></test_output>
+<test_input name="test_4"><![CDATA[2 10
+10 9
+10 9]]></test_input>
+<test_output name="test_4"><![CDATA[20]]></test_output>
+<test_input name="test_5"><![CDATA[7 50
+10 20
+8 15
+5 10
+3 8
+2 5
+1 3
+100 60]]></test_input>
+<test_output name="test_5"><![CDATA[24]]></test_output>
+<test_input name="test_6"><![CDATA[4 1000
+500 500
+500 500
+500 500
+900 1000]]></test_input>
+<test_output name="test_6"><![CDATA[900]]></test_output>
+<test_input name="test_7"><![CDATA[5 30
+7 10
+6 10
+5 10
+4 10
+3 10]]></test_input>
+<test_output name="test_7"><![CDATA[12
+]]></test_output>
+<test_input name="test_8"><![CDATA[8 100
+1 1
+2 2
+3 3
+4 4
+5 5
+6 6
+7 7
+100 100]]></test_input>
+<test_output name="test_8"><![CDATA[100
+]]></test_output>
+<test_input name="test_9"><![CDATA[6 40
+5 8
+6 9
+7 10
+8 11
+9 12
+10 13]]></test_input>
+<test_output name="test_9"><![CDATA[28
+]]></test_output>
+    <hint><![CDATA[<span class="md">
+<p>
+	<strong>样例 1 解释</strong>
+</p>
+<p>
+	小杨可以购买 $2&#44;3&#44;5$ 号饮料，总计获得 $50+40+20=110$ 毫升饮料，花费 $2+4+3=9$ 元。
+</p>
+<p>
+	如果只考虑前两项需求，小杨也可以购买 $2&#44;4&#44;5$ 号饮料，它们的容量总和为 $50+30+20=100$ 毫升，恰好可以满足需求。但遗憾的是，这个方案需要花费 $2+5+3=10$ 元。
+</p>
+<p>
+	<strong>输入样例2</strong>
+</p>
+<p>
+<pre class="prettyprint">5 141
+100 2000
+2 50
+4 40
+5 30
+3 20</pre>
+</p>
+<p>
+	<strong>样例2输出</strong>
+</p>
+<p>
+<pre class="prettyprint">100</pre>
+</p>
+<p>
+	<strong>
+	<p>
+		样例 2 解释
+	</p>
+	<p>
+		$1&#44;2&#44;3&#44;4$ 号饮料总计 $140$ 毫升，如每种饮料至多购买 $1$ 瓶，则恰好无法满足需求，因此只能花费 $100$ 元购买 $0$ 号饮料。
+	</p>
+</strong>
+</p>
+<p>
+	<strong>输入样例3</strong>
+</p>
+<p>
+<pre class="prettyprint">4 141
+2 50
+4 40
+5 30
+3 20</pre>
+</p>
+<p>
+	<strong>样例3输出</strong>
+</p>
+<p>
+<pre class="prettyprint">no solution</pre>
+</p>
+<p>
+	<strong>数据规模</strong>
+</p>
+<p>
+	对于 $40\%$ 的测试点，保证 $N \le 20;1\le L \le 100; l_i \le 100$。
+</p>
+<p>
+	对于 $70\%$ 的测试点，保证 $l_i \le 100$。
+</p>
+<p>
+	对于 $100\%$ 的测试点，保证 $1\le N \le 500;1\le L \le 2000; 1\le c_i&#44;l_i \le 10^6$。
+</p>
+</span>]]></hint>
+    <source><![CDATA[GESP六级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include <bits/stdc++.h>
+using namespace std;
+
+int n, L, c[509], l[509];
+int f[2009]; //f[j]:买总容量不低于L的饮料的最小花费
+
+int main()
+{
+    cin >> n >> L; // n种饮料   总容量不低于L
+    for (int i = 1; i <= n; i++)
+        cin >> c[i] >> l[i]; // 每一种饮料的售价和容量
+    
+    memset(f , 0x3f , sizeof(f));
+    f[0] = 0;
+
+    for(int i = 1; i <= n; i++)
+    {
+        for(int j = L; j >= 0; j--)
+            f[j] = min(f[j] , f[max(0 , j - l[i])] + c[i]);
+    }
+    
+    if(f[L] != 0x3f3f3f3f)
+        cout << f[L];
+    else
+        cout << "no solution";
+    return 0;
+}
+]]></solution>
+    
+</item>
+
+
+  <item>
+    <title><![CDATA[[GESP202309 六级] 小杨的握手问题]]></title>
+    <url><![CDATA[http://jk.fortunefreedom.top:8888/problem.php?id=4814]]></url>
+    <time_limit unit="s"><![CDATA[1]]></time_limit>
+
+    <memory_limit unit="mb"><![CDATA[128]]></memory_limit>
+
+    
+    <description><![CDATA[<span class="md auto_select">
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;小杨的班级里共有 $N$ 名同学，学号从 $0$ 至 $N-1$。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;某节课上，老师安排全班同学进行一次握手游戏，具体规则如下：老师安排了一个顺序，让全班 $N$ 名同学依次进入教室。每位同学进入教室时，需要和 **已经在教室内** 且 **学号小于自己** 的同学握手。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;现在，小杨想知道，整个班级总共会进行多少次握手。
+</p>
+<p>
+	<strong>提示：可以考虑使用归并排序进行降序排序，并在此过程中求解。</strong>
+</p>
+</span>]]></description>
+    <input><![CDATA[<span class="md">
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;输入包含 $2$ 行。第一行一个整数 $N$ ，表示同学的个数；第二行 $N$ 个用单个空格隔开的整数，依次描述同学们进入教室的顺序，每个整数在 $0 \sim N-1$ 之间，表示该同学的学号。
+</p>
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;保证每位同学会且只会进入教室一次。
+</p>
+</span>]]></input> 
+    <output><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;输出一行一个整数，表示全班握手的总次数。<span class="md"> </span>]]></output>
+    <sample_input><![CDATA[4
+2 1 3 0]]></sample_input>
+    <sample_output><![CDATA[2]]></sample_output>
+    <test_input name="test"><![CDATA[6
+0 1 2 3 4 5]]></test_input>
+<test_output name="test"><![CDATA[15]]></test_output>
+<test_input name="test_1"><![CDATA[5
+4 3 2 1 0]]></test_input>
+<test_output name="test_1"><![CDATA[0]]></test_output>
+<test_input name="test_2"><![CDATA[3
+1 0 2]]></test_input>
+<test_output name="test_2"><![CDATA[2]]></test_output>
+<test_input name="test_3"><![CDATA[7
+3 5 1 6 2 0 4]]></test_input>
+<test_output name="test_3"><![CDATA[9]]></test_output>
+<test_input name="test_4"><![CDATA[2
+1 0]]></test_input>
+<test_output name="test_4"><![CDATA[0]]></test_output>
+<test_input name="test_5"><![CDATA[8
+5 0 7 2 6 3 1 4]]></test_input>
+<test_output name="test_5"><![CDATA[13]]></test_output>
+<test_input name="test_6"><![CDATA[10
+9 8 7 6 5 4 3 2 1 0]]></test_input>
+<test_output name="test_6"><![CDATA[0]]></test_output>
+<test_input name="test_7"><![CDATA[6
+2 5 0 3 1 4]]></test_input>
+<test_output name="test_7"><![CDATA[8
+]]></test_output>
+<test_input name="test_8"><![CDATA[9
+0 2 4 6 8 1 3 5 7]]></test_input>
+<test_output name="test_8"><![CDATA[26]]></test_output>
+<test_input name="test_9"><![CDATA[7
+6 4 2 0 5 3 1]]></test_input>
+<test_output name="test_9"><![CDATA[6]]></test_output>
+    <hint><![CDATA[<p>
+	<strong>样例解释 1：</strong>
+</p>
+<p>
+	$2$ 号同学进入教室，此时教室里没有其他同学。
+</p>
+<p>
+	$1$ 号同学进入教室，此时教室里有 $2$ 号同学。$1$ 号同学的学号小于 $2$ 号同学，因此他们之间不需要握手。
+</p>
+<p>
+	$3$ 号同学进入教室，此时教室里有 $1&#44;2$ 号同学。$3$ 号同学的学号比他们都大，因此 $3$ 号同学需要分别和另外两位同学握手。
+</p>
+<p>
+	$0$ 号同学进入教室，此时教室里有 $1&#44;2&#44;3$ 号同学。$0$ 号同学的学号比他们都小，因此 $0$ 号同学不需要与其他同学握手。
+</p>
+<p>
+	<strong>样例输入2</strong>
+</p>
+<p>
+<pre class="prettyprint">6
+0 1 2 3 4 5</pre>
+</p>
+<p>
+	<strong>样例2输出</strong>
+</p>
+<p>
+<pre class="prettyprint">15</pre>
+</p>
+<p>
+	<strong>样例解释2：</strong>
+</p>
+<p>
+	全班所有同学之间都会进行握手，因为每位同学来到教室时，都会发现他的学号是当前教室里最大的，所以他需要和教室里的每位其他同学进行握手。
+</p>
+<p>
+	对于 $30\%$ 的测试点，保证 $N\le100$。
+</p>
+<p>
+	对于所有测试点，保证 $2\le N\le3\times10^5$。
+</p>]]></hint>
+    <source><![CDATA[GESP六级]]></source>
+    <remote_oj><![CDATA[]]></remote_oj>
+    <remote_id><![CDATA[]]></remote_id>
+
+            <solution language="C++"><![CDATA[#include<iostream>
+using namespace std;
+const int N = 3e5+5;
+int n;
+int a[N], b[N];
+long long ans = 0;
+void merge(int l, int r){
+	int mid = l + r >> 1;
+	if(l>=r)
+		return;
+	merge(l, mid);
+	merge(mid+1, r);
+	int i = l, j = mid + 1, k = 0;
+	while(i<=mid && j<=r)	{
+		if(a[i]>a[j])		{
+			ans += mid - i + 1;
+			b[++k] = a[j++];
+		}
+		else
+			b[++k] = a[i++];
+	}
+	while(i<=mid)
+		b[++k] = a[i++];
+	while(j<=r)
+		b[++k] = a[j++];
+	
+	for(int i=l;i<=r;i++)
+		a[i] = b[i-l+1];
+}
+int main(){
+	cin>>n;
+	for(int i=n;i;i--)
+		cin>>a[i];
+	merge(1, n);
+	cout<<ans;
+	return 0;
+}
+]]></solution>
+    
+</item>
+
+</fps>

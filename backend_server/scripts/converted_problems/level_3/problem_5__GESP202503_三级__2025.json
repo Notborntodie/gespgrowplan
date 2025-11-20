@@ -1,0 +1,90 @@
+{
+  "title": "[GESP202503 三级] 2025",
+  "description": "小 A 有一个整数 $x$，他想找到最小的正整数 $y$ 使得下式成立：\r\n\n\t$$(x \\ \\operatorname{and} \\ y) + (x \\ \\operatorname{or} \\ y) = 2025$$\r\n\n\t    其中 $\\operatorname{and}$ 表示二进制按位与运算，$\\operatorname{or}$ 表示二进制按位或运算。如果不存在满足条件的 $y$，则输出 $-1$。",
+  "input_format": "一行，一个整数 $x$。",
+  "output_format": "一行，一个整数，若满足条件的 $y$ 存在则输出 $y$，否则输出 $-1$。",
+  "data_range": "对于所有测试点，保证 $0 \\leq x < 2025$。\r\n\n\t$$(x \\ \\operatorname{and} \\ y) + (x \\ \\operatorname{or} \\ y) = 2025$$\r\n\n\t其中：\r\n\n\t1. $\\operatorname{and}$ 表示按位与运算，运算符为 $\\&$。\r\n\n\t2. $\\operatorname{or}$ 表示按位或运算，运算符为 $|$。",
+  "time_limit": 1000,
+  "memory_limit": 128,
+  "level": 3,
+  "publish_date": "2025-03-01",
+  "samples": [
+    {
+      "input": "1025",
+      "output": "1000",
+      "explanation": "样例",
+      "is_hidden": false,
+      "sort_order": 1
+    },
+    {
+      "input": "1025",
+      "output": "1000",
+      "explanation": "test",
+      "is_hidden": true,
+      "sort_order": 2
+    },
+    {
+      "input": "1510",
+      "output": "515",
+      "explanation": "test_1",
+      "is_hidden": true,
+      "sort_order": 3
+    },
+    {
+      "input": "94",
+      "output": "1931",
+      "explanation": "test_2",
+      "is_hidden": true,
+      "sort_order": 4
+    },
+    {
+      "input": "710",
+      "output": "1315",
+      "explanation": "test_3",
+      "is_hidden": true,
+      "sort_order": 5
+    },
+    {
+      "input": "1727",
+      "output": "298",
+      "explanation": "test_4",
+      "is_hidden": true,
+      "sort_order": 6
+    },
+    {
+      "input": "581",
+      "output": "1444",
+      "explanation": "test_5",
+      "is_hidden": true,
+      "sort_order": 7
+    },
+    {
+      "input": "528",
+      "output": "1497",
+      "explanation": "test_6",
+      "is_hidden": true,
+      "sort_order": 8
+    },
+    {
+      "input": "999",
+      "output": "1026",
+      "explanation": "test_7",
+      "is_hidden": true,
+      "sort_order": 9
+    },
+    {
+      "input": "123",
+      "output": "1902",
+      "explanation": "test_8",
+      "is_hidden": true,
+      "sort_order": 10
+    },
+    {
+      "input": "462",
+      "output": "1563",
+      "explanation": "test_9",
+      "is_hidden": true,
+      "sort_order": 11
+    }
+  ]
+}

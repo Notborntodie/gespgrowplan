@@ -1,0 +1,90 @@
+{
+  "title": "[GESP202309 五级] 巧夺大奖",
+  "description": "小明参加了一个巧夺大奖的游戏节目。主持人宣布了游戏规则：\r\n\n\t\t\t游戏分为 $n$ 个时间段，参加者每个时间段可以选择一个小游戏。\r\n\n\t\t\t游戏中共有 $n$ 个小游戏可供选择。\r\n\n\t\t\t每个小游戏有规定的时限和奖励。对于第 $i$ 个小游戏，参加者必须在第 $T_i$ 个时间段结束前完成才能得到奖励 $R_i$。\r\n\n\t    小明发现，这些小游戏都很简单，不管选择哪个小游戏，他都能在一个时间段内完成。关键问题在于，如何安排每个时间段分别选择哪个小游戏，才能使得总奖励最高？",
+  "input_format": "输入第一行，包含一个正整数 $n$。$n$ 既是游戏时间段的个数，也是小游戏的个数。约定 $1\\le n\\le500$。\r\n\n\t    输入第二行，包含 $n$ 个正整数。第 $i$ 个正整数为 $T_i$，即第 $i$ 个小游戏的完成期限。约定 $1\\le T_i\\le n$。\r\n\n\t    输入第三行，包含 $n$ 个正整数。第 $i$ 个正整数为 $R_i$，即第 $i$ 个小游戏的完成奖励。约定 $1\\le R_i\\le 1000$。",
+  "output_format": "输出一行，包含一个正整数 $C$，为最高可获得的奖励。",
+  "data_range": "样例解释 1\r\n\n\t$7$ 个时间段可分别安排完成第 4、2、3、1、6、7、5 个小游戏，其中第 4、2、3、1、7 个小游戏在期限内完成。因此，可以获得总计 $40+60+50+70+10=230$ 的奖励。",
+  "time_limit": 1000,
+  "memory_limit": 128,
+  "level": 5,
+  "publish_date": "2023-09-01",
+  "samples": [
+    {
+      "input": "7\r\n4 2 4 3 1 4 6\r\n70 60 50 40 30 20 10",
+      "output": "230",
+      "explanation": "样例",
+      "is_hidden": false,
+      "sort_order": 1
+    },
+    {
+      "input": "7\n4 2 4 3 1 4 6\n70 60 50 40 30 20 10",
+      "output": "230",
+      "explanation": "test",
+      "is_hidden": true,
+      "sort_order": 2
+    },
+    {
+      "input": "5\n3 3 3 3 3\n10 20 30 40 50",
+      "output": "120",
+      "explanation": "test_1",
+      "is_hidden": true,
+      "sort_order": 3
+    },
+    {
+      "input": "4\n1 2 3 4\n100 200 300 400",
+      "output": "1000",
+      "explanation": "test_2",
+      "is_hidden": true,
+      "sort_order": 4
+    },
+    {
+      "input": "3\n1 1 1\n5 3 8",
+      "output": "8",
+      "explanation": "test_3",
+      "is_hidden": true,
+      "sort_order": 5
+    },
+    {
+      "input": "6\n2 3 1 4 6 5\n10 20 5 30 50 40",
+      "output": "155",
+      "explanation": "test_4",
+      "is_hidden": true,
+      "sort_order": 6
+    },
+    {
+      "input": "5\n5 4 3 2 1\n10 20 30 40 50",
+      "output": "150",
+      "explanation": "test_5",
+      "is_hidden": true,
+      "sort_order": 7
+    },
+    {
+      "input": "1\n1\n100",
+      "output": "100",
+      "explanation": "test_6",
+      "is_hidden": true,
+      "sort_order": 8
+    },
+    {
+      "input": "6\n2 2 2 5 5 5\n10 20 30 40 50 60",
+      "output": "200",
+      "explanation": "test_7",
+      "is_hidden": true,
+      "sort_order": 9
+    },
+    {
+      "input": "4\n2 3 1 2\n5 5 5 5",
+      "output": "15",
+      "explanation": "test_8",
+      "is_hidden": true,
+      "sort_order": 10
+    },
+    {
+      "input": "10\n3 1 4 2 5 3 6 4 2 5\n90 80 70 60 50 40 30 20 10 5",
+      "output": "380",
+      "explanation": "test_9",
+      "is_hidden": true,
+      "sort_order": 11
+    }
+  ]
+}

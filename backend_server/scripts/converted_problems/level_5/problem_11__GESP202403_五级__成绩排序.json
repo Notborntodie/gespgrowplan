@@ -1,0 +1,90 @@
+{
+  "title": "[GESP202403 五级] 成绩排序",
+  "description": "有 $n$ 名同学，每名同学有语文、数学、英语三科成绩，你需要按照如下规则对所有同学的成绩从高到低排序：\r\n\n\t\t\t比较总分，高者靠前；\r\n\n\t\t\t如果总分相同，则比较语文和数学两科的总分，高者靠前；\r\n\n\t\t\t如果仍相同，则比较语文和数学两科的最高分，高者靠前；\r\n\n\t\t\t如果仍相同，则二人并列。\r\n\n\t    你需要输出每位同学的排名，如遇 $x$ 人并列，则他们排名相同，并留空后面的 $x - 1$ 个名次。例如，有 $3$ 名同学并列第 $1$，则后一名同学自动成为第 $4$ 名。",
+  "input_format": "第一行一个整数 $N$，表示同学的人数。  \r\n\n\t    接下来 $N$ 行，每行三个非负整数 $c_i, m_i, e_i$ 分别表示该名同学的语文、数学、英语成绩。",
+  "output_format": "输出 $N$ 行，按输入同学的顺序，输出他们的排名。  \r\n\n\t    注意：请不要按排名输出同学的序号，而是按同学的顺序输出他们各自的排名。",
+  "data_range": "对 $30\\%$ 的数据，$N \\leq 100$，且所有同学总分各不相同。\r\n\n\t\t\t对全部的测试数据，保证 $2 \\leq N \\leq 10^4$，$0 \\leq c_i, m_i, e_i \\leq 150$。",
+  "time_limit": 1000,
+  "memory_limit": 128,
+  "level": 5,
+  "publish_date": "2024-03-01",
+  "samples": [
+    {
+      "input": "6\r\n140 140 150\r\n140 149 140\r\n148 141 140\r\n141 148 140\r\n145 145 139\r\n0 0 0",
+      "output": "1\r\n3\r\n4\r\n4\r\n2\r\n6",
+      "explanation": "样例",
+      "is_hidden": false,
+      "sort_order": 1
+    },
+    {
+      "input": "6\n140 140 150\n140 149 140\n148 141 140\n141 148 140\n145 145 139\n0 0 0",
+      "output": "1\n3\n4\n4\n2\n6",
+      "explanation": "test",
+      "is_hidden": true,
+      "sort_order": 2
+    },
+    {
+      "input": "4\n100 100 100\n100 100 100\n100 100 100\n100 100 100",
+      "output": "1\n1\n1\n1",
+      "explanation": "test_1",
+      "is_hidden": true,
+      "sort_order": 3
+    },
+    {
+      "input": "5\n90 80 70\n80 90 70\n70 80 90\n60 70 80\n50 60 90",
+      "output": "1\n1\n3\n4\n5",
+      "explanation": "test_2",
+      "is_hidden": true,
+      "sort_order": 4
+    },
+    {
+      "input": "3\n100 50 50\n80 70 50\n90 60 50",
+      "output": "1\n3\n2",
+      "explanation": "test_3",
+      "is_hidden": true,
+      "sort_order": 5
+    },
+    {
+      "input": "7\n150 150 150\n150 150 150\n140 140 140\n140 140 140\n130 130 130\n120 120 120\n120 120 120",
+      "output": "1\n1\n3\n3\n5\n6\n6",
+      "explanation": "test_4",
+      "is_hidden": true,
+      "sort_order": 6
+    },
+    {
+      "input": "3\n0 0 0\n0 0 0\n0 0 1",
+      "output": "2\n2\n1",
+      "explanation": "test_5",
+      "is_hidden": true,
+      "sort_order": 7
+    },
+    {
+      "input": "5\n90 85 95\n90 85 95\n85 90 95\n95 80 95\n80 95 95",
+      "output": "3\n3\n3\n1\n1",
+      "explanation": "test_6",
+      "is_hidden": true,
+      "sort_order": 8
+    },
+    {
+      "input": "8\n120 130 110\n130 120 110\n125 125 110\n120 130 110\n110 140 110\n140 110 110\n120 130 110\n100 150 110",
+      "output": "4\n4\n8\n4\n2\n2\n4\n1",
+      "explanation": "test_7",
+      "is_hidden": true,
+      "sort_order": 9
+    },
+    {
+      "input": "4\n0 150 150\n150 0 150\n75 75 150\n75 75 150",
+      "output": "1\n1\n3\n3",
+      "explanation": "test_8",
+      "is_hidden": true,
+      "sort_order": 10
+    },
+    {
+      "input": "7\n100 100 50\n100 90 60\n90 100 60\n95 95 60\n100 100 50\n90 90 70\n80 80 80",
+      "output": "1\n3\n3\n5\n1\n6\n7",
+      "explanation": "test_9",
+      "is_hidden": true,
+      "sort_order": 11
+    }
+  ]
+}

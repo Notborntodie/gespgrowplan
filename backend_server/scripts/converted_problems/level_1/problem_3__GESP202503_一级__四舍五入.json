@@ -1,0 +1,69 @@
+{
+  "title": "[GESP202503 一级] 四舍五入",
+  "description": "四舍五入是一种常见的近似计算方法。现在，给定 $n$ 个整数，你需要将每个整数四舍五入到最接近的整十数。例如，$43$ 四舍五入后为 $40$，$58$ 四舍五入后为 $60$。",
+  "input_format": "共 $n+1$ 行，第一行，一个整数 $n$，表示接下来输入的整数个数。\r\n\n\t    接下来 $n$ 行，每行一个整数 $a_1, \\cdots, a_n$，表示需要四舍五入的整数。",
+  "output_format": "$n$ 行，每行一个整数，表示每个整数四舍五入后的结果。",
+  "data_range": "对于所有测试点，保证 $1\\leq n\\leq 100$，$1\\leq a_i\\leq 10000$。",
+  "time_limit": 1000,
+  "memory_limit": 128,
+  "level": 1,
+  "publish_date": "2025-03-01",
+  "samples": [
+    {
+      "input": "5\r\n43\r\n58\r\n25\r\n67\r\n90",
+      "output": "40\r\n60\r\n30\r\n70\r\n90",
+      "explanation": "样例",
+      "is_hidden": false,
+      "sort_order": 1
+    },
+    {
+      "input": "5\n43\n58\n25\n67\n90",
+      "output": "40\n60\n30\n70\n90",
+      "explanation": "test",
+      "is_hidden": true,
+      "sort_order": 2
+    },
+    {
+      "input": "10\n3\n54\n33\n45\n23\n53\n12\n94\n1\n37",
+      "output": "0\n50\n30\n50\n20\n50\n10\n90\n0\n40",
+      "explanation": "test1",
+      "is_hidden": true,
+      "sort_order": 3
+    },
+    {
+      "input": "5\n123\n3452\n2342\n5342\n23",
+      "output": "120\n3450\n2340\n5340\n20",
+      "explanation": "test2",
+      "is_hidden": true,
+      "sort_order": 4
+    },
+    {
+      "input": "2\n9999\n10000",
+      "output": "10000\n10000",
+      "explanation": "test3",
+      "is_hidden": true,
+      "sort_order": 5
+    },
+    {
+      "input": "6\n5\n14\n25\n36\n49\n50",
+      "output": "10\n10\n30\n40\n50\n50",
+      "explanation": "test4",
+      "is_hidden": true,
+      "sort_order": 6
+    },
+    {
+      "input": "4\n995\n999\n1001\n1005",
+      "output": "1000\n1000\n1000\n1010",
+      "explanation": "test5",
+      "is_hidden": true,
+      "sort_order": 7
+    },
+    {
+      "input": "3\n12\n15\n18",
+      "output": "10\n20\n20",
+      "explanation": "test6",
+      "is_hidden": true,
+      "sort_order": 8
+    }
+  ]
+}

@@ -1,0 +1,1380 @@
+[
+  {
+    "title": "[GESP202506 一级] 假期阅读",
+    "description": "小 A 有一本厚厚的书。这本书总共有 $n$ 页，小 A 一天中最多只能阅读完其中的 $k$ 页。小 A 的假期总共有 $t$ 天，他想知道在假期中最多能阅读完这本书的多少页。",
+    "input_format": "第一行，一个正整数 $n$，表示书的页数。\r\n\n\t    第二行，一个正整数 $k$，表示小 A 每天最多阅读的页数。\r\n\n\t    第三行，一个正整数 $t$，表示小 A 假期的天数。",
+    "output_format": "一行，一个整数，表示假期中所能阅读的最多页数。",
+    "data_range": "对于所有测试点，保证 $n,k,t$ 均不超过 $1000$。",
+    "time_limit": 1000,
+    "memory_limit": 128,
+    "level": 1,
+    "publish_date": "2025-06-01",
+    "samples": [
+      {
+        "input": "8\r\n3\r\n2",
+        "output": "6",
+        "explanation": "样例",
+        "is_hidden": false,
+        "sort_order": 1
+      },
+      {
+        "input": "19\n3\n30",
+        "output": "19",
+        "explanation": "test",
+        "is_hidden": true,
+        "sort_order": 2
+      },
+      {
+        "input": "723\n33\n12",
+        "output": "396",
+        "explanation": "test1",
+        "is_hidden": true,
+        "sort_order": 3
+      },
+      {
+        "input": "123\n21\n4",
+        "output": "84",
+        "explanation": "test2",
+        "is_hidden": true,
+        "sort_order": 4
+      },
+      {
+        "input": "87\n11\n2",
+        "output": "22",
+        "explanation": "test3",
+        "is_hidden": true,
+        "sort_order": 5
+      },
+      {
+        "input": "8\n3\n2",
+        "output": "6",
+        "explanation": "test4",
+        "is_hidden": true,
+        "sort_order": 6
+      },
+      {
+        "input": "1000\n1000\n1",
+        "output": "1000",
+        "explanation": "test5",
+        "is_hidden": true,
+        "sort_order": 7
+      },
+      {
+        "input": "1\n1\n1",
+        "output": "1",
+        "explanation": "test6",
+        "is_hidden": true,
+        "sort_order": 8
+      }
+    ]
+  },
+  {
+    "title": "[GESP202506 一级] 值日",
+    "description": "小杨和小红是值日生，负责打扫教室。小杨每 $m$ 天值日一次，小红每 $n$ 天值日一次。今天他们两个一起值日，请问至少多少天后，他们会再次同一天值日？",
+    "input_format": "第一行，一个正整数 $m$，表示小杨的值日周期；\r\n\n\t    第二行，一个正整数 $n$，表示小红的值日周期。",
+    "output_format": "一行，一个整数，表示至少多少天后他们会再次同一天值日。",
+    "data_range": "对于所有测试点，保证 $1 \\leq m, n \\leq 100$。",
+    "time_limit": 1000,
+    "memory_limit": 128,
+    "level": 1,
+    "publish_date": "2025-06-01",
+    "samples": [
+      {
+        "input": "4\r\n6",
+        "output": "12",
+        "explanation": "样例",
+        "is_hidden": false,
+        "sort_order": 1
+      },
+      {
+        "input": "4\n6",
+        "output": "12",
+        "explanation": "test",
+        "is_hidden": true,
+        "sort_order": 2
+      },
+      {
+        "input": "12\n24",
+        "output": "24",
+        "explanation": "test1",
+        "is_hidden": true,
+        "sort_order": 3
+      },
+      {
+        "input": "52\n12",
+        "output": "156",
+        "explanation": "test2",
+        "is_hidden": true,
+        "sort_order": 4
+      },
+      {
+        "input": "86\n44",
+        "output": "1892",
+        "explanation": "test3",
+        "is_hidden": true,
+        "sort_order": 5
+      },
+      {
+        "input": "6 77",
+        "output": "462",
+        "explanation": "test4",
+        "is_hidden": true,
+        "sort_order": 6
+      },
+      {
+        "input": "99 99",
+        "output": "99",
+        "explanation": "test5",
+        "is_hidden": true,
+        "sort_order": 7
+      }
+    ]
+  },
+  {
+    "title": "[GESP202503 一级] 四舍五入",
+    "description": "四舍五入是一种常见的近似计算方法。现在，给定 $n$ 个整数，你需要将每个整数四舍五入到最接近的整十数。例如，$43$ 四舍五入后为 $40$，$58$ 四舍五入后为 $60$。",
+    "input_format": "共 $n+1$ 行，第一行，一个整数 $n$，表示接下来输入的整数个数。\r\n\n\t    接下来 $n$ 行，每行一个整数 $a_1, \\cdots, a_n$，表示需要四舍五入的整数。",
+    "output_format": "$n$ 行，每行一个整数，表示每个整数四舍五入后的结果。",
+    "data_range": "对于所有测试点，保证 $1\\leq n\\leq 100$，$1\\leq a_i\\leq 10000$。",
+    "time_limit": 1000,
+    "memory_limit": 128,
+    "level": 1,
+    "publish_date": "2025-03-01",
+    "samples": [
+      {
+        "input": "5\r\n43\r\n58\r\n25\r\n67\r\n90",
+        "output": "40\r\n60\r\n30\r\n70\r\n90",
+        "explanation": "样例",
+        "is_hidden": false,
+        "sort_order": 1
+      },
+      {
+        "input": "5\n43\n58\n25\n67\n90",
+        "output": "40\n60\n30\n70\n90",
+        "explanation": "test",
+        "is_hidden": true,
+        "sort_order": 2
+      },
+      {
+        "input": "10\n3\n54\n33\n45\n23\n53\n12\n94\n1\n37",
+        "output": "0\n50\n30\n50\n20\n50\n10\n90\n0\n40",
+        "explanation": "test1",
+        "is_hidden": true,
+        "sort_order": 3
+      },
+      {
+        "input": "5\n123\n3452\n2342\n5342\n23",
+        "output": "120\n3450\n2340\n5340\n20",
+        "explanation": "test2",
+        "is_hidden": true,
+        "sort_order": 4
+      },
+      {
+        "input": "2\n9999\n10000",
+        "output": "10000\n10000",
+        "explanation": "test3",
+        "is_hidden": true,
+        "sort_order": 5
+      },
+      {
+        "input": "6\n5\n14\n25\n36\n49\n50",
+        "output": "10\n10\n30\n40\n50\n50",
+        "explanation": "test4",
+        "is_hidden": true,
+        "sort_order": 6
+      },
+      {
+        "input": "4\n995\n999\n1001\n1005",
+        "output": "1000\n1000\n1000\n1010",
+        "explanation": "test5",
+        "is_hidden": true,
+        "sort_order": 7
+      },
+      {
+        "input": "3\n12\n15\n18",
+        "output": "10\n20\n20",
+        "explanation": "test6",
+        "is_hidden": true,
+        "sort_order": 8
+      }
+    ]
+  },
+  {
+    "title": "[GESP202503 一级] 图书馆里的老鼠",
+    "description": "图书馆里有 $n$ 本书，不幸的是，还混入了一只老鼠，老鼠每 $x$ 小时能啃光一本书，假设老鼠在啃光一本书之前，不会啃另一本。请问 $y$ 小时后图书馆里还剩下多少本完整的书。",
+    "input_format": "三行，第一行一个正整数 $n$，表示图书馆里书的数量；\r\n\n\t    第二行，一个正整数 $x$，表示老鼠啃光一本书需要的时间；\r\n\n\t    第三行，一个正整数 $y$，表示经过的总时间；\r\n\n\t    输入数据保证 $y$ 小时后至少会剩下一本完整的书。",
+    "output_format": "一行，一个整数，表示 $y$ 小时后图书馆里还剩下多少本完整的书。",
+    "data_range": "对于所有测试点，保证 $1\\leq n,x,y\\leq 1000$，保证 $y$ 小时后至少会剩下⼀本完整的书。",
+    "time_limit": 1000,
+    "memory_limit": 128,
+    "level": 1,
+    "publish_date": "2025-03-01",
+    "samples": [
+      {
+        "input": "10\r\n2\r\n3",
+        "output": "8",
+        "explanation": "样例",
+        "is_hidden": false,
+        "sort_order": 1
+      },
+      {
+        "input": "5\n2\n4",
+        "output": "3",
+        "explanation": "test",
+        "is_hidden": true,
+        "sort_order": 2
+      },
+      {
+        "input": "999\n23\n444",
+        "output": "979",
+        "explanation": "test1",
+        "is_hidden": true,
+        "sort_order": 3
+      },
+      {
+        "input": "834\n123\n11",
+        "output": "833",
+        "explanation": "test2",
+        "is_hidden": true,
+        "sort_order": 4
+      },
+      {
+        "input": "284\n111\n44",
+        "output": "283",
+        "explanation": "test3",
+        "is_hidden": true,
+        "sort_order": 5
+      },
+      {
+        "input": "912\n321\n123",
+        "output": "911",
+        "explanation": "test4",
+        "is_hidden": true,
+        "sort_order": 6
+      }
+    ]
+  },
+  {
+    "title": "[GESP202412 一级] 温度转换",
+    "description": "小杨最近学习了开尔文温度、摄氏温度和华氏温度的转换。令符号 $K$ 表开尔文温度，符号 $C$ 表摄氏温度，符号 $F$ 表华氏温度，这三者的转换公式如下：\r\n\n\t$$C=K-273.15\\\\$$\r\n\n\t$$F=C\\times 1.8+32$$\r\n\n\t    现在小杨想编写一个程序计算某一开尔文温度对应的摄氏温度和华氏温度，你能帮帮他吗?",
+    "input_format": "一行，一个实数 $K$，表示开尔文温度。",
+    "output_format": "一行，若输入开尔文温度对应的华氏温度高于 $212$，输出 Temperature is too high!；\r\n\n\t    否则，输出两个由空格分隔的实数 $C$ 和 $F$，分别表示摄氏温度和华氏度，保留两位小数。",
+    "data_range": "$0<K<10^5$。",
+    "time_limit": 1000,
+    "memory_limit": 128,
+    "level": 1,
+    "publish_date": "2024-12-01",
+    "samples": [
+      {
+        "input": "412.00",
+        "output": "Temperature is too high!",
+        "explanation": "样例",
+        "is_hidden": false,
+        "sort_order": 1
+      },
+      {
+        "input": "173.56",
+        "output": "-99.59 -147.26",
+        "explanation": "test",
+        "is_hidden": true,
+        "sort_order": 2
+      },
+      {
+        "input": "123",
+        "output": "-150.15 -238.27",
+        "explanation": "test1",
+        "is_hidden": true,
+        "sort_order": 3
+      },
+      {
+        "input": "213",
+        "output": "-60.15 -76.27",
+        "explanation": "test2",
+        "is_hidden": true,
+        "sort_order": 4
+      },
+      {
+        "input": "111",
+        "output": "-162.15 -259.87",
+        "explanation": "test3",
+        "is_hidden": true,
+        "sort_order": 5
+      },
+      {
+        "input": "199",
+        "output": "-74.15 -101.47",
+        "explanation": "test4",
+        "is_hidden": true,
+        "sort_order": 6
+      }
+    ]
+  },
+  {
+    "title": "[GESP202412 一级] 奇数和偶数",
+    "description": "小杨有 $n$ 个正整数，他想知道其中的奇数有多少个，偶数有多少个。",
+    "input_format": "第一行包含一个正整数 $n$，代表正整数个数。\r\n\n\t    之后 $n$ 行，每行包含一个正整数。",
+    "output_format": "输出两个正整数（英文空格间隔），代表奇数的个数和偶数的个数。如奇数或偶数的个数为 $0$，则对应输出 $0$。",
+    "data_range": "对于全部数据，保证有 $1\\leq n\\leq 10^5$ 且正整数不超过 $10^5$。",
+    "time_limit": 1000,
+    "memory_limit": 128,
+    "level": 1,
+    "publish_date": "2024-12-01",
+    "samples": [
+      {
+        "input": "5\r\n1\r\n2\r\n3\r\n4\r\n5",
+        "output": "3 2",
+        "explanation": "样例",
+        "is_hidden": false,
+        "sort_order": 1
+      },
+      {
+        "input": "5\n1\n2\n3\n4\n5",
+        "output": "3 2",
+        "explanation": "test",
+        "is_hidden": true,
+        "sort_order": 2
+      },
+      {
+        "input": "10\n23\n42\n63\n12\n54\n23\n16\n73\n444\n634",
+        "output": "4 6",
+        "explanation": "test1",
+        "is_hidden": true,
+        "sort_order": 3
+      },
+      {
+        "input": "3\n111\n5435\n7332",
+        "output": "2 1",
+        "explanation": "test2",
+        "is_hidden": true,
+        "sort_order": 4
+      },
+      {
+        "input": "4\n999\n222\n4444\n6345",
+        "output": "2 2",
+        "explanation": "test3",
+        "is_hidden": true,
+        "sort_order": 5
+      },
+      {
+        "input": "3\n10\n20\n30",
+        "output": "0 3",
+        "explanation": "test4",
+        "is_hidden": true,
+        "sort_order": 6
+      },
+      {
+        "input": "4\n7\n13\n29\n45",
+        "output": "4 0",
+        "explanation": "test5",
+        "is_hidden": true,
+        "sort_order": 7
+      },
+      {
+        "input": "7\n99999\n100000\n12345\n67890\n111\n222\n333",
+        "output": "4 3",
+        "explanation": "test6",
+        "is_hidden": true,
+        "sort_order": 8
+      }
+    ]
+  },
+  {
+    "title": "[GESP202409 一级] 美丽数字",
+    "description": "小杨有 $n$ 个正整数，他认为一个正整数是美丽数字当且仅当该正整数是 $9$ 的倍数但不是 $8$ 的倍数。\r\n\n\t    小杨想请你编写一个程序计算 $n$ 个正整数中美丽数字的数量。",
+    "input_format": "第一行包含一个整数 $n$，代表正整数个数。  \r\n\n\t    第二行有 $n$ 个正整数 $a_1, a_2, \\dots a_n$。",
+    "output_format": "输出一个整数，表示其中美丽数字的数量。",
+    "data_range": "样例 1 解释\r\n\n\t1.  $1$ 既不是 $9$ 的倍数也不是 $8$ 的倍数。\r\n\n\t2.  $9$ 是 $9$ 的倍数不是 $8$ 的倍数。\r\n\n\t3.  $72$ 既是 $9$ 的倍数又是 $8$ 的倍数。\r\n\n\t数据规模与约定\r\n\n\t对全部的测试数据，保证 $1 \\leq n, a_i \\leq 10^5$。",
+    "time_limit": 1000,
+    "memory_limit": 128,
+    "level": 1,
+    "publish_date": "2024-09-01",
+    "samples": [
+      {
+        "input": "3\r\n1 9 72",
+        "output": "1",
+        "explanation": "样例",
+        "is_hidden": false,
+        "sort_order": 1
+      },
+      {
+        "input": "5\n1 8 23 543 23463",
+        "output": "1",
+        "explanation": "test1",
+        "is_hidden": true,
+        "sort_order": 2
+      },
+      {
+        "input": "3\n5646 2342 7643",
+        "output": "0",
+        "explanation": "test2",
+        "is_hidden": true,
+        "sort_order": 3
+      },
+      {
+        "input": "4\n22 33 44 55",
+        "output": "0",
+        "explanation": "test3",
+        "is_hidden": true,
+        "sort_order": 4
+      },
+      {
+        "input": "6\n9 18 27 36 45 54",
+        "output": "6",
+        "explanation": "test4",
+        "is_hidden": true,
+        "sort_order": 5
+      },
+      {
+        "input": "4\n8 16 72 144",
+        "output": "0",
+        "explanation": "test5",
+        "is_hidden": true,
+        "sort_order": 6
+      },
+      {
+        "input": "7\n99999 100000 12345 67890 9999 8888 7272",
+        "output": "2",
+        "explanation": "test6",
+        "is_hidden": true,
+        "sort_order": 7
+      }
+    ]
+  },
+  {
+    "title": "[GESP202409 一级] 小杨购物",
+    "description": "小杨有 $n$ 元钱用于购物。商品 A 的单价是 $a$ 元，商品 B 的单价是 $b$ 元。小杨想购买相同数量的商品 A 和商品 B。\r\n\n\t    请你编写程序帮助小杨计算出他最多能够购买多少个商品 A 和商品 B。",
+    "input_format": "第一行包含一个正整数 $n$，代表小杨用于购物的金额。\r\n\n\t    第二行包含一个正整数 $a$，代表商品 A 的单价。\r\n\n\t    第三行包含一个正整数 $b$，代表商品 B 的单价。",
+    "output_format": "输出一行，包含一个整数，代表小杨最多能够购买的商品 A 和商品 B 的数量。",
+    "data_range": "样例 1 解释\r\n\n\t    对于样例 1，由于需要购买相同数量的两种商品，因此⼩杨最多能够购买 $4$  件商品 $A$ 和 $4$ 件商品 $B$，共花费 $1 \\times 4 + 2 \\times 4 = 12$ 元。因此，样例 1 的答案为 $4$。\r\n\n\t样例 2 解释\r\n\n\t对于输入：\r\n\n13\r\n1\r\n2\r\n应该输出：\r\n\n4\r\n\n\t    对于样例 1，由于需要购买相同数量的两种商品，因此⼩杨最多能够购买 $4$  件商品 $A$ 和 $4$ 件商品 $B$，共花费 $1 \\times 4 + 2 \\times 4 = 12$ 元。因此，样例 1 的答案为 $4$。如果小杨想购买 $5$ 件商品 $A$ 和商品 $B$，则需要花费 $1 \\times 5 + 2 \\times 5 = 15$ 元，超过了小样的预算 $13$ 元。因此，样例 2 答案为 $4$。\r\n\n\t数据规模与约定\r\n\n\t    对全部的测试数据，保证 $1 \\leq n,a,b \\leq 10^5$。",
+    "time_limit": 1000,
+    "memory_limit": 128,
+    "level": 1,
+    "publish_date": "2024-09-01",
+    "samples": [
+      {
+        "input": "12\r\n1\r\n2",
+        "output": "4",
+        "explanation": "样例",
+        "is_hidden": false,
+        "sort_order": 1
+      },
+      {
+        "input": "13\n1\n2",
+        "output": "4",
+        "explanation": "test",
+        "is_hidden": true,
+        "sort_order": 2
+      },
+      {
+        "input": "1765 34 52",
+        "output": "20",
+        "explanation": "test1",
+        "is_hidden": true,
+        "sort_order": 3
+      },
+      {
+        "input": "4353 22 2",
+        "output": "181",
+        "explanation": "test2",
+        "is_hidden": true,
+        "sort_order": 4
+      },
+      {
+        "input": "100\n5\n5",
+        "output": "10",
+        "explanation": "test3",
+        "is_hidden": true,
+        "sort_order": 5
+      },
+      {
+        "input": "25\n3\n4",
+        "output": "3",
+        "explanation": "test4",
+        "is_hidden": true,
+        "sort_order": 6
+      },
+      {
+        "input": "100000\n100000\n100000",
+        "output": "0",
+        "explanation": "test5",
+        "is_hidden": true,
+        "sort_order": 7
+      }
+    ]
+  },
+  {
+    "title": "[GESP202406 一级] 立方数",
+    "description": "小杨有一个正整数 $n$，他想知道 $n$ 是否是一个立方数。一个正整数 $n$ 是立方数当且仅当存在一个正整数 $x$ 满足 $x\\times x\\times x=n$ 。",
+    "input_format": "第一行包含一个正整数 $n$。",
+    "output_format": "如果正整数 $n$ 是一个立方数，输出 `Yes`，否则输出 `No`。",
+    "data_range": "对于样例 1，存在正整数 $2$ 使得 $8=2\\times 2\\times 2$ ，因此 $8$ 为立方数。\r\n\n\t    对于样例 $2$，不存在满足条件的正整数，因此 $9$ 不为立方数。\r\n\n\t    对于全部数据，保证有 $1 \\le n \\le 1000$。",
+    "time_limit": 1000,
+    "memory_limit": 128,
+    "level": 1,
+    "publish_date": "2024-06-01",
+    "samples": [
+      {
+        "input": "8",
+        "output": "Yes",
+        "explanation": "样例",
+        "is_hidden": false,
+        "sort_order": 1
+      },
+      {
+        "input": "9",
+        "output": "No",
+        "explanation": "test",
+        "is_hidden": true,
+        "sort_order": 2
+      },
+      {
+        "input": "567",
+        "output": "No",
+        "explanation": "test1",
+        "is_hidden": true,
+        "sort_order": 3
+      },
+      {
+        "input": "333",
+        "output": "No",
+        "explanation": "test2",
+        "is_hidden": true,
+        "sort_order": 4
+      },
+      {
+        "input": "897",
+        "output": "No",
+        "explanation": "test3",
+        "is_hidden": true,
+        "sort_order": 5
+      },
+      {
+        "input": "999",
+        "output": "No",
+        "explanation": "test4",
+        "is_hidden": true,
+        "sort_order": 6
+      },
+      {
+        "input": "378",
+        "output": "No",
+        "explanation": "test5",
+        "is_hidden": true,
+        "sort_order": 7
+      },
+      {
+        "input": "573",
+        "output": "No",
+        "explanation": "test6",
+        "is_hidden": true,
+        "sort_order": 8
+      }
+    ]
+  },
+  {
+    "title": "[GESP202406 一级] 休息时间",
+    "description": "小杨计划在某个时刻开始学习，并决定在学习 $k$ 秒后开始休息。\r\n\n\t    小杨想知道自己开始休息的时刻是多少。",
+    "input_format": "前三行每行包含一个整数，分别表示小杨开始学习时刻的时 $h$、分 $m$、秒 $s$（$h,m, s$ 的值符合\r\n\n\t$1 \\le h \\le 12,0 \\le m\\le 59,0 \\le s\\le59$）。\r\n\n\t    第四行包含一个整数 $k$，表示小杨学习的总秒数（注：$k$ 的值符合 $1 \\le k \\le 3600$）。",
+    "output_format": "输出一行，包含三个整数，分别表示小杨开始休息时刻的时、分、秒。",
+    "data_range": "小杨在时刻 12:59:59 开始学习，学习 10 秒后开始休息，即在 13:0:9 时刻开始休息。\r\n\n\t    对于全部数据，保证有  $1 \\le h \\le 12$，$0 \\le m\\le 59$，$0 \\le s\\le 59$，$1 \\le k \\le 3600$。",
+    "time_limit": 1000,
+    "memory_limit": 128,
+    "level": 1,
+    "publish_date": "2024-06-01",
+    "samples": [
+      {
+        "input": "12\r\n59\r\n59\r\n10",
+        "output": "13 0 9",
+        "explanation": "样例",
+        "is_hidden": false,
+        "sort_order": 1
+      },
+      {
+        "input": "9\n30\n45\n1200",
+        "output": "9 50 45",
+        "explanation": "test_1",
+        "is_hidden": true,
+        "sort_order": 2
+      },
+      {
+        "input": "12\n59\n59\n3600",
+        "output": "13 59 59",
+        "explanation": "test_2",
+        "is_hidden": true,
+        "sort_order": 3
+      },
+      {
+        "input": "1\n0\n0\n1800",
+        "output": "1 30 0",
+        "explanation": "test_3",
+        "is_hidden": true,
+        "sort_order": 4
+      },
+      {
+        "input": "6\n45\n15\n900",
+        "output": "7 0 15",
+        "explanation": "test_4",
+        "is_hidden": true,
+        "sort_order": 5
+      },
+      {
+        "input": "11\n11\n11\n1",
+        "output": "11 11 12",
+        "explanation": "test_5",
+        "is_hidden": true,
+        "sort_order": 6
+      }
+    ]
+  },
+  {
+    "title": "[GESP202403 一级] 找因数",
+    "description": "小 A 最近刚刚学习了因数的概念，具体来说，如果一个正整数 $a$ 可以被另一个正整数 $b$ 整除，那么我们就说 $b$ 是 $a$ 的因数。\r\n\n\t    请你帮忙写一个程序，从小到大输出正整数 $a$ 的所有因数。",
+    "input_format": "输入一行一个正整数 $a$。保证 $a\\leq1000$。",
+    "output_format": "输出若干行，为 $a$ 的所有约数，从小到大排序。",
+    "data_range": "",
+    "time_limit": 1000,
+    "memory_limit": 128,
+    "level": 1,
+    "publish_date": "2024-03-01",
+    "samples": [
+      {
+        "input": "10",
+        "output": "1\r\n2\r\n5\r\n10",
+        "explanation": "样例",
+        "is_hidden": false,
+        "sort_order": 1
+      },
+      {
+        "input": "6",
+        "output": "1\n2\n3\n6",
+        "explanation": "test",
+        "is_hidden": true,
+        "sort_order": 2
+      },
+      {
+        "input": "999",
+        "output": "1\n3\n9\n27\n37\n111\n333\n999",
+        "explanation": "test_1",
+        "is_hidden": true,
+        "sort_order": 3
+      },
+      {
+        "input": "457",
+        "output": "1\n457",
+        "explanation": "test_2",
+        "is_hidden": true,
+        "sort_order": 4
+      },
+      {
+        "input": "745",
+        "output": "1\n5\n149\n745",
+        "explanation": "test_3",
+        "is_hidden": true,
+        "sort_order": 5
+      },
+      {
+        "input": "252",
+        "output": "1\n2\n3\n4\n6\n7\n9\n12\n14\n18\n21\n28\n36\n42\n63\n84\n126\n252",
+        "explanation": "test_4",
+        "is_hidden": true,
+        "sort_order": 6
+      },
+      {
+        "input": "834",
+        "output": "1\n2\n3\n6\n139\n278\n417\n834",
+        "explanation": "test_5",
+        "is_hidden": true,
+        "sort_order": 7
+      }
+    ]
+  },
+  {
+    "title": "[GESP202312 一级] 小杨报数",
+    "description": "小杨需要从 $1$ 到 $N$ 报数。在报数过程中，小杨希望跳过 $M$ 的倍数。例如，如果 $N=5$， $M=2$ ，那么小杨就需要依次报出 $1$、$3$、$5$。\r\n\n\t    现在，请你依次输出小杨报的数。",
+    "input_format": "输入 $2$ 行，第一行一个整数 $N（1 \\le N \\le 1,000）$；第二行一个整数 $M（2 \\le M \\le 100）$。",
+    "output_format": "输出若干行，依次表示小杨报的数。",
+    "data_range": "",
+    "time_limit": 1000,
+    "memory_limit": 128,
+    "level": 1,
+    "publish_date": "2023-12-01",
+    "samples": [
+      {
+        "input": "5\r\n2",
+        "output": "1\r\n3\r\n5",
+        "explanation": "样例",
+        "is_hidden": false,
+        "sort_order": 1
+      },
+      {
+        "input": "10\n3",
+        "output": "1\n2\n4\n5\n7\n8\n10",
+        "explanation": "test",
+        "is_hidden": true,
+        "sort_order": 2
+      },
+      {
+        "input": "5\n2",
+        "output": "1\n3\n5",
+        "explanation": "test_1",
+        "is_hidden": true,
+        "sort_order": 3
+      },
+      {
+        "input": "10\n3",
+        "output": "1\n2\n4\n5\n7\n8\n10",
+        "explanation": "test_2",
+        "is_hidden": true,
+        "sort_order": 4
+      },
+      {
+        "input": "15\n5",
+        "output": "1\n2\n3\n4\n6\n7\n8\n9\n11\n12\n13\n14",
+        "explanation": "test_3",
+        "is_hidden": true,
+        "sort_order": 5
+      },
+      {
+        "input": "7\n7",
+        "output": "1\n2\n3\n4\n5\n6",
+        "explanation": "test_4",
+        "is_hidden": true,
+        "sort_order": 6
+      },
+      {
+        "input": "20\n4",
+        "output": "1\n2\n3\n5\n6\n7\n9\n10\n11\n13\n14\n15\n17\n18\n19",
+        "explanation": "test_5",
+        "is_hidden": true,
+        "sort_order": 7
+      }
+    ]
+  },
+  {
+    "title": "[GESP202312 一级] 小杨的考试",
+    "description": "今天是星期 $X$，小杨还有 $N$ 天就要考试了，你能推算出小杨考试那天是星期几吗？（本题中使用 $7$ 表示星期日）",
+    "input_format": "输入 $2$ 行，第一行一个整数 $X(1\\le X \\le 7)$；第二行一个整数 $N(1≤N≤364)$。",
+    "output_format": "输出一个整数，表示小杨考试那天是星期几。",
+    "data_range": "样例解释\r\n\n\t    今天是星期 1，那么 6 天后就是星期日，星期日在本题中用 $7$ 表示。",
+    "time_limit": 1000,
+    "memory_limit": 128,
+    "level": 1,
+    "publish_date": "2023-12-01",
+    "samples": [
+      {
+        "input": "1\r\n6",
+        "output": "7",
+        "explanation": "样例",
+        "is_hidden": false,
+        "sort_order": 1
+      },
+      {
+        "input": "5\n3",
+        "output": "1",
+        "explanation": "test",
+        "is_hidden": true,
+        "sort_order": 2
+      },
+      {
+        "input": "5\n2",
+        "output": "7",
+        "explanation": "test_1",
+        "is_hidden": true,
+        "sort_order": 3
+      },
+      {
+        "input": "10\n3",
+        "output": "6",
+        "explanation": "test_2",
+        "is_hidden": true,
+        "sort_order": 4
+      },
+      {
+        "input": "15\n5",
+        "output": "6",
+        "explanation": "test_3",
+        "is_hidden": true,
+        "sort_order": 5
+      },
+      {
+        "input": "7\n7",
+        "output": "7",
+        "explanation": "test_4",
+        "is_hidden": true,
+        "sort_order": 6
+      },
+      {
+        "input": "20\n4",
+        "output": "3",
+        "explanation": "test_5",
+        "is_hidden": true,
+        "sort_order": 7
+      }
+    ]
+  },
+  {
+    "title": "[GESP202309 一级] 买文具",
+    "description": "开学了，小明来到文具店选购文具。签字笔 $2$ 元一支，他需要 $X$ 支；记事本 $5$ 元一本，他需要 $Y$ 本；直尺 $3$ 元一把，他需要 $Z$ 把。小明手里有 $Q$ 元钱。请你通过编程帮小明算算，他手里的钱是否够买他需要的文具。",
+    "input_format": "第一行包含一个正整数，是小明购买签字笔的数量。约定 $1 \\le X \\le 10$。\r\n\n\t    第二行包含一个正整数，是小明购买记事本的数量。约定 $1 \\le Y \\le 10$。\r\n\n\t    第三行包含一个正整数，是小明购买直尺的数量。约定 $1 \\le Z \\le 10$。\r\n\n\t    第四行包含一个正整数 $Q$，是小明手里的钱数（单位：元）。",
+    "output_format": "输出 $2$ 行。如果小明手里的钱够买他需要的文具，则第一行输出 Yes，第二行输出小明会剩下的钱数（单位：元）；否则，第一行输出 No，第二行输出小明缺少的钱数（单位：元）。",
+    "data_range": "",
+    "time_limit": 1000,
+    "memory_limit": 128,
+    "level": 1,
+    "publish_date": "2023-09-01",
+    "samples": [
+      {
+        "input": "1\r\n1\r\n1\r\n20",
+        "output": "Yes\r\n10",
+        "explanation": "样例",
+        "is_hidden": false,
+        "sort_order": 1
+      },
+      {
+        "input": "1\n1\n1\n5",
+        "output": "No\n5",
+        "explanation": "test",
+        "is_hidden": true,
+        "sort_order": 2
+      },
+      {
+        "input": "2\n3\n4\n30",
+        "output": "No\n1",
+        "explanation": "test_1",
+        "is_hidden": true,
+        "sort_order": 3
+      },
+      {
+        "input": "5\n2\n1\n20",
+        "output": "No\n3",
+        "explanation": "test_2",
+        "is_hidden": true,
+        "sort_order": 4
+      },
+      {
+        "input": "10\n10\n10\n100",
+        "output": "Yes\n0",
+        "explanation": "test_3",
+        "is_hidden": true,
+        "sort_order": 5
+      },
+      {
+        "input": "3\n1\n2\n15",
+        "output": "No\n2",
+        "explanation": "test_4",
+        "is_hidden": true,
+        "sort_order": 6
+      },
+      {
+        "input": "1\n2\n3\n25",
+        "output": "Yes\n4",
+        "explanation": "test_5",
+        "is_hidden": true,
+        "sort_order": 7
+      }
+    ]
+  },
+  {
+    "title": "[GESP202309 一级] 小明的幸运数",
+    "description": "所有个位数为 $k$ 的正整数，以及所有 $k$ 的倍数，都被小明称为“ $k$ 幸运数”。小明想知道正整数 $L$ 和 $R$ 之间（包括 $L$ 和 $R$）所有 $k$ 幸运数的和，你能帮帮他吗？",
+    "input_format": "输入 $3$ 行。第一行包含一个正整数 $k$，第二行包含一个正整数 $L$，第三行包含一个正整数 $R$。约定 $2 \\le k \\le 9$，$1 \\le L \\le R \\le 1000$。",
+    "output_format": "输出 $1$ 行，符合题意的幸运数之和。",
+    "data_range": "样例解释 ：\r\n\n\t    $1$ 和 $10$ 之间共有 $1$ 个 $7$ 幸运数：$7$。因为 $7$ 既是 $7$ 的倍数，个位数又为 $7$。因此，结果为 $7$。",
+    "time_limit": 1000,
+    "memory_limit": 128,
+    "level": 1,
+    "publish_date": "2023-09-01",
+    "samples": [
+      {
+        "input": "7\r\n1\r\n10",
+        "output": "7",
+        "explanation": "样例",
+        "is_hidden": false,
+        "sort_order": 1
+      },
+      {
+        "input": "7\n10\n20",
+        "output": "31",
+        "explanation": "test",
+        "is_hidden": true,
+        "sort_order": 2
+      },
+      {
+        "input": "3\n2\n4\n50",
+        "output": "3",
+        "explanation": "test_1",
+        "is_hidden": true,
+        "sort_order": 3
+      },
+      {
+        "input": "5\n5\n5\n60",
+        "output": "5",
+        "explanation": "test_2",
+        "is_hidden": true,
+        "sort_order": 4
+      },
+      {
+        "input": "2\n3\n1\n25",
+        "output": "0",
+        "explanation": "test_3",
+        "is_hidden": true,
+        "sort_order": 5
+      },
+      {
+        "input": "10\n10\n10\n100",
+        "output": "10",
+        "explanation": "test_4",
+        "is_hidden": true,
+        "sort_order": 6
+      },
+      {
+        "input": "1\n2\n3\n20",
+        "output": "5",
+        "explanation": "test_5",
+        "is_hidden": true,
+        "sort_order": 7
+      }
+    ]
+  },
+  {
+    "title": "[GESP202306 一级] 时间规划",
+    "description": "小明在为自己规划学习时间。现在他想知道两个时刻之间有多少分钟，你能通过编程帮他做到吗？",
+    "input_format": "输入 $4$ 行，第一行为开始时刻的小时，第二行为开始时刻的分钟，第三行为结束时刻的小时，第四行为结束时刻的分钟。输入保证两个时刻是同一天，开始时刻一定在结束时刻之前。时刻使用 $24$ 小时制，即小时在 $0$ 到 $23$ 之间，分钟在 $0$ 到 $59$ 之间。",
+    "output_format": "输出一行，包含一个整数，从开始时刻到结束时刻之间有多少分钟。",
+    "data_range": "",
+    "time_limit": 1000,
+    "memory_limit": 128,
+    "level": 1,
+    "publish_date": "2023-06-01",
+    "samples": [
+      {
+        "input": "9\r\n5\r\n9\r\n6",
+        "output": "1",
+        "explanation": "样例",
+        "is_hidden": false,
+        "sort_order": 1
+      },
+      {
+        "input": "9\n5\n10\n0",
+        "output": "55",
+        "explanation": "test",
+        "is_hidden": true,
+        "sort_order": 2
+      },
+      {
+        "input": "5\n20\n35",
+        "output": "1780",
+        "explanation": "test_1",
+        "is_hidden": true,
+        "sort_order": 3
+      },
+      {
+        "input": "3\n1\n15",
+        "output": "719",
+        "explanation": "test_2",
+        "is_hidden": true,
+        "sort_order": 4
+      },
+      {
+        "input": "8\n50\n70",
+        "output": "3670",
+        "explanation": "test_3",
+        "is_hidden": true,
+        "sort_order": 5
+      },
+      {
+        "input": "2\n100\n110",
+        "output": "6380",
+        "explanation": "test_4",
+        "is_hidden": true,
+        "sort_order": 6
+      },
+      {
+        "input": "9\n80\n95",
+        "output": "5080",
+        "explanation": "test_5",
+        "is_hidden": true,
+        "sort_order": 7
+      }
+    ]
+  },
+  {
+    "title": "[GESP202306 一级] 累计相加",
+    "description": "输入一个正整数 $n$，求形如：\r\n\n\t$1+(1+2)+(1+2+3)+(1+2+3+4)+ \\cdots  +(1+2+3+4+5+ \\cdots  +n)$ 的累计相加。",
+    "input_format": "输入一个正整数 $n$。约定 $1<n \\le 100$。",
+    "output_format": "输出累计相加的结果。",
+    "data_range": "",
+    "time_limit": 1000,
+    "memory_limit": 128,
+    "level": 1,
+    "publish_date": "2023-06-01",
+    "samples": [
+      {
+        "input": "3",
+        "output": "10",
+        "explanation": "样例",
+        "is_hidden": false,
+        "sort_order": 1
+      },
+      {
+        "input": "4",
+        "output": "20",
+        "explanation": "test",
+        "is_hidden": true,
+        "sort_order": 2
+      },
+      {
+        "input": "99",
+        "output": "166650",
+        "explanation": "test_1",
+        "is_hidden": true,
+        "sort_order": 3
+      },
+      {
+        "input": "54",
+        "output": "27720",
+        "explanation": "test_2",
+        "is_hidden": true,
+        "sort_order": 4
+      },
+      {
+        "input": "8",
+        "output": "120",
+        "explanation": "test_3",
+        "is_hidden": true,
+        "sort_order": 5
+      },
+      {
+        "input": "26",
+        "output": "3276",
+        "explanation": "test_4",
+        "is_hidden": true,
+        "sort_order": 6
+      },
+      {
+        "input": "75",
+        "output": "73150",
+        "explanation": "test_5",
+        "is_hidden": true,
+        "sort_order": 7
+      }
+    ]
+  },
+  {
+    "title": "[GESP202303 一级] 每月天数",
+    "description": "小明刚刚学习了每月有多少天，以及如何判断平年和闰年，想到可以使用编程方法求出给定的月份有多少天。你能做到吗？",
+    "input_format": "输入一行，包含两个整数 $A, B$，分别表示一个日期的年、月。约定 $2000 \\leq A \\leq 3000$，$1 \\leq B \\leq 12$。",
+    "output_format": "输出一行，包含一个整数，表示输入月份有多少天。",
+    "data_range": "",
+    "time_limit": 1000,
+    "memory_limit": 128,
+    "level": 1,
+    "publish_date": "2023-03-01",
+    "samples": [
+      {
+        "input": "2022 1",
+        "output": "31",
+        "explanation": "样例",
+        "is_hidden": false,
+        "sort_order": 1
+      },
+      {
+        "input": "2020 2",
+        "output": "29",
+        "explanation": "test",
+        "is_hidden": true,
+        "sort_order": 2
+      },
+      {
+        "input": "2023 2",
+        "output": "28",
+        "explanation": "test_1",
+        "is_hidden": true,
+        "sort_order": 3
+      },
+      {
+        "input": "2100 2",
+        "output": "28",
+        "explanation": "test_2",
+        "is_hidden": true,
+        "sort_order": 4
+      },
+      {
+        "input": "2412 1",
+        "output": "31",
+        "explanation": "test_3",
+        "is_hidden": true,
+        "sort_order": 5
+      },
+      {
+        "input": "2015 12",
+        "output": "31",
+        "explanation": "test_4",
+        "is_hidden": true,
+        "sort_order": 6
+      },
+      {
+        "input": "2019 3",
+        "output": "31",
+        "explanation": "test_5",
+        "is_hidden": true,
+        "sort_order": 7
+      }
+    ]
+  },
+  {
+    "title": "[GESP202303 一级] 长方形面积",
+    "description": "小明刚刚学习了如何计算长方形面积。他发现，如果一个长方形的长和宽都是整数，它的面积一定也是整数。现在，小明想知道如果给定长方形的面积，有多少种可能的长方形，满足长和宽都是整数？如果两个长方形的长相等、宽也相等，则认为是同一种长方形。约定长方形的长大于等于宽。正方形是长方形的特例，即长方形的长和宽可以相等。",
+    "input_format": "输入一行，包含一个整数 $A$，表示长方形的面积。约定 $2 \\leq A \\leq 1000$。",
+    "output_format": "输出一行，包含一个整数 $C$，表示有 $C$ 种可能的长方形。",
+    "data_range": "【样例 1 解释】\r\n\n\t    有 $2$ 种长方形面积为 $4$，它们的长宽分别为 $2 \\times 2$，$4 \\times 1$。",
+    "time_limit": 1000,
+    "memory_limit": 128,
+    "level": 1,
+    "publish_date": "2023-03-01",
+    "samples": [
+      {
+        "input": "4",
+        "output": "2",
+        "explanation": "样例",
+        "is_hidden": false,
+        "sort_order": 1
+      },
+      {
+        "input": "6",
+        "output": "2",
+        "explanation": "test",
+        "is_hidden": true,
+        "sort_order": 2
+      },
+      {
+        "input": "12",
+        "output": "3",
+        "explanation": "test_1",
+        "is_hidden": true,
+        "sort_order": 3
+      },
+      {
+        "input": "55",
+        "output": "2",
+        "explanation": "test_2",
+        "is_hidden": true,
+        "sort_order": 4
+      },
+      {
+        "input": "78",
+        "output": "4",
+        "explanation": "test_3",
+        "is_hidden": true,
+        "sort_order": 5
+      },
+      {
+        "input": "99",
+        "output": "3",
+        "explanation": "test_4",
+        "is_hidden": true,
+        "sort_order": 6
+      },
+      {
+        "input": "100",
+        "output": "5",
+        "explanation": "test_5",
+        "is_hidden": true,
+        "sort_order": 7
+      }
+    ]
+  },
+  {
+    "title": "[GESP202403 一级] 小杨买书",
+    "description": "小杨同学积攒了一部分零用钱想要用来购买书籍，已知一本书的单价是 $13$ 元，请根据小杨零用钱的金额，编写程序计算可以购买多少本书，还剩多少零用钱。",
+    "input_format": "输入一个正整数 $m$，表示小杨拥有的零用钱数。",
+    "output_format": "输出包含两行，第一行，购买图书的本数；第二行，剩余的零用钱数。",
+    "data_range": "输入样例2：\n\n\t100\r\n\n\t样例2输出：\r\n\n\t7\r\n\n\t9\r\n\n\t对全部的测试数据，保证 $0 < m < 200$。",
+    "time_limit": 1000,
+    "memory_limit": 128,
+    "level": 1,
+    "publish_date": "2024-03-01",
+    "samples": [
+      {
+        "input": "100",
+        "output": "7\r\n9",
+        "explanation": "样例",
+        "is_hidden": false,
+        "sort_order": 1
+      },
+      {
+        "input": "199",
+        "output": "15\n4",
+        "explanation": "test",
+        "is_hidden": true,
+        "sort_order": 2
+      },
+      {
+        "input": "29",
+        "output": "2\n3",
+        "explanation": "test_1",
+        "is_hidden": true,
+        "sort_order": 3
+      },
+      {
+        "input": "67",
+        "output": "5\n2",
+        "explanation": "test_2",
+        "is_hidden": true,
+        "sort_order": 4
+      },
+      {
+        "input": "109",
+        "output": "8\n5",
+        "explanation": "test_3",
+        "is_hidden": true,
+        "sort_order": 5
+      },
+      {
+        "input": "199",
+        "output": "15\n4",
+        "explanation": "test_4",
+        "is_hidden": true,
+        "sort_order": 6
+      },
+      {
+        "input": "100",
+        "output": "7\n9",
+        "explanation": "test_5",
+        "is_hidden": true,
+        "sort_order": 7
+      }
+    ]
+  },
+  {
+    "title": "[GESP202509 一级] 金字塔",
+    "description": "金字塔由 $n$ 层石块垒成。从塔底向上，每层依次需要 $n \\times n, (n-1) \\times (n-1), \\cdots, 2 \\times 2, 1 \\times 1$ 块石块。请问搭建金字塔总共需要多少块石块？",
+    "input_format": "一行，一个正整数 $n$，表示金字塔的层数。",
+    "output_format": "一行，一个正整数，表示搭建金字塔所需的石块数量。",
+    "data_range": "测试样例2：\n\n5\r\n\n\t样例2输出：\r\n\n55\r\n\n\t对于所有测试点，保证 $1 \\leq n \\leq 50$。",
+    "time_limit": 1000,
+    "memory_limit": 128,
+    "level": 1,
+    "publish_date": "2025-09-01",
+    "samples": [
+      {
+        "input": "2",
+        "output": "5",
+        "explanation": "样例",
+        "is_hidden": false,
+        "sort_order": 1
+      },
+      {
+        "input": "5",
+        "output": "55",
+        "explanation": "test",
+        "is_hidden": true,
+        "sort_order": 2
+      },
+      {
+        "input": "50",
+        "output": "42925",
+        "explanation": "test_1",
+        "is_hidden": true,
+        "sort_order": 3
+      },
+      {
+        "input": "20",
+        "output": "2870",
+        "explanation": "test_2",
+        "is_hidden": true,
+        "sort_order": 4
+      },
+      {
+        "input": "40",
+        "output": "22140",
+        "explanation": "test_3",
+        "is_hidden": true,
+        "sort_order": 5
+      },
+      {
+        "input": "30",
+        "output": "9455",
+        "explanation": "test_4",
+        "is_hidden": true,
+        "sort_order": 6
+      },
+      {
+        "input": "10",
+        "output": "385",
+        "explanation": "test_5",
+        "is_hidden": true,
+        "sort_order": 7
+      },
+      {
+        "input": "33",
+        "output": "12529",
+        "explanation": "test_6",
+        "is_hidden": true,
+        "sort_order": 8
+      }
+    ]
+  },
+  {
+    "title": "[GESP202509 一级] 商店折扣",
+    "description": "商店正在开展促销活动，给出了两种方案的折扣优惠。第一种方案是购物满 $x$ 元减 $y$ 元；第二种方案是直接打 $n$ 折，也就是说价格变为原先的 $n/10$。这里的 $x, y, n$ 均是正整数，并且 $1 \\leq y < x$，$1 \\leq n < 10$。\r\n\n\t    需要注意的是，第一种方案中满减优惠只能使用一次。例如购物满 $10$ 元减 $3$ 元时，若挑选了价格总和为 $33$ 元的物品，只能减免 $3$ 元，需要支付 $30$ 元。\r\n\n\t    小明在商店挑选了价格总和为 $p$ 元的物品，结账时只能使用一种优惠方案。小明最少需要支付多少钱呢？",
+    "input_format": "四行，四个正整数 $x, y, n, p$，含义见题目描述。",
+    "output_format": "一行，一个小数，表示小明最少需要支付多少钱，保留两位小数。",
+    "data_range": "输入样例2：\r\n\n8\r\n7\r\n2\r\n11\r\n\n\t样例2输出：\r\n\n2.20\r\n\n\t对于所有测试点，保证 $1 \\leq y < x \\leq 100$，$1 \\leq n < 10$，$1 \\leq p \\leq 100$。",
+    "time_limit": 1000,
+    "memory_limit": 128,
+    "level": 1,
+    "publish_date": "2025-09-01",
+    "samples": [
+      {
+        "input": "8\r\n7\r\n9\r\n10",
+        "output": "3.00",
+        "explanation": "样例",
+        "is_hidden": false,
+        "sort_order": 1
+      },
+      {
+        "input": "8\n7\n2\n11",
+        "output": "2.20",
+        "explanation": "test",
+        "is_hidden": true,
+        "sort_order": 2
+      },
+      {
+        "input": "5\n2\n8\n3",
+        "output": "2.40",
+        "explanation": "test_1",
+        "is_hidden": true,
+        "sort_order": 3
+      },
+      {
+        "input": "10\n3\n7\n15",
+        "output": "10.50",
+        "explanation": "test_2",
+        "is_hidden": true,
+        "sort_order": 4
+      },
+      {
+        "input": "20\n5\n8\n25",
+        "output": "20.00",
+        "explanation": "test_3",
+        "is_hidden": true,
+        "sort_order": 5
+      },
+      {
+        "input": "15\n4\n9\n12",
+        "output": "10.80",
+        "explanation": "test_4",
+        "is_hidden": true,
+        "sort_order": 6
+      },
+      {
+        "input": "30\n10\n6\n40",
+        "output": "24.00",
+        "explanation": "test_5",
+        "is_hidden": true,
+        "sort_order": 7
+      }
+    ]
+  }
+]

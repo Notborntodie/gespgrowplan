@@ -1,0 +1,69 @@
+{
+  "title": "[GESP202506 一级] 假期阅读",
+  "description": "小 A 有一本厚厚的书。这本书总共有 $n$ 页，小 A 一天中最多只能阅读完其中的 $k$ 页。小 A 的假期总共有 $t$ 天，他想知道在假期中最多能阅读完这本书的多少页。",
+  "input_format": "第一行，一个正整数 $n$，表示书的页数。\r\n\n\t    第二行，一个正整数 $k$，表示小 A 每天最多阅读的页数。\r\n\n\t    第三行，一个正整数 $t$，表示小 A 假期的天数。",
+  "output_format": "一行，一个整数，表示假期中所能阅读的最多页数。",
+  "data_range": "对于所有测试点，保证 $n,k,t$ 均不超过 $1000$。",
+  "time_limit": 1000,
+  "memory_limit": 128,
+  "level": 1,
+  "publish_date": "2025-06-01",
+  "samples": [
+    {
+      "input": "8\r\n3\r\n2",
+      "output": "6",
+      "explanation": "样例",
+      "is_hidden": false,
+      "sort_order": 1
+    },
+    {
+      "input": "19\n3\n30",
+      "output": "19",
+      "explanation": "test",
+      "is_hidden": true,
+      "sort_order": 2
+    },
+    {
+      "input": "723\n33\n12",
+      "output": "396",
+      "explanation": "test1",
+      "is_hidden": true,
+      "sort_order": 3
+    },
+    {
+      "input": "123\n21\n4",
+      "output": "84",
+      "explanation": "test2",
+      "is_hidden": true,
+      "sort_order": 4
+    },
+    {
+      "input": "87\n11\n2",
+      "output": "22",
+      "explanation": "test3",
+      "is_hidden": true,
+      "sort_order": 5
+    },
+    {
+      "input": "8\n3\n2",
+      "output": "6",
+      "explanation": "test4",
+      "is_hidden": true,
+      "sort_order": 6
+    },
+    {
+      "input": "1000\n1000\n1",
+      "output": "1000",
+      "explanation": "test5",
+      "is_hidden": true,
+      "sort_order": 7
+    },
+    {
+      "input": "1\n1\n1",
+      "output": "1",
+      "explanation": "test6",
+      "is_hidden": true,
+      "sort_order": 8
+    }
+  ]
+}

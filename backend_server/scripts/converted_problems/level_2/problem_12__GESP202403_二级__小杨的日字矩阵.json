@@ -1,0 +1,62 @@
+{
+  "title": "[GESP202403 二级] 小杨的日字矩阵",
+  "description": "小杨想要构造一个 $N\\times N$  的日字矩阵（$N$ 为奇数），具体来说，这个矩阵共有 $N$ 行，每行 $N$ 个字符，其中最左列、最右列都是 `|`，而第一行、最后一行、以及中间一行（即第 $\\frac{N+1}{2}$ 行）的第 $2\\sim N-1$ 个字符都是 `-` ，其余所有字符都是半角小写字母 `x` 。例如，一个 $N = 5$ 日字矩阵如下:\r\n\r\n|---|\r\n|xxx|\r\n|---|\r\n|xxx|\r\n|---|\r\n\n\t    请你帮小杨根据给定的 $N$ 打印出对应的“日字矩阵”。",
+  "input_format": "一行一个整数 $N$（$5\\leq N \\leq 49$，保证 $N$ 为奇数）。",
+  "output_format": "输出对应的“日字矩阵”。\r\n\n\t    请严格按格式要求输出，不要擅自添加任何空格、标点、空格等任何符号。你一个恰好输出 $N$ 行，每行除了换行符外恰好包含 $N$ 个字符，这些字符要么是 `-`，要么是 `|`，要么是 `x`。\r\n\n\t    你的输出必须和标准答案完全一致才能得分，请在提交前仔细检查！",
+  "data_range": "",
+  "time_limit": 1000,
+  "memory_limit": 512,
+  "level": 2,
+  "publish_date": "2024-03-01",
+  "samples": [
+    {
+      "input": "5",
+      "output": "|---|\r\n|xxx|\r\n|---|\r\n|xxx|\r\n|---|",
+      "explanation": "样例",
+      "is_hidden": false,
+      "sort_order": 1
+    },
+    {
+      "input": "7",
+      "output": "|-----|\n|xxxxx|\n|xxxxx|\n|-----|\n|xxxxx|\n|xxxxx|\n|-----|",
+      "explanation": "test",
+      "is_hidden": true,
+      "sort_order": 2
+    },
+    {
+      "input": "49",
+      "output": "|-----------------------------------------------|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|-----------------------------------------------|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|-----------------------------------------------|",
+      "explanation": "test1",
+      "is_hidden": true,
+      "sort_order": 3
+    },
+    {
+      "input": "7",
+      "output": "|-----|\n|xxxxx|\n|xxxxx|\n|-----|\n|xxxxx|\n|xxxxx|\n|-----|",
+      "explanation": "test_1",
+      "is_hidden": true,
+      "sort_order": 4
+    },
+    {
+      "input": "17",
+      "output": "|---------------|\n|xxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxx|\n|---------------|\n|xxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxx|\n|---------------|",
+      "explanation": "test_2",
+      "is_hidden": true,
+      "sort_order": 5
+    },
+    {
+      "input": "37",
+      "output": "|-----------------------------------|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|-----------------------------------|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|-----------------------------------|",
+      "explanation": "test_3",
+      "is_hidden": true,
+      "sort_order": 6
+    },
+    {
+      "input": "47",
+      "output": "|---------------------------------------------|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|---------------------------------------------|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|\n|---------------------------------------------|",
+      "explanation": "test_4",
+      "is_hidden": true,
+      "sort_order": 7
+    }
+  ]
+}

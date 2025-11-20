@@ -1,0 +1,90 @@
+{
+  "title": "[GESP202506 六级] 最大因数",
+  "description": "给定一棵有 $10^9$ 个结点的有根树，这些结点依次以 $1, 2, \\dots, 10^9$ 编号，根结点的编号为 $1$。对于编号为 $k$（$2 \\leq k \\leq 10^9$）的结点，其父结点的编号为 $k$ 的因数中除 $k$ 以外最大的因数。\r\n\n\t    现在有 $q$ 组询问，第 $i$（$1 \\leq i \\leq q$）组询问给定 $x_i, y_i$，请你求出编号分别为 $x_i, y_i$ 的两个结点在这棵树上的距离。两个结点之间的距离是连接这两个结点的简单路径所包含的边数。",
+  "input_format": "第一行，一个正整数 $q$，表示询问组数。\r\n\n\t    接下来 $q$ 行，每行两个正整数 $x_i, y_i$，表示询问结点的编号。",
+  "output_format": "输出共 $q$ 行，每行一个整数，表示结点 $x_i, y_i$ 之间的距离。",
+  "data_range": "测试样例2\r\n\n1\r\n120 650\r\n\n\t样例2输出\r\n\n9\r\n\n\t对于 $60\\%$ 的测试点，保证 $1 \\leq x_i, y_i \\leq 1000$。\r\n\n\t对于所有测试点，保证 $1 \\leq q \\leq 1000$，$1 \\leq x_i, y_i \\leq 10^9$。",
+  "time_limit": 1000,
+  "memory_limit": 128,
+  "level": 6,
+  "publish_date": "2025-06-01",
+  "samples": [
+    {
+      "input": "3\r\n1 3\r\n2 5\r\n4 8",
+      "output": "1\r\n2\r\n1",
+      "explanation": "样例",
+      "is_hidden": false,
+      "sort_order": 1
+    },
+    {
+      "input": "1\n120 650",
+      "output": "9",
+      "explanation": "test",
+      "is_hidden": true,
+      "sort_order": 2
+    },
+    {
+      "input": "1\n120 650",
+      "output": "9",
+      "explanation": "test_1",
+      "is_hidden": true,
+      "sort_order": 3
+    },
+    {
+      "input": "2\n7 7\n100 100",
+      "output": "0\n0",
+      "explanation": "test_2",
+      "is_hidden": true,
+      "sort_order": 4
+    },
+    {
+      "input": "3\n1 1\n1 10\n1 97",
+      "output": "0\n2\n1",
+      "explanation": "test_3",
+      "is_hidden": true,
+      "sort_order": 5
+    },
+    {
+      "input": "2\n7 28\n13 39",
+      "output": "2\n1",
+      "explanation": "test_4",
+      "is_hidden": true,
+      "sort_order": 6
+    },
+    {
+      "input": "2\n8 64\n9 81",
+      "output": "3\n2",
+      "explanation": "test_5",
+      "is_hidden": true,
+      "sort_order": 7
+    },
+    {
+      "input": "2\n6 5\n12 7",
+      "output": "3\n4",
+      "explanation": "test_6",
+      "is_hidden": true,
+      "sort_order": 8
+    },
+    {
+      "input": "2\n16 256\n12 48",
+      "output": "4\n2",
+      "explanation": "test_7",
+      "is_hidden": true,
+      "sort_order": 9
+    },
+    {
+      "input": "5\n3 6\n5 10\n2 12\n15 21\n100 2000",
+      "output": "1\n1\n4\n4\n7",
+      "explanation": "test_8",
+      "is_hidden": true,
+      "sort_order": 10
+    },
+    {
+      "input": "4\n9  18\n17  51\n25  100\n49  343",
+      "output": "1\n1\n2\n1",
+      "explanation": "test_9",
+      "is_hidden": true,
+      "sort_order": 11
+    }
+  ]
+}

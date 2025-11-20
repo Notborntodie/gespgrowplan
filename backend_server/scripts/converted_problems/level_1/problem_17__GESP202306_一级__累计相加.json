@@ -1,0 +1,62 @@
+{
+  "title": "[GESP202306 一级] 累计相加",
+  "description": "输入一个正整数 $n$，求形如：\r\n\n\t$1+(1+2)+(1+2+3)+(1+2+3+4)+ \\cdots  +(1+2+3+4+5+ \\cdots  +n)$ 的累计相加。",
+  "input_format": "输入一个正整数 $n$。约定 $1<n \\le 100$。",
+  "output_format": "输出累计相加的结果。",
+  "data_range": "",
+  "time_limit": 1000,
+  "memory_limit": 128,
+  "level": 1,
+  "publish_date": "2023-06-01",
+  "samples": [
+    {
+      "input": "3",
+      "output": "10",
+      "explanation": "样例",
+      "is_hidden": false,
+      "sort_order": 1
+    },
+    {
+      "input": "4",
+      "output": "20",
+      "explanation": "test",
+      "is_hidden": true,
+      "sort_order": 2
+    },
+    {
+      "input": "99",
+      "output": "166650",
+      "explanation": "test_1",
+      "is_hidden": true,
+      "sort_order": 3
+    },
+    {
+      "input": "54",
+      "output": "27720",
+      "explanation": "test_2",
+      "is_hidden": true,
+      "sort_order": 4
+    },
+    {
+      "input": "8",
+      "output": "120",
+      "explanation": "test_3",
+      "is_hidden": true,
+      "sort_order": 5
+    },
+    {
+      "input": "26",
+      "output": "3276",
+      "explanation": "test_4",
+      "is_hidden": true,
+      "sort_order": 6
+    },
+    {
+      "input": "75",
+      "output": "73150",
+      "explanation": "test_5",
+      "is_hidden": true,
+      "sort_order": 7
+    }
+  ]
+}

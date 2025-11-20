@@ -1,0 +1,55 @@
+{
+  "title": "[GESP202412 一级] 温度转换",
+  "description": "小杨最近学习了开尔文温度、摄氏温度和华氏温度的转换。令符号 $K$ 表开尔文温度，符号 $C$ 表摄氏温度，符号 $F$ 表华氏温度，这三者的转换公式如下：\r\n\n\t$$C=K-273.15\\\\$$\r\n\n\t$$F=C\\times 1.8+32$$\r\n\n\t    现在小杨想编写一个程序计算某一开尔文温度对应的摄氏温度和华氏温度，你能帮帮他吗?",
+  "input_format": "一行，一个实数 $K$，表示开尔文温度。",
+  "output_format": "一行，若输入开尔文温度对应的华氏温度高于 $212$，输出 Temperature is too high!；\r\n\n\t    否则，输出两个由空格分隔的实数 $C$ 和 $F$，分别表示摄氏温度和华氏度，保留两位小数。",
+  "data_range": "$0<K<10^5$。",
+  "time_limit": 1000,
+  "memory_limit": 128,
+  "level": 1,
+  "publish_date": "2024-12-01",
+  "samples": [
+    {
+      "input": "412.00",
+      "output": "Temperature is too high!",
+      "explanation": "样例",
+      "is_hidden": false,
+      "sort_order": 1
+    },
+    {
+      "input": "173.56",
+      "output": "-99.59 -147.26",
+      "explanation": "test",
+      "is_hidden": true,
+      "sort_order": 2
+    },
+    {
+      "input": "123",
+      "output": "-150.15 -238.27",
+      "explanation": "test1",
+      "is_hidden": true,
+      "sort_order": 3
+    },
+    {
+      "input": "213",
+      "output": "-60.15 -76.27",
+      "explanation": "test2",
+      "is_hidden": true,
+      "sort_order": 4
+    },
+    {
+      "input": "111",
+      "output": "-162.15 -259.87",
+      "explanation": "test3",
+      "is_hidden": true,
+      "sort_order": 5
+    },
+    {
+      "input": "199",
+      "output": "-74.15 -101.47",
+      "explanation": "test4",
+      "is_hidden": true,
+      "sort_order": 6
+    }
+  ]
+}
