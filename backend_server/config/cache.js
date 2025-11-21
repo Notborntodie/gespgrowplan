@@ -1,3 +1,13 @@
+// 确保环境变量已加载（如果还没有加载的话）
+if (!process.env.DOTENV_LOADED) {
+  try {
+    require('dotenv').config();
+    process.env.DOTENV_LOADED = 'true';
+  } catch (e) {
+    // dotenv可能已经加载过了，忽略错误
+  }
+}
+
 const Redis = require('ioredis');
 
 // Redis配置（从环境变量读取，如果没有则使用默认值）
@@ -7,8 +17,8 @@ const redisConfig = {
   password: process.env.REDIS_PASSWORD || null, // 如果有密码，请设置
   db: parseInt(process.env.REDIS_DB) || 0,
   // 连接配置
-  lazyConnect: true,
-  enableReadyCheck: false,
+  lazyConnect: false, // 改为false，立即建立连接
+  enableReadyCheck: true,
   // 重试配置
   maxRetriesPerRequest: parseInt(process.env.REDIS_MAX_RETRIES) || 3,
   retryDelayOnFailover: parseInt(process.env.REDIS_RETRY_DELAY) || 100,
@@ -33,7 +43,7 @@ redis.on('ready', () => {
 });
 
 redis.on('error', (error) => {
-  console.error('Redis连接错误:', error);
+  console.error('Redis连接错误:', error.message);
 });
 
 redis.on('close', () => {
@@ -42,6 +52,12 @@ redis.on('close', () => {
 
 redis.on('reconnecting', () => {
   console.log('Redis正在重连...');
+});
+
+// 由于lazyConnect设为false，连接会自动建立
+// 添加连接状态检查
+redis.on('ready', () => {
+  console.log('✅ Redis已准备就绪，可以开始使用缓存');
 });
 
 // 缓存中间件
@@ -55,6 +71,17 @@ const cacheMiddleware = (duration = 300, keyPrefix = 'cache') => {
     const key = `${keyPrefix}:${req.originalUrl}`;
     
     try {
+      // 确保Redis连接已建立
+      if (redis.status !== 'ready' && redis.status !== 'connect') {
+        try {
+          await redis.connect();
+        } catch (connectErr) {
+          // 连接失败时继续处理请求，但不使用缓存
+          console.warn(`Redis连接失败，跳过缓存: ${connectErr.message}`);
+          return next();
+        }
+      }
+      
       const cached = await redis.get(key);
       if (cached) {
         console.log(`缓存命中: ${key}`);
@@ -64,9 +91,14 @@ const cacheMiddleware = (duration = 300, keyPrefix = 'cache') => {
       // 重写res.json方法以缓存响应
       const originalJson = res.json;
       res.json = function(body) {
-        // 缓存响应数据
+        // 缓存响应数据（异步，不阻塞响应）
         redis.setex(key, duration, JSON.stringify(body))
-          .catch(err => console.error('缓存写入失败:', err));
+          .then(() => {
+            console.log(`缓存已写入: ${key} (${duration}秒)`);
+          })
+          .catch(err => {
+            console.error(`缓存写入失败: ${key}`, err.message);
+          });
         
         // 调用原始的json方法
         return originalJson.call(this, body);
@@ -74,7 +106,7 @@ const cacheMiddleware = (duration = 300, keyPrefix = 'cache') => {
       
       next();
     } catch (error) {
-      console.error('缓存中间件错误:', error);
+      console.error('缓存中间件错误:', error.message);
       next(); // 缓存出错时继续处理请求
     }
   };
@@ -343,6 +375,178 @@ const cacheUtils = {
       }
       
       console.log(`OJ缓存清理完成，共删除 ${totalDeleted} 个缓存键`);
+      return totalDeleted;
+    }
+  },
+
+  // Exam 专用缓存管理
+  exam: {
+    // 获取考试详情（带缓存，包含题目、选项和图片）
+    async getExamDetail(examId, pool) {
+      const cacheKey = `cache:exam:detail:${examId}`;
+      
+      // 尝试从缓存获取
+      let examDetail = await cacheUtils.get(cacheKey);
+      if (examDetail) {
+        console.log(`考试详情缓存命中: ${examId}`);
+        return examDetail;
+      }
+      
+      // 从数据库查询
+      try {
+        const connection = await pool.getConnection();
+        
+        // 获取考试基本信息
+        const [examRows] = await connection.execute(
+          'SELECT * FROM exams WHERE id = ?',
+          [examId]
+        );
+        
+        if (examRows.length === 0) {
+          connection.release();
+          return null;
+        }
+        
+        const exam = examRows[0];
+        
+        // 获取考试包含的题目和选项（优化：一次性JOIN查询）
+        const [questionRows] = await connection.execute(`
+          SELECT q.*, eq.question_number, o.option_label, o.option_value, o.option_text
+          FROM questions q
+          JOIN exam_questions eq ON q.id = eq.question_id
+          LEFT JOIN options o ON q.id = o.question_id
+          WHERE eq.exam_id = ?
+          ORDER BY eq.question_number, o.option_label
+        `, [examId]);
+        
+        // 整理题目数据
+        const questions = [];
+        const questionMap = new Map();
+        const questionIds = [];
+        
+        questionRows.forEach(row => {
+          if (!questionMap.has(row.id)) {
+            questionMap.set(row.id, {
+              id: row.id,
+              question_number: row.question_number,
+              question_text: row.question_text,
+              question_type: row.question_type,
+              question_code: row.question_code,
+              correct_answer: row.correct_answer,
+              explanation: row.explanation,
+              level: row.level,
+              difficulty: row.difficulty,
+              image_url: row.image_url,
+              question_date: row.question_date,
+              created_at: row.created_at,
+              options: [],
+              images: []
+            });
+            questions.push(questionMap.get(row.id));
+            questionIds.push(row.id);
+          }
+          
+          if (row.option_label) {
+            questionMap.get(row.id).options.push({
+              label: row.option_label,
+              value: row.option_value,
+              text: row.option_text
+            });
+          }
+        });
+        
+        // 优化：一次性获取所有题目的图片，而不是循环查询（解决N+1问题）
+        if (questionIds.length > 0) {
+          const placeholders = questionIds.map(() => '?').join(',');
+          const [imageRows] = await connection.execute(
+            `SELECT * FROM question_images WHERE question_id IN (${placeholders}) ORDER BY question_id, display_order`,
+            questionIds
+          );
+          
+          // 将图片按题目ID分组
+          const imageMap = new Map();
+          imageRows.forEach(image => {
+            if (!imageMap.has(image.question_id)) {
+              imageMap.set(image.question_id, []);
+            }
+            imageMap.get(image.question_id).push(image);
+          });
+          
+          // 将图片分配到对应的题目
+          questions.forEach(question => {
+            question.images = imageMap.get(question.id) || [];
+          });
+        }
+        
+        connection.release();
+        
+        examDetail = {
+          exam: exam,
+          questions: questions
+        };
+        
+        // 缓存30分钟
+        await cacheUtils.set(cacheKey, examDetail, 1800);
+        console.log(`考试详情已缓存: ${examId}, 题目数: ${questions.length}`);
+        return examDetail;
+      } catch (error) {
+        console.error('查询考试详情失败:', error);
+        return null;
+      }
+    },
+
+    // 清除特定考试的缓存
+    async clearExam(examId) {
+      const patterns = [
+        `cache:exam:detail:${examId}`,
+        `cache:exam:${examId}*`,
+        `cache:/api/exams/${examId}*`,
+        `cache:/api/exam/${examId}*`
+      ];
+      
+      let totalDeleted = 0;
+      for (const pattern of patterns) {
+        const deleted = await cacheUtils.delPattern(pattern);
+        totalDeleted += deleted;
+      }
+      
+      console.log(`考试 ${examId} 缓存已清除，共 ${totalDeleted} 个键`);
+      return totalDeleted;
+    },
+
+    // 清除考试列表缓存
+    async clearExamList() {
+      const patterns = [
+        'cache:/api/exams*',
+        'cache:exams:*'
+      ];
+      
+      let totalDeleted = 0;
+      for (const pattern of patterns) {
+        const deleted = await cacheUtils.delPattern(pattern);
+        totalDeleted += deleted;
+      }
+      
+      console.log(`考试列表缓存已清除，共 ${totalDeleted} 个键`);
+      return totalDeleted;
+    },
+
+    // 清除所有考试相关缓存
+    async clearAll() {
+      const patterns = [
+        'cache:exam:*',
+        'cache:exams:*',
+        'cache:/api/exams*',
+        'cache:/api/exam*'
+      ];
+      
+      let totalDeleted = 0;
+      for (const pattern of patterns) {
+        const deleted = await cacheUtils.delPattern(pattern);
+        totalDeleted += deleted;
+      }
+      
+      console.log(`考试缓存清理完成，共删除 ${totalDeleted} 个缓存键`);
       return totalDeleted;
     }
   }

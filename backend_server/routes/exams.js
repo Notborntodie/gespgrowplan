@@ -8,80 +8,15 @@ const { logger } = require('../config/logger');
 router.get('/exam/:examId', cacheMiddleware(600, 'exam'), async (req, res) => {
   try {
     const { examId } = req.params;
-    const connection = await pool.getConnection();
     
-    // 获取考试基本信息
-    const [examRows] = await connection.execute(
-      'SELECT * FROM exams WHERE id = ?',
-      [examId]
-    );
+    // 使用缓存工具函数获取考试详情（包含数据层缓存）
+    const examDetail = await cacheUtils.exam.getExamDetail(examId, pool);
     
-    if (examRows.length === 0) {
-      connection.release();
+    if (!examDetail) {
       return res.status(404).json({ error: '考试不存在' });
     }
     
-    const exam = examRows[0];
-    
-    // 获取题目和选项
-    const [questionRows] = await connection.execute(`
-      SELECT q.*, eq.question_number, o.option_label, o.option_value, o.option_text
-      FROM questions q
-      JOIN exam_questions eq ON q.id = eq.question_id
-      LEFT JOIN options o ON q.id = o.question_id
-      WHERE eq.exam_id = ?
-      ORDER BY eq.question_number, o.option_label
-    `, [examId]);
-    
-    // 整理题目数据
-    const questions = [];
-    const questionMap = new Map();
-    
-    questionRows.forEach(row => {
-      if (!questionMap.has(row.id)) {
-        questionMap.set(row.id, {
-          id: row.id,
-          question_number: row.question_number,
-          question_text: row.question_text,
-          question_type: row.question_type,
-          question_code: row.question_code,
-          correct_answer: row.correct_answer,
-          explanation: row.explanation,
-          level: row.level,
-          difficulty: row.difficulty,
-          image_url: row.image_url,
-          question_date: row.question_date,
-          created_at: row.created_at,
-          options: [],
-          images: []
-        });
-        questions.push(questionMap.get(row.id));
-      }
-      
-      if (row.option_label) {
-        questionMap.get(row.id).options.push({
-          label: row.option_label,
-          value: row.option_value,
-          text: row.option_text
-        });
-      }
-    });
-    
-    // 获取所有题目的图片
-    for (let question of questions) {
-      const [imageRows] = await connection.execute(
-        'SELECT * FROM question_images WHERE question_id = ? ORDER BY display_order',
-        [question.id]
-      );
-      question.images = imageRows;
-    }
-    
-    connection.release();
-    
-    res.json({
-      exam: exam,
-      questions: questions
-    });
+    res.json(examDetail);
   } catch (error) {
     logger.error('获取考试信息错误', { error: error.message, examId });
     res.status(500).json({ error: '服务器错误' });
@@ -142,80 +77,15 @@ router.get('/exams', cacheMiddleware(300, 'exams'), async (req, res) => {
 router.get('/exams/:examId', cacheMiddleware(300, 'exam'), async (req, res) => {
   try {
     const { examId } = req.params;
-    const connection = await pool.getConnection();
     
-    // 获取考试基本信息
-    const [examRows] = await connection.execute(
-      'SELECT * FROM exams WHERE id = ?',
-      [examId]
-    );
+    // 使用缓存工具函数获取考试详情（包含数据层缓存）
+    const examDetail = await cacheUtils.exam.getExamDetail(examId, pool);
     
-    if (examRows.length === 0) {
-      connection.release();
+    if (!examDetail) {
       return res.status(404).json({ error: '考试不存在' });
     }
     
-    const exam = examRows[0];
-    
-    // 获取考试包含的题目和选项
-    const [questionRows] = await connection.execute(`
-      SELECT q.*, eq.question_number, o.option_label, o.option_value, o.option_text
-      FROM questions q
-      JOIN exam_questions eq ON q.id = eq.question_id
-      LEFT JOIN options o ON q.id = o.question_id
-      WHERE eq.exam_id = ?
-      ORDER BY eq.question_number, o.option_label
-    `, [examId]);
-    
-    // 整理题目数据
-    const questions = [];
-    const questionMap = new Map();
-    
-    questionRows.forEach(row => {
-      if (!questionMap.has(row.id)) {
-        questionMap.set(row.id, {
-          id: row.id,
-          question_number: row.question_number,
-          question_text: row.question_text,
-          question_type: row.question_type,
-          question_code: row.question_code,
-          correct_answer: row.correct_answer,
-          explanation: row.explanation,
-          level: row.level,
-          difficulty: row.difficulty,
-          image_url: row.image_url,
-          question_date: row.question_date,
-          created_at: row.created_at,
-          options: [],
-          images: []
-        });
-        questions.push(questionMap.get(row.id));
-      }
-      
-      if (row.option_label) {
-        questionMap.get(row.id).options.push({
-          label: row.option_label,
-          value: row.option_value,
-          text: row.option_text
-        });
-      }
-    });
-    
-    // 获取所有题目的图片
-    for (let question of questions) {
-      const [imageRows] = await connection.execute(
-        'SELECT * FROM question_images WHERE question_id = ? ORDER BY display_order',
-        [question.id]
-      );
-      question.images = imageRows;
-    }
-    
-    connection.release();
-    
-    res.json({
-      exam: exam,
-      questions: questions
-    });
+    res.json(examDetail);
   } catch (error) {
     logger.error('获取考试详情错误', { error: error.message, examId });
     res.status(500).json({ error: '服务器错误' });
@@ -312,8 +182,8 @@ router.post('/exams', async (req, res) => {
       await connection.commit();
       
       // 清除相关缓存
-      await cacheUtils.delPattern('exams:*');
-      await cacheUtils.delPattern('exam:*');
+      await cacheUtils.exam.clearExamList();
+      await cacheUtils.exam.clearExam(examId);
       
       res.json({ 
         message: '考试创建成功',
@@ -453,8 +323,8 @@ router.put('/exams/:examId', async (req, res) => {
       await connection.commit();
       
       // 清除相关缓存
-      await cacheUtils.delPattern('exams:*');
-      await cacheUtils.delPattern('exam:*');
+      await cacheUtils.exam.clearExamList();
+      await cacheUtils.exam.clearExam(examId);
       
       res.json({ message: '考试更新成功' });
       
@@ -499,8 +369,8 @@ router.delete('/exams/:examId', async (req, res) => {
       await connection.commit();
       
       // 清除相关缓存
-      await cacheUtils.delPattern('exams:*');
-      await cacheUtils.delPattern('exam:*');
+      await cacheUtils.exam.clearExamList();
+      await cacheUtils.exam.clearExam(examId);
       
       res.json({ message: '考试删除成功' });
       
