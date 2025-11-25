@@ -12,11 +12,27 @@ const { judgeCode } = require('./isolateJudge');  // isolate 轻量级方案
 
 const execFileAsync = promisify(execFile);
 
-// 创建判题队列
+// 确保环境变量已加载
+if (!process.env.DOTENV_LOADED) {
+  try {
+    require('dotenv').config();
+    process.env.DOTENV_LOADED = 'true';
+  } catch (e) {
+    // dotenv可能已经加载过了，忽略错误
+  }
+}
+
+// 创建判题队列（从环境变量读取Redis配置）
 const judgeQueue = new Queue('oj-judge-queue', {
   redis: {
-    host: '127.0.0.1',
-    port: 6379
+    host: process.env.REDIS_HOST || '127.0.0.1',
+    port: parseInt(process.env.REDIS_PORT) || 6379,
+    password: process.env.REDIS_PASSWORD || undefined,
+    db: parseInt(process.env.REDIS_DB) || 0,
+    maxRetriesPerRequest: parseInt(process.env.REDIS_MAX_RETRIES) || 3,
+    retryDelayOnFailover: parseInt(process.env.REDIS_RETRY_DELAY) || 100,
+    connectTimeout: parseInt(process.env.REDIS_CONNECT_TIMEOUT) || 10000,
+    commandTimeout: parseInt(process.env.REDIS_COMMAND_TIMEOUT) || 5000
   },
   defaultJobOptions: {
     attempts: 2,           // 失败后重试2次
