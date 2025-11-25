@@ -1,4 +1,4 @@
-mysqldump: [Warning] Using a password on the command line interface can be insecure.
+
 -- MySQL dump 10.13  Distrib 8.0.41, for Linux (x86_64)
 --
 -- Host: 106.14.143.27    Database: gesp_practice_system

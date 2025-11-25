@@ -82,6 +82,34 @@ cp env.example .env
 
 直接下载 isolate-master 仓库并安装：
 
+#### Ubuntu/Debian系统
+
+```bash
+# 1. 安装编译依赖
+sudo apt update
+sudo apt install -y gcc make libcap-dev libsystemd-dev pkg-config
+
+# 2. 下载 isolate-master 仓库（如果尚未下载）
+# 将 isolate-master 仓库下载到项目根目录
+
+# 3. 编译安装
+cd isolate-master
+make isolate
+sudo make install
+
+# 4. 配置权限
+sudo chmod 4755 /usr/local/bin/isolate
+
+# 5. 初始化沙箱
+sudo isolate --init
+sudo isolate --cleanup
+
+# 6. 验证安装
+isolate --version
+```
+
+#### CentOS/RHEL系统
+
 ```bash
 # 1. 安装编译依赖
 yum install -y gcc make libcap-devel
