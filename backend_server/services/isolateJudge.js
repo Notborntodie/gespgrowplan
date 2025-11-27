@@ -18,6 +18,19 @@ const { logger } = require('../config/logger');
 
 const execFileAsync = promisify(execFile);
 
+/**
+ * 标准化输出（符合 OJ 判题规则）
+ * - 去除每行末尾的空格
+ * - 去除文件末尾的空行
+ */
+function normalizeOutput(str) {
+  return str
+    .split('\n')
+    .map(line => line.trimEnd())
+    .join('\n')
+    .trim();
+}
+
 // isolate 沙箱池（复用box ID）
 class IsolatePool {
   constructor(maxBoxes = 10) {
@@ -447,8 +460,8 @@ async function judgeCode(code, samples, options = {}) {
           memoryLimit
         });
         
-        const actualTrimmed = result.output.trim();
-        const expectedTrimmed = (sample.output || '').trim();
+        const actualTrimmed = normalizeOutput(result.output);
+        const expectedTrimmed = normalizeOutput(sample.output || '');
         const passed = actualTrimmed === expectedTrimmed;
         
         return {
