@@ -80,8 +80,8 @@ class IsolatePool {
   }
 }
 
-// 创建全局沙箱池
-const isolatePool = new IsolatePool(10);
+// 创建全局沙箱池（4核8GB服务器最优配置）
+const isolatePool = new IsolatePool(30);
 
 // 预编译头文件路径（全局缓存）
 const PCH_DIR = '/tmp/cpp_pch_cache';
