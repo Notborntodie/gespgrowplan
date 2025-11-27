@@ -83,6 +83,68 @@ class IsolatePool {
 // 创建全局沙箱池
 const isolatePool = new IsolatePool(10);
 
+// 预编译头文件路径（全局缓存）
+const PCH_DIR = '/tmp/cpp_pch_cache';
+const PCH_HEADER = path.join(PCH_DIR, 'stdc++.h');
+const PCH_FILE = path.join(PCH_DIR, 'stdc++.h.gch');
+
+// 初始化预编译头文件（如果不存在）
+let pchInitialized = false;
+async function ensurePCH() {
+  if (pchInitialized) return;
+  
+  try {
+    // 检查 PCH 文件是否存在
+    try {
+      await fs.access(PCH_FILE);
+      pchInitialized = true;
+      logger.info('预编译头文件已存在', { pchFile: PCH_FILE });
+      return;
+    } catch (e) {
+      // PCH 文件不存在，需要创建
+    }
+    
+    // 创建 PCH 目录
+    await fs.mkdir(PCH_DIR, { recursive: true });
+    
+    // 创建 stdc++.h 文件用于预编译（包含 bits/stdc++.h）
+    await fs.writeFile(PCH_HEADER, '#include <bits/stdc++.h>\n');
+    
+    logger.info('开始创建预编译头文件', { pchFile: PCH_FILE });
+    
+    // 预编译头文件（使用 -x c++-header 表示这是头文件）
+    await execFileAsync('g++', [
+      '-std=c++17',
+      '-O2',
+      '-x', 'c++-header',
+      PCH_HEADER,
+      '-o', PCH_FILE
+    ], {
+      timeout: 30000, // 预编译可能需要更长时间
+      maxBuffer: 1024 * 1024
+    });
+    
+    pchInitialized = true;
+    logger.info('预编译头文件创建成功', { pchFile: PCH_FILE });
+    
+  } catch (error) {
+    logger.warn('创建预编译头文件失败，将使用普通编译', { 
+      error: error.message,
+      pchFile: PCH_FILE 
+    });
+    // 如果预编译失败，继续使用普通编译方式
+    pchInitialized = false;
+  }
+}
+
+/**
+ * 检查代码是否使用了 bits/stdc++.h
+ */
+function usesBitsStdCpp(code) {
+  // 检查是否包含 bits/stdc++.h（忽略大小写和空格）
+  return /#include\s*[<"]bits\/stdc\+\+\.h[>"]/i.test(code);
+}
+
 /**
  * 编译 C++ 代码
  */
@@ -93,18 +155,87 @@ async function compileCode(code, tempDir) {
     const sourceFile = path.join(tempDir, 'main.cpp');
     const binaryFile = path.join(tempDir, 'main');
     
-    await fs.writeFile(sourceFile, code);
+    // 检查是否使用 bits/stdc++.h
+    const useBitsStdCpp = usesBitsStdCpp(code);
+    let finalCode = code;
     
-    logger.info('开始编译 C++ 代码', { codeLength: code.length });
+    // 如果使用 bits/stdc++.h，尝试使用预编译头文件优化
+    if (useBitsStdCpp) {
+      await ensurePCH();
+      
+      // 如果预编译头文件存在，修改代码以使用预编译头文件
+      // g++ 的预编译头文件要求源文件第一行必须是 #include "header.h"
+      if (pchInitialized) {
+        try {
+          await fs.access(PCH_FILE);
+          // 将第一行的 #include <bits/stdc++.h> 替换为 #include "stdc++.h"
+          // 只替换第一个匹配的，并且必须是文件的第一行（前面只有空白或注释）
+          const lines = finalCode.split('\n');
+          let replaced = false;
+          for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+            // 跳过空行和注释
+            if (line.trim() === '' || line.trim().startsWith('//') || line.trim().startsWith('/*')) {
+              continue;
+            }
+            // 检查是否是 #include <bits/stdc++.h> 或 #include<bits/stdc++.h>
+            if (/^\s*#include\s*[<"]bits\/stdc\+\+\.h[>"]/i.test(line)) {
+              // 替换为 #include "stdc++.h"
+              lines[i] = line.replace(
+                /#include\s*[<"]bits\/stdc\+\+\.h[>"]/i,
+                '#include "stdc++.h"'
+              );
+              replaced = true;
+              break;
+            }
+            // 如果遇到其他非空非注释行，说明第一行不是 bits/stdc++.h，停止查找
+            if (line.trim() && !line.trim().startsWith('#')) {
+              break;
+            }
+          }
+          if (replaced) {
+            finalCode = lines.join('\n');
+            logger.info('使用预编译头文件优化编译');
+          } else {
+            logger.debug('bits/stdc++.h 不在第一行，无法使用预编译头文件');
+          }
+        } catch (e) {
+          // PCH 文件不存在，使用原始代码
+          logger.debug('预编译头文件不存在，使用普通编译');
+        }
+      }
+    }
+    
+    await fs.writeFile(sourceFile, finalCode);
+    
+    logger.info('开始编译 C++ 代码', { 
+      codeLength: code.length,
+      useBitsStdCpp,
+      usePCH: useBitsStdCpp && pchInitialized
+    });
+    
+    // 构建编译参数
+    const compileArgs = [
+      '-std=c++17',
+      '-O2',
+      '-o', binaryFile,
+      sourceFile
+    ];
+    
+    // 如果使用预编译头文件，添加包含路径
+    if (useBitsStdCpp && pchInitialized) {
+      try {
+        await fs.access(PCH_FILE);
+        // 添加 PCH 目录到包含路径，这样 #include "stdc++.h" 可以找到预编译头文件
+        compileArgs.push('-I', PCH_DIR);
+      } catch (e) {
+        // PCH 文件不存在，忽略
+      }
+    }
     
     // 使用 g++ 编译（不需要隔离）
     try {
-      const { stderr } = await execFileAsync('g++', [
-        '-std=c++17',
-        '-O2',
-        '-o', binaryFile,
-        sourceFile
-      ], {
+      const { stderr } = await execFileAsync('g++', compileArgs, {
         timeout: 10000,
         maxBuffer: 1024 * 1024
       });
