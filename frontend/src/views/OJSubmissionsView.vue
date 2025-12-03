@@ -1,16 +1,13 @@
 <template>
   <div class="oj-submissions-container">
-    <div class="submissions-header">
-      <div class="header-left">
-        <button @click="goBack" class="back-btn">
-          ← 返回
-        </button>
-        <h2>{{ problemInfo.title ? problemInfo.title + ' - 提交记录' : '提交记录' }}</h2>
-      </div>
-      <div class="header-right">
-        <span class="submission-count">共 {{ submissions.length }} 次提交</span>
-      </div>
-    </div>
+    <!-- 左侧返回按钮 -->
+    <button 
+      class="back-nav-arrow" 
+      @click="goBack" 
+      title="返回"
+    >
+      <Icon name="arrow-left" :size="32" />
+    </button>
 
     <div class="submissions-content">
       <div v-if="loading" class="loading-state">
@@ -19,7 +16,7 @@
       </div>
       
       <div v-else-if="submissions.length === 0" class="empty-state">
-        <div class="empty-icon">📝</div>
+        <div class="empty-icon"><Icon name="file-text" :size="64" /></div>
         <h3>暂无提交记录</h3>
         <p>您还没有提交过这道题目</p>
         <button v-if="problemId" @click="goToProblem" class="btn btn-primary">
@@ -27,70 +24,63 @@
         </button>
       </div>
       
-      <div v-else class="submissions-table-container">
-        <table class="submissions-table">
-          <thead>
-            <tr>
-              <th>提交ID</th>
-              <th v-if="!problemId">题目</th>
-              <th>提交时间</th>
-              <th>语言</th>
-              <th>状态</th>
-              <th>判题结果</th>
-              <th>通过测试</th>
-              <th>运行时间</th>
-              <th>操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr 
-              v-for="submission in submissions" 
-              :key="submission.id"
-              class="submission-row"
-              @click="viewSubmissionDetail(submission)"
-            >
-              <td>#{{ submission.id }}</td>
-              <td v-if="!problemId" class="problem-title-cell">
-                <span class="problem-title" @click.stop="goToProblemFromSubmission(submission.problem_id)">
-                  {{ submission.problem_title || `题目 #${submission.problem_id}` }}
-                </span>
-              </td>
-              <td class="date-cell">{{ formatDateTime(submission.submit_time) }}</td>
-              <td>
-                <span class="language-badge">{{ getLanguageName(submission.language) }}</span>
-              </td>
-              <td>
-                <span class="status-badge" :class="getStatusClass(submission.status)">
-                  {{ getStatusText(submission.status) }}
-                </span>
-              </td>
-              <td>
-                <span class="verdict-badge" :class="getVerdictClass(submission.verdict)">
-                  {{ getVerdictText(submission.verdict) }}
-                </span>
-              </td>
-              <td>
-                <span v-if="submission.total_tests" class="test-info">
-                  {{ submission.passed_tests || 0 }}/{{ submission.total_tests }}
-                </span>
-                <span v-else>-</span>
-              </td>
-              <td>
-                <span v-if="submission.judge_duration" class="runtime-info">
-                  {{ submission.judge_duration }}ms
-                </span>
-                <span v-else>-</span>
-              </td>
-              <td>
-                <div class="action-buttons" @click.stop>
-                  <button @click="viewSubmissionDetail(submission)" class="btn-action btn-view" title="查看详情">
-                    <span>👀</span>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <div v-else class="submissions-by-month">
+        <div v-for="(monthData, monthKey) in groupedSubmissions" :key="monthKey" class="month-group">
+          <div class="month-header">
+            <span class="month-title"><Icon name="calendar" :size="18" /> {{ monthKey }}</span>
+            <span class="month-count">{{ monthData.length }} 次提交</span>
+          </div>
+          <div class="submissions-table-container">
+            <table class="submissions-table">
+              <thead>
+                <tr>
+                  <th>提交ID</th>
+                  <th v-if="!problemId">题目</th>
+                  <th>提交时间</th>
+                  <th>语言</th>
+                  <th>状态</th>
+                  <th>判题结果</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr 
+                  v-for="submission in monthData" 
+                  :key="submission.id"
+                  class="submission-row"
+                >
+                  <td>#{{ submission.id }}</td>
+                  <td v-if="!problemId" class="problem-title-cell">
+                    <span class="problem-title" @click.stop="goToProblemFromSubmission(submission.problem_id)">
+                      {{ submission.problem_title || `题目 #${submission.problem_id}` }}
+                    </span>
+                  </td>
+                  <td class="date-cell">{{ formatDateTime(submission.submit_time) }}</td>
+                  <td>
+                    <span class="language-badge">{{ getLanguageName(submission.language) }}</span>
+                  </td>
+                  <td>
+                    <span class="status-badge" :class="getStatusClass(submission.status)">
+                      {{ getStatusText(submission.status) }}
+                    </span>
+                  </td>
+                  <td>
+                    <span class="verdict-badge" :class="getVerdictClass(submission.verdict)">
+                      {{ getVerdictText(submission.verdict) }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="action-buttons">
+                      <button class="btn-action btn-view" @click="viewSubmissionDetail(submission)">
+                        <Icon name="eye" :size="16" /> 查看详情
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -107,6 +97,19 @@
             <p>加载详情中...</p>
           </div>
           <div v-else-if="submissionDetail">
+            <!-- 提交的代码（放在第一位） -->
+            <div v-if="submissionDetail.code" class="code-section">
+              <div class="code-section-header">
+                <h4>提交的代码</h4>
+                <button class="btn-copy-code" @click="copyCode" :class="{ copied: codeCopied }">
+                  <Icon name="copy" :size="16" /> {{ codeCopied ? '已复制' : '复制代码' }}
+                </button>
+              </div>
+              <div class="code-container">
+                <pre><code class="language-{{ submissionDetail.language }}">{{ submissionDetail.code }}</code></pre>
+              </div>
+            </div>
+
             <!-- 基本信息 -->
             <div class="detail-summary">
               <div class="summary-header">
@@ -185,14 +188,6 @@
               </div>
             </div>
 
-            <!-- 提交的代码 -->
-            <div v-if="submissionDetail.code" class="code-section">
-              <h4>提交的代码</h4>
-              <div class="code-container">
-                <pre><code class="language-{{ submissionDetail.language }}">{{ submissionDetail.code }}</code></pre>
-              </div>
-            </div>
-
             <!-- 错误信息 -->
             <div v-if="submissionDetail.error_message" class="error-section">
               <h4>错误信息</h4>
@@ -204,18 +199,24 @@
         </div>
         <div class="modal-footer">
           <button @click="closeDetailDialog" class="btn btn-secondary">关闭</button>
-          <button v-if="problemId" @click="goToProblem" class="btn btn-primary">重新提交</button>
         </div>
       </div>
+    </div>
+
+    <!-- 底部 Header -->
+    <div class="submissions-header-bottom">
+      <h2>{{ problemInfo.title ? problemInfo.title + ' - 提交记录' : '提交记录' }}</h2>
+      <span class="submission-count">共 {{ submissions.length }} 次提交</span>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">import { BASE_URL } from '@/config/api'
 
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
+import Icon from '@/components/Icon.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -231,6 +232,21 @@ const showDetailDialog = ref(false)
 const selectedSubmission = ref<any>(null)
 const submissionDetail = ref<any>(null)
 const detailLoading = ref(false)
+const codeCopied = ref(false)
+
+// 按月份分组提交记录
+const groupedSubmissions = computed(() => {
+  const groups: Record<string, any[]> = {}
+  submissions.value.forEach((submission: any) => {
+    const date = new Date(submission.submit_time)
+    const monthKey = `${date.getFullYear()}年${date.getMonth() + 1}月`
+    if (!groups[monthKey]) {
+      groups[monthKey] = []
+    }
+    groups[monthKey].push(submission)
+  })
+  return groups
+})
 
 // 获取题目信息
 async function fetchProblemInfo() {
@@ -407,6 +423,35 @@ function closeDetailDialog() {
   showDetailDialog.value = false
   selectedSubmission.value = null
   submissionDetail.value = null
+  codeCopied.value = false
+}
+
+// 复制代码
+async function copyCode() {
+  if (!submissionDetail.value?.code) return
+  try {
+    // 优先使用 Clipboard API（需要 HTTPS）
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(submissionDetail.value.code)
+    } else {
+      // 降级方案：使用 textarea + execCommand
+      const textarea = document.createElement('textarea')
+      textarea.value = submissionDetail.value.code
+      textarea.style.position = 'fixed'
+      textarea.style.left = '-9999px'
+      document.body.appendChild(textarea)
+      textarea.select()
+      document.execCommand('copy')
+      document.body.removeChild(textarea)
+    }
+    codeCopied.value = true
+    setTimeout(() => {
+      codeCopied.value = false
+    }, 2000)
+  } catch (err) {
+    console.error('复制失败:', err)
+    alert('复制失败，请手动选择复制')
+  }
 }
 
 onMounted(() => {
@@ -430,63 +475,70 @@ onMounted(() => {
   overflow-x: hidden;
 }
 
-.submissions-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 30px;
-  background: linear-gradient(135deg, #87ceeb 0%, #f8fafc 100%);
-  border-bottom: 2px solid #e2e8f0;
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+/* 左侧返回按钮样式 - 固定定位 */
+.back-nav-arrow {
   position: fixed;
-  top: 48px; /* NavBar 的高度 */
+  left: 20px;
+  top: 80px;
+  background: rgba(30, 144, 255, 0.15);
+  backdrop-filter: blur(10px);
+  color: #1e90ff;
+  border: 2px solid rgba(30, 144, 255, 0.3);
+  border-radius: 12px;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(30, 144, 255, 0.2);
+  z-index: 100;
+}
+
+.back-nav-arrow:hover {
+  background: rgba(30, 144, 255, 0.2);
+  border-color: rgba(30, 144, 255, 0.5);
+  color: #0c7cd5;
+  transform: scale(1.1);
+  box-shadow: 0 4px 16px rgba(30, 144, 255, 0.3);
+}
+
+.back-nav-arrow:active {
+  transform: scale(0.95);
+}
+
+.back-nav-arrow :deep(.lucide-icon) {
+  flex-shrink: 0;
+}
+
+/* 底部固定 Header */
+.submissions-header-bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  border-top: 2px solid #e2e8f0;
+  position: fixed;
+  bottom: 0;
   left: 0;
   right: 0;
   z-index: 999;
   backdrop-filter: blur(10px);
-  background: linear-gradient(135deg, rgba(135, 206, 235, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+  background: rgba(135, 206, 235, 0.95);
   width: 100%;
+  gap: 4px;
   box-sizing: border-box;
-  flex-shrink: 0;
 }
 
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.back-btn {
-  background: linear-gradient(135deg, #1e90ff 0%, #38bdf8 100%);
-  border: none;
-  color: white;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  padding: 10px 16px;
-  border-radius: 10px;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(30,144,255,0.2);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.back-btn:hover {
-  background: linear-gradient(135deg, #38bdf8 0%, #1e90ff 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(30,144,255,0.3);
-}
-
-.header-left h2 {
+.submissions-header-bottom h2 {
   margin: 0;
   color: #1e293b;
   font-weight: 700;
-  font-size: 1.8rem;
+  font-size: 1.4rem;
   letter-spacing: 0.01em;
-  font-family: 'SF Pro Display', 'Inter', 'Segoe UI', 'Roboto', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-  text-align: left;
-  line-height: 1.3;
+  text-align: center;
 }
 
 .submission-count {
@@ -498,11 +550,13 @@ onMounted(() => {
 .submissions-content {
   flex: 1;
   padding: 24px 32px;
+  padding-left: 100px; /* 为左侧返回按钮留出空间 */
+  padding-bottom: 100px; /* 为底部固定的header留出空间 */
   width: 100%;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  margin-top: 128px; /* 为固定的header留出空间：48px(NavBar) + 80px(header) */
+  margin-top: 20px; /* 减少顶部间距，让卡片上移 */
 }
 
 .loading-state {
@@ -556,15 +610,51 @@ onMounted(() => {
   font-size: 16px;
 }
 
-/* 表格容器 */
-.submissions-table-container {
-  background: white;
-  border-radius: 12px;
-  border: 1.5px solid #e2e8f0;
-  overflow: hidden;
+/* 按月份分组 */
+.submissions-by-month {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
+}
+
+.month-group {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.month-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.month-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.month-count {
+  font-size: 14px;
+  color: #64748b;
+  background: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-weight: 500;
+}
+
+/* 表格容器 */
+.submissions-table-container {
+  overflow: hidden;
+  width: 100%;
 }
 
 .submissions-table {
@@ -692,16 +782,6 @@ onMounted(() => {
 
 .verdict-badge.unknown {
   background: rgba(107, 114, 128, 0.9);
-}
-
-.test-info {
-  font-weight: 600;
-  color: #1e293b;
-}
-
-.runtime-info {
-  color: #64748b;
-  font-size: 13px;
 }
 
 .action-buttons {
@@ -1009,10 +1089,48 @@ onMounted(() => {
 }
 
 .code-section, .error-section {
-  margin-top: 24px;
+  margin-bottom: 24px;
 }
 
-.code-section h4, .error-section h4 {
+.code-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 8px;
+}
+
+.code-section-header h4 {
+  margin: 0;
+  color: #1e293b;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.btn-copy-code {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #1e90ff 0%, #38bdf8 100%);
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-copy-code:hover {
+  background: linear-gradient(135deg, #0c7cd5 0%, #1e90ff 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(30, 144, 255, 0.3);
+}
+
+.btn-copy-code.copied {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+}
+
+.error-section h4 {
   margin: 0 0 16px 0;
   color: #1e293b;
   font-size: 16px;
@@ -1071,14 +1189,31 @@ onMounted(() => {
 }
 
 @media (max-width: 768px) {
-  .submissions-header {
-    padding: 15px 20px;
-    top: 48px;
+  .back-nav-arrow {
+    width: 48px;
+    height: 48px;
+    left: 16px;
+    top: 70px;
+  }
+
+  .back-nav-arrow :deep(.lucide-icon) {
+    width: 24px;
+    height: 24px;
   }
   
   .submissions-content {
-    margin-top: 108px;
+    margin-top: 50px;
     padding: 20px 16px;
+    padding-left: 16px;
+    padding-bottom: 90px;
+  }
+
+  .submissions-header-bottom {
+    padding: 10px 16px;
+  }
+
+  .submissions-header-bottom h2 {
+    font-size: 1.2rem;
   }
 
   .submissions-table-container {
@@ -1107,17 +1242,9 @@ onMounted(() => {
 }
 
 @media (max-width: 480px) {
-  .submissions-header {
-    padding: 16px;
-  }
-
   .submissions-content {
     padding: 16px;
-    margin-top: 100px;
-  }
-
-  .submissions-table-container {
-    border-radius: 8px;
+    padding-bottom: 90px;
   }
 
   .submissions-table th,

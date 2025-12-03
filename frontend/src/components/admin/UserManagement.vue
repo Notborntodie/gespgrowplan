@@ -5,7 +5,7 @@
           <h2>用户管理</h2>
           <span class="user-count">共 {{ users.length }} 个用户</span>
           <span v-if="userStore.isCacheValid && userStore.hasUsers" class="cache-indicator">
-            📦 使用缓存数据
+            <Icon name="package" :size="16" /> 使用缓存数据
           </span>
         </div>
         <div class="header-actions">
@@ -16,13 +16,13 @@
               placeholder="搜索用户名或真实姓名..."
               class="search-input"
             />
-            <i class="search-icon">🔍</i>
+            <Icon name="search" :size="18" class="search-icon" />
           </div>
           <button @click="refreshUsers" class="btn-refresh" title="刷新用户列表">
-            🔄 刷新
+            <Icon name="refresh-cw" :size="16" /> 刷新
           </button>
           <button @click="showCreateDialog = true" class="btn-primary">
-            <i class="icon-plus"></i>
+            <Icon name="plus" :size="18" />
             创建用户
           </button>
         </div>
@@ -62,8 +62,13 @@
                 </div>
               </div>
               <div class="user-actions" @click.stop>
-                <button @click="deleteUser(user)" class="btn-icon btn-delete" title="删除用户">
-                  <i class="icon-delete"></i>
+                <button 
+                  v-if="isSuperAdmin"
+                  @click="deleteUser(user)" 
+                  class="btn-icon btn-delete" 
+                  title="删除用户"
+                >
+                  <Icon name="trash-2" :size="18" />
                 </button>
               </div>
             </div>
@@ -152,6 +157,14 @@
                     />
                     <span class="role-badge role-admin">管理员</span>
                   </label>
+                  <label v-if="isSuperAdmin" class="role-checkbox">
+                    <input 
+                      type="checkbox" 
+                      v-model="newUser.role_ids" 
+                      value="4"
+                    />
+                    <span class="role-badge role-super-admin">超级管理员</span>
+                  </label>
                 </div>
               </div>
               
@@ -183,8 +196,12 @@
               <div class="details-section">
                 <div class="section-header">
                   <h4>基本信息</h4>
-                  <button v-if="!isEditingInDetails" @click="startEditInDetails" class="btn-edit-inline">
-                    <i class="icon-edit"></i>
+                  <button 
+                    v-if="!isEditingInDetails && isSuperAdmin" 
+                    @click="startEditInDetails" 
+                    class="btn-edit-inline"
+                  >
+                    <Icon name="edit" :size="16" />
                     编辑
                   </button>
                 </div>
@@ -253,8 +270,12 @@
               <div class="details-section">
                 <div class="section-header">
                   <h4>角色信息</h4>
-                  <button v-if="!isEditingRoleInDetails" @click="startEditRoleInDetails" class="btn-edit-inline">
-                    <i class="icon-shield"></i>
+                  <button 
+                    v-if="!isEditingRoleInDetails && isSuperAdmin" 
+                    @click="startEditRoleInDetails" 
+                    class="btn-edit-inline"
+                  >
+                    <Icon name="shield" :size="16" />
                     管理角色
                   </button>
                 </div>
@@ -299,6 +320,14 @@
                         />
                         <span class="role-badge role-admin">管理员</span>
                       </label>
+                      <label v-if="isSuperAdmin" class="role-option">
+                        <input 
+                          type="checkbox" 
+                          v-model="selectedRoleIds" 
+                          value="4"
+                        />
+                        <span class="role-badge role-super-admin">超级管理员</span>
+                      </label>
                     </div>
                   </div>
                   
@@ -316,12 +345,22 @@
             </div>
             
             <div class="dialog-actions">
-              <button @click="userDetails && resetUserPassword(userDetails)" class="btn-warning" :disabled="isResettingPassword">
-                <i class="icon-key"></i>
+              <button 
+                v-if="isSuperAdmin"
+                @click="userDetails && resetUserPassword(userDetails)" 
+                class="btn-warning" 
+                :disabled="isResettingPassword"
+              >
+                <Icon name="key" :size="18" />
                 {{ isResettingPassword ? '重置中...' : '重置密码' }}
               </button>
-              <button @click="userDetails && deleteUser(userDetails)" class="btn-danger" :disabled="isDeleting">
-                <i class="icon-delete"></i>
+              <button 
+                v-if="isSuperAdmin"
+                @click="userDetails && deleteUser(userDetails)" 
+                class="btn-danger" 
+                :disabled="isDeleting"
+              >
+                <Icon name="trash-2" :size="18" />
                 {{ isDeleting ? '删除中...' : '删除用户' }}
               </button>
               <button @click="closeDetailsDialog" class="btn-secondary">
@@ -356,6 +395,7 @@ import { ref, onMounted, reactive, computed } from 'vue'
 import SuccessMessageDialog from './Dialog/SuccessMessageDialog.vue'
 import ConfirmDialog from './Dialog/ConfirmDialog.vue'
 import { useUserStore } from '../../stores/userStore'
+import Icon from '@/components/Icon.vue'
 
 // 使用用户store
 const userStore = useUserStore()
@@ -376,6 +416,28 @@ interface User {
   real_name?: string
   created_at: string
   roles: Role[]
+}
+
+// 当前登录用户信息
+const currentUser = ref<any>(null)
+
+// 检查当前用户是否为超级管理员（角色ID=4）
+const isSuperAdmin = computed(() => {
+  if (!currentUser.value || !currentUser.value.roles) return false
+  return currentUser.value.roles.some((role: Role) => role.id === 4)
+})
+
+// 获取当前登录用户信息
+const getCurrentUser = () => {
+  const userInfoStr = localStorage.getItem('userInfo')
+  if (userInfoStr) {
+    currentUser.value = JSON.parse(userInfoStr)
+  }
+}
+
+// 获取当前用户ID
+const getCurrentUserId = (): number | null => {
+  return currentUser.value?.id || null
 }
   
   // 响应式数据
@@ -509,7 +571,8 @@ interface User {
               const roleMap: { [key: string]: any } = {
                 '1': { id: 1, name: 'admin', display_name: '管理员', description: '系统管理员' },
                 '2': { id: 2, name: 'user', display_name: '普通用户', description: '普通用户' },
-                '3': { id: 3, name: 'teacher', display_name: '教师', description: '教师' }
+                '3': { id: 3, name: 'teacher', display_name: '教师', description: '教师' },
+                '4': { id: 4, name: 'super_admin', display_name: '超级管理员', description: '超级管理员' }
               }
               return {
                 ...roleMap[roleId],
@@ -567,7 +630,8 @@ interface User {
         body: JSON.stringify({
           username: editingUser.username,
           email: editingUser.email,
-          real_name: editingUser.real_name
+          real_name: editingUser.real_name,
+          admin_user_id: getCurrentUserId()
         })
       })
       
@@ -650,7 +714,7 @@ interface User {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          admin_user_id: 1 // 这里应该从当前登录用户获取，暂时硬编码
+          admin_user_id: getCurrentUserId() // 从当前登录用户获取
         })
       })
       
@@ -681,7 +745,7 @@ interface User {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          admin_user_id: 1 // 这里应该从当前登录用户获取，暂时硬编码
+          admin_user_id: getCurrentUserId() // 从当前登录用户获取
         })
       })
       
@@ -750,7 +814,8 @@ interface User {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          role_ids: selectedRoleIds.value.map(id => parseInt(id))
+          role_ids: selectedRoleIds.value.map(id => parseInt(id)),
+          admin_user_id: getCurrentUserId()
         })
       })
       
@@ -788,7 +853,8 @@ interface User {
         body: JSON.stringify({
           username: editingUser.username,
           email: editingUser.email,
-          real_name: editingUser.real_name
+          real_name: editingUser.real_name,
+          admin_user_id: getCurrentUserId()
         })
       })
       
@@ -901,7 +967,8 @@ interface User {
     const roleMap: { [key: number]: string } = {
       1: '管理员',
       2: '普通用户',
-      3: '教师'
+      3: '教师',
+      4: '超级管理员'
     }
     return roleMap[roleId] || '未知角色'
   }
@@ -911,7 +978,8 @@ interface User {
     const classMap: { [key: number]: string } = {
       1: 'role-admin',
       2: 'role-user',
-      3: 'role-teacher'
+      3: 'role-teacher',
+      4: 'role-super-admin'
     }
     return classMap[roleId] || 'role-user'
   }
@@ -941,6 +1009,9 @@ interface User {
 
   // 组件挂载时获取用户列表
   onMounted(async () => {
+    // 获取当前登录用户信息
+    getCurrentUser()
+    
     // 只在没有缓存数据时才显示loading状态
     if (!userStore.hasUsers.value) {
       await fetchUsers()
@@ -1029,6 +1100,11 @@ interface User {
     color: #64748b;
     font-size: 16px;
     pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: 50%;
+    transform: translateY(-50%);
   }
   
   .btn-primary {
@@ -1738,6 +1814,12 @@ interface User {
   .role-badge.role-admin {
     background: #fed7d7;
     color: #c53030;
+  }
+
+  .role-badge.role-super-admin {
+    background: #fce7f3;
+    color: #9f1239;
+    border: 2px solid #ec4899;
   }
 
   .user-roles {

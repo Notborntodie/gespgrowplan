@@ -22,7 +22,7 @@
         <p>正在加载题目列表...</p>
       </div>
       <div v-else-if="filteredOJProblems.length === 0" class="empty-state">
-        <div class="empty-icon">💻</div>
+        <Icon name="code" :size="64" class="empty-icon" />
         <h3>暂无题目</h3>
         <p>当前筛选条件下没有题目</p>
       </div>
@@ -69,7 +69,7 @@
               <td>
                 <div class="action-buttons" @click.stop>
                   <button @click="handleProblemClick(problem)" class="btn-action btn-view" title="查看提交记录">
-                    <span>👀</span>
+                    <Icon name="eye" :size="18" />
                   </button>
                 </div>
               </td>
@@ -87,6 +87,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
 import BaseTeacherSection from './BaseTeacherSection.vue'
+import Icon from '@/components/Icon.vue'
 
 const router = useRouter()
 
@@ -309,6 +310,10 @@ watch(selectedOJLevel, (newLevel) => {
 .empty-icon {
   font-size: 64px;
   margin-bottom: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #64748b;
 }
 
 .empty-state h3 {
@@ -426,6 +431,10 @@ watch(selectedOJLevel, (newLevel) => {
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
   font-size: 14px;
 }
 

@@ -15,78 +15,75 @@
   </div>
 
   <div v-else class="exam-layout">
-    <div class="exam-header">
-      <div class="header-content">
-        <div class="header-left">
-          <button @click="showExitConfirm" class="exit-practice-btn">
-            &lt;-
-          </button>
-          <div class="progress-info">
-            <span>进度: {{ answeredCount }}/{{ questions.length }}</span>
-            <div class="progress-bar">
-              <div class="progress-fill" :style="{ width: progressPercentage + '%' }"></div>
+    <div class="exam-content exam-content-flex-row">
+      <!-- 新的 exam 卡片容器，占屏幕70% -->
+      <div class="exam-card-wrapper">
+        <!-- 第一层级：考试级别头部 -->
+        <div class="exam-level-header">
+          <div class="exam-level-header-content">
+            <!-- 考试标题 -->
+            <div class="exam-title-section">
+              <h2 class="exam-title">{{ examInfo.name || 'GESP 考试' }}</h2>
+              <span class="exam-level-badge">GESP {{ examInfo.level || 1 }}级</span>
             </div>
-          </div>
-        </div>
-        <div class="header-center">
-          <div class="header-center-bottom">
-            <button class="btn btn-secondary nav-btn" @click="prevQuestion" :disabled="currentQuestionIndex === 0">
-              <i class="fas fa-chevron-left"></i> 上一题
-            </button>
-            <div class="question-mini-nav">
-              <div 
-                v-for="(question, idx) in visibleQuestions" 
-                :key="idx" 
-                class="mini-question-item"
-                :class="{
-                  'mini-question-item--active': question.index === currentQuestionIndex,
-                  'mini-question-item--answered': answers[question.index],
-                  'mini-question-item--unanswered': highlightUnanswered && !answers[question.index]
-                }"
-                @click="goToQuestion(question.index)"
+            
+            <!-- 进度信息 - 可点击图标 -->
+            <div class="exam-progress-section">
+              <button class="progress-icon-btn" @click="showProgressModal = true" title="查看进度">
+                <Icon name="bar-chart-3" :size="20" />
+                <span class="progress-text">进度</span>
+                <span class="progress-badge">{{ answeredCount }}/{{ questions.length }}</span>
+              </button>
+            </div>
+            
+            <!-- 提交按钮和模式指示器 -->
+            <div class="exam-actions-section">
+              <button 
+                v-if="practiceMode === 'exam'"
+                class="btn btn-primary submit-btn-header" 
+                @click="submitAnswers" 
+                :disabled="loading || questions.length === 0 || submitting"
+                :class="{ 'btn-loading': submitting }"
               >
-                <span class="mini-question-number">{{ question.index + 1 }}</span>
+                <span v-if="!submitting" class="btn-content">
+                  <Icon name="rocket" :size="16" />
+                  <span>提交答题</span>
+                </span>
+                <span v-else class="btn-content">
+                  <Icon name="loader-2" :size="16" spin />
+                  <span>提交中...</span>
+                </span>
+              </button>
+              <div v-else class="mode-indicator">
+                <div class="review-mode-container">
+                  <span class="review-mode-text">{{ getModeText(practiceMode) }}</span>
+                </div>
               </div>
             </div>
-            <button class="btn btn-secondary nav-btn" @click="nextQuestion" :disabled="currentQuestionIndex === questions.length - 1">
-              下一题 <i class="fas fa-chevron-right"></i>
+          </div>
+        </div>
+        
+        <!-- 第二层级：题目内容 -->
+        <div class="question-content-wrapper">
+          <div class="question-main">
+            <!-- 左侧切换箭头 -->
+            <button 
+              class="question-nav-arrow question-nav-arrow-left" 
+              @click="prevQuestion" 
+              :disabled="currentQuestionIndex === 0"
+              title="上一题"
+            >
+              <Icon name="arrow-left" :size="32" />
             </button>
-          </div>
-        </div>
-        <div class="header-right">
-          <button 
-            v-if="practiceMode === 'exam'"
-            class="btn btn-primary submit-btn-header" 
-            @click="submitAnswers" 
-            :disabled="loading || questions.length === 0 || submitting"
-          >
-            <i v-if="submitting" class="fas fa-spinner fa-spin"></i>
-            <i v-else class="fas fa-paper-plane"></i>
-            {{ submitting ? '提交中...' : '提交答题' }}
-          </button>
-          <div v-else class="mode-indicator">
-            <div class="review-mode-container">
-              <span class="review-mode-text">{{ getModeText(practiceMode) }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="exam-content exam-content-flex-row">
-      <!-- 左侧占位区域 -->
-      <div class="sidebar-placeholder-left"></div>
-      
-      <!-- 主体：单题展示 -->
-      <div class="question-main">
-        <transition name="fade-slide" mode="out-in">
-          <div v-if="questions.length > 0" :key="currentQuestionIndex" class="question-card">
+            
+            <transition name="fade-slide" mode="out-in">
+              <div v-if="questions.length > 0" :key="currentQuestionIndex" class="question-card">
             <div class="question-card-header">
               <div class="question-number">
                 <span class="number-badge">{{ currentQuestionIndex + 1 }}</span>
                 <span class="level-badge">GESP {{ currentQuestion.level }}级</span>
                 <span class="question-date" v-if="currentQuestion.question_date">
-                  <i class="fas fa-calendar-alt"></i>
+                  <Icon name="calendar" :size="16" />
                   <span>{{ formatDate(currentQuestion.question_date) }}</span>
                 </span>
               </div>
@@ -150,7 +147,7 @@
                   <div class="section-content">
                     <pre v-if="currentQuestion.question_code" v-highlight class="code-block"><code class="language-cpp">{{ currentQuestion.question_code }}</code></pre>
                     <div v-else class="code-placeholder">
-                      <i class="fas fa-info-circle"></i>
+                      <Icon name="info" :size="20" />
                       <p>暂无代码内容</p>
                     </div>
                   </div>
@@ -184,20 +181,33 @@
             </div>
           </div>
         </transition>
-      </div>
-      <!-- 右侧解析栏 -->
-      <div v-if="practiceMode === 'review'" class="sidebar-explanation">   
-        <div class="question-explanation">
-          <transition name="explanation-slide" mode="out-in">
-            <div v-show="showExplain" class="explanation-content" key="explanation">
-              <p>{{ currentQuestion.explanation }}</p>
+        
+        <!-- 右侧切换箭头 -->
+        <button 
+          class="question-nav-arrow question-nav-arrow-right" 
+          @click="nextQuestion" 
+          :disabled="currentQuestionIndex === questions.length - 1"
+          title="下一题"
+        >
+          <Icon name="arrow-right" :size="32" />
+        </button>
+          </div>
+          
+          <!-- 右侧解析栏 -->
+          <div v-if="practiceMode === 'review'" class="sidebar-explanation">   
+            <div class="question-explanation">
+              <transition name="explanation-slide" mode="out-in">
+                <div v-show="showExplain" class="explanation-content" key="explanation">
+                  <p>{{ currentQuestion.explanation }}</p>
+                </div>
+              </transition>
             </div>
-          </transition>
+          </div>
+          
+          <!-- 考试模式和课堂模式下的右侧占位区域 -->
+          <div v-if="practiceMode === 'exam' || practiceMode === 'classroom'" class="sidebar-placeholder">
+          </div>
         </div>
-      </div>
-      
-      <!-- 考试模式和课堂模式下的右侧占位区域 -->
-      <div v-if="practiceMode === 'exam' || practiceMode === 'classroom'" class="sidebar-placeholder">
       </div>
     </div>
   </div>
@@ -206,7 +216,7 @@
   <div v-if="practiceMode === 'review'" class="floating-ai-button">
     <button class="ai-button" @click="toggleAIPanel">
       <span class="ai-button-text">题目解析</span>
-      <i class="fas fa-lightbulb"></i>
+      <Icon name="lightbulb" :size="20" />
     </button>
   </div>
 
@@ -216,17 +226,17 @@
       <div class="ai-panel-header">
         <h3>题目解析</h3>
         <button class="ai-close-btn" @click="toggleAIPanel">
-          <i class="fas fa-times"></i>
+          <Icon name="x" :size="18" />
         </button>
       </div>
       <div class="ai-panel-content">
         <div v-if="loading" class="ai-placeholder">
-          <i class="fas fa-spinner ai-placeholder-icon"></i>
+          <Icon name="loader-2" :size="20" spin class="ai-placeholder-icon" />
           正在加载解析...
         </div>
         <div v-else-if="currentQuestion.explanation">
           <div class="ai-response-header">
-            <i class="fas fa-lightbulb"></i>
+            <Icon name="lightbulb" :size="20" />
             题目解析
           </div>
           <div class="explanation-content">
@@ -234,7 +244,7 @@
           </div>
         </div>
         <div v-else class="ai-placeholder">
-          <i class="fas fa-info-circle ai-placeholder-icon"></i>
+          <Icon name="info" :size="20" class="ai-placeholder-icon" />
           该题目暂无解析内容
         </div>
       </div>
@@ -291,23 +301,20 @@
         
         <div class="result-message">
           <p v-if="submitResult?.score >= 90" class="message excellent">
-            🎉 优秀！你的表现非常出色！
+            <Icon name="sparkles" :size="18" /> 优秀！你的表现非常出色！
           </p>
           <p v-else-if="submitResult?.score >= 80" class="message good">
-            👍 良好！继续保持！
+            <Icon name="thumbs-up" :size="18" /> 良好！继续保持！
           </p>
           <p v-else-if="submitResult?.score >= 60" class="message pass">
-            ✅ 及格！还有提升空间。
+            <Icon name="check-circle" :size="18" /> 及格！还有提升空间。
           </p>
           <p v-else class="message need-improvement">
-            💪 需要努力！建议多练习相关知识点。
+            <Icon name="trending-up" :size="18" /> 需要努力！建议多练习相关知识点。
           </p>
         </div>
       </div>
       <div class="submit-result-footer">
-        <button @click="viewSubmissionDetail" class="btn btn-secondary">
-          <span>👀</span> 查看详情
-        </button>
         <button @click="goBackToLevelExams" class="btn btn-primary">
           返回考试列表
         </button>
@@ -323,7 +330,7 @@
         <button @click="cancelExit" class="exit-confirm-close">×</button>
       </div>
       <div class="exit-confirm-body">
-        <div class="exit-confirm-icon">⚠️</div>
+        <div class="exit-confirm-icon"><Icon name="alert-triangle" :size="48" /></div>
         <p class="exit-confirm-message">
           您确定要退出当前练习吗？<br>
           <span class="exit-confirm-warning">未完成的答题进度将会丢失！</span>
@@ -342,6 +349,62 @@
         <button @click="confirmExit" class="btn btn-danger">
           确认退出
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 进度弹窗 -->
+  <div v-if="showProgressModal" class="progress-modal-overlay" @click="showProgressModal = false">
+    <div class="progress-modal-content" @click.stop>
+      <div class="progress-modal-header">
+        <h3>答题进度</h3>
+        <button @click="showProgressModal = false" class="progress-modal-close">
+          <Icon name="x" :size="18" />
+        </button>
+      </div>
+      <div class="progress-modal-body">
+        <div class="progress-summary">
+          <div class="summary-item">
+            <span class="summary-label">总题数:</span>
+            <span class="summary-value">{{ questions.length }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">已答题:</span>
+            <span class="summary-value answered">{{ answeredCount }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">未答题:</span>
+            <span class="summary-value unanswered">{{ questions.length - answeredCount }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">完成度:</span>
+            <span class="summary-value">{{ Math.round(progressPercentage) }}%</span>
+          </div>
+        </div>
+        <div class="progress-bar-full">
+          <div class="progress-fill-full" :style="{ width: progressPercentage + '%' }"></div>
+        </div>
+        <div class="questions-grid">
+          <div 
+            v-for="(question, index) in questions" 
+            :key="index"
+            class="question-item"
+            :class="{
+              'question-item--active': index === currentQuestionIndex,
+              'question-item--answered': answers[index],
+              'question-item--unanswered': !answers[index]
+            }"
+            @click="handleQuestionClick(index)"
+          >
+            <span class="question-item-number">{{ index + 1 }}</span>
+            <Icon 
+              v-if="answers[index]" 
+              name="check-circle" 
+              :size="14" 
+              class="question-item-icon"
+            />
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -370,6 +433,7 @@
 
 import { defineComponent } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import Icon from '@/components/Icon.vue'
 // 导入 highlight.js 库和样式
 import hljs from 'highlight.js'
 import 'highlight.js/styles/github.css'
@@ -459,6 +523,9 @@ export default defineComponent({
       }
     }
   },
+  components: {
+    Icon
+  },
   data() {
     const router = useRouter();
     return {
@@ -469,8 +536,6 @@ export default defineComponent({
       examInfo: {} as ExamInfo,
       questions: [] as Question[],
       answers: [] as string[],
-      showExplainOverlay: false,
-      showExplainContent: false,
       currentQuestionIndex: 0, // 当前题目索引
       showExplain: false, // 控制解析是否展开
       highlightUnanswered: false, // 控制未答题高亮
@@ -494,6 +559,8 @@ export default defineComponent({
       showAlertDialog: false,
       alertMessage: '',
       alertTitle: '',
+      // 进度弹窗状态
+      showProgressModal: false,
       // 浏览器事件处理器引用
       beforeUnloadHandler: null as ((event: BeforeUnloadEvent) => void) | null,
       popStateHandler: null as ((event: PopStateEvent) => void) | null,
@@ -565,6 +632,9 @@ export default defineComponent({
     // 添加键盘事件监听
     this.setupKeyboardShortcuts();
     
+    // 监听 NavBar 触发的退出请求
+    window.addEventListener('exitExamRequest', this.handleExitExamRequest);
+    
     // 页面加载完成后滚动到合适位置
     this.$nextTick(() => {
       setTimeout(() => {
@@ -586,6 +656,7 @@ export default defineComponent({
     // 清理事件监听器
     this.cleanupBeforeUnload();
     this.cleanupKeyboardShortcuts();
+    window.removeEventListener('exitExamRequest', this.handleExitExamRequest);
   },
   methods: {
     async loadExamData() {
@@ -760,6 +831,12 @@ export default defineComponent({
       // 应用代码高亮
       this.highlightCode();
     },
+    // 处理进度弹窗中的题目点击
+    handleQuestionClick(index: number) {
+      this.goToQuestion(index);
+      // 跳转后自动关闭弹窗
+      this.showProgressModal = false;
+    },
     prevQuestionPage() {
       if (this.currentQuestionPage > 0) {
         this.currentQuestionPage--;
@@ -813,9 +890,6 @@ export default defineComponent({
         setTimeout(() => this.nextQuestion(), 200);
       }
     },
-    toggleExplain() {
-      this.showExplain = !this.showExplain;
-    },
     toggleAIPanel() {
       this.showAIPanel = !this.showAIPanel;
     },
@@ -827,12 +901,6 @@ export default defineComponent({
       this.showImageModal = false;
       this.selectedImageUrl = '';
     },
-    // 查看提交详情
-    viewSubmissionDetail() {
-      this.showSubmitResult = false;
-      // 跳转到提交详情页面
-      this.router.push(`/exam-submissions/${this.EXAM_ID}`);
-    },
     // 返回对应等级的考试列表
     goBackToLevelExams() {
       this.showSubmitResult = false;
@@ -842,7 +910,7 @@ export default defineComponent({
       const planId = urlParams.get('planId');
       const taskId = urlParams.get('taskId');
       if (from === 'taskview' && planId && taskId) {
-        this.router.push(`/plan/${planId}/tasks/${taskId}`);
+        this.router.push(`/plan/${planId}/tasks/${taskId}?tab=exercises`);
       } else if (this.fromPlan) {
         this.router.push('/plan');
       } else {
@@ -851,6 +919,10 @@ export default defineComponent({
     },
     showExitConfirm() {
       this.showExitConfirmDialog = true;
+    },
+    // 处理 NavBar 触发的退出请求
+    handleExitExamRequest() {
+      this.showExitConfirm();
     },
     // 确认退出练习
     confirmExit() {
@@ -862,7 +934,7 @@ export default defineComponent({
       const planId = urlParams.get('planId');
       const taskId = urlParams.get('taskId');
       if (from === 'taskview' && planId && taskId) {
-        this.router.push(`/plan/${planId}/tasks/${taskId}`);
+        this.router.push(`/plan/${planId}/tasks/${taskId}?tab=exercises`);
       } else if (this.fromPlan) {
         this.router.push('/plan');
       } else {
@@ -1153,97 +1225,6 @@ export default defineComponent({
       const img = event.target as HTMLImageElement;
       console.log('图片加载成功:', img.src);
     },
-    // 检测代码语言类型
-    detectLanguage(code: string): string {
-      const trimmedCode = code.trim();
-      console.log('检测语言，代码内容:', trimmedCode.substring(0, 100) + '...');
-      
-      // C/C++ 检测 - 优先级最高
-      if (trimmedCode.includes('#include') || 
-          trimmedCode.includes('int main') ||
-          trimmedCode.includes('printf') || 
-          trimmedCode.includes('cout') ||
-          trimmedCode.includes('cin') ||
-          trimmedCode.includes('std::') ||
-          trimmedCode.includes('using namespace') ||
-          trimmedCode.includes('class ') ||
-          trimmedCode.includes('public:') ||
-          trimmedCode.includes('private:') ||
-          trimmedCode.includes('protected:') ||
-          trimmedCode.includes('void ') ||
-          trimmedCode.includes('int ') ||
-          trimmedCode.includes('char ') ||
-          trimmedCode.includes('string ') ||
-          trimmedCode.includes('vector<') ||
-          trimmedCode.includes('map<') ||
-          trimmedCode.includes('set<') ||
-          trimmedCode.includes('for(') ||
-          trimmedCode.includes('while(') ||
-          trimmedCode.includes('if(') ||
-          trimmedCode.includes('else')) {
-        console.log('检测到 C++ 语言');
-        return 'cpp';
-      }
-      
-      // JavaScript/TypeScript 检测
-      if (trimmedCode.includes('function') || trimmedCode.includes('const ') || 
-          trimmedCode.includes('let ') || trimmedCode.includes('var ') ||
-          trimmedCode.includes('=>') || trimmedCode.includes('console.log')) {
-        console.log('检测到 JavaScript 语言');
-        return 'javascript';
-      }
-      
-      // Python 检测
-      if (trimmedCode.includes('def ') || trimmedCode.includes('import ') ||
-          trimmedCode.includes('print(') || trimmedCode.includes('if __name__')) {
-        console.log('检测到 Python 语言');
-        return 'python';
-      }
-      
-      // Java 检测
-      if (trimmedCode.includes('public class') || trimmedCode.includes('System.out.println') ||
-          trimmedCode.includes('public static void main')) {
-        console.log('检测到 Java 语言');
-        return 'java';
-      }
-      
-      // C# 检测
-      if (trimmedCode.includes('using System') || trimmedCode.includes('Console.WriteLine') ||
-          trimmedCode.includes('namespace')) {
-        console.log('检测到 C# 语言');
-        return 'csharp';
-      }
-      
-      // SQL 检测
-      if (trimmedCode.includes('SELECT') || trimmedCode.includes('INSERT') ||
-          trimmedCode.includes('UPDATE') || trimmedCode.includes('DELETE')) {
-        console.log('检测到 SQL 语言');
-        return 'sql';
-      }
-      
-      // HTML/XML 检测
-      if (trimmedCode.includes('<') && trimmedCode.includes('>')) {
-        console.log('检测到 XML/HTML 语言');
-        return 'xml';
-      }
-      
-      // CSS 检测
-      if (trimmedCode.includes('{') && trimmedCode.includes('}') && 
-          (trimmedCode.includes('color:') || trimmedCode.includes('background:'))) {
-        console.log('检测到 CSS 语言');
-        return 'css';
-      }
-      
-      // JSON 检测
-      if (trimmedCode.startsWith('{') && trimmedCode.endsWith('}')) {
-        console.log('检测到 JSON 语言');
-        return 'json';
-      }
-      
-      // 默认返回 javascript
-      console.log('使用默认 JavaScript 语言');
-      return 'javascript';
-    },
   }
 });
 </script>
@@ -1381,271 +1362,6 @@ export default defineComponent({
   font-family: 'HarmonyOS Sans', 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif;
 }
 
-.exam-header {
-  background: linear-gradient(135deg, #87ceeb 0%, #f8fafc 100%);
-  padding: 6px 20px;
-  border-bottom: 2px solid #e2e8f0;
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-  position: fixed;
-  top: 48px; /* NavBar 的高度 */
-  left: 0;
-  right: 0;
-  z-index: 999;
-  backdrop-filter: blur(10px);
-  background: linear-gradient(135deg, rgba(135, 206, 235, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
-}
-
-.header-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  position: relative;
-}
-
-.header-left {
-  position: absolute;
-  left: 20px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 20px;
-}
-
-/* 退出练习按钮样式 */
-.exit-practice-btn {
-  background: linear-gradient(135deg, #87ceeb 0%, #b0e0e6 100%);
-  color: #2c5282;
-  border: none;
-  border-radius: 50%;
-  font-size: 1.3rem;
-  font-weight: 700;
-  cursor: pointer;
-  padding: 8px;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(135, 206, 235, 0.25);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 38px;
-  height: 38px;
-  position: relative;
-  overflow: hidden;
-}
-
-.exit-practice-btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  transition: left 0.6s ease;
-}
-
-.exit-practice-btn:hover::before {
-  left: 100%;
-}
-
-.exit-practice-btn:hover {
-  background: linear-gradient(135deg, #b0e0e6 0%, #87ceeb 100%);
-  transform: translateY(-2px) scale(1.1);
-  box-shadow: 0 6px 16px rgba(135, 206, 235, 0.35);
-}
-
-.exit-practice-btn:active {
-  transform: translateY(0) scale(0.95);
-  box-shadow: 0 2px 8px rgba(135, 206, 235, 0.3);
-}
-
-.header-center {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 0 300px;
-}
-
-.header-center-bottom {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  max-width: 800px;
-}
-
-.header-right {
-  position: absolute;
-  right: 20px;
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 24px;
-}
-
-
-.nav-btn {
-  padding: 6px 18px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
-  color: white;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(107,114,128,0.2);
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  min-width: 100px;
-  height: auto;
-}
-
-.nav-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(107,114,128,0.3);
-}
-
-.nav-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.nav-btn i {
-  font-size: 0.9rem;
-}
-
-/* 题目迷你导航样式 */
-.question-mini-nav {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  justify-content: center;
-  padding: 0 8px;
-}
-
-.mini-question-item {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  border: 2px solid #d1d5db;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  font-size: 0.75rem;
-  font-weight: 700;
-  box-shadow: 0 2px 8px rgba(30,144,255,0.12);
-  color: #374151;
-  position: relative;
-  overflow: hidden;
-}
-
-.mini-question-item::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
-  transform: rotate(45deg);
-  transition: all 0.6s ease;
-  opacity: 0;
-}
-
-.mini-question-item:hover::before {
-  opacity: 1;
-  animation: shimmer 1.5s ease-in-out;
-}
-
-.mini-question-item:hover {
-  transform: scale(1.15) translateY(-2px);
-  box-shadow: 0 4px 12px rgba(30,144,255,0.25);
-  border-color: #1e90ff;
-}
-
-.mini-question-item--active {
-  border: 2px solid #1e90ff;
-  background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
-  color: #1e90ff;
-  font-weight: 800;
-  box-shadow: 0 4px 12px rgba(30,144,255,0.3);
-  transform: scale(1.1);
-  animation: activePulse 2s ease-in-out infinite;
-}
-
-.mini-question-item--answered {
-  border: 2px solid #22c55e;
-  background: linear-gradient(135deg, #e7f9ef 0%, #d1fae5 100%);
-  color: #22c55e;
-  box-shadow: 0 2px 8px rgba(34,197,94,0.2);
-  position: relative;
-}
-
-.mini-question-item--answered::after {
-  content: '✓';
-  position: absolute;
-  top: -3px;
-  right: -3px;
-  width: 14px;
-  height: 14px;
-  background: #22c55e;
-  color: white;
-  border-radius: 50%;
-  font-size: 9px;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 1px 4px rgba(34,197,94,0.3);
-}
-
-.mini-question-item--unanswered {
-  border: 2px solid #ef4444;
-  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
-  color: #ef4444;
-  box-shadow: 0 2px 8px rgba(239,68,68,0.2);
-  animation: warningPulse 1.5s ease-in-out infinite;
-}
-
-.mini-question-number {
-  font-size: 0.75rem;
-  font-weight: 800;
-  color: inherit;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
-  position: relative;
-  z-index: 1;
-}
-
-/* 新增：解析按钮样式 */
-.nav-btn.btn-info {
-  background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
-  color: white;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(6,182,212,0.2);
-}
-
-.nav-btn.btn-info:hover:not(:disabled) {
-  background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(6,182,212,0.3);
-}
-
-.nav-btn.btn-info:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
-}
 
 .progress-info {
   display: flex;
@@ -1691,7 +1407,143 @@ export default defineComponent({
   flex-shrink: 0;
   align-items: flex-start;
   justify-content: center;
-  margin-top: 90px; /* 为固定的header留出空间 (NavBar 48px + exam-header 42px) */
+  margin-top: 20px; /* 为 NavBar 留出少量空间 */
+  margin-bottom: 60px; /* 为底部固定的 exam-header 留出空间 */
+  padding-bottom: 0;
+  justify-content: center;
+}
+
+/* 新的 exam 卡片容器 - 占屏幕90% */
+.exam-card-wrapper {
+  width: 90%;
+  max-width: 1800px; /* 增加最大宽度以适应更宽的布局 */
+  margin: 80px auto 0; /* 下移卡片，从40px增加到80px */
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: transparent;
+}
+
+/* 第一层级：考试级别头部 */
+.exam-level-header {
+  background: linear-gradient(135deg, #1e90ff 0%, #38bdf8 100%);
+  border-radius: 20px 20px 0 0;
+  padding: 12px 32px; /* 上下变窄，从20px减少到12px */
+  box-shadow: 0 2px 8px rgba(30, 144, 255, 0.15); /* 只保留顶部和两侧阴影，移除底部阴影 */
+  border: none; /* 完全移除边框 */
+  border-bottom: none; /* 移除底部边框，与第二层级紧贴 */
+  margin-bottom: 0; /* 确保没有外边距 */
+  position: relative;
+  z-index: 1; /* 确保在第一层级 */
+}
+
+.exam-level-header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  background: transparent; /* 确保透明，显示父元素的主题色背景 */
+}
+
+.exam-title-section {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+}
+
+.exam-title {
+  margin: 0;
+  color: white;
+  font-size: 1.4rem; /* 稍微减小字体以适应变窄的header */
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.exam-level-badge {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%);
+  color: white;
+  padding: 6px 14px; /* 稍微减小内边距以适应变窄的header */
+  border-radius: 18px;
+  font-weight: 700;
+  font-size: 0.9rem; /* 稍微减小字体 */
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+}
+
+.exam-progress-section {
+  display: flex;
+  align-items: center;
+}
+
+/* 进度图标按钮样式 */
+.progress-icon-btn {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  padding: 8px 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+  position: relative;
+}
+
+.progress-icon-btn:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.2) 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(255, 255, 255, 0.3);
+}
+
+.progress-icon-btn:active {
+  transform: translateY(0);
+}
+
+.progress-text {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.progress-badge {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.2);
+  padding: 2px 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.exam-actions-section {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* 第二层级：题目内容容器 */
+.question-content-wrapper {
+  background: #ffffff; /* 底色设为白色 */
+  border-radius: 0 0 20px 20px;
+  box-shadow: 0 6px 24px -4px rgba(30, 144, 255, 0.15);
+  border: 1.5px solid rgba(30, 144, 255, 0.2); /* 统一边框 */
+  border-top: none; /* 完全移除顶部边框，与第一层级紧贴 */
+  padding: 24px;
+  padding-top: 24px; /* 确保顶部内边距 */
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center; /* 内容居中 */
+  margin-top: -2px; /* 负边距，向上覆盖第一层级底部，消除白色间隙 */
+  position: relative;
+  z-index: 0; /* 确保在第二层级 */
 }
 
 /* 左侧占位区域 */
@@ -1703,10 +1555,6 @@ export default defineComponent({
   order: 1;
 }
 
-/* 侧边栏垂直排列 - 隐藏 */
-.sidebar-vertical {
-  display: none;
-}
 
 /* 侧边栏item样式 - 可爱风格 */
 .sidebar-item {
@@ -1864,49 +1712,93 @@ export default defineComponent({
 }
 
 
-/* 主体区域 - 增加宽度 */
+/* 主体区域 - 在新结构中占满容器 */
 .question-main {
-  width: 100% !important;
-  max-width: 1200px !important;
-  margin: 0 auto;
+  width: 100%;
+  max-width: 100%; /* 移除宽度限制，使其更宽 */
+  margin: 0 auto; /* 水平居中 */
   flex-shrink: 0;
-  overflow: hidden;
+  overflow: visible;
   order: 2;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center; /* 内容居中 */
+  gap: 32px;
 }
 
-/* 右侧占位区域 - 调整大小 */
-.sidebar-placeholder {
-  width: 300px;
-  min-width: 300px;
-  max-width: 300px;
-  flex-shrink: 0;
-  order: 3;
-}
 
-/* 左侧侧边栏 */
-.sidebar-vertical {
-  order: 1;
-}
 
 /* 题目卡片 - 增加高度和宽度 */
 .question-card {
-  background: #f8fafc;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 18px;
-  box-shadow: 0 6px 24px -4px rgba(30,144,255,0.10);
+  background: transparent;
+  border: 2px solid #1e90ff; /* 添加主题蓝色边框 */
+  border-radius: 16px; /* 添加圆角，与header圆角匹配 */
+  box-shadow: 0 4px 16px rgba(30, 144, 255, 0.15); /* 添加阴影 */
   transition: all 0.3s ease;
   padding: 0;
-  overflow: hidden;
-  width: 100% !important;
+  overflow: hidden; /* 确保内容不会溢出圆角 */
+  flex: 1;
   height: auto !important; /* 改为自适应高度 */
-  min-height: 700px;
-  max-height: 1200px !important; /* 设置最大高度 */
+  min-height: 600px;
+  max-height: none;
   display: flex;
   flex-direction: column;
-  margin: 0 auto;
-  max-width: 1200px !important;
-  flex-shrink: 0;
+  margin: 0;
+  flex-shrink: 1;
   box-sizing: border-box;
+}
+
+/* 题目切换箭头样式 */
+.question-nav-arrow {
+  background: rgba(30, 144, 255, 0.1);
+  backdrop-filter: blur(10px);
+  color: #1e90ff;
+  border: 2px solid rgba(30, 144, 255, 0.3);
+  border-radius: 12px;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(30, 144, 255, 0.2);
+  flex-shrink: 0;
+  z-index: 10;
+  position: relative;
+}
+
+.question-nav-arrow:hover:not(:disabled) {
+  background: rgba(30, 144, 255, 0.2);
+  border-color: rgba(30, 144, 255, 0.5);
+  color: #0c7cd5;
+  transform: scale(1.1);
+  box-shadow: 0 4px 16px rgba(30, 144, 255, 0.3);
+}
+
+.question-nav-arrow:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.question-nav-arrow:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  color: #94a3b8;
+  border-color: rgba(148, 163, 184, 0.3);
+  background: rgba(148, 163, 184, 0.05);
+}
+
+.question-nav-arrow-left {
+  order: 1;
+}
+
+.question-card {
+  order: 2;
+}
+
+.question-nav-arrow-right {
+  order: 3;
 }
 
 /* 统一的内容滚动区域 - 改为左右分栏布局 */
@@ -1944,12 +1836,13 @@ export default defineComponent({
 
 /* 内容区域通用样式 - 更有趣的设计 */
 .content-section {
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(224, 242, 254, 0.4) 100%); /* 使用半透明主题色 */
+  backdrop-filter: blur(12px); /* 增强毛玻璃效果 */
   border-radius: 20px;
   margin: 0; /* 移除margin，使用gap来控制间距 */
-  box-shadow: 0 8px 32px rgba(30,144,255,0.12);
+  box-shadow: 0 8px 32px rgba(30,144,255,0.15);
   overflow: hidden;
-  border: 2px solid #e0f2fe;
+  border: 2px solid #1e90ff; /* 使用主题蓝色边框 */
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
 }
@@ -1977,8 +1870,6 @@ export default defineComponent({
   background: linear-gradient(90deg, #1e90ff, #38bdf8, #06b6d4, #1e90ff);
   background-size: 200% 100%;
 }
-
-/* 移除hover动画效果 */
 
 /* 区域头部样式 - 减少内边距 */
 .section-header {
@@ -2023,13 +1914,12 @@ export default defineComponent({
   white-space: normal !important;
   position: relative;
   padding: 16px;
-  background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 100%);
+  background: linear-gradient(135deg, rgba(224, 242, 254, 0.5) 0%, rgba(186, 230, 253, 0.3) 100%); /* 使用主题色半透明背景 */
+  backdrop-filter: blur(8px);
   border-radius: 16px;
   border-left: 4px solid #1e90ff;
   box-shadow: 0 4px 16px rgba(30,144,255,0.15);
 }
-
-/* 移除题目文本的呼吸动画效果 */
 
 /* 图片区域优化 - 更有趣的设计 */
 .images-section .section-content {
@@ -2046,13 +1936,12 @@ export default defineComponent({
   position: relative;
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 8px 24px rgba(30, 144, 255, 0.15);
+  box-shadow: 0 8px 24px rgba(30, 144, 255, 0.2);
   cursor: pointer;
-  background: white;
-  border: 3px solid #e0f2fe;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(224, 242, 254, 0.5) 100%); /* 使用半透明主题色 */
+  backdrop-filter: blur(8px);
+  border: 3px solid rgba(30, 144, 255, 0.25); /* 使用主题色边框 */
 }
-
-/* 移除图片的hover动画效果 */
 
 .question-image {
   width: 100%;
@@ -2069,7 +1958,8 @@ export default defineComponent({
 }
 
 .code-block {
-  background: #ffffff;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(224, 242, 254, 0.5) 100%); /* 使用半透明主题色 */
+  backdrop-filter: blur(10px);
   color: #1e293b;
   padding: 24px;
   font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
@@ -2084,7 +1974,7 @@ export default defineComponent({
   overflow-y: auto;
   border-radius: 16px;
   border: 3px solid #1e90ff;
-  box-shadow: 0 8px 32px rgba(30, 144, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(30, 144, 255, 0.25);
   position: relative;
 }
 
@@ -2213,17 +2103,16 @@ export default defineComponent({
   border-radius: 16px 16px 0 0;
 }
 
-/* 移除代码区域的呼吸动画效果 */
-
 .code-placeholder {
   padding: 20px;
-  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  background: linear-gradient(135deg, rgba(224, 242, 254, 0.4) 0%, rgba(186, 230, 253, 0.3) 100%); /* 使用主题色 */
+  backdrop-filter: blur(8px);
   color: #64748b;
   text-align: center;
   font-style: italic;
   border-radius: 12px;
   margin: 16px;
-  border: 2px dashed #cbd5e1;
+  border: 2px dashed rgba(30, 144, 255, 0.3); /* 使用主题色边框 */
   font-size: 14px;
   font-weight: 500;
   display: flex;
@@ -2294,12 +2183,13 @@ export default defineComponent({
   gap: 12px;
   padding: 16px 20px;
   border-radius: 16px;
-  border: 3px solid #e0f2fe;
+  border: 3px solid rgba(30, 144, 255, 0.25); /* 使用主题色边框 */
   cursor: pointer;
   font-size: 1rem;
   font-weight: 600;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(224, 242, 254, 0.4) 100%); /* 使用半透明主题色 */
+  backdrop-filter: blur(8px);
   flex-shrink: 0;
   width: 100%;
   box-sizing: border-box;
@@ -2333,21 +2223,23 @@ export default defineComponent({
 
 /* hover时的3D效果 */
 .option-item:hover {
-  background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+  background: linear-gradient(135deg, rgba(224, 242, 254, 0.8) 0%, rgba(186, 230, 253, 0.6) 100%); /* 使用主题色半透明 */
+  backdrop-filter: blur(10px);
   color: #1e90ff;
   font-weight: 700;
   border-color: #1e90ff;
   transform: perspective(1000px) rotateX(2deg) translateY(-4px) scale(1.02);
-  box-shadow: 0 12px 32px rgba(30,144,255,0.25);
+  box-shadow: 0 12px 32px rgba(30,144,255,0.3);
 }
 
 /* 选中状态的样式 */
 .option-selected {
-  background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+  background: linear-gradient(135deg, rgba(224, 242, 254, 0.9) 0%, rgba(186, 230, 253, 0.7) 100%); /* 使用主题色半透明 */
+  backdrop-filter: blur(10px);
   color: #1e90ff;
   font-weight: 700;
   border-color: #1e90ff;
-  box-shadow: 0 4px 16px rgba(30,144,255,0.25);
+  box-shadow: 0 4px 16px rgba(30,144,255,0.3);
 }
 
 .option-label {
@@ -2366,8 +2258,6 @@ export default defineComponent({
   z-index: 1; /* 确保标签在光效上方 */
   flex-shrink: 0;
 }
-
-/* 移除选项标签的弹跳动画 */
 
 .option-text {
   flex: 1;
@@ -2390,13 +2280,14 @@ export default defineComponent({
 }
 
 .option-code-block {
-  background: #ffffff;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(224, 242, 254, 0.5) 100%); /* 使用半透明主题色 */
+  backdrop-filter: blur(8px);
   border: 2px solid #1e90ff;
   border-radius: 8px;
   padding: 12px;
   margin: 4px 0;
   overflow-x: auto;
-  box-shadow: 0 2px 8px rgba(30, 144, 255, 0.1);
+  box-shadow: 0 2px 8px rgba(30, 144, 255, 0.15);
 }
 
 .option-code-block pre {
@@ -2558,42 +2449,40 @@ export default defineComponent({
   }
 }
 
-.explain-toggle {
-  background: none;
-  border: none;
-  color: #1e90ff;
-  font-weight: bold;
-  cursor: pointer;
-  margin-bottom: 6px;
-  font-size: 15px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
 
-.explain-toggle:hover {
-  background-color: #e0f2fe;
-}
 
-/* 删除原来的导航区域样式 */
-.question-nav {
-  display: none;
-}
-
-/* 头部提交按钮样式 */
+/* 头部提交按钮样式 - 与SmartOJView的绿色按钮保持一致 */
 .submit-btn-header {
   padding: 8px 18px;
   font-size: 0.9rem;
   font-weight: 600;
   border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(30,144,255,0.2);
+  background: linear-gradient(135deg, #10b981 0%, #34d399 100%); /* 与SmartOJView的btn-test绿色一致 */
+  color: white;
+  border: none;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); /* 与SmartOJView一致 */
   transition: all 0.3s ease;
   margin-left: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
-.submit-btn-header:hover {
+.submit-btn-header:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(30,144,255,0.3);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4); /* 与SmartOJView一致 */
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%); /* 与SmartOJView的hover绿色一致 */
+}
+
+.submit-btn-header:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 3px 8px rgba(16, 185, 129, 0.3); /* 与SmartOJView一致 */
+}
+
+.submit-btn-header.btn-loading {
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%); /* 与SmartOJView的loading绿色一致 */
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.5); /* 与SmartOJView一致 */
 }
 
 .submit-btn-header:disabled {
@@ -2602,17 +2491,64 @@ export default defineComponent({
   transform: none;
 }
 
+/* 按钮内容包装器样式 - 与SmartOJView保持一致 */
+.btn-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.3s ease;
+}
+
+.btn-content i {
+  font-size: 16px;
+  transition: transform 0.3s ease;
+}
+
+.submit-btn-header:not(:disabled):hover .btn-content i:not(.fa-spin) {
+  transform: scale(1.2);
+}
+
+/* 按钮加载状态样式 - 与SmartOJView保持一致 */
+.btn-loading {
+  position: relative;
+}
+
+.btn-loading::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
 
 /* 题目卡片头部样式优化 - 更有趣的设计 */
 .question-card-header {
   background: linear-gradient(135deg, #1e90ff 0%, #38bdf8 100%);
-  padding: 24px 28px;
+  padding: 6px 28px; /* 上下变窄，从24px减少到6px，非常窄 */
   border-bottom: 3px solid #e0f2fe;
+  border-radius: 14px 14px 0 0; /* 圆角 = card圆角(16px) - 边框宽度(2px) = 14px */
   display: flex;
   justify-content: space-between;
   align-items: center;
   position: relative;
   overflow: hidden;
+  margin: 0; /* 正常边距 */
+  width: 100%; /* 正常宽度 */
+  box-sizing: border-box; /* 确保包含边框 */
 }
 
 .question-card-header::before {
@@ -2640,11 +2576,11 @@ export default defineComponent({
 .number-badge {
   background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
   color: #1e90ff;
-  padding: 10px 18px;
-  border-radius: 24px;
+  padding: 4px 14px; /* 上下变窄，从10px减少到4px，适应非常窄的header */
+  border-radius: 20px; /* 稍微减小圆角 */
   font-weight: 800;
-  font-size: 1.2rem;
-  box-shadow: 0 6px 20px rgba(30,144,255,0.4);
+  font-size: 1rem; /* 稍微减小字体 */
+  box-shadow: 0 4px 12px rgba(30,144,255,0.4);
   border: 2px solid rgba(255,255,255,0.3);
   animation: numberPulse 2s ease-in-out infinite;
   position: relative;
@@ -2660,10 +2596,10 @@ export default defineComponent({
 .level-badge {
   background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.1) 100%);
   color: white;
-  padding: 8px 14px;
-  border-radius: 18px;
+  padding: 4px 12px; /* 上下变窄，从8px减少到4px，适应非常窄的header */
+  border-radius: 16px; /* 稍微减小圆角 */
   font-weight: 700;
-  font-size: 0.95rem;
+  font-size: 0.85rem; /* 稍微减小字体 */
   box-shadow: 0 4px 12px rgba(255,255,255,0.2);
   border: 1px solid rgba(255,255,255,0.3);
   backdrop-filter: blur(10px);
@@ -2674,12 +2610,12 @@ export default defineComponent({
 /* 题目日期样式 - 与level-badge保持一致 */
 .question-number .question-date {
   margin-left: 8px;
-  font-size: 0.95rem;
+  font-size: 0.85rem; /* 稍微减小字体 */
   font-weight: 700;
   color: white;
   background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.1) 100%);
-  padding: 8px 14px;
-  border-radius: 18px;
+  padding: 4px 12px; /* 上下变窄，从8px减少到4px，适应非常窄的header */
+  border-radius: 16px; /* 稍微减小圆角 */
   box-shadow: 0 4px 12px rgba(255,255,255,0.2);
   border: 1px solid rgba(255,255,255,0.3);
   backdrop-filter: blur(10px);
@@ -2704,11 +2640,11 @@ export default defineComponent({
 .status-answered {
   background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
   color: white;
-  padding: 10px 18px;
-  border-radius: 24px;
+  padding: 4px 14px; /* 上下变窄，从10px减少到4px，适应非常窄的header */
+  border-radius: 20px; /* 稍微减小圆角 */
   font-weight: 700;
-  font-size: 0.95rem;
-  box-shadow: 0 6px 20px rgba(34,197,94,0.4);
+  font-size: 0.85rem; /* 稍微减小字体 */
+  box-shadow: 0 4px 12px rgba(34,197,94,0.4);
   border: 2px solid rgba(255,255,255,0.3);
   position: relative;
   z-index: 1;
@@ -2723,11 +2659,11 @@ export default defineComponent({
 .status-unanswered {
   background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
   color: white;
-  padding: 10px 18px;
-  border-radius: 24px;
+  padding: 4px 14px; /* 上下变窄，从10px减少到4px，适应非常窄的header */
+  border-radius: 20px; /* 稍微减小圆角 */
   font-weight: 700;
-  font-size: 0.95rem;
-  box-shadow: 0 6px 20px rgba(239,68,68,0.4);
+  font-size: 0.85rem; /* 稍微减小字体 */
+  box-shadow: 0 4px 12px rgba(239,68,68,0.4);
   border: 2px solid rgba(255,255,255,0.3);
   position: relative;
   z-index: 1;
@@ -2739,10 +2675,6 @@ export default defineComponent({
   50% { transform: scale(1.05); }
 }
 
-/* 删除原来的提交区域样式 */
-.submit-section {
-  display: none;
-}
 
 /* 动画 */
 .fade-slide-enter-active, .fade-slide-leave-active {
@@ -2769,7 +2701,8 @@ export default defineComponent({
     max-width: 100% !important;
     padding: 0 16px;
     justify-content: center;
-    margin-top: 90px;
+    margin-top: 20px;
+    margin-bottom: 60px;
   }
   
   .sidebar-placeholder-left {
@@ -2786,12 +2719,12 @@ export default defineComponent({
   
   .question-main {
     width: 100% !important;
-    max-width: 1000px !important;
+    max-width: 100% !important; /* 移除宽度限制，使其更宽 */
   }
   
   .question-card {
     width: 100% !important;
-    max-width: 1000px !important;
+    max-width: 100% !important; /* 移除宽度限制，使其更宽 */
   }
 }
 
@@ -2810,18 +2743,19 @@ export default defineComponent({
   
   .question-main {
     width: 100% !important;
-    max-width: 800px !important;
+    max-width: 100% !important; /* 移除宽度限制，使其更宽 */
   }
   
   .question-card {
     width: 100% !important;
-    max-width: 800px !important;
+    max-width: 100% !important; /* 移除宽度限制，使其更宽 */
   }
 }
 
 @media (max-width: 1024px) {
   .exam-content-flex-row {
-    margin-top: 90px;
+    margin-top: 20px;
+    margin-bottom: 60px;
   }
   
   .sidebar-placeholder-left {
@@ -2842,13 +2776,9 @@ export default defineComponent({
 }
 
 @media (max-width: 768px) {
-  .exam-header {
-    padding: 5px 12px;
-    top: 48px;
-  }
-  
   .exam-content-flex-row {
-    margin-top: 95px; /* 移动端 */
+    margin-top: 20px; /* 移动端：为 NavBar 留出少量空间 */
+    margin-bottom: 20px;
     padding: 0 10px;
   }
   
@@ -2920,6 +2850,48 @@ export default defineComponent({
     width: 100%;
     max-width: 100%;
   }
+  
+  /* 移动端 exam-card-wrapper 样式 */
+  .exam-card-wrapper {
+    width: 95%;
+    max-width: 100%;
+    margin: 60px auto 0; /* 移动端也下移一些 */
+  }
+  
+  .exam-level-header {
+    padding: 10px 20px; /* 移动端也变窄 */
+    border-radius: 16px 16px 0 0;
+  }
+  
+  .exam-level-header-content {
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-start;
+  }
+  
+  .exam-title {
+    font-size: 1.2rem;
+  }
+  
+  .question-content-wrapper {
+    padding: 16px;
+    border-radius: 0 0 16px 16px;
+  }
+  
+  /* 移动端箭头样式调整 */
+  .question-main {
+    gap: 8px;
+  }
+  
+  .question-nav-arrow {
+    width: 44px;
+    height: 44px;
+  }
+  
+  .question-nav-arrow :deep(svg) {
+    width: 24px;
+    height: 24px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -2945,6 +2917,21 @@ export default defineComponent({
   .submit-btn-header {
     padding: 8px 16px;
     font-size: 0.85rem;
+  }
+  
+  /* 小屏幕箭头样式调整 */
+  .question-main {
+    gap: 6px;
+  }
+  
+  .question-nav-arrow {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .question-nav-arrow :deep(svg) {
+    width: 20px;
+    height: 20px;
   }
 }
 
@@ -3000,29 +2987,6 @@ export default defineComponent({
   box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* 给内容区域添加阴影 */
 }
 
-/* 解析按钮样式调整 */
-.sidebar-explanation .explain-toggle {
-  background: linear-gradient(135deg, #1e90ff 0%, #38bdf8 100%); /* 给按钮添加渐变背景 */
-  border: none;
-  color: white; /* 改为白色文字 */
-  font-weight: bold;
-  cursor: pointer;
-  margin-bottom: 8px;
-  font-size: 18px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 16px; /* 增加按钮内边距 */
-  border-radius: 10px; /* 给按钮添加圆角 */
-  transition: all 0.3s ease; /* 添加过渡效果 */
-  box-shadow: 0 2px 8px rgba(30,144,255,0.3); /* 给按钮添加阴影 */
-}
-
-.sidebar-explanation .explain-toggle:hover {
-  background: linear-gradient(135deg, #38bdf8 0%, #1e90ff 100%); /* hover时反转渐变 */
-  transform: translateY(-1px); /* hover时轻微上移 */
-  box-shadow: 0 4px 12px rgba(30,144,255,0.4); /* hover时增强阴影 */
-}
 
 /* 浮动题目解析按钮样式 */
 .floating-ai-button {
@@ -3306,64 +3270,6 @@ export default defineComponent({
 }
 
 
-/* 图片网格样式 */
-.images-section {
-  margin-bottom: 24px;
-}
-
-.images-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  margin-top: 12px;
-}
-
-.image-item {
-  position: relative;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(30, 144, 255, 0.15);
-  transition: all 0.3s ease;
-  cursor: pointer;
-  background: white;
-  border: 2px solid #e2e8f0;
-}
-
-.image-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(30, 144, 255, 0.25);
-  border-color: #1e90ff;
-}
-
-.question-image {
-  width: 100%;
-  max-height: 300px;
-  object-fit: contain;
-  display: block;
-  transition: all 0.3s ease;
-  background: #f8fafc;
-}
-
-.image-item:hover .question-image {
-  transform: scale(1.02);
-}
-
-.image-info {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  background: rgba(30, 144, 255, 0.9);
-  color: white;
-  padding: 4px 8px;
-  font-size: 11px;
-  font-weight: 600;
-  border-radius: 6px;
-  backdrop-filter: blur(4px);
-}
-
-.image-order {
-  display: block;
-}
 
 /* 图片模态框样式 */
 .image-modal-overlay {
@@ -3742,16 +3648,7 @@ export default defineComponent({
   z-index: 1;
 }
 
-/* 右侧占位区域 - 调整大小 */
-.sidebar-placeholder {
-  width: 280px;
-  min-width: 280px;
-  max-width: 280px;
-  flex-shrink: 0;
-  order: 3;
-}
-
-/* 考试模式下的右侧占位区域 */
+/* 右侧占位区域 */
 .sidebar-placeholder {
   width: 320px;
   min-width: 320px;
@@ -3765,12 +3662,13 @@ export default defineComponent({
   align-content: start;
   justify-content: flex-start;
   position: sticky;
-  top: 68px; /* 调整sticky位置，为固定的header留出空间 (NavBar 48px + 部分exam-header) */
+  top: 68px;
   z-index: 10;
   display: flex;
   flex-direction: column;
   gap: 12px;
   order: 3;
+  flex-shrink: 0;
 }
 
 .back-btn {
@@ -3873,6 +3771,10 @@ export default defineComponent({
   font-size: 48px;
   margin-bottom: 16px;
   animation: pulse 2s infinite;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #f59e0b;
 }
 
 @keyframes pulse {
@@ -4096,5 +3998,296 @@ export default defineComponent({
 
 .alert-modal-footer .btn-primary:active {
   transform: translateY(0) scale(0.98);
+}
+
+/* 进度弹窗样式 */
+.progress-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10001;
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.2s ease;
+}
+
+.progress-modal-content {
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  width: 90%;
+  max-width: 600px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  animation: slideUp 0.3s ease;
+}
+
+.progress-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, #1e90ff 0%, #38bdf8 100%);
+  color: #fff;
+  padding: 20px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.progress-modal-header h3 {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.progress-modal-close {
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  color: white;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  font-size: 18px;
+  backdrop-filter: blur(10px);
+}
+
+.progress-modal-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+}
+
+.progress-modal-close:active {
+  transform: scale(0.95);
+}
+
+.progress-modal-body {
+  padding: 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.progress-summary {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+  padding: 20px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.summary-label {
+  font-size: 0.85rem;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.summary-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e90ff;
+}
+
+.summary-value.answered {
+  color: #22c55e;
+}
+
+.summary-value.unanswered {
+  color: #ef4444;
+}
+
+.progress-bar-full {
+  width: 100%;
+  height: 12px;
+  background: #e5e7eb;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 4px rgba(30, 144, 255, 0.1);
+}
+
+.progress-fill-full {
+  height: 100%;
+  background: linear-gradient(90deg, #1e90ff 0%, #38bdf8 100%);
+  border-radius: 6px;
+  transition: width 0.5s ease;
+  box-shadow: 0 2px 8px rgba(30, 144, 255, 0.3);
+}
+
+.questions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+  gap: 12px;
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.question-item {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: 2px solid #d1d5db;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 0.9rem;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(30, 144, 255, 0.12);
+  color: #374151;
+  position: relative;
+  overflow: hidden;
+}
+
+.question-item:hover {
+  transform: scale(1.1) translateY(-2px);
+  box-shadow: 0 4px 12px rgba(30, 144, 255, 0.25);
+  border-color: #1e90ff;
+}
+
+.question-item--active {
+  border: 2px solid #1e90ff;
+  background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+  color: #1e90ff;
+  font-weight: 800;
+  box-shadow: 0 4px 12px rgba(30, 144, 255, 0.3);
+  transform: scale(1.1);
+  animation: activePulse 2s ease-in-out infinite;
+}
+
+.question-item--answered {
+  border: 2px solid #22c55e;
+  background: linear-gradient(135deg, #e7f9ef 0%, #d1fae5 100%);
+  color: #22c55e;
+  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.2);
+}
+
+.question-item--unanswered {
+  border: 2px solid #ef4444;
+  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+  color: #ef4444;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.2);
+}
+
+.question-item-number {
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: inherit;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  position: relative;
+  z-index: 1;
+}
+
+.question-item-icon {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  color: #22c55e;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+}
+
+/* 进度弹窗滚动条样式 */
+.progress-modal-body::-webkit-scrollbar,
+.questions-grid::-webkit-scrollbar {
+  width: 8px;
+}
+
+.progress-modal-body::-webkit-scrollbar-track,
+.questions-grid::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.progress-modal-body::-webkit-scrollbar-thumb,
+.questions-grid::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+  border: 2px solid #f1f5f9;
+}
+
+.progress-modal-body::-webkit-scrollbar-thumb:hover,
+.questions-grid::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes activePulse {
+  0%, 100% {
+    box-shadow: 0 4px 12px rgba(30, 144, 255, 0.3);
+    transform: scale(1.1);
+  }
+  50% {
+    box-shadow: 0 6px 16px rgba(30, 144, 255, 0.4);
+    transform: scale(1.15);
+  }
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .progress-modal-content {
+    width: 95%;
+    max-height: 90vh;
+  }
+
+  .progress-summary {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .questions-grid {
+    grid-template-columns: repeat(auto-fill, minmax(45px, 1fr));
+    gap: 10px;
+  }
+
+  .question-item {
+    width: 45px;
+    height: 45px;
+    font-size: 0.85rem;
+  }
 }
 </style>

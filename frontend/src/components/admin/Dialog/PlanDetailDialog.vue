@@ -52,6 +52,9 @@
                   <div class="task-title-row">
                     <span class="task-number">{{ index + 1 }}</span>
                     <h5>{{ task.name }}</h5>
+                    <span v-if="task.is_exam_mode" class="exam-mode-badge">
+                      <i class="fas fa-clipboard-check"></i> 考试模式
+                    </span>
                   </div>
                   <span class="task-status" :class="getTaskStatusClass(task)">
                     {{ getTaskStatusText(task) }}
@@ -152,6 +155,7 @@ async function fetchPlanDetail() {
           start_time: task.start_time,
           end_time: task.end_time,
           is_completed: task.is_completed || false,
+          is_exam_mode: task.is_exam_mode || false,
           exam_count: task.exams?.length || 0,
           oj_count: task.oj_problems?.length || 0
         }))
@@ -433,6 +437,18 @@ onMounted(() => {
   color: #1e293b;
   font-size: 1.2rem;
   font-weight: 700;
+}
+
+.exam-mode-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
 }
 
 .task-status {

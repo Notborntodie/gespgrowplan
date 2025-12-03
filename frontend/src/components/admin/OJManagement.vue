@@ -63,13 +63,13 @@
             <td>
               <div class="action-buttons">
                 <button @click="viewProblem(problem.id)" class="btn-action btn-view" title="查看详情">
-                  <span class="action-icon">👀</span>
+                  <Icon name="eye" :size="18" />
                 </button>
                 <button @click="editProblem(problem.id)" class="btn-action btn-edit" title="编辑">
-                  <span class="action-icon">📝</span>
+                  <Icon name="edit" :size="18" />
                 </button>
                 <button @click="deleteProblem(problem.id)" class="btn-action btn-delete" title="删除">
-                  <span class="action-icon">🗑</span>
+                  <Icon name="trash-2" :size="18" />
                 </button>
               </div>
             </td>
@@ -78,7 +78,7 @@
       </table>
 
       <div v-else class="empty-state">
-        <div class="empty-icon">📭</div>
+        <Icon name="inbox" :size="64" class="empty-icon" />
         <p>暂无题目</p>
       </div>
     </div>
@@ -107,6 +107,7 @@ import { useRouter } from 'vue-router'
 import axios from 'axios'
 import SingleOJUploadDialog from './Dialog/SingleOJUploadDialog.vue'
 import EditOJDialog from './Dialog/EditOJDialog.vue'
+import Icon from '@/components/Icon.vue'
 
 const router = useRouter()
 
@@ -350,6 +351,10 @@ onMounted(() => {
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
   font-size: 14px;
 }
 
@@ -445,6 +450,10 @@ onMounted(() => {
 .empty-icon {
   font-size: 64px;
   margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #64748b;
   opacity: 0.5;
 }
 
@@ -461,6 +470,14 @@ onMounted(() => {
 
 .action-icon {
   font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-action :deep(.lucide-icon) {
+  flex-shrink: 0;
+  color: inherit;
 }
 </style>
 

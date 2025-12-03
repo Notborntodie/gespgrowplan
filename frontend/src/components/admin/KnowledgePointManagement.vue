@@ -5,15 +5,15 @@
       <div class="header-info">
         <span class="knowledge-point-count">共 {{ knowledgePoints.length }} 个知识点</span>
         <span v-if="knowledgePointStore.isCacheValid && knowledgePointStore.hasKnowledgePoints" class="cache-indicator">
-          📦 使用缓存数据
+          <Icon name="package" :size="16" /> 使用缓存数据
         </span>
       </div>
       <div class="action-buttons">
         <button @click="openCreateKnowledgePointDialog" class="btn btn-primary">
-          <span class="btn-icon">+</span> 创建知识点
+          <Icon name="plus" :size="18" /> 创建知识点
         </button>
         <button @click="refreshKnowledgePoints" class="btn btn-secondary" title="刷新知识点列表">
-          <span class="btn-icon">↻</span> 刷新
+          <Icon name="refresh-cw" :size="18" /> 刷新
         </button>
       </div>
     </div>
@@ -101,13 +101,13 @@
             <td @click.stop>
               <div class="action-buttons">
                 <button @click="viewKnowledgePointDetails(kp.id)" class="btn-action btn-view" title="查看详情">
-                  <span class="action-icon">👀</span>
+                  <Icon name="eye" :size="18" />
                 </button>
                 <button @click="editKnowledgePoint(kp)" class="btn-action btn-edit" title="编辑">
-                  <span class="action-icon">📝</span>
+                  <Icon name="edit" :size="18" />
                 </button>
                 <button @click="deleteKnowledgePoint(kp)" class="btn-action btn-delete" title="删除">
-                  <span class="action-icon">🗑</span>
+                  <Icon name="trash-2" :size="18" />
                 </button>
               </div>
             </td>
@@ -204,6 +204,7 @@ import EditKnowledgePointDialog from './Dialog/EditKnowledgePointDialog.vue'
 import ConfirmDialog from './Dialog/ConfirmDialog.vue'
 import SuccessMessageDialog from './Dialog/SuccessMessageDialog.vue'
 import { useKnowledgePointStore } from '../../stores/knowledgePointStore'
+import Icon from '@/components/Icon.vue'
 
 // Props 定义
 interface Props {
@@ -839,6 +840,10 @@ onMounted(async () => {
   font-size: 64px;
   margin-bottom: 20px;
   opacity: 0.5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #64748b;
 }
 
 .empty-state p {
@@ -850,9 +855,20 @@ onMounted(async () => {
   font-size: 16px;
   font-weight: bold;
   margin-right: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .action-icon {
   font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-buttons :deep(.lucide-icon) {
+  flex-shrink: 0;
+  color: inherit;
 }
 </style>

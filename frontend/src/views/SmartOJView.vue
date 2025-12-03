@@ -23,47 +23,63 @@
         <div class="question-main">
           <div class="question-card">
             <div class="question-card-header">
-              <div class="question-number">
+              <div class="question-title-section">
+                <h2 class="question-title">{{ currentProblem.title }}</h2>
                 <span class="level-badge">GESP {{ currentProblem.level }}级</span>
                 <span class="question-date" v-if="currentProblem.date">
-                  <i class="fas fa-calendar-alt"></i>
+                  <Icon name="calendar" :size="16" />
                   <span>{{ formatDate(currentProblem.date) }}</span>
                 </span>
-              </div>
-              <div class="header-buttons-center">
-                <button @click="runCode" class="btn btn-test" :disabled="isRunning" :class="{ 'btn-loading': isRunning }">
-                  <span v-if="!isRunning" class="btn-content">
-                    <span>▶️</span>
-                    <span>运行代码</span>
-                  </span>
-                  <span v-else class="btn-content">
-                    <i class="fas fa-spinner fa-spin"></i>
-                    <span>运行中...</span>
-                  </span>
-                </button>
-                <button @click="submitCode" class="btn btn-submit" :disabled="isSubmitting" :class="{ 'btn-loading': isSubmitting }">
-                  <span v-if="!isSubmitting" class="btn-content">
-                    <span>🚀</span>
-                    <span>提交代码</span>
-                  </span>
-                  <span v-else-if="isJudging" class="btn-content">
-                    <i class="fas fa-spinner fa-spin"></i>
-                    <span>判题中...</span>
-                  </span>
-                  <span v-else class="btn-content">
-                    <i class="fas fa-spinner fa-spin"></i>
-                    <span>提交中...</span>
-                  </span>
-                </button>
               </div>
               <div class="header-buttons">
                 <button 
                   class="btn btn-primary submit-btn-header" 
                   @click="openAnalysis"
-                  :disabled="isAnalysisLocked"
                 >
-                  <i v-if="!isAnalysisLocked" class="fas fa-book-open"></i>
-                  {{ analysisButtonText }}
+                  <Icon name="book-open" :size="16" />
+                  解析
+                </button>
+                <button 
+                  @click="runCode" 
+                  class="btn btn-test" 
+                  :disabled="isRunning || runCooldown > 0" 
+                  :class="{ 'btn-loading': isRunning }"
+                >
+                  <span v-if="!isRunning && runCooldown === 0" class="btn-content">
+                    <Icon name="play" :size="16" />
+                    <span>运行代码</span>
+                  </span>
+                  <span v-else-if="isRunning" class="btn-content">
+                    <Icon name="loader-2" :size="16" spin />
+                    <span>运行中...</span>
+                  </span>
+                  <span v-else class="btn-content">
+                    <Icon name="clock" :size="16" />
+                    <span>等待 {{ runCooldown }}s</span>
+                  </span>
+                </button>
+                <button 
+                  @click="submitCode" 
+                  class="btn btn-submit" 
+                  :disabled="isSubmitting || submitCooldown > 0" 
+                  :class="{ 'btn-loading': isSubmitting }"
+                >
+                  <span v-if="!isSubmitting && submitCooldown === 0" class="btn-content">
+                    <Icon name="rocket" :size="16" />
+                    <span>提交代码</span>
+                  </span>
+                  <span v-else-if="isJudging" class="btn-content">
+                    <Icon name="loader-2" :size="16" spin />
+                    <span>判题中...</span>
+                  </span>
+                  <span v-else-if="isSubmitting" class="btn-content">
+                    <Icon name="loader-2" :size="16" spin />
+                    <span>提交中...</span>
+                  </span>
+                  <span v-else class="btn-content">
+                    <Icon name="clock" :size="16" />
+                    <span>等待 {{ submitCooldown }}s</span>
+                  </span>
                 </button>
               </div>
             </div>
@@ -75,7 +91,7 @@
                 <!-- 题目描述 -->
                   <div class="content-section question-text-section">
                     <div class="section-header">
-                      <h4 class="section-title">📝 题目描述</h4>
+                      <h4 class="section-title"><Icon name="file-text" :size="18" /> 题目描述</h4>
                     </div>
                     <div class="section-content">
                       <div class="problem-description">
@@ -90,7 +106,7 @@
                   <!-- 输入输出格式 -->
                   <div class="content-section problem-io-section">
                     <div class="section-header">
-                      <h4 class="section-title">📥 输入格式</h4>
+                      <h4 class="section-title"><Icon name="download" :size="18" /> 输入格式</h4>
                     </div>
                     <div class="section-content">
                       <div class="problem-io">
@@ -104,7 +120,7 @@
   
                   <div class="content-section problem-io-section">
                     <div class="section-header">
-                      <h4 class="section-title">📤 输出格式</h4>
+                      <h4 class="section-title"><Icon name="upload" :size="18" /> 输出格式</h4>
                     </div>
                     <div class="section-content">
                       <div class="problem-io">
@@ -119,7 +135,7 @@
                   <!-- 样例 -->
                   <div class="content-section problem-samples-section">
                     <div class="section-header">
-                      <h4 class="section-title">💡 样例</h4>
+                      <h4 class="section-title"><Icon name="lightbulb" :size="18" /> 样例</h4>
                     </div>
                     <div class="section-content">
                       <div class="problem-samples">
@@ -151,7 +167,7 @@
                   <!-- 数据范围 -->
                   <div class="content-section problem-constraints-section">
                     <div class="section-header">
-                      <h4 class="section-title">📊 数据范围</h4>
+                      <h4 class="section-title"><Icon name="bar-chart-3" :size="18" /> 数据范围</h4>
                     </div>
                     <div class="section-content">
                       <div class="problem-constraints">
@@ -171,7 +187,7 @@
               <div class="panel-resizer" @mousedown="startDrag">
                 <div class="resizer-line"></div>
                 <div class="resizer-handle">
-                  <i class="fas fa-grip-lines-vertical"></i>
+                  <Icon name="grip-vertical" :size="16" />
                 </div>
               </div>
   
@@ -207,7 +223,7 @@
                 {{ testResult.success ? '✓ 通过' : '✗ 失败' }}
               </span>
               <button class="close-modal-btn" @click="closeTestResult">
-                <i class="fas fa-times"></i>
+                <Icon name="x" :size="18" />
               </button>
             </div>
           </div>
@@ -240,7 +256,7 @@
             <button @click="cancelExit" class="exit-confirm-close">×</button>
           </div>
           <div class="exit-confirm-body">
-            <div class="exit-confirm-icon">⚠️</div>
+            <div class="exit-confirm-icon"><Icon name="alert-triangle" :size="48" /></div>
             <p class="exit-confirm-message">
               您确定要退出当前 OJ 练习吗？<br>
               <span class="exit-confirm-warning">还没有提交答题哦！</span>
@@ -264,7 +280,7 @@
                 {{ submitResult.statusText }}
               </span>
               <button class="close-modal-btn" @click="closeSubmitResult">
-                <i class="fas fa-times"></i>
+                <Icon name="x" :size="18" />
               </button>
             </div>
           </div>
@@ -319,7 +335,7 @@
                 </div>
                 
                 <div v-else class="test-case-hidden">
-                  <i class="fas fa-lock"></i>
+                  <Icon name="lock" :size="16" />
                   <span>隐藏测试点</span>
                   <span v-if="testCase.passed" class="hidden-result">（已通过）</span>
                   <span v-else class="hidden-result">（未通过）</span>
@@ -343,11 +359,15 @@
             <span class="result-title">语言解析</span>
             <div class="result-header-right">
               <button class="close-modal-btn" @click="closeAnalysisModal">
-                <i class="fas fa-times"></i>
+                <Icon name="x" :size="18" />
               </button>
             </div>
           </div>
           <div class="result-modal-content">
+            <div class="analysis-tip">
+              <Icon name="lightbulb" :size="20" />
+              <span>先思考15min,自己尝试再查看解析噢！</span>
+            </div>
             <div class="markdown-content" v-html="renderMarkdown(analysisContent)"></div>
           </div>
         </div>
@@ -362,11 +382,11 @@
       <div v-if="showReturnConfirmDialog" class="exit-confirm-modal-overlay" @click="cancelReturn">
         <div class="exit-confirm-modal-content return-confirm-modal" @click.stop>
           <div class="exit-confirm-header return-confirm-header">
-            <h3>🎉 恭喜通过！</h3>
+            <h3>恭喜通过！</h3>
             <button @click="cancelReturn" class="exit-confirm-close">×</button>
           </div>
           <div class="exit-confirm-body">
-            <div class="exit-confirm-icon success-icon">✅</div>
+            <div class="exit-confirm-icon success-icon"><Icon name="check-circle" :size="48" /></div>
             <p class="exit-confirm-message">
               恭喜您成功通过本题！<br>
               <span class="exit-confirm-warning">是否返回上一页？</span>
@@ -382,6 +402,39 @@
           </div>
         </div>
       </div>
+
+      <!-- 提交确认弹窗 -->
+      <div v-if="showCaptchaModal" class="exit-confirm-modal-overlay" @click="closeCaptchaModal">
+        <div class="exit-confirm-modal-content captcha-modal" @click.stop>
+          <div class="exit-confirm-header">
+            <h3>提交确认</h3>
+            <button @click="closeCaptchaModal" class="exit-confirm-close">×</button>
+          </div>
+          <div class="exit-confirm-body">
+            <div class="captcha-content">
+              <!-- 提示信息 -->
+              <div class="captcha-tip">
+                <Icon name="info" :size="20" />
+                <p class="captcha-tip-text">
+                  提交后需要等待 <strong>15秒</strong> 才能再次提交。如果判题出现错误，请自行查看测试点信息排查问题。
+                </p>
+              </div>
+              <div class="captcha-question">
+                <Icon name="alert-triangle" :size="32" />
+                <p class="captcha-text">确定要提交代码吗？</p>
+              </div>
+            </div>
+          </div>
+          <div class="exit-confirm-footer">
+            <button @click="closeCaptchaModal" class="btn btn-secondary">
+              取消
+            </button>
+            <button @click="confirmAndSubmit" class="btn btn-primary">
+              确认提交
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   </template>
   
@@ -389,7 +442,105 @@
   import { ref, onMounted, onUnmounted, computed } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import axios from 'axios'
-  import { BASE_URL } from '@/config/api'
+  import { BASE_URL, OJ_API_CONFIGS } from '@/config/api'
+  import Icon from '@/components/Icon.vue'
+  
+// 当前使用的API配置索引
+let currentApiIndex = 0
+
+// 负载均衡：随机选择服务器（50%概率）
+const getRandomApiConfig = () => {
+  const availableConfigs = OJ_API_CONFIGS.filter(config => config.enabled)
+  if (availableConfigs.length === 0) return OJ_API_CONFIGS[0]
+  const randomIndex = Math.floor(Math.random() * availableConfigs.length)
+  currentApiIndex = randomIndex
+  return availableConfigs[randomIndex]
+}
+
+// 获取当前有效的API配置
+const getCurrentApiConfig = () => {
+  // 按优先级排序并过滤启用的配置
+  const availableConfigs = OJ_API_CONFIGS
+    .filter(config => config.enabled)
+    .sort((a, b) => a.priority - b.priority)
+  
+  // 如果当前索引超出范围，使用第一个可用的配置
+  if (currentApiIndex >= availableConfigs.length) {
+    currentApiIndex = 0
+  }
+  
+  return availableConfigs[currentApiIndex] || availableConfigs[0]
+}
+
+// 获取当前API基础URL（使用负载均衡）
+const getCurrentApiBaseUrl = () => {
+  const config = getRandomApiConfig()
+  console.log(`负载均衡选择: ${config.name} (${config.url})`)
+  return config ? config.url : OJ_API_CONFIGS[0].url
+}
+  
+  // 切换到下一个可用的API配置
+  const switchToNextApi = () => {
+    const availableConfigs = OJ_API_CONFIGS
+      .filter(config => config.enabled)
+      .sort((a, b) => a.priority - b.priority)
+    
+    if (availableConfigs.length <= 1) {
+      console.warn('没有可用的备用API配置')
+      return false
+    }
+    
+    currentApiIndex = (currentApiIndex + 1) % availableConfigs.length
+    const newConfig = getCurrentApiConfig()
+    console.log(`切换到备用API: ${newConfig.name} (${newConfig.url})`)
+    return true
+  }
+  
+  // 带故障切换的API请求函数
+  const apiRequestWithFallback = async (url: string, options: RequestInit, maxRetries = 1) => {
+    let lastError: Error | null = null
+    
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      const currentApiUrl = getCurrentApiBaseUrl()
+      const fullUrl = `${currentApiUrl}${url}`
+      
+      try {
+        console.log(`API请求尝试 ${attempt + 1}: ${fullUrl}`)
+        const response = await fetch(fullUrl, options)
+        
+        if (response.ok) {
+          return response
+        }
+        
+        // 如果不是网络错误，直接抛出
+        if (response.status >= 400 && response.status < 500) {
+          throw new Error(`API错误: ${response.status} ${response.statusText}`)
+        }
+        
+        // 服务器错误，尝试切换API
+        throw new Error(`服务器错误: ${response.status}`)
+        
+      } catch (error) {
+        lastError = error as Error
+        console.error(`API请求失败 (尝试 ${attempt + 1}):`, error)
+        
+        // 如果是最后一次尝试，直接抛出错误
+        if (attempt >= maxRetries) {
+          break
+        }
+        
+        // 切换到下一个API配置
+        if (!switchToNextApi()) {
+          break // 没有可用的备用配置
+        }
+        
+        // 等待一段时间后重试
+        await new Promise(resolve => setTimeout(resolve, 1000))
+      }
+    }
+    
+    throw lastError || new Error('所有API配置都失败了')
+  }
   // 导入 CodeMirror 6
   import { EditorView, keymap, lineNumbers as cmLineNumbers } from '@codemirror/view'
   import { EditorState } from '@codemirror/state'
@@ -513,19 +664,25 @@ import katex from 'katex'
   const showReturnConfirmDialog = ref(false)
   // 提交OJ答题相关状态
   const isSubmittingOJ = ref(false)
-  // 解析按钮锁定与弹窗
-  const isAnalysisLocked = ref(true)
-  const lockRemainSeconds = ref(900)
-  const lockTimer = ref<number | null>(null)
+  // 解析弹窗
   const showAnalysisModal = ref(false)
   const analysisContent = ref('')
   // 烟花效果状态
   const showFireworks = ref(false)
-  const analysisButtonText = computed(() => {
-    return isAnalysisLocked.value
-      ? `${String(Math.floor(lockRemainSeconds.value / 60)).padStart(2,'0')}:${String(lockRemainSeconds.value % 60).padStart(2,'0')}`
-      : '解析'
-  })
+  
+  // 时间限制相关状态
+  const lastRunTime = ref(0) // 上次运行代码的时间戳
+  const lastSubmitTime = ref(0) // 上次提交代码的时间戳
+  const runCooldown = ref(0) // 运行代码冷却时间（秒）
+  const submitCooldown = ref(0) // 提交代码冷却时间（秒）
+  const COOLDOWN_DURATION = 10000 // 冷却时间：10秒
+  
+  // 验证码相关状态
+  const showCaptchaModal = ref(false)
+  const captchaCode = ref('') // 用户输入的验证码
+  const captchaAnswer = ref('') // 正确的验证码答案
+  const captchaInput = ref('') // 验证码输入框的值
+  const captchaError = ref('') // 验证码错误提示
   
   // 编辑器相关
   const editorContainer = ref<HTMLElement | null>(null)
@@ -759,7 +916,153 @@ const renderMarkdown = (text: string): string => {
     }
   }
   
+  // 生成验证码（至少包含三个数）
+  const generateCaptcha = () => {
+    // 生成更难的数学验证码：所有题目至少包含三个数
+    const operations = [
+      // 混合运算：两位数 + 两位数 - 一位数
+      () => {
+        const num1 = Math.floor(Math.random() * 90) + 10 // 10-99
+        const num2 = Math.floor(Math.random() * 90) + 10 // 10-99
+        const num3 = Math.floor(Math.random() * 9) + 1 // 1-9
+        const answer = num1 + num2 - num3
+        return { question: `${num1} + ${num2} - ${num3} = ?`, answer: answer.toString() }
+      },
+      // 混合运算：两位数 × 一位数 + 两位数
+      () => {
+        const num1 = Math.floor(Math.random() * 90) + 10 // 10-99
+        const num2 = Math.floor(Math.random() * 9) + 2 // 2-10
+        const num3 = Math.floor(Math.random() * 90) + 10 // 10-99
+        const answer = num1 * num2 + num3
+        return { question: `${num1} × ${num2} + ${num3} = ?`, answer: answer.toString() }
+      },
+      // 混合运算：两位数 + 两位数 + 一位数
+      () => {
+        const num1 = Math.floor(Math.random() * 90) + 10 // 10-99
+        const num2 = Math.floor(Math.random() * 90) + 10 // 10-99
+        const num3 = Math.floor(Math.random() * 9) + 1 // 1-9
+        const answer = num1 + num2 + num3
+        return { question: `${num1} + ${num2} + ${num3} = ?`, answer: answer.toString() }
+      },
+      // 混合运算：两位数 - 一位数 + 两位数
+      () => {
+        const num1 = Math.floor(Math.random() * 90) + 10 // 10-99
+        const num2 = Math.floor(Math.random() * 9) + 1 // 1-9
+        const num3 = Math.floor(Math.random() * 90) + 10 // 10-99
+        const answer = num1 - num2 + num3
+        return { question: `${num1} - ${num2} + ${num3} = ?`, answer: answer.toString() }
+      },
+      // 混合运算：两位数 × 一位数 - 两位数
+      () => {
+        const num1 = Math.floor(Math.random() * 90) + 10 // 10-99
+        const num2 = Math.floor(Math.random() * 9) + 2 // 2-10
+        const num3 = Math.floor(Math.random() * 90) + 10 // 10-99
+        const answer = num1 * num2 - num3
+        return { question: `${num1} × ${num2} - ${num3} = ?`, answer: answer.toString() }
+      },
+      // 混合运算：三位数 + 两位数 - 一位数
+      () => {
+        const num1 = Math.floor(Math.random() * 900) + 100 // 100-999
+        const num2 = Math.floor(Math.random() * 90) + 10 // 10-99
+        const num3 = Math.floor(Math.random() * 9) + 1 // 1-9
+        const answer = num1 + num2 - num3
+        return { question: `${num1} + ${num2} - ${num3} = ?`, answer: answer.toString() }
+      },
+      // 混合运算：两位数 + 两位数 × 一位数
+      () => {
+        const num1 = Math.floor(Math.random() * 90) + 10 // 10-99
+        const num2 = Math.floor(Math.random() * 90) + 10 // 10-99
+        const num3 = Math.floor(Math.random() * 9) + 2 // 2-10
+        const answer = num1 + num2 * num3
+        return { question: `${num1} + ${num2} × ${num3} = ?`, answer: answer.toString() }
+      },
+      // 混合运算：三位数 - 两位数 + 一位数
+      () => {
+        let num1 = Math.floor(Math.random() * 900) + 100 // 100-999
+        let num2 = Math.floor(Math.random() * 90) + 10 // 10-99
+        const num3 = Math.floor(Math.random() * 9) + 1 // 1-9
+        // 确保结果为正
+        if (num1 - num2 < 0) {
+          const temp = num1
+          num1 = num2
+          num2 = temp
+        }
+        const answer = num1 - num2 + num3
+        return { question: `${num1} - ${num2} + ${num3} = ?`, answer: answer.toString() }
+      },
+      // 混合运算：一位数 × 两位数 + 两位数
+      () => {
+        const num1 = Math.floor(Math.random() * 9) + 2 // 2-10
+        const num2 = Math.floor(Math.random() * 90) + 10 // 10-99
+        const num3 = Math.floor(Math.random() * 90) + 10 // 10-99
+        const answer = num1 * num2 + num3
+        return { question: `${num1} × ${num2} + ${num3} = ?`, answer: answer.toString() }
+      },
+      // 混合运算：两位数 + 一位数 × 两位数
+      () => {
+        const num1 = Math.floor(Math.random() * 90) + 10 // 10-99
+        const num2 = Math.floor(Math.random() * 9) + 2 // 2-10
+        const num3 = Math.floor(Math.random() * 90) + 10 // 10-99
+        const answer = num1 + num2 * num3
+        return { question: `${num1} + ${num2} × ${num3} = ?`, answer: answer.toString() }
+      }
+    ]
+    
+    // 随机选择一种运算类型
+    const randomOp = operations[Math.floor(Math.random() * operations.length)]
+    const result = randomOp()
+    captchaAnswer.value = result.answer
+    captchaCode.value = result.question
+    captchaInput.value = ''
+    captchaError.value = '' // 清除错误信息
+  }
+  
+  // 更新冷却时间倒计时
+  const updateCooldowns = () => {
+    const now = Date.now()
+    
+    // 更新运行代码冷却时间
+    if (lastRunTime.value > 0) {
+      const elapsed = now - lastRunTime.value
+      const remaining = Math.max(0, COOLDOWN_DURATION - elapsed)
+      runCooldown.value = Math.ceil(remaining / 1000)
+    } else {
+      runCooldown.value = 0
+    }
+    
+    // 更新提交代码冷却时间
+    if (lastSubmitTime.value > 0) {
+      const elapsed = now - lastSubmitTime.value
+      const remaining = Math.max(0, COOLDOWN_DURATION - elapsed)
+      submitCooldown.value = Math.ceil(remaining / 1000)
+    } else {
+      submitCooldown.value = 0
+    }
+  }
+  
+  // 启动冷却时间定时器
+  let cooldownTimer: number | null = null
+  const startCooldownTimer = () => {
+    if (cooldownTimer) {
+      clearInterval(cooldownTimer)
+    }
+    cooldownTimer = window.setInterval(() => {
+      updateCooldowns()
+    }, 100)
+  }
+  
   const runCode = async () => {
+    // 检查冷却时间
+    const now = Date.now()
+    if (lastRunTime.value > 0) {
+      const elapsed = now - lastRunTime.value
+      if (elapsed < COOLDOWN_DURATION) {
+        const remaining = Math.ceil((COOLDOWN_DURATION - elapsed) / 1000)
+        alert(`请等待 ${remaining} 秒后再运行代码`)
+        return
+      }
+    }
+    
     isRunning.value = true
     testResult.value = null
     submitResult.value = null
@@ -780,6 +1083,9 @@ const renderMarkdown = (text: string): string => {
           error: '没有可用的测试样例',
         }
         isRunning.value = false
+        // 即使没有样例，也要开始倒计时
+        lastRunTime.value = Date.now()
+        updateCooldowns()
         return
       }
   
@@ -793,8 +1099,8 @@ const renderMarkdown = (text: string): string => {
       
       console.log('发送到后端的数据:', requestData)
   
-      // 发送请求到后端
-      const response = await fetch(`${BASE_URL}/oj/run`, {
+      // 发送请求到后端（支持故障切换）
+      const response = await apiRequestWithFallback('/api/oj/run', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -844,10 +1150,63 @@ const renderMarkdown = (text: string): string => {
       }
     } finally {
       isRunning.value = false
+      // 运行完成后开始倒计时
+      lastRunTime.value = Date.now()
+      updateCooldowns()
     }
   }
   
-  const submitCode = async () => {
+// 打开提交确认弹窗
+const openCaptchaModal = () => {
+  showCaptchaModal.value = true
+}
+  
+  // 关闭验证码弹窗
+  const closeCaptchaModal = () => {
+    showCaptchaModal.value = false
+    captchaInput.value = ''
+    captchaError.value = '' // 清除错误信息
+  }
+  
+  // 提交代码（先检查冷却时间，然后打开验证码弹窗）
+  const submitCode = () => {
+    // 检查冷却时间
+    const now = Date.now()
+    if (lastSubmitTime.value > 0) {
+      const elapsed = now - lastSubmitTime.value
+      if (elapsed < COOLDOWN_DURATION) {
+        const remaining = Math.ceil((COOLDOWN_DURATION - elapsed) / 1000)
+        alert(`请等待 ${remaining} 秒后再提交代码`)
+        return
+      }
+    }
+    
+    // 打开验证码弹窗
+    openCaptchaModal()
+  }
+  
+// 确认并提交代码（无需验证码）
+const confirmAndSubmit = async () => {
+  // 关闭弹窗
+  closeCaptchaModal()
+  
+  // 执行提交
+  await doSubmitCode()
+}
+  
+  // 执行提交代码的实际逻辑
+  const doSubmitCode = async () => {
+    // 检查冷却时间
+    const now = Date.now()
+    if (lastSubmitTime.value > 0) {
+      const elapsed = now - lastSubmitTime.value
+      if (elapsed < COOLDOWN_DURATION) {
+        const remaining = Math.ceil((COOLDOWN_DURATION - elapsed) / 1000)
+        alert(`请等待 ${remaining} 秒后再提交代码`)
+        return
+      }
+    }
+    
     isSubmitting.value = true
     testResult.value = null
     submitResult.value = null
@@ -878,19 +1237,33 @@ const renderMarkdown = (text: string): string => {
       console.log('发送到后端的提交数据:', requestData)
   
       // 判断是否使用任务内提交接口
-      let submitUrl = `${BASE_URL}/oj/submit`
+      let submitUrl = '/api/oj/submit'
+      let useFallback = true
+      
       if (fromTaskView && taskId) {
+        // 任务内提交仍然使用原 BASE_URL（不使用故障切换）
         submitUrl = `${BASE_URL}/learning-tasks/${taskId}/submit-oj`
+        useFallback = false
         console.log('使用任务内提交接口:', submitUrl)
+      } else {
+        console.log('使用 OJ 判题服务接口（支持故障切换）')
       }
-  
-      const submitResponse = await fetch(submitUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestData),
-      })
+
+      const submitResponse = useFallback 
+        ? await apiRequestWithFallback(submitUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestData),
+          })
+        : await fetch(submitUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestData),
+          })
   
       if (!submitResponse.ok) {
         const errorText = await submitResponse.text()
@@ -995,7 +1368,12 @@ const renderMarkdown = (text: string): string => {
         console.log(`第 ${i + 1} 次查询判题结果...`)
         
         try {
-          const queryResponse = await fetch(`${BASE_URL}/oj/submissions/${submissionId}`)
+          const queryResponse = await apiRequestWithFallback(`/api/oj/submissions/${submissionId}`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          })
           
           if (!queryResponse.ok) {
             console.warn('查询判题结果失败，继续重试...')
@@ -1065,12 +1443,14 @@ const renderMarkdown = (text: string): string => {
     } finally {
       isSubmitting.value = false
       isJudging.value = false
+      // 提交完成后开始倒计时
+      lastSubmitTime.value = Date.now()
+      updateCooldowns()
     }
   }
 
   // 打开语言解析
   const openAnalysis = () => {
-    if (isAnalysisLocked.value) return
     // 构造基础解析内容（占位实现，可接入后端）
     const title = currentProblem.value.title || '本题'
     const level = currentProblem.value.level
@@ -1175,8 +1555,11 @@ const renderMarkdown = (text: string): string => {
   // 确认返回
   const confirmReturn = () => {
     showReturnConfirmDialog.value = false
-    // 如果是从计划页面进入的，返回到计划页面
-    if (fromPlan) {
+    // 如果是从任务页面进入的，返回到任务页面并激活编程题标签
+    if (fromTaskView && planId && taskId) {
+      console.log('从任务页面进入，返回到任务页面（编程题标签）')
+      router.push(`/plan/${planId}/tasks/${taskId}?tab=programming`)
+    } else if (fromPlan) {
       console.log('从计划页面进入，返回到计划页面')
       router.push('/plan')
     } else {
@@ -1577,25 +1960,8 @@ const renderMarkdown = (text: string): string => {
     window.scrollTo(0, 0)
     document.documentElement.scrollTop = 0
     document.body.scrollTop = 0
-    // 启动解析按钮15分钟锁定倒计时
-    lockRemainSeconds.value = 900
-    isAnalysisLocked.value = true
-    if (lockTimer.value) {
-      window.clearInterval(lockTimer.value)
-      lockTimer.value = null
-    }
-    lockTimer.value = window.setInterval(() => {
-      if (lockRemainSeconds.value > 0) {
-        lockRemainSeconds.value -= 1
-      }
-      if (lockRemainSeconds.value <= 0) {
-        isAnalysisLocked.value = false
-        if (lockTimer.value) {
-          window.clearInterval(lockTimer.value)
-          lockTimer.value = null
-        }
-      }
-    }, 1000)
+    // 启动冷却时间定时器
+    startCooldownTimer()
   })
   
   // 组件卸载时清理编辑器和事件监听器
@@ -1609,10 +1975,10 @@ const renderMarkdown = (text: string): string => {
     // 清理拖动事件监听器
     document.removeEventListener('mousemove', onDrag)
     document.removeEventListener('mouseup', stopDrag)
-    // 清理解析计时器
-    if (lockTimer.value) {
-      window.clearInterval(lockTimer.value)
-      lockTimer.value = null
+    // 清理冷却时间定时器
+    if (cooldownTimer) {
+      clearInterval(cooldownTimer)
+      cooldownTimer = null
     }
   })
   </script>
@@ -1991,7 +2357,7 @@ const renderMarkdown = (text: string): string => {
     flex-shrink: 0;
     align-items: flex-start;
     justify-content: center;
-    margin-top: 40px; /* 缩小与NavBar的距离 */
+    margin-top: 10px; /* 缩小与NavBar的距离 */
   }
   
   /* 复习模式容器 */
@@ -2178,23 +2544,6 @@ const renderMarkdown = (text: string): string => {
     margin-top: 0;
   }
   
-  .question-card-header .header-buttons-center {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    flex: 1;
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-  
-  .question-card-header .header-buttons-center .btn {
-    padding: 8px 16px;
-    font-size: 0.9rem;
-    min-width: 120px;
-  }
-  
   .question-card-header .exit-practice-btn {
     background: linear-gradient(135deg, #87ceeb 0%, #b0e0e6 100%);
     color: #2c5282;
@@ -2227,6 +2576,12 @@ const renderMarkdown = (text: string): string => {
     gap: 12px;
     flex: 0 0 auto;
     z-index: 1;
+  }
+  
+  .question-card-header .header-buttons .btn {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    min-width: 120px;
   }
 
   .question-card-header .submit-btn-header {
@@ -2261,37 +2616,49 @@ const renderMarkdown = (text: string): string => {
     transform: none;
   }
   
-  /* 题目信息样式 - 与GESPEaxmView保持一致 */
-  .question-card-header .question-number {
+  /* 题目标题样式 - 与GESPEaxmView保持一致 */
+  .question-card-header .question-title-section {
     display: flex;
     align-items: center;
-    gap: 12px;
-    flex: 0 0 auto;
+    gap: 16px;
+    flex: 1;
     min-width: 0;
     z-index: 1;
+  }
+  
+  .question-card-header .question-title {
+    margin: 0;
+    color: white;
+    font-size: 1.4rem;
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 400px;
   }
   
   .question-card-header .level-badge {
     background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.1) 100%);
     color: white;
-    padding: 8px 14px;
+    padding: 6px 14px;
     border-radius: 18px;
     font-weight: 700;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     box-shadow: 0 4px 12px rgba(255,255,255,0.2);
     border: 1px solid rgba(255,255,255,0.3);
     backdrop-filter: blur(10px);
     position: relative;
     z-index: 1;
+    flex-shrink: 0;
   }
   
   .question-card-header .question-date {
-    margin-left: 8px;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     font-weight: 700;
     color: white;
     background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.1) 100%);
-    padding: 8px 14px;
+    padding: 6px 14px;
     border-radius: 18px;
     box-shadow: 0 4px 12px rgba(255,255,255,0.2);
     border: 1px solid rgba(255,255,255,0.3);
@@ -2299,11 +2666,14 @@ const renderMarkdown = (text: string): string => {
     position: relative;
     z-index: 1;
     transition: all 0.3s ease;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
   }
   
   .question-card-header .question-date i {
     font-size: 0.9rem;
-    margin-right: 6px;
     color: rgba(255,255,255,0.9);
   }
   
@@ -2884,47 +3254,47 @@ const renderMarkdown = (text: string): string => {
   }
   
   .btn-test {
-    background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
-    color: white;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-  }
-  
-  .btn-test:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
-    background: linear-gradient(135deg, #059669 0%, #10b981 100%);
-  }
-
-  .btn-test:active:not(:disabled) {
-    transform: translateY(0);
-    box-shadow: 0 3px 8px rgba(16, 185, 129, 0.3);
-  }
-
-  .btn-test.btn-loading {
-    background: linear-gradient(135deg, #059669 0%, #10b981 100%);
-    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.5);
-  }
-  
-  .btn-submit {
     background: linear-gradient(135deg, #1e90ff 0%, #38bdf8 100%);
     color: white;
     box-shadow: 0 4px 12px rgba(30, 144, 255, 0.3);
   }
   
-  .btn-submit:hover:not(:disabled) {
+  .btn-test:hover:not(:disabled) {
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(30, 144, 255, 0.4);
     background: linear-gradient(135deg, #0c7cd5 0%, #1e90ff 100%);
   }
 
-  .btn-submit:active:not(:disabled) {
+  .btn-test:active:not(:disabled) {
     transform: translateY(0);
     box-shadow: 0 3px 8px rgba(30, 144, 255, 0.3);
   }
 
-  .btn-submit.btn-loading {
+  .btn-test.btn-loading {
     background: linear-gradient(135deg, #0c7cd5 0%, #1e90ff 100%);
     box-shadow: 0 4px 16px rgba(30, 144, 255, 0.5);
+  }
+  
+  .btn-submit {
+    background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  }
+  
+  .btn-submit:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+    background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  }
+
+  .btn-submit:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 3px 8px rgba(16, 185, 129, 0.3);
+  }
+
+  .btn-submit.btn-loading {
+    background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.5);
   }
 
   /* Loading spinner 旋转动画 */
@@ -4473,7 +4843,7 @@ const renderMarkdown = (text: string): string => {
     padding: 0;
     overflow: hidden;
     width: 100%;
-    height: calc(100vh - 20px);
+    height: calc(100vh - 50px);
     display: flex;
     flex-direction: column;
     margin: 0 auto;
@@ -4718,6 +5088,22 @@ const renderMarkdown = (text: string): string => {
   }
   
   @media (max-width: 480px) {
+    .question-card-header .question-title-section {
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    
+    .question-card-header .question-title {
+      font-size: 1rem;
+      max-width: 200px;
+    }
+    
+    .question-card-header .level-badge,
+    .question-card-header .question-date {
+      font-size: 0.8rem;
+      padding: 4px 10px;
+    }
+    
     .level-exams-header {
       padding: 8px 12px;
       gap: 12px;
@@ -4919,6 +5305,37 @@ const renderMarkdown = (text: string): string => {
     padding: 28px;
     max-height: calc(80vh - 100px);
     overflow-y: auto;
+  }
+  
+  /* 解析提示框样式 */
+  .analysis-tip {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border: 2px solid #fbbf24;
+    border-radius: 12px;
+    color: #92400e;
+    font-weight: 600;
+    font-size: 0.95rem;
+    box-shadow: 0 4px 12px rgba(251, 191, 36, 0.2);
+    animation: tipPulse 2s ease-in-out infinite;
+  }
+  
+  .analysis-tip i {
+    color: #f59e0b;
+    flex-shrink: 0;
+  }
+  
+  @keyframes tipPulse {
+    0%, 100% {
+      box-shadow: 0 4px 12px rgba(251, 191, 36, 0.2);
+    }
+    50% {
+      box-shadow: 0 6px 16px rgba(251, 191, 36, 0.3);
+    }
   }
   
   /* 弹窗内容滚动条也隐藏 */
@@ -5170,6 +5587,211 @@ const renderMarkdown = (text: string): string => {
     background: linear-gradient(135deg, #0c7cd5 0%, #1e90ff 100%);
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(30, 144, 255, 0.3);
+  }
+
+  /* 验证码弹窗样式 */
+  .captcha-modal {
+    max-width: 500px;
+  }
+
+  .captcha-content {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    align-items: center;
+    padding: 20px 0;
+  }
+
+  .captcha-tip {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px 20px;
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border: 2px solid #fbbf24;
+    border-radius: 12px;
+    width: 100%;
+    box-shadow: 0 4px 12px rgba(251, 191, 36, 0.15);
+  }
+
+  .captcha-tip i {
+    color: #f59e0b;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .captcha-tip-text {
+    margin: 0;
+    color: #92400e;
+    font-size: 14px;
+    line-height: 1.6;
+    text-align: left;
+    font-weight: 500;
+  }
+
+  .captcha-question {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+  }
+
+  .captcha-question i {
+    color: #1e90ff;
+  }
+
+  .captcha-text {
+    margin: 0;
+    color: #374151;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .captcha-display {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 24px;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border: 2px solid #bae6fd;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(30, 144, 255, 0.1);
+  }
+
+  .captcha-code {
+    font-size: 24px;
+    font-weight: 700;
+    color: #0c4a6e;
+    font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+    letter-spacing: 2px;
+    min-width: 120px;
+    text-align: center;
+  }
+
+  .captcha-refresh-btn {
+    background: linear-gradient(135deg, #1e90ff 0%, #38bdf8 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(30, 144, 255, 0.2);
+  }
+
+  .captcha-refresh-btn:hover {
+    background: linear-gradient(135deg, #0c7cd5 0%, #1e90ff 100%);
+    transform: rotate(180deg);
+    box-shadow: 0 4px 12px rgba(30, 144, 255, 0.3);
+  }
+
+  .captcha-input-group {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  .captcha-input {
+    width: 100%;
+    max-width: 300px;
+    padding: 14px 18px;
+    font-size: 18px;
+    font-weight: 600;
+    text-align: center;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    background: white;
+    color: #1e293b;
+    transition: all 0.3s ease;
+    font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+  }
+
+  .captcha-input:focus {
+    outline: none;
+    border-color: #1e90ff;
+    box-shadow: 0 0 0 3px rgba(30, 144, 255, 0.1);
+    background: #f8fafc;
+  }
+
+  .captcha-input::placeholder {
+    color: #94a3b8;
+    font-weight: normal;
+  }
+
+  .captcha-input-error {
+    border-color: #ef4444 !important;
+    background: #fef2f2 !important;
+  }
+
+  .captcha-input-error:focus {
+    border-color: #ef4444 !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+    background: #fee2e2 !important;
+  }
+
+  .captcha-error-message {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    border: 2px solid #fca5a5;
+    border-radius: 10px;
+    color: #991b1b;
+    font-size: 14px;
+    font-weight: 600;
+    width: 100%;
+    max-width: 300px;
+    animation: shake 0.4s ease;
+  }
+
+  .captcha-error-message i {
+    color: #dc2626;
+    flex-shrink: 0;
+  }
+
+  @keyframes shake {
+    0%, 100% {
+      transform: translateX(0);
+    }
+    25% {
+      transform: translateX(-8px);
+    }
+    75% {
+      transform: translateX(8px);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .captcha-modal {
+      max-width: 90%;
+    }
+
+    .captcha-tip {
+      padding: 12px 16px;
+      gap: 10px;
+    }
+
+    .captcha-tip-text {
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .captcha-code {
+      font-size: 20px;
+      min-width: 100px;
+    }
+
+    .captcha-input {
+      max-width: 100%;
+      font-size: 16px;
+    }
   }
   </style>
   

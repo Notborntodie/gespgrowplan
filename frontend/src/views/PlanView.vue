@@ -1,24 +1,12 @@
 <template>
   <div class="exam-layout">
-    <!-- 置顶：我的学习计划 + 加入计划（仅在计划列表视图展示） -->
-    <div v-if="currentView === 'plans'" class="plan-header-fixed">
-      <div class="plan-header-inner">
-        <h2 class="plan-header-title">我的学习计划</h2>
-        <div class="plan-header-actions">
-          <button class="join-plan-btn-premium" @click="showJoinDialog = true">
-            <i class="fas fa-plus"></i> 加入计划
-          </button>
-        </div>
-      </div>
-      <div class="plan-header-underline"></div>
-    </div>
     <div class="exam-content exam-content-flex-row">
       <!-- 左侧占位区域 -->
       <div class="sidebar-placeholder-left"></div>
 
       <!-- 主体：计划内容 -->
       <div class="question-main">
-        <div class="question-card">
+        <div class="question-card" :class="{ 'plan-view-transparent': currentView === 'plans' }">
           <div class="question-card-header">
             <div class="header-left-section">
               <button v-if="currentView === 'tasks'" class="back-btn-header" @click="backToPlans">
@@ -47,11 +35,11 @@
                 <!-- 错误状态 -->
                 <div v-if="error" class="content-section error-state">
                   <div class="section-content">
-                    <div class="error-icon">⚠️</div>
+                    <div class="error-icon"><Icon name="alert-triangle" :size="80" /></div>
                     <h3>连接错误</h3>
                     <p>{{ error }}</p>
                     <button @click="fetchMyPlans" class="retry-btn">
-                      <i class="fas fa-refresh"></i> 重试
+                      <Icon name="refresh-cw" :size="16" /> 重试
                     </button>
                 </div>
                 </div>
@@ -59,7 +47,7 @@
                 <!-- 加载状态 -->
                 <div v-else-if="loading" class="content-section loading-state">
                 <div class="section-content">
-                    <div class="loading-icon">⏳</div>
+                    <div class="loading-icon"><Icon name="loader-2" :size="80" spin /></div>
                     <h3>加载中...</h3>
                     <p>正在获取学习计划数据</p>
                   </div>
@@ -68,9 +56,9 @@
                 <!-- 如果没有加入任何计划 -->
                 <div v-else-if="myPlans.length === 0" class="content-section empty-state">
                 <div class="section-content">
-                    <div class="empty-icon">📚</div>
+                    <div class="empty-icon"><Icon name="book-open" :size="80" /></div>
                     <h3>暂无学习计划</h3>
-                    <p>点击右上角"加入计划"按钮开始你的学习之旅</p>
+                    <p>点击右下角"加入计划"按钮开始你的学习之旅</p>
                   </div>
                   </div>
                   
@@ -84,7 +72,6 @@
                   >
                     <div class="plan-card-header">
                       <div class="plan-level-badge">GESP {{ plan.level }}级</div>
-                      <div class="plan-testing-badge">处于测试中</div>
                       <div class="plan-status-badge" :class="getPlanStatusClass(plan)">
                         {{ getPlanStatusText(plan) }}
                       </div>
@@ -93,7 +80,7 @@
                       <h3>{{ plan.name }}</h3>
                       <p class="plan-desc">{{ plan.description }}</p>
                       <div class="plan-time">
-                        <i class="fas fa-calendar-alt"></i>
+                        <Icon name="calendar" :size="16" />
                         {{ formatDate(plan.start_time) }} - {{ formatDate(plan.end_time) }}
                       </div>
                       <div class="plan-progress">
@@ -107,7 +94,7 @@
                     </div>
                     <div class="plan-card-footer">
                       <button class="enter-plan-btn">
-                        <span>👀</span> 查看任务 <span>→</span>
+                        <Icon name="eye" :size="16" /> 查看任务 <Icon name="arrow-right" :size="16" />
                     </button>
                   </div>
                   </div>
@@ -119,7 +106,7 @@
                 <!-- 任务列表 -->
                 <div class="content-section tasks-section">
                   <div class="section-header">
-                    <h4 class="section-title">📋 学习任务列表</h4>
+                    <h4 class="section-title"><Icon name="clipboard-list" :size="18" /> 学习任务列表</h4>
                   </div>
                   <div class="section-content">
                     <div class="tasks-list">
@@ -142,29 +129,29 @@
                           <!-- 复习内容 -->
                           <div v-if="task.review_content" class="task-review">
                             <div class="review-label">
-                              <i class="fas fa-book"></i> 复习内容
+                              <Icon name="book-open" :size="16" /> 复习内容
                         </div>
                             <div class="review-content">{{ task.review_content }}</div>
                             <div v-if="task.review_video_url" class="review-video">
                               <a :href="task.review_video_url" target="_blank" class="video-link">
-                                <span>▶️</span> 观看复习视频
+                                <Icon name="play" :size="16" /> 观看复习视频
                               </a>
                       </div>
                     </div>
 
                           <div class="task-time">
-                            <i class="fas fa-clock"></i>
+                            <Icon name="clock" :size="16" />
                             {{ formatDateTime(task.start_time) }} - {{ formatDateTime(task.end_time) }}
                 </div>
 
                           <!-- 练习统计 -->
                           <div class="task-exercises-stats">
                             <div class="exercise-stat">
-                              <i class="fas fa-file-alt"></i>
+                              <Icon name="file-text" :size="16" />
                               客观题: {{ task.exam_count || 0 }}套
                   </div>
                             <div class="exercise-stat">
-                              <i class="fas fa-code"></i>
+                              <Icon name="code" :size="16" />
                               OJ题: {{ task.oj_count || 0 }}道
                         </div>
                         </div>
@@ -175,7 +162,7 @@
                               @click.stop="enterTask(task)"
                               :disabled="!isTaskActive(task)"
                             >
-                              <span>▶️</span> 开始任务
+                              <Icon name="play" :size="16" /> 开始任务
                           </button>
                           </div>
                         </div>
@@ -220,10 +207,10 @@
                     
                     <!-- 复习内容展示 -->
                     <div v-if="selectedTask.review_content" class="review-section">
-                      <h4><i class="fas fa-book"></i> 复习内容</h4>
+                      <h4><Icon name="book-open" :size="18" /> 复习内容</h4>
                       <div class="review-content-box">{{ selectedTask.review_content }}</div>
                       <a v-if="selectedTask.review_video_url" :href="selectedTask.review_video_url" target="_blank" class="video-link-large">
-                        <span>▶️</span> 观看复习视频
+                        <Icon name="play" :size="18" /> 观看复习视频
                       </a>
                       </div>
                           </div>
@@ -232,7 +219,7 @@
                 <!-- 客观题练习列表 -->
                 <div v-if="selectedTask.exams && selectedTask.exams.length > 0" class="content-section">
                   <div class="section-header">
-                    <h4 class="section-title">📝 客观题练习</h4>
+                    <h4 class="section-title"><Icon name="file-text" :size="18" /> 客观题练习</h4>
                   </div>
                   <div class="section-content">
                     <div class="exercises-grid">
@@ -242,7 +229,7 @@
                         class="exercise-card"
                         @click="startExam(exam)"
                       >
-                        <div class="exercise-icon">📝</div>
+                        <div class="exercise-icon"><Icon name="file-text" :size="40" /></div>
                         <h4>{{ exam.name }}</h4>
                         <p class="exercise-desc">{{ exam.description }}</p>
                         <div class="exercise-info">
@@ -258,7 +245,7 @@
                 <!-- OJ题目列表 -->
                 <div v-if="selectedTask.oj_problems && selectedTask.oj_problems.length > 0" class="content-section">
                   <div class="section-header">
-                    <h4 class="section-title">💻 OJ编程题</h4>
+                    <h4 class="section-title"><Icon name="code" :size="18" /> OJ编程题</h4>
                   </div>
                   <div class="section-content">
                     <div class="exercises-grid">
@@ -268,7 +255,7 @@
                         class="exercise-card"
                         @click="startOJ(problem)"
                       >
-                        <div class="exercise-icon">💻</div>
+                        <div class="exercise-icon"><Icon name="code" :size="40" /></div>
                         <h4>{{ problem.title }}</h4>
                         <div class="exercise-info">
                           <span class="difficulty-badge" :class="'difficulty-' + problem.difficulty">
@@ -286,12 +273,12 @@
               <!-- 学习总结（费恩曼学习法）入口 -->
               <div class="content-section" v-if="currentView === 'exercises'">
                 <div class="section-header">
-                  <h4 class="section-title">🎥 学习总结（费恩曼学习法）</h4>
+                  <h4 class="section-title"><Icon name="video" :size="18" /> 学习总结（费恩曼学习法）</h4>
                 </div>
                 <div class="section-content">
                   <p class="feynman-intro">使用费恩曼学习法录制你的任务总结，巩固理解、发现盲点、提升表达能力。</p>
                   <button class="enter-plan-btn" @click="goFeynmanSummary">
-                    进入学习总结页面 <i class="fas fa-arrow-right"></i>
+                    进入学习总结页面 <Icon name="arrow-right" :size="16" />
                   </button>
                 </div>
               </div>
@@ -306,13 +293,26 @@
       <div class="sidebar-placeholder-right"></div>
             </div>
 
+    <!-- 底部固定：我的学习计划 + 加入计划（仅在计划列表视图展示） -->
+    <div v-if="currentView === 'plans'" class="plan-header-fixed">
+      <div class="plan-header-inner">
+        <h2 class="plan-header-title">我的学习计划</h2>
+        <div class="plan-header-actions">
+          <button v-if="isTeacherOrAdmin" class="join-plan-btn-premium" @click="showJoinDialog = true">
+            <Icon name="plus" :size="16" /> 加入计划
+          </button>
+        </div>
+      </div>
+      <div class="plan-header-underline"></div>
+    </div>
+
     <!-- 加入计划弹窗 -->
     <div v-if="showJoinDialog" class="modal-overlay" @click="showJoinDialog = false">
       <div class="modal-content join-plan-modal" @click.stop>
         <div class="modal-header">
           <h3>加入学习计划</h3>
           <button class="modal-close-btn" @click="showJoinDialog = false">
-            <i class="fas fa-times"></i>
+            <Icon name="x" :size="18" />
           </button>
           </div>
         <div class="modal-body">
@@ -347,8 +347,8 @@
               </div>
               <p>{{ plan.description }}</p>
               <div class="plan-meta">
-                <span><i class="fas fa-calendar-alt"></i> {{ formatDate(plan.start_time) }} - {{ formatDate(plan.end_time) }}</span>
-                <span><i class="fas fa-tasks"></i> {{ plan.total_tasks }}个任务</span>
+                <span><Icon name="calendar" :size="16" /> {{ formatDate(plan.start_time) }} - {{ formatDate(plan.end_time) }}</span>
+                <span><Icon name="check-square" :size="16" /> {{ plan.total_tasks }}个任务</span>
               </div>
             </div>
           </div>
@@ -371,6 +371,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import Icon from '@/components/Icon.vue'
 
 const router = useRouter()
 
@@ -399,6 +400,14 @@ const myPlans = ref<any[]>([])
 
 // 所有可用计划（用于加入计划弹窗）
 const allAvailablePlans = ref<any[]>([])
+
+// 判断是否为教师或管理员
+const isTeacherOrAdmin = computed(() => {
+  if (!userInfo.value) return false
+  return userInfo.value.role_names?.includes('teacher') || 
+         userInfo.value.role_names?.includes('admin') ||
+         userInfo.value.roles?.some((role: any) => role.name === 'teacher' || role.name === 'admin')
+})
 
 // API调用方法
 const fetchMyPlans = async () => {
@@ -774,6 +783,9 @@ const testAPIConnection = async () => {
 
 // 组件挂载
 onMounted(async () => {
+  // 滚动到顶部
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+  
   // 获取用户信息
   const userInfoStr = localStorage.getItem('userInfo')
   if (userInfoStr) {
@@ -813,7 +825,7 @@ onMounted(async () => {
   gap: 32px;
   width: 100%;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 20px 100px 20px; /* 底部 padding 为底部 header 留出空间 */
   box-sizing: border-box;
   flex-shrink: 0;
   align-items: flex-start;
@@ -821,16 +833,16 @@ onMounted(async () => {
   margin-top: 0;
 }
 
-/* 置顶计划头部 */
+/* 底部固定计划头部 */
 .plan-header-fixed {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 2px 24px;
-  border-bottom: 2px solid #e2e8f0;
+  border-top: 2px solid #e2e8f0;
   position: fixed;
-  top: 48px; /* NavBar 高度 */
+  bottom: 0; /* 固定在底部 */
   left: 0;
   right: 0;
   z-index: 999;
@@ -936,13 +948,24 @@ onMounted(async () => {
   box-shadow: 0 6px 24px -4px rgba(30, 144, 255, 0.1);
   transition: all 0.3s ease;
   padding: 0;
-  overflow: hidden;
+  overflow: visible;
   width: 100%;
-  height: calc(100vh - 84px);
+  min-height: calc(100vh - 84px - 80px); /* 最小高度，允许内容超出 */
   display: flex;
   flex-direction: column;
-  margin: 64px auto 0 auto;
+  margin: 20px auto 0 auto; /* 减少上边距，让卡片上移 */
   box-sizing: border-box;
+}
+
+/* 计划列表视图时，卡片背景透明融入页面背景 */
+.question-card.plan-view-transparent {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.question-card.plan-view-transparent .question-card-header {
+  display: none; /* 计划列表视图时隐藏 header */
 }
 
 .question-card-header {
@@ -1042,17 +1065,18 @@ onMounted(async () => {
   flex: 1;
   display: flex;
   flex-direction: row;
-  overflow: hidden;
-  background: #f8fafc;
+  overflow: visible;
+  background: transparent; /* 透明背景，融入页面背景 */
 }
 
 .question-left-panel {
   flex: 1;
-  overflow-y: auto;
+  overflow: visible;
   padding: 24px;
   display: flex;
   flex-direction: column;
   gap: 24px;
+  background: transparent; /* 透明背景，融入页面背景 */
 }
 
 .question-left-panel-centered {
@@ -1093,6 +1117,10 @@ onMounted(async () => {
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+.section-title :deep(.lucide-icon) {
+  flex-shrink: 0;
+}
+
 .section-content {
   padding: 24px;
   background: transparent;
@@ -1107,6 +1135,10 @@ onMounted(async () => {
 .empty-icon {
   font-size: 5rem;
   margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #1e90ff;
 }
 
 .empty-state h3 {
@@ -1131,6 +1163,10 @@ onMounted(async () => {
 .error-icon {
   font-size: 5rem;
   margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #dc2626;
 }
 
 .error-state h3 {
@@ -1177,6 +1213,10 @@ onMounted(async () => {
 .loading-icon {
   font-size: 5rem;
   margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #1e90ff;
   animation: spin 2s linear infinite;
 }
 
@@ -1199,20 +1239,20 @@ onMounted(async () => {
 /* 我的计划列表 */
 .my-plans-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
-  gap: 32px;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 24px;
 }
 
 .plan-card {
   background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-  border: 3px solid #e0f2fe;
-  border-radius: 24px;
+  border: 2px solid #e0f2fe;
+  border-radius: 18px;
   padding: 0;
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 6px 24px rgba(30, 144, 255, 0.12);
   overflow: hidden;
-  min-height: 320px;
+  min-height: 260px;
 }
 
 .plan-card:hover {
@@ -1223,7 +1263,7 @@ onMounted(async () => {
 
 .plan-card-header {
   background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
-  padding: 20px 28px;
+  padding: 16px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -1232,26 +1272,26 @@ onMounted(async () => {
 .plan-level-badge {
   background: #1e90ff;
   color: white;
-  padding: 8px 16px;
-  border-radius: 14px;
-  font-size: 1rem;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 0.9rem;
   font-weight: 700;
 }
 
 .plan-testing-badge {
   background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
   color: white;
-  padding: 8px 16px;
-  border-radius: 14px;
-  font-size: 0.95rem;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 0.85rem;
   font-weight: 700;
   box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
 }
 
 .plan-status-badge {
-  padding: 8px 16px;
-  border-radius: 14px;
-  font-size: 0.95rem;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 0.85rem;
   font-weight: 700;
 }
 
@@ -1271,34 +1311,34 @@ onMounted(async () => {
 }
 
 .plan-card-body {
-  padding: 28px;
+  padding: 20px;
 }
 
 .plan-card-body h3 {
   color: #1e293b;
-  font-size: 1.5rem;
-  margin: 0 0 12px 0;
+  font-size: 1.3rem;
+  margin: 0 0 10px 0;
   font-weight: 700;
 }
 
 .plan-desc {
   color: #64748b;
-  font-size: 1.05rem;
-  margin: 0 0 16px 0;
-  line-height: 1.6;
+  font-size: 0.95rem;
+  margin: 0 0 12px 0;
+  line-height: 1.5;
 }
 
 .plan-time {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   color: #64748b;
-  font-size: 1rem;
-  margin-bottom: 20px;
+  font-size: 0.9rem;
+  margin-bottom: 16px;
 }
 
 .plan-progress {
-  margin-top: 20px;
+  margin-top: 16px;
 }
 
 .progress-bar-container {
@@ -1319,12 +1359,12 @@ onMounted(async () => {
 
 .progress-text {
   color: #64748b;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   font-weight: 600;
 }
 
 .plan-card-footer {
-  padding: 20px 28px;
+  padding: 16px 20px;
   background: #f8fafc;
   border-top: 1px solid #e2e8f0;
 }
@@ -1334,16 +1374,20 @@ onMounted(async () => {
   background: linear-gradient(135deg, #1e90ff 0%, #38bdf8 100%);
   color: white;
   border: none;
-  padding: 14px 24px;
-  border-radius: 14px;
-  font-size: 1.05rem;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-size: 0.95rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
+}
+
+.enter-plan-btn :deep(.lucide-icon) {
+  flex-shrink: 0;
 }
 
 .enter-plan-btn:hover {
@@ -1553,6 +1597,10 @@ onMounted(async () => {
   margin-bottom: 12px;
 }
 
+.task-time :deep(.lucide-icon) {
+  flex-shrink: 0;
+}
+
 .task-exercises-stats {
   display: flex;
   gap: 16px;
@@ -1566,6 +1614,10 @@ onMounted(async () => {
   color: #64748b;
   font-size: 0.9rem;
   font-weight: 500;
+}
+
+.exercise-stat :deep(.lucide-icon) {
+  flex-shrink: 0;
 }
 
 .task-actions {
@@ -1640,6 +1692,10 @@ onMounted(async () => {
   gap: 8px;
 }
 
+.review-section h4 :deep(.lucide-icon) {
+  flex-shrink: 0;
+}
+
 .review-content-box {
   background: rgba(255, 255, 255, 0.5);
   padding: 16px;
@@ -1660,6 +1716,10 @@ onMounted(async () => {
   text-decoration: none;
   font-weight: 600;
   transition: all 0.3s ease;
+}
+
+.video-link-large :deep(.lucide-icon) {
+  flex-shrink: 0;
 }
 
 .video-link-large:hover {
@@ -1695,6 +1755,10 @@ onMounted(async () => {
 .exercise-icon {
   font-size: 2.5rem;
   margin-bottom: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #1e90ff;
 }
 
 .exercise-card h4 {

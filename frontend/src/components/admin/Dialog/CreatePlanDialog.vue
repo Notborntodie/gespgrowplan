@@ -80,7 +80,64 @@
 
             <div class="form-group">
               <label>复习内容</label>
-              <textarea v-model="task.review_content" placeholder="请输入复习内容" rows="3"></textarea>
+              <div class="review-content-upload">
+                <div class="upload-row">
+                  <input 
+                    type="file" 
+                    accept=".docx" 
+                    @change="(e) => handleDocxUpload(e, index)"
+                    :id="'docx-upload-' + index"
+                    class="docx-input"
+                  />
+                  <label :for="'docx-upload-' + index" class="btn-upload-docx">
+                    <i class="fas fa-file-word"></i> 上传Word文档
+                  </label>
+                  <input 
+                    type="file" 
+                    accept=".pdf" 
+                    @change="(e) => handlePdfUpload(e, index)"
+                    :id="'pdf-upload-' + index"
+                    class="docx-input"
+                  />
+                  <label :for="'pdf-upload-' + index" class="btn-upload-pdf">
+                    <i class="fas fa-file-pdf"></i> 上传PDF
+                  </label>
+                  <button 
+                    @click="showUrlInput(index)" 
+                    class="btn-upload-url"
+                    :class="{ 'active': task.showUrlInput }"
+                  >
+                    <i class="fas fa-link"></i> 输入URL
+                  </button>
+                  <span v-if="task.review_content" class="upload-status">
+                    <i class="fas fa-check-circle"></i> 
+                    {{ task.review_content_type === 'pdf' ? '已上传PDF' : '已有内容' }}
+                  </span>
+                </div>
+                <!-- URL输入框 -->
+                <div v-if="task.showUrlInput" class="url-input-section">
+                  <input 
+                    v-model="task.review_content_url" 
+                    type="url" 
+                    placeholder="请输入PDF或文档URL（支持够快云盘等）"
+                    class="url-input"
+                    @blur="handleUrlInput(index)"
+                    @keyup.enter="handleUrlInput(index)"
+                  />
+                  <div class="url-input-actions">
+                    <button @click="confirmUrlInput(index)" class="btn-confirm-url">
+                      <i class="fas fa-check"></i> 确认
+                    </button>
+                    <button @click="cancelUrlInput(index)" class="btn-cancel-url">
+                      <i class="fas fa-times"></i> 取消
+                    </button>
+                  </div>
+                </div>
+                <div v-if="task.review_content_type === 'pdf'" class="pdf-preview-hint">
+                  <i class="fas fa-file-pdf"></i> PDF文件已上传，内容将以PDF形式展示
+                </div>
+                <textarea v-else v-model="task.review_content" placeholder="请输入复习内容，或上传.docx/.pdf文件，或输入URL" rows="5"></textarea>
+              </div>
             </div>
 
             <div class="form-group">
@@ -98,6 +155,14 @@
                 <label>结束时间<span class="required">*</span></label>
                 <input v-model="task.end_time" type="datetime-local" />
               </div>
+            </div>
+
+            <div class="form-group checkbox-group">
+              <label class="checkbox-label">
+                <input type="checkbox" v-model="task.is_exam_mode" />
+                <span>考试模式</span>
+              </label>
+              <span class="checkbox-hint">开启后，学生做题时不会显示答案和解析</span>
             </div>
 
             <!-- 客观题练习 -->
@@ -213,10 +278,14 @@ function addTask() {
     name: '',
     description: '',
     review_content: '',
+    review_content_type: 'text',
+    review_content_url: '',
+    showUrlInput: false,
     review_video_url: '',
     start_time: '',
     end_time: '',
     task_order: formData.value.tasks.length + 1,
+    is_exam_mode: false,
     exams: [],
     oj_problems: []
   })
@@ -291,6 +360,144 @@ function removeProblem(taskIndex: number, problemIndex: number) {
   formData.value.tasks[taskIndex].oj_problems.splice(problemIndex, 1)
 }
 
+// 处理docx文件上传
+async function handleDocxUpload(event: Event, taskIndex: number) {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
+  if (!file) return
+  
+  if (!file.name.endsWith('.docx')) {
+    alert('请上传.docx格式的文件')
+    return
+  }
+  
+  try {
+    // 动态导入mammoth
+    const mammoth = await import('mammoth')
+    const arrayBuffer = await file.arrayBuffer()
+    // 使用HTML输出保留格式
+    const result = await mammoth.convertToHtml({ arrayBuffer })
+    
+    // 将HTML内容设置到复习内容
+    formData.value.tasks[taskIndex].review_content = result.value.trim()
+    formData.value.tasks[taskIndex].review_content_type = 'text'
+    alert('文档内容已成功导入！')
+  } catch (error) {
+    console.error('解析docx文件失败:', error)
+    alert('解析文档失败，请确保文件格式正确')
+  }
+  
+  // 清空input，允许重复选择同一文件
+  input.value = ''
+}
+
+// 处理PDF文件上传
+async function handlePdfUpload(event: Event, taskIndex: number) {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
+  if (!file) return
+  
+  if (!file.name.endsWith('.pdf')) {
+    alert('请上传.pdf格式的文件')
+    return
+  }
+  
+  // 检查文件大小（最大20MB）
+  if (file.size > 20 * 1024 * 1024) {
+    alert('PDF文件大小不能超过20MB')
+    return
+  }
+  
+  try {
+    const formDataUpload = new FormData()
+    formDataUpload.append('file', file)
+    
+    const response = await axios.post(`${BASE_URL}/learning-tasks/upload-review-pdf`, formDataUpload, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+    
+    if (response.data.success) {
+      formData.value.tasks[taskIndex].review_content = response.data.data.file_path
+      formData.value.tasks[taskIndex].review_content_type = 'pdf'
+      formData.value.tasks[taskIndex].showUrlInput = false
+      alert('PDF文件已成功上传！')
+    } else {
+      throw new Error(response.data.message || '上传失败')
+    }
+  } catch (error: any) {
+    console.error('上传PDF文件失败:', error)
+    alert('上传PDF失败: ' + (error.response?.data?.message || error.message))
+  }
+  
+  // 清空input，允许重复选择同一文件
+  input.value = ''
+}
+
+// 判断是否为PDF URL
+function isPdfUrl(url: string): boolean {
+  if (!url) return false
+  const lowerUrl = url.toLowerCase()
+  // 检查是否是PDF文件扩展名
+  if (lowerUrl.includes('.pdf')) return true
+  // 检查是否是够快云盘链接
+  if (lowerUrl.includes('gokuai.com') || lowerUrl.includes('gokuai.cn')) return true
+  // 可以添加其他PDF托管服务的检测
+  return false
+}
+
+// 显示URL输入框
+function showUrlInput(taskIndex: number) {
+  const task = formData.value.tasks[taskIndex]
+  task.showUrlInput = !task.showUrlInput
+  if (!task.review_content_url) {
+    task.review_content_url = ''
+  }
+}
+
+// 处理URL输入
+function handleUrlInput(taskIndex: number) {
+  const task = formData.value.tasks[taskIndex]
+  const url = task.review_content_url?.trim()
+  
+  if (!url) {
+    return
+  }
+  
+  // 验证URL格式
+  try {
+    new URL(url)
+  } catch {
+    alert('请输入有效的URL')
+    return
+  }
+  
+  // 如果是PDF URL，设置类型为pdf
+  if (isPdfUrl(url)) {
+    task.review_content = url
+    task.review_content_type = 'pdf'
+    task.showUrlInput = false
+    alert('PDF URL已设置！')
+  } else {
+    // 其他URL作为文本内容
+    task.review_content = url
+    task.review_content_type = 'text'
+    task.showUrlInput = false
+    alert('URL已设置！')
+  }
+}
+
+// 确认URL输入
+function confirmUrlInput(taskIndex: number) {
+  handleUrlInput(taskIndex)
+}
+
+// 取消URL输入
+function cancelUrlInput(taskIndex: number) {
+  const task = formData.value.tasks[taskIndex]
+  task.showUrlInput = false
+  task.review_content_url = ''
+}
+
 // 提交表单
 async function handleSubmit() {
   // 验证必填字段
@@ -349,10 +556,14 @@ function initFormData() {
         name: task.name || '',
         description: task.description || '',
         review_content: task.review_content || '',
+        review_content_type: task.review_content_type || 'text',
+        review_content_url: '',
+        showUrlInput: false,
         review_video_url: task.review_video_url || '',
         start_time: formatDateTimeForInput(task.start_time),
         end_time: formatDateTimeForInput(task.end_time),
         task_order: task.task_order || 0,
+        is_exam_mode: task.is_exam_mode || false,
         exams: task.exams || [],
         oj_problems: task.oj_problems || []
       }))
@@ -537,6 +748,34 @@ onMounted(() => {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 16px;
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #1e90ff;
+}
+
+.checkbox-hint {
+  color: #64748b;
+  font-size: 12px;
 }
 
 .btn-add-task {
@@ -773,6 +1012,171 @@ onMounted(() => {
 .btn-confirm:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* docx上传样式 */
+.review-content-upload {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.upload-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.docx-input {
+  display: none;
+}
+
+.btn-upload-docx {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-upload-docx:hover {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  transform: translateY(-1px);
+}
+
+.btn-upload-pdf {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #ef4444 0%, #f97316 100%);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-upload-pdf:hover {
+  background: linear-gradient(135deg, #dc2626 0%, #ea580c 100%);
+  transform: translateY(-1px);
+}
+
+.btn-upload-url {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.btn-upload-url:hover {
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  transform: translateY(-1px);
+}
+
+.btn-upload-url.active {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.3);
+}
+
+.url-input-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 2px solid #1e90ff;
+}
+
+.url-input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.url-input:focus {
+  outline: none;
+  border-color: #1e90ff;
+  box-shadow: 0 0 0 3px rgba(30, 144, 255, 0.1);
+}
+
+.url-input-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.btn-confirm-url,
+.btn-cancel-url {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-confirm-url {
+  background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+  color: white;
+}
+
+.btn-confirm-url:hover {
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+}
+
+.btn-cancel-url {
+  background: #e2e8f0;
+  color: #64748b;
+}
+
+.btn-cancel-url:hover {
+  background: #cbd5e1;
+}
+
+.pdf-preview-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+  border: 2px solid #fca5a5;
+  border-radius: 8px;
+  color: #dc2626;
+  font-weight: 500;
+}
+
+.upload-status {
+  color: #10b981;
+  font-size: 13px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 </style>
 

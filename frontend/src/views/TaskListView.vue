@@ -1,20 +1,18 @@
 <template>
   <div class="exam-layout">
-    <!-- 置顶：计划信息 + 返回计划 -->
-    <div class="plan-header-fixed">
-      <div class="plan-header-inner">
-        <div class="plan-header-actions">
-          <button class="back-btn" @click="backToPlans">← 返回计划</button>
-        </div>
-        <h2 class="plan-header-title" v-if="selectedPlan">{{ selectedPlan.name }}</h2>
-      </div>
-      <div class="plan-header-underline"></div>
-    </div>
-
     <div class="exam-content exam-content-flex-row">
-      <div class="sidebar-placeholder-left"></div>
+      <!-- 左侧返回按钮 -->
+      <div class="sidebar-placeholder-left">
+        <button 
+          class="back-nav-arrow" 
+          @click="backToPlans" 
+          title="返回计划列表"
+        >
+          <Icon name="arrow-left" :size="32" />
+        </button>
+      </div>
       <div class="question-main">
-        <div class="question-card">
+        <div class="question-card task-view-transparent">
           <div class="question-card-header">
             <div class="header-left-section"></div>
             <div class="header-center-section"></div>
@@ -25,7 +23,7 @@
             <div class="question-left-panel question-left-panel-centered" style="width: 100%;">
               <div v-if="error" class="content-section error-state">
                 <div class="section-content">
-                  <div class="error-icon">⚠️</div>
+                  <div class="error-icon"><Icon name="alert-triangle" :size="64" /></div>
                   <h3>连接错误</h3>
                   <p>{{ error }}</p>
                 </div>
@@ -33,7 +31,7 @@
 
               <div v-else-if="loading" class="content-section loading-state">
                 <div class="section-content">
-                  <div class="loading-icon">⏳</div>
+                  <div class="loading-icon"><Icon name="loader-2" :size="64" spin /></div>
                   <h3>加载中...</h3>
                   <p>正在获取任务数据</p>
                 </div>
@@ -44,8 +42,8 @@
                 <div v-if="isPlanCompleted()" class="content-section completion-banner">
                   <div class="section-content">
                     <div class="completion-message">
-                      <span class="completion-icon">🎉</span>
-                      <h3>恭喜🎉，计划已经完成！</h3>
+                      <span class="completion-icon"><Icon name="sparkles" :size="64" /></span>
+                      <h3>恭喜，计划已经完成！</h3>
                       <p v-if="planProgress?.completed_at" class="completion-time">
                         完成时间: {{ formatDateTime(planProgress.completed_at) }}
                       </p>
@@ -53,99 +51,141 @@
                   </div>
                 </div>
 
-                <!-- 计划进度信息 -->
-                <div v-if="planProgress" class="content-section plan-progress-card">
-                  <div class="section-header">
-                    <h4 class="section-title">📊 计划完成进度</h4>
+                <!-- 时间轴任务列表 -->
+                <div class="timeline-wrapper">
+                  <!-- 连续的时间轴线 -->
+                  <div class="timeline-axis">
+                    <div class="timeline-axis-line"></div>
                   </div>
-                  <div class="section-content">
-                    <div class="progress-stats">
-                      <div class="progress-stat-item">
-                        <div class="progress-header">
-                          <span class="progress-label">任务完成</span>
-                          <span class="progress-text">
-                            {{ planProgress.completed_tasks ?? 0 }}/{{ planProgress.total_tasks ?? 0 }}
-                          </span>
-                        </div>
-                        <div class="progress-bar-container">
-                          <div 
-                            class="progress-bar-fill" 
-                            :style="{ width: getPlanProgressPercent() + '%' }"
-                          ></div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <div class="tasks-grid">
+                  
+                  <!-- 任务列表 -->
+                  <div class="timeline-items">
                     <div
                       v-for="(task, index) in selectedPlan?.tasks || []"
                       :key="task.id"
-                      class="task-card"
-                      :class="{ completed: task.is_completed, active: isTaskActive(task) }"
-                      @click="enterTask(task)"
+                      class="timeline-item"
                     >
-                      <!-- task-card 头部：状态与序号 -->
-                      <div class="task-card-header">
-                        <span class="task-status-badge" :class="getTaskStatusClass(task)">
+                      <!-- 时间轴节点 -->
+                      <div class="timeline-node-wrapper">
+                        <div class="timeline-node" :class="getTimelineNodeClass(task)">
+                          <div class="timeline-node-inner"></div>
+                          <div class="timeline-node-glow"></div>
+                        </div>
+                        <div class="timeline-node-label">
+                          <span class="node-number">{{ index + 1 }}</span>
+                        </div>
+                      </div>
+                      
+                      <!-- 任务卡片 -->
+                      <div class="timeline-card-wrapper">
+                        <div
+                          class="content-section task-card-compact"
+                      :class="{ completed: task.is_completed, active: isTaskActive(task), locked: !isTaskActive(task) }"
+                      @click="isTaskActive(task) && enterTask(task)"
+                    >
+                          <div class="section-content-compact">
+                            <!-- 任务头部 -->
+                            <div class="task-header-compact">
+                              <div class="task-title-row">
+                                <span class="task-type-badge" :class="task.is_exam_mode ? 'type-exam' : 'type-normal'">
+                                  {{ task.is_exam_mode ? '真题试炼' : '专项突破' }}
+                                </span>
+                                <h3 class="task-title-compact">{{ task.name }}</h3>
+                                <span class="task-status-badge-compact" :class="getTaskStatusClass(task)">
                           {{ getTaskStatusText(task) }}
                         </span>
-                        <span class="task-level-badge">{{ index + 1 }}</span>
                       </div>
-                      <!-- 内容body -->
-                      <div class="task-card-body">
-                        <h3 class="task-title">{{ task.name }}</h3>
-                        <p class="task-desc">{{ task.description }}</p>
-                        <div class="task-time">
-                          <i class="fas fa-clock"></i>
-                          {{ formatDateTime(task.start_time) }} - {{ formatDateTime(task.end_time) }}
                         </div>
-                        <div class="task-meta">
-                          <span class="exercise-stat"><i class="fas fa-file-alt"></i> 客观题: {{ task.exam_count || 0 }}套</span>
-                          <span class="exercise-stat"><i class="fas fa-code"></i> OJ题: {{ task.oj_count || 0 }}道</span>
+                            
+                            <!-- 任务描述 -->
+                            <p class="task-desc-compact">{{ task.description }}</p>
+                            
+                            <!-- 任务元信息 -->
+                            <div class="task-meta-compact">
+                              <div class="task-time-compact">
+                                <Icon name="calendar" :size="14" />
+                                <span>{{ formatDate(task.start_time) }} - {{ formatDate(task.end_time) }}</span>
                         </div>
+                              <div class="task-stats-compact">
+                                <span class="task-stat-item">
+                                  <Icon name="file-text" :size="14" />
+                                  <span>{{ task.exam_count || 0 }}套</span>
+                                </span>
+                                <span class="task-stat-item">
+                                  <Icon name="code" :size="14" />
+                                  <span>{{ task.oj_count || 0 }}道</span>
+                                </span>
+                  </div>
+                </div>
+
+                            <!-- 操作按钮 -->
+                            <div class="task-action-compact">
+                              <button class="enter-task-btn-compact" @click.stop="enterTask(task)" :disabled="!isTaskActive(task)">
+                                <Icon name="arrow-right" :size="14" />
+                              </button>
+                    </div>
                       </div>
-                      <!-- 底部操作区 -->
-                      <div class="task-card-footer">
-                        <button class="enter-task-btn" @click.stop="enterTask(task)" :disabled="!isTaskActive(task)">
-                          <span>👀</span> 查看详情 <span>→</span>
-                        </button>
+                      </div>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div class="content-section plan-info-card" v-if="selectedPlan">
-                  <div class="section-content">
-                    <div class="plan-info-header">
-                      <h2>{{ selectedPlan.name }}</h2>
-                      <div class="plan-level-badge-large">GESP {{ selectedPlan.level }}级</div>
-                    </div>
-                    <p class="plan-info-desc">{{ selectedPlan.description }}</p>
-                    <div class="plan-info-stats">
-                      <div class="info-stat">
-                        <span class="stat-value">{{ planProgress?.completed_tasks ?? selectedPlan.completed_tasks ?? 0 }}</span>
-                        <span class="stat-label">已完成</span>
-                      </div>
-                      <div class="info-stat">
-                        <span class="stat-value">{{ planProgress?.total_tasks ?? selectedPlan.total_tasks ?? 0 }}</span>
-                        <span class="stat-label">总任务</span>
-                      </div>
-                      <div class="info-stat">
-                        <span class="stat-value">{{ planProgress?.progress_rate ?? selectedPlan.progress ?? 0 }}%</span>
-                        <span class="stat-label">完成率</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
       <div class="sidebar-placeholder-right"></div>
+    </div>
+
+    <!-- 底部固定：计划信息 + 计划完成进度 -->
+    <div class="plan-header-fixed" v-if="selectedPlan">
+      <div class="plan-header-inner">
+        <div class="plan-header-actions">
+          <button class="back-btn" @click="backToPlans">
+            <Icon name="arrow-left" :size="16" /> 返回
+          </button>
+        </div>
+        <!-- 计划基本信息 -->
+        <div class="plan-header-info">
+          <div class="plan-header-title-section">
+            <h2 class="plan-header-title">{{ selectedPlan.name }}</h2>
+            <div class="plan-level-badge-header">GESP {{ selectedPlan.level }}级</div>
+        </div>
+          <p class="plan-header-desc" v-if="selectedPlan.description">{{ selectedPlan.description }}</p>
+          <div class="plan-header-stats">
+            <div class="info-stat-header">
+              <span class="stat-value-header">{{ planProgress?.completed_tasks ?? selectedPlan.completed_tasks ?? 0 }}</span>
+              <span class="stat-label-header">已完成</span>
+            </div>
+            <div class="info-stat-header">
+              <span class="stat-value-header">{{ planProgress?.total_tasks ?? selectedPlan.total_tasks ?? 0 }}</span>
+              <span class="stat-label-header">总任务</span>
+            </div>
+            <div class="info-stat-header">
+              <span class="stat-value-header">{{ planProgress?.progress_rate ?? selectedPlan.progress ?? 0 }}%</span>
+              <span class="stat-label-header">完成率</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- 计划完成进度 -->
+      <div v-if="planProgress" class="plan-progress-in-header">
+        <div class="progress-header-row">
+          <span class="progress-label">任务完成</span>
+          <span class="progress-text">
+            {{ planProgress.completed_tasks ?? 0 }}/{{ planProgress.total_tasks ?? 0 }}
+          </span>
+        </div>
+        <div class="progress-bar-container-header">
+          <div 
+            class="progress-bar-fill-header" 
+            :style="{ width: getPlanProgressPercent() + '%' }"
+          ></div>
+        </div>
+      </div>
+      <div class="plan-header-underline"></div>
     </div>
 
     <!-- 烟花效果 -->
@@ -158,6 +198,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import Icon from '@/components/Icon.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -212,6 +253,14 @@ const formatDateTime = (dateString: string) => {
   })
 }
 
+const formatDate = (dateString: string) => {
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  return date.toLocaleString('zh-CN', {
+    month: '2-digit', day: '2-digit'
+  })
+}
+
 const getTaskStatusClass = (task: any) => {
   if (task.is_completed) return 'status-completed'
   const now = new Date()
@@ -230,6 +279,16 @@ const getTaskStatusText = (task: any) => {
   if (now < start) return '未开始'
   if (now > end) return '已过期'
   return '进行中'
+}
+
+const getTimelineNodeClass = (task: any) => {
+  if (task.is_completed) return 'node-completed'
+  const now = new Date()
+  const start = new Date(task.start_time)
+  const end = new Date(task.end_time)
+  if (now < start) return 'node-upcoming'
+  if (now > end) return 'node-overdue'
+  return 'node-active'
 }
 
 const getPlanProgressPercent = () => {
@@ -258,10 +317,10 @@ const isPlanCompleted = () => {
 // 触发烟花效果
 const triggerFireworks = () => {
   showFireworks.value = true
-  // 3秒后自动关闭烟花效果
+  // 15秒后自动关闭烟花效果
   setTimeout(() => {
     showFireworks.value = false
-  }, 3000)
+  }, 15000)
 }
 
 // 生成烟花样式
@@ -285,8 +344,9 @@ const isTaskActive = (task: any) => {
   if (task.is_completed) return true
   const now = new Date()
   const start = new Date(task.start_time)
-  const end = new Date(task.end_time)
-  return now >= start && now <= end
+  // 未开始的任务不可进入，已过期的可以进入
+  if (now < start) return false
+  return true
 }
 
 const backToPlans = () => {
@@ -311,6 +371,9 @@ const testAPIConnection = async () => {
 }
 
 onMounted(async () => {
+  // 滚动到顶部
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+  
   const userInfoStr = localStorage.getItem('userInfo')
   if (!userInfoStr) {
     error.value = '请先登录'
@@ -395,7 +458,7 @@ watch(() => {
   gap: 32px;
   width: 100%;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 20px 100px 20px; /* 底部 padding 为底部 header 留出空间 */
   box-sizing: border-box;
   flex-shrink: 0;
   align-items: flex-start;
@@ -403,40 +466,204 @@ watch(() => {
   margin-top: 0;
 }
 
-/* 置顶计划头部 */
+/* 底部固定计划头部 */
 .plan-header-fixed {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 2px 24px;
-  border-bottom: 2px solid #e2e8f0;
+  padding: 5px 24px;
+  border-top: 2px solid rgba(255, 255, 255, 0.2);
   position: fixed;
-  top: 48px; /* NavBar 高度 */
+  bottom: 0; /* 固定在底部 */
   left: 0;
   right: 0;
   z-index: 999;
-  background: linear-gradient(135deg, #87ceeb 0%, #f8fafc 100%);
+  backdrop-filter: blur(10px);
+  background: linear-gradient(135deg, rgba(135, 206, 235, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
   width: 100%;
-  gap: 2px;
+  gap: 4px;
   box-sizing: border-box;
+  max-height: 40vh;
+  overflow-y: auto;
 }
 
 .plan-header-inner {
   width: 100%;
   max-width: 1600px;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   position: relative;
+  gap: 4px;
+  padding: 4px 24px;
+  min-height: auto;
+}
+
+.plan-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: absolute;
+  left: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+}
+
+/* 计划信息区域 - 一行显示 */
+.plan-header-info {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
   gap: 16px;
-  min-height: 54px; /* 足够容纳按钮和较大标题 */
+  flex-wrap: nowrap;
+  position: relative;
+  padding: 0 100px;
+  box-sizing: border-box;
+}
+
+.plan-header-title-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  min-width: 0;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
 }
 
 .plan-header-title {
-  position: absolute;
-  left: 0; right: 0;
-  margin: 0 auto;
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: #1e293b;
+  padding: 2px 10px;
+  border-radius: 10px;
+  border: 1.5px solid rgba(30, 144, 255, 0.3);
+  backdrop-filter: blur(10px);
+  background-color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 4px 16px rgba(30, 144, 255, 0.15), inset 0 1px 0 rgba(255,255,255,0.8);
+  margin: 0;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 300px;
+  z-index: 2;
+}
+
+.plan-level-badge-header {
+  background: linear-gradient(135deg, #1e90ff 0%, #38bdf8 100%);
+  color: white;
+  padding: 2px 10px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(30, 144, 255, 0.3);
+  flex-shrink: 0;
+}
+
+.plan-header-desc {
+  color: #1e293b;
+  font-size: 0.8rem;
+  margin: 0;
+  line-height: 1.4;
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 300px;
+  font-weight: 500;
+  margin-right: auto;
+}
+
+.plan-header-stats {
+  display: flex;
+  gap: 12px;
+  flex-wrap: nowrap;
+  flex-shrink: 0;
+}
+
+.info-stat-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 3px 10px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 8px;
+  border: 1px solid rgba(30, 144, 255, 0.2);
+  backdrop-filter: blur(10px);
+  min-width: 65px;
+  box-shadow: 0 2px 6px rgba(30, 144, 255, 0.1);
+}
+
+.stat-value-header {
+  display: block;
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #1e90ff;
+  line-height: 1;
+}
+
+.stat-label-header {
+  color: #64748b;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* 计划完成进度在 header 中的样式 */
+.plan-progress-in-header {
+  width: 100%;
+  max-width: 1600px;
+  padding: 4px 24px;
+  margin-top: 3px;
+}
+
+.progress-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 3px;
+}
+
+.progress-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.progress-text {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #1e90ff;
+}
+
+.progress-bar-container-header {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-bar-fill-header {
+  height: 100%;
+  background: linear-gradient(90deg, #1e90ff 0%, #38bdf8 100%);
+  border-radius: 10px;
+  transition: width 0.5s ease-in-out;
+  box-shadow: 0 2px 8px rgba(30, 144, 255, 0.4);
+}
+
+.plan-header-title {
   text-align: center;
   font-size: 1.6rem;
   font-weight: 800;
@@ -451,22 +678,13 @@ watch(() => {
   backdrop-filter: blur(10px);
   background-color: rgba(255, 255, 255, 0.3);
   box-shadow: 0 6px 24px rgba(30, 144, 255, 0.18), inset 0 1px 0 rgba(255,255,255,0.6);
-  max-width: 65%;
+  max-width: 80%;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  top: 50%;
-  transform: translateY(-50%);
   z-index: 2;
 }
 
-.plan-header-actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  position: static;
-  margin-right: 12px;
-}
 
 .plan-header-underline {
   height: 2px;
@@ -478,7 +696,55 @@ watch(() => {
   max-width: 1600px;
 }
 
-.sidebar-placeholder-left, .sidebar-placeholder-right { width: 50px; flex-shrink: 0; }
+.sidebar-placeholder-left { 
+  width: 50px; 
+  flex-shrink: 0; 
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 20px;
+  position: sticky;
+  top: 20px;
+  height: fit-content;
+  z-index: 10;
+}
+.sidebar-placeholder-right { width: 50px; flex-shrink: 0; }
+
+/* 左侧返回按钮样式 */
+.back-nav-arrow {
+  background: rgba(30, 144, 255, 0.1);
+  backdrop-filter: blur(10px);
+  color: #1e90ff;
+  border: 2px solid rgba(30, 144, 255, 0.3);
+  border-radius: 12px;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(30, 144, 255, 0.2);
+  flex-shrink: 0;
+  z-index: 10;
+  position: relative;
+}
+
+.back-nav-arrow:hover {
+  background: rgba(30, 144, 255, 0.2);
+  border-color: rgba(30, 144, 255, 0.5);
+  color: #0c7cd5;
+  transform: scale(1.1);
+  box-shadow: 0 4px 16px rgba(30, 144, 255, 0.3);
+}
+
+.back-nav-arrow:active {
+  transform: scale(0.95);
+}
+
+.back-nav-arrow :deep(.lucide-icon) {
+  flex-shrink: 0;
+}
 .question-main { flex: 1; max-width: 1600px; min-width: 0; }
 .question-card { 
   background: #f8fafc; 
@@ -487,13 +753,24 @@ watch(() => {
   box-shadow: 0 6px 24px -4px rgba(30, 144, 255, 0.1); 
   transition: all 0.3s ease; 
   padding: 0; 
-  overflow: hidden; 
+  overflow: visible; 
   width: 100%; 
-  height: calc(100vh - 84px); 
+  min-height: calc(100vh - 84px - 80px); /* 最小高度，减去顶部空间和底部 header 高度 */
   display: flex; 
   flex-direction: column; 
-  margin: 64px auto 0 auto; 
+  margin: 20px auto 0 auto; /* 减少上边距，让卡片上移 */
   box-sizing: border-box; 
+}
+
+/* 任务列表视图时，卡片背景透明融入页面背景 */
+.question-card.task-view-transparent {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.question-card.task-view-transparent .question-card-header {
+  display: none; /* 任务列表视图时隐藏 header */
 }
 .question-card-header { 
   background: linear-gradient(135deg, #1e90ff 0%, #38bdf8 100%); 
@@ -510,8 +787,8 @@ watch(() => {
 .header-right-section { display: flex; align-items: center; gap: 12px; min-width: 150px; justify-content: flex-end; }
 .number-badge { background: rgba(255, 255, 255, 0.2); color: white; padding: 10px 20px; border-radius: 24px; font-weight: 700; font-size: 1.1rem; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3); box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2); }
 .level-badge { background: rgba(255, 255, 255, 0.15); color: white; padding: 8px 14px; border-radius: 18px; font-weight: 600; font-size: 0.95rem; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); }
-.question-content-unified { flex: 1; display: flex; flex-direction: row; overflow: hidden; background: #f8fafc; }
-.question-left-panel { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+.question-content-unified { flex: 1; display: flex; flex-direction: row; overflow: visible; background: transparent; /* 透明背景，融入页面背景 */ }
+.question-left-panel { flex: 1; overflow: visible; padding: 24px; display: flex; flex-direction: column; gap: 24px; background: transparent; /* 透明背景，融入页面背景 */ }
 .question-left-panel-centered { max-width: 1600px; margin: 0 auto; width: 100%; }
 .content-section { 
   background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); 
@@ -553,13 +830,25 @@ watch(() => {
 .empty-state h3 { color: #1e293b; font-size: 1.5rem; margin: 0 0 10px 0; }
 .empty-state p { color: #64748b; font-size: 1.1rem; }
 .error-state { text-align: center; padding: 60px 20px; background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border: 2px solid #fecaca; }
-.error-icon { font-size: 5rem; margin-bottom: 20px; }
+.error-icon { 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+  color: #dc2626;
+}
 .error-state h3 { color: #dc2626; font-size: 1.5rem; margin: 0 0 10px 0; }
 .error-state p { color: #991b1b; font-size: 1.1rem; margin-bottom: 20px; }
 .retry-btn { background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); color: white; border: none; padding: 12px 24px; border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 8px; }
 .retry-btn:hover { background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3); }
 .loading-state { text-align: center; padding: 60px 20px; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border: 2px solid #bae6fd; }
-.loading-icon { font-size: 5rem; margin-bottom: 20px; animation: spin 2s linear infinite; }
+.loading-icon { 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+  color: #1e90ff;
+}
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 .tasks-list { display: flex; flex-direction: column; gap: 20px; }
 .task-item { display: flex; gap: 16px; padding: 24px; background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border: 2px solid #e2e8f0; border-radius: 16px; transition: all 0.3s ease; }
@@ -577,15 +866,6 @@ watch(() => {
 .start-btn { background: linear-gradient(135deg, #10b981 0%, #34d399 100%); color: white; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3); }
 .start-btn:hover:not(:disabled) { background: linear-gradient(135deg, #059669 0%, #10b981 100%); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4); }
 .start-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.plan-info-card { margin-bottom: 24px; }
-.plan-info-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-.plan-info-header h2 { color: #1e293b; font-size: 1.8rem; margin: 0; font-weight: 700; }
-.plan-level-badge-large { background: linear-gradient(135deg, #1e90ff 0%, #38bdf8 100%); color: white; padding: 10px 20px; border-radius: 16px; font-size: 1rem; font-weight: 700; }
-.plan-info-desc { color: #64748b; font-size: 1rem; margin: 0 0 20px 0; line-height: 1.6; }
-.plan-info-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 16px; }
-.info-stat { text-align: center; padding: 16px; background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%); border-radius: 12px; border: 1px solid #bae6fd; }
-.stat-value { display: block; font-size: 2rem; font-weight: 800; color: #1e90ff; margin-bottom: 4px; }
-.stat-label { color: #64748b; font-size: 0.9rem; font-weight: 500; }
 
 /* 完成提示横幅 */
 .completion-banner {
@@ -610,9 +890,11 @@ watch(() => {
 }
 
 .completion-icon {
-  font-size: 4rem;
-  display: block;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   margin-bottom: 12px;
+  color: #22c55e;
   animation: bounce 1s ease-in-out infinite;
 }
 
@@ -639,142 +921,422 @@ watch(() => {
   font-weight: 500;
 }
 
-/* 卡片栅格布局 */
-.tasks-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(500px, 1fr)); gap: 32px; }
-/* 计划卡同风格的任务卡片样式 */
-.task-card {
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-  border: 3px solid #e0f2fe;
-  border-radius: 24px;
-  padding: 0;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 6px 24px rgba(30, 144, 255, 0.12);
-  overflow: hidden;
-  min-height: 320px;
+/* 时间轴包装器 */
+.timeline-wrapper {
+  position: relative;
+  padding: 20px 0 20px 60px;
+  margin: 24px 0;
+}
+
+/* 连续的时间轴线 */
+.timeline-axis {
+  position: absolute;
+  left: 30px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  z-index: 1;
+}
+
+.timeline-axis-line {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, 
+    rgba(30, 144, 255, 0.3) 0%,
+    rgba(30, 144, 255, 0.6) 20%,
+    rgba(56, 189, 248, 0.8) 50%,
+    rgba(30, 144, 255, 0.6) 80%,
+    rgba(30, 144, 255, 0.3) 100%
+  );
+  border-radius: 2px;
+  box-shadow: 0 0 8px rgba(30, 144, 255, 0.3);
+}
+
+/* 时间轴项容器 */
+.timeline-items {
   display: flex;
   flex-direction: column;
+  gap: 20px;
+  position: relative;
+  z-index: 2;
 }
-.task-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 16px 40px rgba(30, 144, 255, 0.25);
+
+/* 时间轴项 */
+.timeline-item {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  position: relative;
+}
+
+/* 时间轴节点包装器 */
+.timeline-node-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: absolute;
+  left: -46px;
+  top: 0;
+  width: 40px;
+  flex-shrink: 0;
+}
+
+/* 时间轴节点 */
+.timeline-node {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 3px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 3;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.timeline-node-inner {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #1e90ff;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 2;
+}
+
+.timeline-node-glow {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 1;
+}
+
+.timeline-node.node-completed {
+  border-color: #22c55e;
+  background: #ffffff;
+  box-shadow: 0 2px 12px rgba(34, 197, 94, 0.3);
+}
+
+.timeline-node.node-completed .timeline-node-inner {
+  background: #22c55e;
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
+}
+
+.timeline-node.node-completed .timeline-node-glow {
+  background: radial-gradient(circle, rgba(34, 197, 94, 0.4) 0%, transparent 70%);
+  opacity: 1;
+}
+
+.timeline-node.node-active {
+  border-color: #1e90ff;
+  background: #ffffff;
+  box-shadow: 0 2px 12px rgba(30, 144, 255, 0.4);
+  animation: nodePulse 2s ease-in-out infinite;
+}
+
+.timeline-node.node-active .timeline-node-inner {
+  background: #1e90ff;
+  box-shadow: 0 0 10px rgba(30, 144, 255, 0.7);
+}
+
+.timeline-node.node-active .timeline-node-glow {
+  background: radial-gradient(circle, rgba(30, 144, 255, 0.4) 0%, transparent 70%);
+  opacity: 1;
+  animation: glowPulse 2s ease-in-out infinite;
+}
+
+.timeline-node.node-upcoming {
+  border-color: #fbbf24;
+  background: #ffffff;
+}
+
+.timeline-node.node-upcoming .timeline-node-inner {
+  background: #fbbf24;
+}
+
+.timeline-node.node-overdue {
+  border-color: #ef4444;
+  background: #ffffff;
+}
+
+.timeline-node.node-overdue .timeline-node-inner {
+  background: #ef4444;
+}
+
+@keyframes nodePulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+}
+
+@keyframes glowPulse {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.3);
+  }
+}
+
+/* 节点标签 */
+.timeline-node-label {
+  margin-top: 8px;
+}
+
+.node-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: linear-gradient(135deg, #1e90ff 0%, #38bdf8 100%);
+  color: white;
+  border-radius: 50%;
+  font-size: 0.75rem;
+  font-weight: 700;
+  box-shadow: 0 2px 6px rgba(30, 144, 255, 0.3);
+}
+
+/* 卡片包装器 */
+.timeline-card-wrapper {
+  flex: 1;
+  min-width: 0;
+}
+
+/* 紧凑的任务卡片 */
+.task-card-compact {
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
+  border: 1.5px solid #e0f2fe;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(30, 144, 255, 0.08);
+  overflow: hidden;
+}
+
+.task-card-compact:hover {
+  transform: translateX(4px);
+  box-shadow: 0 8px 24px rgba(30, 144, 255, 0.15);
   border-color: #1e90ff;
 }
-.task-card.completed {
-  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+
+.task-card-compact.completed {
+  background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%) !important;
   border-color: #86efac;
 }
-.task-card.active {
+
+.task-card-compact.active {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%) !important;
   border-color: #38bdf8;
-  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  box-shadow: 0 4px 20px rgba(30, 144, 255, 0.12);
 }
-.task-card-header {
-  background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
-  padding: 20px 28px;
+
+.task-card-compact.locked {
+  opacity: 0.6;
+  cursor: not-allowed;
+  filter: grayscale(30%);
+}
+
+.task-card-compact.locked:hover {
+  transform: none;
+  box-shadow: 0 4px 16px rgba(30, 144, 255, 0.08);
+  border-color: #e0f2fe;
+}
+
+/* 紧凑的内容区域 */
+.section-content-compact {
+  padding: 16px 18px;
+  background: transparent;
+}
+
+/* 任务头部紧凑版 */
+.task-header-compact {
+  margin-bottom: 10px;
+}
+
+.task-title-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
 }
-.task-status-badge {
-  padding: 8px 16px;
-  border-radius: 14px;
-  font-size: 0.95rem;
+
+.task-title-compact {
+  color: #1e293b;
+  font-size: 1.1rem;
+  margin: 0;
   font-weight: 700;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.4;
 }
-.status-completed {
+
+.task-type-badge {
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  white-space: nowrap;
+  letter-spacing: 0.3px;
+}
+
+.task-type-badge.type-exam {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+  box-shadow: 0 2px 6px rgba(245, 158, 11, 0.3);
+}
+
+.task-type-badge.type-normal {
+  background: linear-gradient(135deg, #1e90ff 0%, #38bdf8 100%);
+  color: white;
+  box-shadow: 0 2px 6px rgba(30, 144, 255, 0.3);
+}
+
+.task-status-badge-compact {
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  white-space: nowrap;
+  letter-spacing: 0.3px;
+}
+
+.task-status-badge-compact.status-completed {
   background: #d1fae5;
   color: #059669;
 }
-.status-active {
-  background: #d1fae5;
-  color: #059669;
+
+.task-status-badge-compact.status-active {
+  background: #dbeafe;
+  color: #1e40af;
 }
-.status-upcoming {
+
+.task-status-badge-compact.status-upcoming {
   background: #fef3c7;
   color: #d97706;
 }
-.status-overdue {
+
+.task-status-badge-compact.status-overdue {
   background: #fee2e2;
   color: #dc2626;
 }
-.task-level-badge {
-  background: #1e90ff;
-  color: white;
-  padding: 8px 16px;
-  border-radius: 14px;
-  font-size: 1rem;
-  font-weight: 700;
-}
-.task-card-body {
-  padding: 28px;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.task-title {
-  color: #1e293b;
-  font-size: 1.5rem;
+
+/* 任务描述紧凑版 */
+.task-desc-compact {
+  color: #64748b;
+  font-size: 0.875rem;
   margin: 0 0 12px 0;
-  font-weight: 700;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
-.task-desc {
-  color: #64748b;
-  font-size: 1.05rem;
-  margin: 0 0 16px 0;
-  line-height: 1.6;
-}
-.task-time {
+
+/* 任务元信息紧凑版 */
+.task-meta-compact {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 10px;
-  color: #64748b;
-  font-size: 1rem;
+  gap: 12px;
   margin-bottom: 10px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 10px;
+  border: 1px solid rgba(30, 144, 255, 0.15);
 }
-.task-meta {
-  display: flex;
-  gap: 16px;
-  font-size: 0.95rem;
-  color: #64748b;
-  margin-bottom: 8px;
-}
-.exercise-stat {
+
+.task-time-compact {
   display: flex;
   align-items: center;
   gap: 6px;
+  color: #64748b;
+  font-size: 0.8rem;
   font-weight: 500;
+  flex: 1;
+  min-width: 0;
 }
-.task-card-footer {
-  padding: 20px 28px;
-  background: #f8fafc;
-  border-top: 1px solid #e2e8f0;
+
+.task-time-compact :deep(.lucide-icon) {
+  flex-shrink: 0;
+  color: #1e90ff;
+}
+
+.task-stats-compact {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.task-stat-item {
   display: flex;
   align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: rgba(30, 144, 255, 0.08);
+  border-radius: 6px;
+  font-size: 0.75rem;
+  color: #1e40af;
+  font-weight: 600;
+}
+
+.task-stat-item :deep(.lucide-icon) {
+  flex-shrink: 0;
+  color: #1e90ff;
+}
+
+/* 操作按钮紧凑版 */
+.task-action-compact {
+  display: flex;
   justify-content: flex-end;
 }
-.enter-task-btn {
+
+.enter-task-btn-compact {
   background: linear-gradient(135deg, #1e90ff 0%, #38bdf8 100%);
   color: white;
   border: none;
-  padding: 14px 24px;
-  border-radius: 14px;
-  font-size: 1.05rem;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  font-size: 0.875rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(30, 144, 255, 0.25);
 }
-.enter-task-btn[disabled] {
-  opacity: 0.5;
+
+.enter-task-btn-compact :deep(.lucide-icon) {
+  flex-shrink: 0;
+}
+
+.enter-task-btn-compact[disabled] {
+  opacity: 0.4;
   cursor: not-allowed;
 }
-.enter-task-btn:hover:not([disabled]) {
+
+.enter-task-btn-compact:hover:not([disabled]) {
   background: linear-gradient(135deg, #0c7cd5 0%, #1e90ff 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(30, 144, 255, 0.35);
+  transform: translateX(2px);
+  box-shadow: 0 4px 12px rgba(30, 144, 255, 0.4);
 }
 
 /* —— 增加卡片内部结构和布局样式优化 —— */
@@ -820,34 +1382,141 @@ watch(() => {
 }
 
 @media (max-width: 768px) {
-  .tasks-grid { grid-template-columns: 1fr; }
-}
-
-@media (max-width: 768px) {
   .exam-content-flex-row { 
     flex-direction: column; 
     gap: 16px; 
     padding: 0 16px; 
   }
-  .sidebar-placeholder-left, .sidebar-placeholder-right { display: none; }
+  .sidebar-placeholder-right { display: none; }
+  .sidebar-placeholder-left {
+    width: auto;
+    padding-top: 10px;
+    position: static;
+  }
+  .back-nav-arrow {
+    width: 48px;
+    height: 48px;
+  }
+  .back-nav-arrow :deep(.lucide-icon) {
+    width: 24px;
+    height: 24px;
+  }
   .question-main { max-width: 100%; }
   .question-card { 
     height: auto; 
     min-height: calc(100vh - 20px); 
   }
   .question-left-panel { padding: 16px; gap: 16px; }
-  .task-item { 
-    flex-direction: column; 
-    gap: 16px; 
+  
+  /* 时间轴响应式 */
+  .timeline-wrapper {
+    padding-left: 60px;
   }
-  .task-number { 
-    width: 36px; 
-    height: 36px; 
+  
+  .timeline-axis {
+    left: 30px;
+  }
+  
+  .timeline-node-wrapper {
+    left: -60px;
+    width: 50px;
+  }
+  
+  .timeline-node {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .timeline-node-inner {
+    width: 12px;
+    height: 12px;
+  }
+  
+  .node-number {
+    width: 20px;
+    height: 20px;
+    font-size: 0.7rem;
+  }
+  
+  .task-title-compact {
     font-size: 1rem; 
   }
-  .task-exercises-stats { 
+  
+  .task-meta-compact {
     flex-direction: column; 
+    align-items: flex-start;
     gap: 8px; 
+  }
+  
+  .task-stats-compact {
+    width: 100%;
+    justify-content: flex-start;
+  }
+  
+  /* Header响应式 */
+  .plan-header-fixed {
+    padding: 10px 12px;
+    max-height: 50vh;
+  }
+  
+  .plan-header-inner {
+    padding: 10px 12px;
+    gap: 6px;
+  }
+  
+  .plan-header-info {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 0 80px;
+  }
+  
+  .plan-header-title-section {
+    position: static;
+    transform: none;
+    order: 1;
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .plan-header-title {
+    font-size: 1rem;
+    max-width: 200px;
+    padding: 3px 8px;
+  }
+  
+  .plan-level-badge-header {
+    font-size: 0.75rem;
+    padding: 3px 8px;
+  }
+  
+  .plan-header-desc {
+    font-size: 0.75rem;
+    max-width: 100%;
+    order: 3;
+    width: 100%;
+    white-space: normal;
+    -webkit-line-clamp: 1;
+    margin-right: 0;
+  }
+  
+  .plan-header-stats {
+    gap: 8px;
+    order: 2;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .info-stat-header {
+    padding: 4px 8px;
+    min-width: 60px;
+  }
+  
+  .stat-value-header {
+    font-size: 1rem;
+  }
+  
+  .stat-label-header {
+    font-size: 0.7rem;
   }
 }
 
@@ -956,7 +1625,7 @@ watch(() => {
     60px 0 0 currentColor,
     0 -60px 0 currentColor,
     0 60px 0 currentColor;
-  animation: firework-explode 2s ease-out forwards;
+  animation: firework-explode 3s ease-out infinite;
   transform: translate(-50%, -50%);
 }
 

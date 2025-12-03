@@ -30,7 +30,7 @@
       </div>
       
       <div v-else-if="levels.length === 0" class="empty-state">
-        <div class="empty-icon">📚</div>
+        <div class="empty-icon"><Icon name="book-open" :size="80" /></div>
         <h3>暂无等级</h3>
         <p>暂时没有可用的等级</p>
       </div>
@@ -47,7 +47,7 @@
                  <div class="enter-level-hint-header">
                    <span class="hint-text">点击卡片进入等级</span>
                    <span class="hint-text-short">进入等级</span>
-                   <div class="hint-icon">→</div>
+                   <Icon name="arrow-right" :size="20" class="hint-icon" />
                  </div>
                </div>
              </div>
@@ -68,7 +68,7 @@
            </div>
            
            <div v-else class="no-selection-placeholder">
-             <div class="placeholder-icon">📚</div>
+             <div class="placeholder-icon"><Icon name="book-open" :size="80" /></div>
              <h3>选择等级</h3>
              <p>点击上方的等级标签开始</p>
            </div>
@@ -84,6 +84,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
+import Icon from '@/components/Icon.vue'
 
 const router = useRouter()
 
@@ -490,6 +491,10 @@ onUnmounted(() => {
 .empty-icon {
   font-size: 64px;
   margin-bottom: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #1e90ff;
 }
 
 .empty-state h3 {
@@ -733,6 +738,10 @@ onUnmounted(() => {
   font-size: 80px;
   margin-bottom: 20px;
   opacity: 0.6;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #1e90ff;
 }
 
 .no-selection-placeholder h3 {

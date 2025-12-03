@@ -5,12 +5,12 @@
       <div class="header-info">
         <span class="exam-count">共 {{ exams.length }} 场考试</span>
         <span v-if="examStore.isCacheValid && examStore.hasExams" class="cache-indicator">
-          📦 使用缓存数据
+          <Icon name="package" :size="16" /> 使用缓存数据
         </span>
       </div>
       <div class="action-buttons">
         <button @click="refreshExams" class="btn btn-secondary" title="刷新考试列表">
-          <span class="btn-icon">↻</span> 刷新
+          <Icon name="refresh-cw" :size="18" /> 刷新
         </button>
       </div>
     </div>
@@ -98,16 +98,16 @@
             <td @click.stop>
               <div class="action-buttons">
                 <button @click="viewExamDetails(exam.id)" class="btn-action btn-view" title="查看详情">
-                  <span class="action-icon">👀</span>
+                  <Icon name="eye" :size="18" />
                 </button>
                 <button @click="openExportDialog(exam)" class="btn-action btn-export" title="导出">
-                  <span class="action-icon">📥</span>
+                  <Icon name="download" :size="18" />
                 </button>
                 <button @click="openEditDialog(exam)" class="btn-action btn-edit" title="编辑">
-                  <span class="action-icon">📝</span>
+                  <Icon name="edit" :size="18" />
                 </button>
                 <button @click="deleteExam(exam.id)" class="btn-action btn-delete" title="删除">
-                  <span class="action-icon">🗑</span>
+                  <Icon name="trash-2" :size="18" />
                 </button>
               </div>
             </td>
@@ -246,6 +246,7 @@ import SuccessMessageDialog from './Dialog/SuccessMessageDialog.vue'
 import ExportDialog from './Dialog/ExportDialog.vue'
 import { useExamStore } from '../../stores/examStore'
 import docxExportService from '../../services/docxExportService'
+import Icon from '@/components/Icon.vue'
 
 // Props 定义
 interface Props {
@@ -739,6 +740,10 @@ onMounted(async () => {
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
   font-size: 14px;
 }
 
@@ -1037,5 +1042,13 @@ onMounted(async () => {
 
 .action-icon {
   font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-action :deep(.lucide-icon) {
+  flex-shrink: 0;
+  color: inherit;
 }
 </style> 
