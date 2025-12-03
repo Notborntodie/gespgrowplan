@@ -12,7 +12,7 @@ logs/
 *.log
 
 # 上传文件
-uploads/
+# uploads/  # 已移除，需要上传到GitHub
 
 # 操作系统文件
 .DS_Store
