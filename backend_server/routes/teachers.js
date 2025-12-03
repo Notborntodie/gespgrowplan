@@ -1084,4 +1084,159 @@ router.get('/teacher/:teacherId/students/:studentId/oj-submissions/:submissionId
   }
 });
 
+/**
+ * 教师批量拉学生加入学习计划
+ * POST /teacher/:teacherId/learning-plans/:planId/add-students
+ * 
+ * 请求体:
+ * - student_ids: 学生ID数组
+ */
+router.post('/teacher/:teacherId/learning-plans/:planId/add-students', async (req, res) => {
+  try {
+    const { teacherId, planId } = req.params;
+    const { student_ids } = req.body;
+    
+    if (!Array.isArray(student_ids) || student_ids.length === 0) {
+      return res.status(400).json({ 
+        success: false,
+        error: 'student_ids 必须是包含学生ID的数组' 
+      });
+    }
+    
+    const connection = await pool.getConnection();
+    
+    try {
+      await connection.beginTransaction();
+      
+      // 验证教师是否存在
+      const [teacherExists] = await connection.execute(
+        'SELECT id FROM users WHERE id = ?',
+        [teacherId]
+      );
+      
+      if (teacherExists.length === 0) {
+        await connection.rollback();
+        connection.release();
+        return res.status(404).json({ success: false, error: '教师不存在' });
+      }
+      
+      // 验证学习计划是否存在且有效
+      const [planRows] = await connection.execute(
+        'SELECT * FROM learning_plans WHERE id = ? AND is_active = 1',
+        [planId]
+      );
+      
+      if (planRows.length === 0) {
+        await connection.rollback();
+        connection.release();
+        return res.status(404).json({ 
+          success: false,
+          error: '学习计划不存在或已停用' 
+        });
+      }
+      
+      // 验证所有学生是否绑定到该教师
+      const placeholders = student_ids.map(() => '?').join(',');
+      const [boundStudents] = await connection.execute(
+        `SELECT student_id FROM teacher_students WHERE teacher_id = ? AND student_id IN (${placeholders})`,
+        [teacherId, ...student_ids]
+      );
+      
+      const boundStudentIds = boundStudents.map(row => row.student_id);
+      const unboundStudents = student_ids.filter(id => !boundStudentIds.includes(id));
+      
+      if (unboundStudents.length > 0) {
+        await connection.rollback();
+        connection.release();
+        return res.status(400).json({ 
+          success: false,
+          error: '部分学生未绑定到该教师',
+          unbound_students: unboundStudents
+        });
+      }
+      
+      const results = [];
+      
+      // 为每个学生加入学习计划
+      for (const studentId of student_ids) {
+        // 检查学生是否已加入该计划
+        const [existingRows] = await connection.execute(
+          'SELECT * FROM user_learning_plans WHERE user_id = ? AND plan_id = ?',
+          [studentId, planId]
+        );
+        
+        if (existingRows.length > 0) {
+          results.push({ student_id: studentId, status: 'already_joined' });
+          continue;
+        }
+        
+        // 加入学习计划
+        await connection.execute(
+          'INSERT INTO user_learning_plans (user_id, plan_id, status) VALUES (?, ?, ?)',
+          [studentId, planId, 'active']
+        );
+        
+        // 为该计划的所有任务创建进度记录
+        await connection.execute(`
+          INSERT INTO user_task_progress (user_id, task_id, is_completed)
+          SELECT ?, id, FALSE
+          FROM learning_tasks
+          WHERE plan_id = ?
+        `, [studentId, planId]);
+        
+        // 为该计划的所有客观题创建进度记录
+        await connection.execute(`
+          INSERT INTO user_exam_progress (user_id, exam_id, is_completed, best_score, attempt_count)
+          SELECT ?, te.exam_id, FALSE, 0, 0
+          FROM task_exams te
+          JOIN learning_tasks lt ON te.task_id = lt.id
+          WHERE lt.plan_id = ?
+          ON DUPLICATE KEY UPDATE
+            is_completed = FALSE,
+            best_score = 0,
+            attempt_count = 0,
+            completed_at = NULL
+        `, [studentId, planId]);
+        
+        // 为该计划的所有OJ题目创建进度记录
+        await connection.execute(`
+          INSERT INTO user_oj_progress (user_id, problem_id, is_completed, best_verdict, attempt_count)
+          SELECT ?, top.problem_id, FALSE, NULL, 0
+          FROM task_oj_problems top
+          JOIN learning_tasks lt ON top.task_id = lt.id
+          WHERE lt.plan_id = ?
+          ON DUPLICATE KEY UPDATE
+            is_completed = FALSE,
+            best_verdict = NULL,
+            attempt_count = 0,
+            completed_at = NULL
+        `, [studentId, planId]);
+        
+        results.push({ student_id: studentId, status: 'success' });
+      }
+      
+      await connection.commit();
+      connection.release();
+      
+      // 清除相关缓存
+      await cacheUtils.delPattern('learning-plans:*');
+      
+      res.json({
+        success: true,
+        message: '学生加入学习计划完成',
+        results: results
+      });
+      
+    } catch (error) {
+      await connection.rollback();
+      connection.release();
+      throw error;
+    }
+    
+  } catch (error) {
+    logger.error('教师拉学生加入学习计划失败', { error: error.message, teacherId, planId });
+    res.status(500).json({ success: false, error: '服务器错误' });
+  }
+});
+
 module.exports = router;

@@ -1,9 +1,40 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 const { pool } = require('../config/database');
 const { logger } = require('../config/logger');
 const { submitExamInternal } = require('./submissions');
 const { submitOjInternal } = require('./oj');
+
+// PDF 上传配置
+const reviewUploadDir = 'uploads/review/';
+if (!fs.existsSync(reviewUploadDir)) {
+  fs.mkdirSync(reviewUploadDir, { recursive: true });
+}
+
+const reviewStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, reviewUploadDir);
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, 'review-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const reviewUpload = multer({
+  storage: reviewStorage,
+  limits: { fileSize: 20 * 1024 * 1024 }, // 20MB
+  fileFilter: function (req, file, cb) {
+    if (file.mimetype === 'application/pdf') {
+      cb(null, true);
+    } else {
+      cb(new Error('只支持 PDF 文件'), false);
+    }
+  }
+});
 
 // ==================== 1. 获取我的学习计划列表 ====================
 router.get('/learning-plans/my-plans', async (req, res) => {
@@ -500,6 +531,7 @@ router.get('/learning-plans/:planId/tasks', async (req, res) => {
           lt.start_time,
           lt.end_time,
           lt.task_order,
+          lt.is_exam_mode,
           COALESCE(utp.is_completed, 0) as is_completed,
           utp.completed_at,
           COUNT(DISTINCT te.exam_id) as exam_count,
@@ -510,7 +542,7 @@ router.get('/learning-plans/:planId/tasks', async (req, res) => {
         LEFT JOIN task_oj_problems top ON lt.id = top.task_id
         WHERE lt.plan_id = ?
         GROUP BY lt.id, lt.name, lt.description, lt.review_content, lt.review_video_url, 
-                 lt.start_time, lt.end_time, lt.task_order, utp.is_completed, utp.completed_at
+                 lt.start_time, lt.end_time, lt.task_order, lt.is_exam_mode, utp.is_completed, utp.completed_at
         ORDER BY lt.task_order, lt.start_time
       `, [user_id, planId]);
       
@@ -564,9 +596,11 @@ router.get('/learning-tasks/:taskId/exercises', async (req, res) => {
           lt.name,
           lt.description,
           lt.review_content,
+          lt.review_content_type,
           lt.review_video_url,
           lt.start_time,
-          lt.end_time
+          lt.end_time,
+          lt.is_exam_mode
         FROM learning_tasks lt
         WHERE lt.id = ?
       `, [taskId]);
@@ -637,7 +671,11 @@ router.get('/learning-tasks/:taskId/exercises', async (req, res) => {
             name: task.name,
             description: task.description,
             review_content: task.review_content,
-            review_video_url: task.review_video_url
+            review_content_type: task.review_content_type || 'text',
+            review_video_url: task.review_video_url,
+            is_exam_mode: task.is_exam_mode,
+            start_time: task.start_time,
+            end_time: task.end_time
           },
           exams: exams,
           oj_problems: ojProblems
@@ -782,17 +820,19 @@ router.post('/learning-plans', async (req, res) => {
           // 创建任务
           const [taskResult] = await connection.execute(`
             INSERT INTO learning_tasks 
-            (plan_id, name, description, review_content, review_video_url, start_time, end_time, task_order)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            (plan_id, name, description, review_content, review_content_type, review_video_url, start_time, end_time, task_order, is_exam_mode)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
           `, [
             planId,
             task.name || `任务${i + 1}`,
             task.description || null,
             task.review_content || null,
+            task.review_content_type || 'text',
             task.review_video_url || null,
             task.start_time || null,
             task.end_time || null,
-            task.task_order !== undefined ? task.task_order : i + 1
+            task.task_order !== undefined ? task.task_order : i + 1,
+            task.is_exam_mode || 0
           ]);
           
           const taskId = taskResult.insertId;
@@ -1023,17 +1063,19 @@ router.put('/learning-plans/:planId', async (req, res) => {
           // 创建任务
           const [taskResult] = await connection.execute(`
             INSERT INTO learning_tasks 
-            (plan_id, name, description, review_content, review_video_url, start_time, end_time, task_order)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            (plan_id, name, description, review_content, review_content_type, review_video_url, start_time, end_time, task_order, is_exam_mode)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
           `, [
             planId,
             task.name || `任务${i + 1}`,
             task.description || null,
             task.review_content || null,
+            task.review_content_type || 'text',
             task.review_video_url || null,
             task.start_time || null,
             task.end_time || null,
-            task.task_order !== undefined ? task.task_order : i + 1
+            task.task_order !== undefined ? task.task_order : i + 1,
+            task.is_exam_mode || 0
           ]);
           
           const taskId = taskResult.insertId;
@@ -1707,14 +1749,18 @@ router.get('/learning-plans/:planId/progress', async (req, res) => {
             COALESCE(uop.is_completed, 0) as is_completed,
             uop.best_verdict,
             COALESCE(uop.attempt_count, 0) as attempt_count,
-            uop.completed_at
+            uop.completed_at,
+            (SELECT MAX(CASE WHEN os.total_tests > 0 THEN ROUND(os.passed_tests * 100.0 / os.total_tests, 0) ELSE 0 END)
+             FROM oj_submissions os 
+             WHERE os.problem_id = op.id AND os.user_id = ? AND os.task_id = ? AND os.status = 'completed'
+            ) as best_pass_rate
           FROM task_oj_problems top
           JOIN oj_problems op ON top.problem_id = op.id
           LEFT JOIN user_oj_progress uop ON op.id = uop.problem_id 
             AND uop.user_id = ? AND uop.task_id = ?
           WHERE top.task_id = ?
           ORDER BY top.problem_order
-        `, [user_id, task.id, task.id]);
+        `, [user_id, task.id, user_id, task.id, task.id]);
         
         taskDetails.push({
           ...task,
@@ -1851,14 +1897,18 @@ router.get('/learning-tasks/:taskId/progress', async (req, res) => {
           COALESCE(uop.is_completed, 0) as is_completed,
           uop.best_verdict,
           COALESCE(uop.attempt_count, 0) as attempt_count,
-          uop.completed_at
+          uop.completed_at,
+          (SELECT MAX(CASE WHEN os.total_tests > 0 THEN ROUND(os.passed_tests * 100.0 / os.total_tests, 0) ELSE 0 END)
+           FROM oj_submissions os 
+           WHERE os.problem_id = op.id AND os.user_id = ? AND os.task_id = ? AND os.status = 'completed'
+          ) as best_pass_rate
         FROM task_oj_problems top
         JOIN oj_problems op ON top.problem_id = op.id
         LEFT JOIN user_oj_progress uop ON op.id = uop.problem_id 
           AND uop.user_id = ? AND uop.task_id = ?
         WHERE top.task_id = ?
         ORDER BY top.problem_order
-      `, [user_id, taskId, taskId]);
+      `, [user_id, taskId, user_id, taskId, taskId]);
       
       // 5. 统计完成情况
       const totalExams = examProgress.length;
@@ -2077,7 +2127,152 @@ router.get('/learning-plans/:planId/students-progress', async (req, res) => {
   }
 });
 
-// ==================== 15. 教师查看单个学生的详细完成情况 ====================
+// ==================== 15. 复制学习计划 ====================
+router.post('/learning-plans/:planId/copy', async (req, res) => {
+  try {
+    const { planId } = req.params;
+    const { name } = req.body; // 可选的新名称
+    
+    const connection = await pool.getConnection();
+    
+    try {
+      await connection.beginTransaction();
+      
+      // 1. 获取原学习计划信息
+      const [planRows] = await connection.execute(
+        'SELECT * FROM learning_plans WHERE id = ?',
+        [planId]
+      );
+      
+      if (planRows.length === 0) {
+        await connection.rollback();
+        connection.release();
+        return res.status(404).json({ 
+          success: false,
+          error: '学习计划不存在' 
+        });
+      }
+      
+      const originalPlan = planRows[0];
+      
+      // 2. 创建新的学习计划
+      const newName = name || `${originalPlan.name} (副本)`;
+      const [newPlanResult] = await connection.execute(`
+        INSERT INTO learning_plans (name, description, level, start_time, end_time, is_active)
+        VALUES (?, ?, ?, ?, ?, ?)
+      `, [
+        newName,
+        originalPlan.description,
+        originalPlan.level,
+        originalPlan.start_time,
+        originalPlan.end_time,
+        originalPlan.is_active
+      ]);
+      
+      const newPlanId = newPlanResult.insertId;
+      
+      // 3. 获取原计划的所有任务
+      const [tasks] = await connection.execute(
+        'SELECT * FROM learning_tasks WHERE plan_id = ? ORDER BY task_order',
+        [planId]
+      );
+      
+      // 4. 复制每个任务及其关联的客观题和OJ题
+      for (const task of tasks) {
+        // 创建新任务
+        const [newTaskResult] = await connection.execute(`
+          INSERT INTO learning_tasks 
+          (plan_id, name, description, review_content, review_content_type, review_video_url, start_time, end_time, task_order, is_exam_mode)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `, [
+          newPlanId,
+          task.name,
+          task.description,
+          task.review_content,
+          task.review_content_type || 'text',
+          task.review_video_url,
+          task.start_time,
+          task.end_time,
+          task.task_order,
+          task.is_exam_mode
+        ]);
+        
+        const newTaskId = newTaskResult.insertId;
+        
+        // 复制任务关联的客观题
+        const [taskExams] = await connection.execute(
+          'SELECT * FROM task_exams WHERE task_id = ? ORDER BY exam_order',
+          [task.id]
+        );
+        
+        for (const exam of taskExams) {
+          await connection.execute(`
+            INSERT INTO task_exams (task_id, exam_id, exam_order)
+            VALUES (?, ?, ?)
+          `, [newTaskId, exam.exam_id, exam.exam_order]);
+        }
+        
+        // 复制任务关联的OJ题
+        const [taskOjProblems] = await connection.execute(
+          'SELECT * FROM task_oj_problems WHERE task_id = ? ORDER BY problem_order',
+          [task.id]
+        );
+        
+        for (const problem of taskOjProblems) {
+          await connection.execute(`
+            INSERT INTO task_oj_problems (task_id, problem_id, problem_order)
+            VALUES (?, ?, ?)
+          `, [newTaskId, problem.problem_id, problem.problem_order]);
+        }
+      }
+      
+      // 5. 获取新创建的完整学习计划信息
+      const [newPlanData] = await connection.execute(
+        'SELECT * FROM learning_plans WHERE id = ?',
+        [newPlanId]
+      );
+      
+      const [newTasksData] = await connection.execute(`
+        SELECT 
+          lt.*,
+          (SELECT JSON_ARRAYAGG(JSON_OBJECT('exam_id', te.exam_id, 'exam_order', te.exam_order))
+           FROM task_exams te WHERE te.task_id = lt.id) as exams,
+          (SELECT JSON_ARRAYAGG(JSON_OBJECT('problem_id', top.problem_id, 'problem_order', top.problem_order))
+           FROM task_oj_problems top WHERE top.task_id = lt.id) as oj_problems
+        FROM learning_tasks lt
+        WHERE lt.plan_id = ?
+        ORDER BY lt.task_order, lt.start_time
+      `, [newPlanId]);
+      
+      await connection.commit();
+      connection.release();
+      
+      res.json({
+        success: true,
+        message: '学习计划复制成功',
+        data: {
+          ...newPlanData[0],
+          tasks: newTasksData
+        }
+      });
+      
+    } catch (error) {
+      await connection.rollback();
+      connection.release();
+      throw error;
+    }
+    
+  } catch (error) {
+    logger.error('复制学习计划失败:', error);
+    res.status(500).json({ 
+      success: false,
+      error: '复制学习计划失败',
+      message: error.message 
+    });
+  }
+});
+
+// ==================== 16. 教师查看单个学生的详细完成情况 ====================
 router.get('/learning-plans/:planId/students/:studentId/progress', async (req, res) => {
   try {
     const { planId, studentId } = req.params;
@@ -2272,6 +2467,37 @@ router.get('/learning-plans/:planId/students/:studentId/progress', async (req, r
       success: false,
       error: '获取学生详细完成情况失败',
       message: error.message 
+    });
+  }
+});
+
+// ==================== 17. 上传复习内容 PDF ====================
+router.post('/learning-tasks/upload-review-pdf', reviewUpload.single('file'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        error: '请上传 PDF 文件'
+      });
+    }
+
+    const filePath = '/' + req.file.path.replace(/\\/g, '/');
+    
+    res.json({
+      success: true,
+      message: 'PDF 上传成功',
+      data: {
+        file_path: filePath,
+        file_name: req.file.originalname,
+        file_size: req.file.size
+      }
+    });
+  } catch (error) {
+    logger.error('上传复习内容 PDF 失败:', error);
+    res.status(500).json({
+      success: false,
+      error: '上传失败',
+      message: error.message
     });
   }
 });

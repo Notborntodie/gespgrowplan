@@ -27,7 +27,7 @@ const judgeQueue = new Queue('oj-judge-queue', {
   redis: {
     host: process.env.REDIS_HOST || '127.0.0.1',
     port: parseInt(process.env.REDIS_PORT) || 6379,
-    password: process.env.REDIS_PASSWORD || undefined,
+    password: process.env.REDIS_PASSWORD && process.env.REDIS_PASSWORD.trim() !== '' ? process.env.REDIS_PASSWORD.trim() : undefined,
     db: parseInt(process.env.REDIS_DB) || 0,
     maxRetriesPerRequest: parseInt(process.env.REDIS_MAX_RETRIES) || 3,
     retryDelayOnFailover: parseInt(process.env.REDIS_RETRY_DELAY) || 100,

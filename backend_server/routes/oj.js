@@ -384,6 +384,37 @@ router.get('/oj/problems/:id', async (req, res) => {
 });
 
 /**
+ * 获取题目解析视频URL
+ * GET /api/oj/problems/:id/video
+ */
+router.get('/oj/problems/:id/video', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const [problems] = await pool.query(
+      'SELECT id, title, video_url FROM oj_problems WHERE id = ?',
+      [id]
+    );
+    
+    if (problems.length === 0) {
+      return res.status(404).json({ success: false, error: '题目不存在' });
+    }
+    
+    res.json({
+      success: true,
+      data: {
+        id: problems[0].id,
+        title: problems[0].title,
+        video_url: problems[0].video_url
+      }
+    });
+  } catch (error) {
+    logger.error('获取题目视频URL失败', { error: error.message });
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/**
  * 获取题目详情（包含全部样例，包括隐藏测试点和不展示的样例）
  * GET /api/oj/problems/:id/all
  */
@@ -502,10 +533,10 @@ router.post('/oj/upload', async (req, res) => {
     // 插入题目
     const [result] = await connection.query(
       `INSERT INTO oj_problems (
-        title, description, input_format, output_format, data_range,
+        title, description, input_format, output_format, data_range, video_url,
         time_limit, memory_limit, level, publish_date
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [title, description, input_format, output_format, data_range,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [title, description, input_format, output_format, data_range, video_url,
        time_limit, memory_limit, level, publish_date]
     );
     
@@ -582,7 +613,8 @@ router.post('/oj/problems', async (req, res) => {
       time_limit = 1000,
       memory_limit = 256,
       level,
-      publish_date
+      publish_date,
+      video_url
     } = req.body;
     
     // 参数验证
@@ -602,10 +634,10 @@ router.post('/oj/problems', async (req, res) => {
     
     const [result] = await pool.query(
       `INSERT INTO oj_problems (
-        title, description, input_format, output_format, data_range,
+        title, description, input_format, output_format, data_range, video_url,
         time_limit, memory_limit, level, publish_date
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [title, description, input_format, output_format, data_range,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [title, description, input_format, output_format, data_range, video_url,
        time_limit, memory_limit, level, publish_date]
     );
     
@@ -660,6 +692,7 @@ router.put('/oj/problems/:id', async (req, res) => {
       input_format,
       output_format,
       data_range,
+      video_url,
       time_limit,
       memory_limit,
       level,
@@ -694,6 +727,7 @@ router.put('/oj/problems/:id', async (req, res) => {
       params.push(level);
     }
     if (publish_date !== undefined) { updates.push('publish_date = ?'); params.push(publish_date); }
+    if (video_url !== undefined) { updates.push('video_url = ?'); params.push(video_url); }
     
     // 更新题目基本信息
     if (updates.length > 0) {
