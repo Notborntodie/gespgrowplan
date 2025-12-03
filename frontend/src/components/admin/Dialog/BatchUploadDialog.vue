@@ -2,16 +2,16 @@
   <div v-if="visible" class="dialog-overlay" @click="handleOverlayClick">
     <div class="dialog-container" @click.stop>
       <div class="dialog-header">
-        <div class="dialog-icon">📦</div>
+        <Icon name="package" :size="32" class="dialog-icon" />
         <h3 class="dialog-title">批量上传题目</h3>
-        <button @click="handleClose" class="close-btn">×</button>
+        <button @click="handleClose" class="close-btn"><Icon name="x" :size="20" /></button>
       </div>
       <div class="dialog-content">
         <div class="batch-upload-area">
           <!-- 格式说明区域 -->
           <div class="batch-example">
             <div class="example-header">
-              <h4>📋 批量上传格式示例</h4>
+              <h4><Icon name="clipboard-list" :size="18" /> 批量上传格式示例</h4>
               <div class="format-badge">JSON 格式</div>
             </div>
             <div class="code-container" @click="copyExample">
@@ -25,7 +25,7 @@
           <!-- 输入区域 -->
           <div class="input-section">
             <div class="input-header">
-              <h5>📝 输入题目数据</h5>
+              <h5><Icon name="file-text" :size="18" /> 输入题目数据</h5>
               <div class="input-stats">
                 <span class="char-count">{{ batchQuestionsText.length }} 字符</span>
               </div>
@@ -106,6 +106,7 @@
 import { ref } from 'vue'
 import axios from 'axios'
 import SuccessMessageDialog from './SuccessMessageDialog.vue'
+import Icon from '@/components/Icon.vue'
 
 const props = defineProps<{
   visible: boolean
@@ -264,6 +265,10 @@ function closeSuccessMessage() {
   background: rgba(255, 255, 255, 0.2);
   border: none;
   font-size: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
   color: white;
   cursor: pointer;
   margin-left: auto;

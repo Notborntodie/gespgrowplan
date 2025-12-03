@@ -60,6 +60,11 @@
             <textarea v-model="editForm.data_range" placeholder="如：2 ≤ n ≤ 1000" rows="3"></textarea>
           </div>
 
+          <div class="form-group">
+            <label>视频讲解链接：</label>
+            <input v-model="editForm.video_url" placeholder="如：https://example.com/video.mp4" />
+          </div>
+
           <!-- 限制条件 -->
           <div class="form-row">
             <div class="form-group">
@@ -277,6 +282,7 @@ function initFormData(problemData: any) {
     input_format: problemData.input_format || '',
     output_format: problemData.output_format || '',
     data_range: problemData.data_range || '',
+    video_url: problemData.video_url || '',
     time_limit: problemData.time_limit || 1000,
     memory_limit: problemData.memory_limit || 256,
     level: problemData.level?.toString() || '3',
@@ -392,6 +398,9 @@ async function updateOJProblem() {
   }
   if (editForm.value.data_range?.trim()) {
     updateData.data_range = editForm.value.data_range.trim()
+  }
+  if (editForm.value.video_url?.trim()) {
+    updateData.video_url = editForm.value.video_url.trim()
   }
   if (editForm.value.time_limit) {
     updateData.time_limit = editForm.value.time_limit

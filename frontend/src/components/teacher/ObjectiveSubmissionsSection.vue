@@ -22,7 +22,7 @@
         <p>正在加载考试列表...</p>
       </div>
       <div v-else-if="filteredExams.length === 0" class="empty-state">
-        <div class="empty-icon">📝</div>
+        <Icon name="file-text" :size="64" class="empty-icon" />
         <h3>暂无考试</h3>
         <p>当前筛选条件下没有考试</p>
       </div>
@@ -65,7 +65,7 @@
               <td>
                 <div class="action-buttons" @click.stop>
                   <button @click="handleExamClick(exam)" class="btn-action btn-view" title="查看详情">
-                    <span>👀</span>
+                    <Icon name="eye" :size="18" />
                   </button>
                 </div>
               </td>
@@ -83,6 +83,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
 import BaseTeacherSection from './BaseTeacherSection.vue'
+import Icon from '@/components/Icon.vue'
 
 const router = useRouter()
 
@@ -281,6 +282,10 @@ watch(() => {
 .empty-icon {
   font-size: 64px;
   margin-bottom: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #64748b;
 }
 
 .empty-state h3 {
@@ -400,6 +405,10 @@ watch(() => {
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
   font-size: 14px;
 }
 

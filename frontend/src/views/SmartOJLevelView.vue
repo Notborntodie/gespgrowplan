@@ -1,74 +1,76 @@
 <template>
   <div class="smartoj-container">
-    <!-- 头部 -->
-    <div class="smartoj-header">
-      <div class="header-content-wrapper">
-        <!-- 左侧占位（保持等级选择器居中） -->
-        <div class="header-left-spacer"></div>
-        
-        <!-- 等级选择器（居中） -->
-        <div class="level-selector">
-          <div class="selector-tabs">
-            <div 
-              v-for="level in levels" 
-              :key="level"
-              class="level-tab"
-              :class="{ 
-                'active': selectedLevel === level.toString(),
-                'disabled': isLevelDisabled(level)
-              }"
-              @click="!isLevelDisabled(level) && selectLevel(level)"
-            >
-              <span class="level-number">{{ level }}</span>
-              <span class="level-label">级</span>
-            </div>
-          </div>
+    <!-- 左侧边栏 -->
+    <div class="sidebar-left">
+      <div class="sidebar-title">{{ getLevelText() }}</div>
+      
+      <!-- 时间过滤器 -->
+      <div class="date-filter-section" v-if="availableDates.length > 0">
+        <div class="filter-label">
+          <Icon name="calendar" :size="16" />
+          <span>时间筛选</span>
         </div>
-        
-        <!-- 右侧：时间过滤器 -->
-        <div class="header-right-section">
-          <!-- 时间过滤器 -->
-          <div class="date-filter" v-if="availableDates.length > 0">
-            <div class="date-filter-wrapper">
-              <div class="date-filter-label">
-                <span class="date-icon">📅</span>
-                <span class="date-label-text">时间筛选</span>
-              </div>
-              <div class="date-filter-selector">
-                <select 
-                  v-model="selectedDate" 
-                  class="date-select"
-                  @change="handleDateChange"
-                >
-                  <option value="">全部时间</option>
-                  <option 
-                    v-for="date in availableDates" 
-                    :key="date" 
-                    :value="date"
-                  >
-                    {{ formatDateOption(date) }}
-                  </option>
-                </select>
-                <span class="date-select-arrow">▼</span>
-              </div>
-            </div>
+        <select 
+          v-model="selectedDate" 
+          class="date-select"
+          @change="handleDateChange"
+        >
+          <option value="">全部时间</option>
+          <option 
+            v-for="date in availableDates" 
+            :key="date" 
+            :value="date"
+          >
+            {{ formatDateOption(date) }}
+          </option>
+        </select>
+      </div>
+      
+      <!-- 等级切换 -->
+      <div class="level-switcher">
+        <div class="level-switcher-header">
+          <Icon name="chevron-down" :size="36" class="level-arrow-icon" />
+          <div class="level-switcher-title">切换等级</div>
+        </div>
+        <div class="level-grid">
+          <div 
+            class="level-item level-item-all"
+            :class="{ 'active': selectedLevel === '' }"
+            @click="selectLevel(0)"
+          >
+            全
+          </div>
+          <div 
+            v-for="lvl in levels" 
+            :key="lvl"
+            class="level-item"
+            :class="{ 
+              'active': selectedLevel === lvl.toString(),
+              'disabled': isLevelDisabled(lvl)
+            }"
+            @click="!isLevelDisabled(lvl) && selectLevel(lvl)"
+          >
+            {{ lvl }}
           </div>
         </div>
       </div>
-      <div class="selector-underline"></div>
     </div>
 
-    <!-- 题目列表 -->
-    <div class="problems-content">
-      <div class="problems-table-container">
-        <!-- 加载状态 -->
-        <div v-if="loading" class="loading-state">
-          <i class="fas fa-spinner fa-spin"></i>
-          <p>加载中...</p>
-        </div>
-
-        <!-- 题目表格 -->
-        <table v-else-if="filteredProblems.length > 0" class="problems-table">
+    <!-- 主内容区域 -->
+    <div class="main-content">
+      <div v-if="loading" class="loading-state">
+        <Icon name="loader-2" :size="24" spin />
+        <p>正在加载题目列表...</p>
+      </div>
+      
+      <div v-else-if="filteredProblems.length === 0" class="empty-state">
+        <Icon name="inbox" :size="48" />
+        <p>暂无符合条件的题目</p>
+      </div>
+      
+      <!-- 题目列表表格 -->
+      <div v-else class="problems-table-container">
+        <table class="problems-table">
           <thead>
             <tr>
               <th>ID</th>
@@ -78,7 +80,15 @@
               <th>提交数</th>
               <th>通过数</th>
               <th>通过率</th>
-              <th>操作</th>
+              <th>
+                <div class="th-with-refresh">
+                  <span>操作</span>
+                  <button @click="fetchProblems" class="btn-refresh-header" :disabled="loading" title="刷新列表">
+                    <Icon name="refresh-cw" :size="14" :spin="loading" />
+                    <span>刷新</span>
+                  </button>
+                </div>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -97,11 +107,11 @@
               <td>
                 <div class="action-buttons">
                   <button @click="goToProblem(problem.id)" class="btn-action btn-view" title="开始练习">
-                    <span>▶️</span>
+                    <Icon name="play" :size="16" />
                     <span>开始练习</span>
                   </button>
                   <button @click.stop="viewSubmissions(problem.id)" class="btn-action btn-submissions" title="查看提交">
-                    <span>📋</span>
+                    <Icon name="clipboard-list" :size="16" />
                     <span>查看提交</span>
                   </button>
                   <button 
@@ -110,7 +120,7 @@
                     class="btn-action btn-student-submissions" 
                     title="查看学生提交"
                   >
-                    <span>👨‍🎓</span>
+                    <Icon name="graduation-cap" :size="16" />
                     <span>查看学生提交</span>
                   </button>
                 </div>
@@ -118,22 +128,17 @@
             </tr>
           </tbody>
         </table>
-
-        <!-- 空状态 -->
-        <div v-else class="empty-state">
-          <i class="fas fa-inbox"></i>
-          <p>暂无符合条件的题目</p>
-        </div>
       </div>
     </div>
   </div>
 </template>
 
-<script setup lang="ts">import { BASE_URL } from '@/config/api'
-
+<script setup lang="ts">
+import { BASE_URL } from '@/config/api'
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
+import Icon from '@/components/Icon.vue'
 
 const router = useRouter()
 
@@ -144,37 +149,9 @@ const selectedDate = ref('')
 // 等级数据
 const levels = ref([1, 2, 3, 4, 5, 6, 7, 8])
 
-// NavBar级别锁定状态
-const navBarLevelLocked = ref(false)
-const navBarSelectedLevel = ref<number | null>(null)
-
-// 检查NavBar级别锁定状态
-function checkNavBarLevelLock() {
-  const isLocked = localStorage.getItem('navBarLevelLocked') === 'true'
-  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true'
-  
-  if (isLocked && isLoggedIn) {
-    const savedLevel = localStorage.getItem('userGespLevel')
-    if (savedLevel) {
-      const level = parseInt(savedLevel, 10)
-      if (level >= 1 && level <= 8) {
-        navBarLevelLocked.value = true
-        navBarSelectedLevel.value = level
-        return
-      }
-    }
-  }
-  
-  navBarLevelLocked.value = false
-  navBarSelectedLevel.value = null
-}
-
-// 检查级别是否被禁用
+// 检查级别是否被禁用（已移除限制，始终返回false）
 function isLevelDisabled(level: number): boolean {
-  if (!navBarLevelLocked.value || navBarSelectedLevel.value === null) {
-    return false
-  }
-  return level !== navBarSelectedLevel.value
+  return false
 }
 
 // 题目数据
@@ -182,9 +159,17 @@ const problems = ref<any[]>([])
 const loading = ref(false)
 const pagination = ref({
   page: 1,
-  pageSize: 100, // 获取所有题目
+  pageSize: 100,
   total: 0
 })
+
+// 获取等级文本
+function getLevelText() {
+  if (!selectedLevel.value) return '全部等级'
+  const level = parseInt(selectedLevel.value)
+  if (level === 6) return 'CSP-J'
+  return `GESP ${level}级`
+}
 
 // 从API获取题目列表
 async function fetchProblems() {
@@ -195,7 +180,6 @@ async function fetchProblems() {
       pageSize: pagination.value.pageSize
     }
     
-    // 如果选择了级别，添加到查询参数
     if (selectedLevel.value) {
       params.level = selectedLevel.value
     }
@@ -234,7 +218,7 @@ function truncateDescription(desc: string, maxLength: number = 80): string {
   return desc.substring(0, maxLength) + '...'
 }
 
-// 从题目中提取所有可用的年月（格式：YYYY-MM）
+// 从题目中提取所有可用的年月
 const availableDates = computed(() => {
   const dates = new Set<string>()
   problems.value.forEach((problem) => {
@@ -250,7 +234,7 @@ const availableDates = computed(() => {
       }
     }
   })
-  return Array.from(dates).sort().reverse() // 按时间倒序排列
+  return Array.from(dates).sort().reverse()
 })
 
 // 筛选后的题目列表
@@ -318,12 +302,7 @@ const viewStudentSubmissions = (problemId: number) => {
   }
 }
 
-// 返回上一页
-const goBack = () => {
-  router.push('/select')
-}
-
-// 格式化日期（只显示年月）
+// 格式化日期
 const formatDate = (dateString: string) => {
   if (!dateString) return ''
   try {
@@ -338,7 +317,7 @@ const formatDate = (dateString: string) => {
   }
 }
 
-// 格式化日期选项（显示为"YYYY年MM月"）
+// 格式化日期选项
 const formatDateOption = (dateStr: string) => {
   if (!dateStr) return ''
   try {
@@ -352,48 +331,36 @@ const formatDateOption = (dateStr: string) => {
 
 // 处理日期变化
 const handleDateChange = () => {
-  // 日期变化时，筛选会在 computed 属性 filteredProblems 中自动处理
-  // 这里可以添加额外的逻辑，比如滚动到顶部
+  // 日期变化时筛选会在 computed 属性中自动处理
 }
 
 // 选择等级
 function selectLevel(level: number) {
-  // 如果NavBar级别已锁定，且选择的级别不是NavBar选中的级别，则不允许选择
-  if (navBarLevelLocked.value && navBarSelectedLevel.value !== null && level !== navBarSelectedLevel.value) {
-    return
+  if (level === 0) {
+    selectedLevel.value = ''
+  } else {
+    selectedLevel.value = level.toString()
+    localStorage.setItem('userGespLevel', level.toString())
+    window.dispatchEvent(new CustomEvent('gespLevelChanged', { detail: { level } }))
   }
-  
-  selectedLevel.value = level.toString()
-  // 保存级别到localStorage
-  localStorage.setItem('userGespLevel', level.toString())
-  // 注意：不清除NavBar级别锁定，保持锁定状态
-  // 触发自定义事件，通知NavBar级别已更改
-  window.dispatchEvent(new CustomEvent('gespLevelChanged', { detail: { level } }))
   pagination.value.page = 1
   fetchProblems()
 }
 
-// 级别变化时重新获取数据
-const handleLevelChange = () => {
-  pagination.value.page = 1
-  fetchProblems()
-}
-
-// 监听级别变化事件（从NavBar触发）
+// 监听级别变化事件
 function handleGespLevelChanged(event: CustomEvent) {
   const newLevel = event.detail.level
   if (newLevel >= 1 && newLevel <= 8) {
-    // 更新NavBar级别锁定状态
-    checkNavBarLevelLock()
-    selectLevel(newLevel)
+    if (selectedLevel.value !== newLevel.toString()) {
+      selectedLevel.value = newLevel.toString()
+      localStorage.setItem('userGespLevel', newLevel.toString())
+      pagination.value.page = 1
+      fetchProblems()
+    }
   }
 }
 
-// 组件挂载时获取数据
 onMounted(() => {
-  // 检查NavBar级别锁定状态
-  checkNavBarLevelLock()
-  // 从localStorage读取用户设置的级别
   const savedLevel = localStorage.getItem('userGespLevel')
   if (savedLevel) {
     const level = parseInt(savedLevel, 10)
@@ -402,7 +369,6 @@ onMounted(() => {
     }
   }
   fetchProblems()
-  // 监听级别变化事件
   window.addEventListener('gespLevelChanged', handleGespLevelChanged as EventListener)
 })
 
@@ -412,278 +378,188 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-/* 基础布局 */
 .smartoj-container {
   width: 100vw;
-  min-height: 100vh;
+  min-height: calc(100vh - 48px);
   background: linear-gradient(135deg, #87ceeb 0%, #f8fafc 100%);
   padding: 0;
   margin: 0;
   display: flex;
-  flex-direction: column;
   font-family: 'HarmonyOS Sans', 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif;
   overflow-x: hidden;
-}
-
-/* 头部 */
-.smartoj-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 4px 30px 8px 30px;
-  background: linear-gradient(135deg, #87ceeb 0%, #f8fafc 100%);
-  border-bottom: 2px solid #e2e8f0;
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
   position: fixed;
-  top: 48px; /* NavBar 的高度 */
+  top: 48px;
   left: 0;
   right: 0;
-  z-index: 999;
-  backdrop-filter: blur(10px);
-  background: linear-gradient(135deg, rgba(135, 206, 235, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
-  width: 100%;
-  gap: 8px;
-  box-sizing: border-box;
-  flex-shrink: 0;
+  bottom: 0;
 }
 
-/* 头部内容包装器 */
-.header-content-wrapper {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  width: 100%;
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 0 20px;
-  gap: 20px;
-  position: relative;
-}
-
-/* 左侧占位 */
-.header-left-spacer {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-}
-
-/* 等级选择器样式 */
-.level-selector {
-  margin-top: 4px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  grid-column: 2;
-}
-
-.selector-tabs {
-  display: flex;
-  justify-content: center;
-  gap: 16px;
-  flex-wrap: wrap;
-  position: relative;
-}
-
-/* 右侧区域 */
-.header-right-section {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  grid-column: 3;
-}
-
-.level-tab {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 12px 20px;
-  background: rgba(255, 255, 255, 0.8);
-  border: 2px solid transparent;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
-  position: relative;
-}
-
-.level-tab:hover {
-  background: rgba(255, 255, 255, 0.9);
-  border-color: #1e90ff;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(30, 144, 255, 0.2);
-}
-
-.level-tab.active {
+/* 左侧边栏 */
+.sidebar-left {
+  width: 160px;
+  min-width: 160px;
   background: linear-gradient(135deg, #1e90ff 0%, #38bdf8 100%);
-  border-color: #1e90ff;
+  padding: 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: fixed;
+  top: 48px;
+  left: 0;
+  bottom: 0;
+  z-index: 100;
+}
+
+.sidebar-title {
   color: white;
-  box-shadow: 0 4px 16px rgba(30, 144, 255, 0.3);
-}
-
-.level-tab.disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  pointer-events: none;
-  background: rgba(200, 200, 200, 0.5);
-}
-
-.level-tab.disabled:hover {
-  background: rgba(200, 200, 200, 0.5);
-  border-color: transparent;
-  transform: none;
-  box-shadow: none;
-}
-
-.level-number {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
-  line-height: 1;
+  text-align: center;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+  margin-bottom: 4px;
 }
 
-.level-label {
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 1;
-}
-
-.selector-underline {
-  height: 3px;
-  background: linear-gradient(90deg, transparent 0%, #1e90ff 50%, transparent 100%);
-  margin-top: 8px;
-  width: 100%;
-  max-width: 1200px;
-  border-radius: 2px;
-  opacity: 0.6;
-}
-
-/* 时间过滤器样式 */
-.date-filter {
+/* 时间过滤器 */
+.date-filter-section {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 4px;
-  flex-shrink: 0;
-  opacity: 0.85;
-  transition: opacity 0.3s ease;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 8px;
 }
 
-.date-filter:hover {
-  opacity: 1;
-}
-
-.date-filter-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(30, 144, 255, 0.15);
-  border-radius: 10px;
-  padding: 8px 16px;
-  transition: all 0.3s ease;
-  white-space: nowrap;
-}
-
-.date-filter-wrapper:hover {
-  background: rgba(255, 255, 255, 0.7);
-  border-color: rgba(30, 144, 255, 0.3);
-  box-shadow: 0 1px 4px rgba(30, 144, 255, 0.08);
-}
-
-.date-filter-label {
+.filter-label {
   display: flex;
   align-items: center;
   gap: 6px;
-  color: #475569;
-  font-size: 13px;
+  color: rgba(255,255,255,0.9);
+  font-size: 12px;
   font-weight: 500;
-  white-space: nowrap;
-}
-
-.date-icon {
-  font-size: 15px;
-  opacity: 0.7;
-}
-
-.date-label-text {
-  color: #64748b;
-  font-weight: 500;
-}
-
-.date-filter-selector {
-  position: relative;
-  display: flex;
-  align-items: center;
-  min-width: 150px;
 }
 
 .date-select {
   appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  background: rgba(255, 255, 255, 0.85);
-  border: 1px solid rgba(30, 144, 255, 0.25);
-  border-radius: 8px;
-  padding: 7px 32px 7px 12px;
-  font-size: 13px;
+  background: rgba(255,255,255,0.9);
+  border: none;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 12px;
   font-weight: 500;
   color: #1e293b;
   cursor: pointer;
-  transition: all 0.25s ease;
-  outline: none;
   width: 100%;
-  min-width: 150px;
-}
-
-.date-select:hover {
-  border-color: rgba(30, 144, 255, 0.4);
-  background: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 1px 4px rgba(30, 144, 255, 0.12);
 }
 
 .date-select:focus {
-  border-color: #1e90ff;
-  background: rgba(255, 255, 255, 1);
-  box-shadow: 0 0 0 2px rgba(30, 144, 255, 0.1);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.5);
 }
 
-.date-select option {
-  background: white;
-  color: #1e293b;
-  padding: 8px;
-  font-size: 13px;
+/* 侧边栏等级切换 */
+.level-switcher {
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255,255,255,0.2);
 }
 
-.date-select-arrow {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  pointer-events: none;
-  color: #94a3b8;
-  font-size: 11px;
-  transition: color 0.2s ease;
-  user-select: none;
-}
-
-.date-filter-selector:hover .date-select-arrow,
-.date-select:focus ~ .date-select-arrow {
-  color: #1e90ff;
-}
-
-/* 题目列表内容区域 */
-.problems-content {
-  flex: 1;
-  padding: 24px 32px;
-  width: 100%;
-  box-sizing: border-box;
+.level-switcher-header {
   display: flex;
   flex-direction: column;
-  margin-top: 80px; /* 为固定的header留出空间：48px(NavBar) + 32px(header) */
+  align-items: center;
+  margin-bottom: 10px;
 }
 
-/* 表格容器 */
+.level-arrow-icon {
+  color: white;
+  animation: bounce 1.5s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(4px);
+  }
+}
+
+.level-switcher-title {
+  color: rgba(255,255,255,0.9);
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.level-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.level-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 1;
+  background: rgba(255,255,255,0.15);
+  border-radius: 8px;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.level-item:hover {
+  background: rgba(255,255,255,0.3);
+  transform: scale(1.05);
+}
+
+.level-item.active {
+  background: white;
+  color: #1e90ff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.level-item.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* 主内容区域 */
+.main-content {
+  flex: 1;
+  margin-left: 160px;
+  padding: 12px 32px;
+  min-height: calc(100vh - 48px);
+  overflow-y: auto;
+}
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  color: #64748b;
+  gap: 12px;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  color: #64748b;
+  gap: 12px;
+}
+
+/* 题目列表表格 */
 .problems-table-container {
   background: white;
   border-radius: 12px;
@@ -711,7 +587,7 @@ onUnmounted(() => {
 
 .problems-table th:last-child,
 .problems-table td:last-child {
-  min-width: 200px;
+  min-width: 280px;
 }
 
 .problems-table td {
@@ -719,6 +595,10 @@ onUnmounted(() => {
   border-top: 1px solid #e2e8f0;
   font-size: 14px;
   color: #1e293b;
+}
+
+.problems-table tbody tr {
+  transition: all 0.2s ease;
 }
 
 .problems-table tbody tr:hover {
@@ -749,6 +629,41 @@ onUnmounted(() => {
   color: #10b981;
 }
 
+/* 表头刷新按钮 */
+.th-with-refresh {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.btn-refresh-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: rgba(255,255,255,0.2);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 6px;
+  color: white;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-refresh-header:hover {
+  background: rgba(255,255,255,0.3);
+  border-color: rgba(255,255,255,0.5);
+}
+
+.btn-refresh-header:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 操作按钮 */
 .action-buttons {
   display: flex;
   gap: 8px;
@@ -768,8 +683,10 @@ onUnmounted(() => {
   white-space: nowrap;
 }
 
-.btn-action i {
+.btn-action :deep(.lucide-icon) {
   font-size: 14px;
+  flex-shrink: 0;
+  color: inherit;
 }
 
 .btn-view {
@@ -808,266 +725,74 @@ onUnmounted(() => {
   box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
 }
 
-/* 加载状态 */
-.loading-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 60px 20px;
-  color: #1e90ff;
-}
-
-.loading-state i {
-  font-size: 48px;
-  margin-bottom: 16px;
-}
-
-.loading-state p {
-  font-size: 16px;
-  font-weight: 500;
-  color: #64748b;
-}
-
-/* 空状态 */
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 60px 20px;
-  color: #64748b;
-}
-
-.empty-state i {
-  font-size: 64px;
-  margin-bottom: 20px;
-  opacity: 0.5;
-}
-
-.empty-state p {
-  font-size: 18px;
-  font-weight: 500;
-}
-
 /* 响应式设计 */
-@media (max-width: 1200px) {
+@media (max-width: 768px) {
+  .sidebar-left {
+    width: 60px;
+    min-width: 60px;
+    padding: 16px 8px;
+  }
+  
+  .sidebar-title {
+    font-size: 12px;
+    padding: 8px 0;
+  }
+  
+  .date-filter-section {
+    padding: 6px;
+  }
+  
+  .filter-label span {
+    display: none;
+  }
+  
+  .date-select {
+    font-size: 10px;
+    padding: 6px;
+  }
+  
+  .level-switcher-title {
+    display: none;
+  }
+  
+  .level-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4px;
+  }
+  
+  .level-item {
+    font-size: 12px;
+  }
+  
+  .main-content {
+    margin-left: 60px;
+    padding: 16px;
+  }
+  
+  .problems-table-container {
+    overflow-x: auto;
+  }
+  
   .problems-table {
-    font-size: 13px;
+    min-width: 800px;
   }
   
   .problems-table th,
   .problems-table td {
-    padding: 12px 8px;
+    padding: 12px 10px;
+    font-size: 12px;
   }
   
-  .btn-action {
-    padding: 6px 12px;
-    font-size: 13px;
-  }
-}
-
-@media (max-width: 768px) {
-  .smartoj-header {
-    padding: 3px 20px 6px 20px;
-  }
-
-  .header-content-wrapper {
-    grid-template-columns: 1fr;
-    gap: 12px;
-    justify-items: center;
-  }
-
-  .header-left-spacer {
+  .btn-action span {
     display: none;
-  }
-
-  .level-selector {
-    margin-top: 2px;
-    grid-column: 1;
-    width: 100%;
-  }
-
-  .header-right-section {
-    grid-column: 1;
-    width: 100%;
-    justify-content: center;
-  }
-
-  .problems-content {
-    margin-top: 85px;
-    padding: 20px 16px;
-  }
-
-  .problems-table-container {
-    overflow-x: auto;
-  }
-
-  .problems-table {
-    min-width: 800px;
-  }
-
-  .selector-tabs {
-    gap: 12px;
-  }
-
-  .level-tab {
-    padding: 10px 16px;
-  }
-
-  .level-number {
-    font-size: 16px;
-  }
-
-  .level-label {
-    font-size: 12px;
-  }
-
-  .date-filter {
-    margin-top: 2px;
-    width: 100%;
-    justify-content: center;
-  }
-
-  .date-filter-wrapper {
-    padding: 7px 14px;
-    gap: 9px;
-  }
-
-  .date-filter-label {
-    font-size: 12px;
-  }
-
-  .date-icon {
-    font-size: 13px;
-  }
-
-  .date-select {
-    font-size: 12px;
-    padding: 6px 28px 6px 10px;
-    min-width: 130px;
-  }
-
-  .date-select-arrow {
-    font-size: 10px;
-    right: 8px;
   }
 }
 
 @media (max-width: 480px) {
-  .smartoj-header {
-    padding: 2px 16px 5px 16px;
-  }
-
-  .header-content-wrapper {
-    gap: 8px;
-    padding: 0 10px;
-  }
-
-  .problems-content {
-    margin-top: 80px;
-    padding: 16px;
-  }
-
-  .level-selector {
-    margin-top: 1px;
-  }
-
-  .selector-tabs {
-    gap: 8px;
-  }
-
-  .level-tab {
-    padding: 8px 12px;
-  }
-
-  .level-number {
-    font-size: 14px;
-  }
-
-  .level-label {
+  .problems-table th,
+  .problems-table td {
+    padding: 10px 8px;
     font-size: 11px;
-  }
-
-  .date-filter {
-    margin-top: 0px;
-  }
-
-  .date-filter-wrapper {
-    padding: 6px 12px;
-    gap: 7px;
-    max-width: 300px;
-  }
-
-  .date-filter-label {
-    font-size: 11px;
-  }
-
-  .date-icon {
-    font-size: 12px;
-  }
-
-  .date-select {
-    font-size: 11px;
-    padding: 5px 26px 5px 8px;
-    min-width: 120px;
-  }
-
-  .date-select-arrow {
-    font-size: 9px;
-    right: 6px;
-  }
-}
-
-@media (max-width: 360px) {
-  .header-content-wrapper {
-    gap: 6px;
-    padding: 0 8px;
-  }
-
-  .level-selector {
-    margin-top: 0px;
-  }
-
-  .selector-tabs {
-    gap: 6px;
-  }
-
-  .level-tab {
-    padding: 6px 10px;
-  }
-
-  .level-number {
-    font-size: 13px;
-  }
-
-  .level-label {
-    font-size: 10px;
-  }
-
-  .date-filter-wrapper {
-    max-width: 240px;
-    padding: 5px 10px;
-    gap: 6px;
-  }
-
-  .date-filter-label {
-    font-size: 10px;
-  }
-
-  .date-icon {
-    font-size: 11px;
-  }
-
-  .date-select {
-    font-size: 10px;
-    padding: 4px 24px 4px 6px;
-    min-width: 100px;
-  }
-
-  .date-select-arrow {
-    font-size: 8px;
-    right: 5px;
   }
 }
 </style>

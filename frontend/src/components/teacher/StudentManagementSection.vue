@@ -8,7 +8,7 @@
           placeholder="搜索学生用户名或真实姓名..."
           class="search-input"
         />
-        <i class="search-icon">🔍</i>
+        <Icon name="search" :size="18" class="search-icon" />
       </div>
     </template>
     
@@ -16,11 +16,15 @@
       <span class="count-info">共 {{ filteredStudents.length }} 个学生</span>
       <div class="header-actions">
         <button @click="$emit('bind-student')" class="btn-secondary">
-          <i class="icon-plus"></i>
+          <Icon name="plus" :size="18" />
           绑定学生
         </button>
+        <button @click="$emit('batch-create-student')" class="btn-secondary">
+          <Icon name="users" :size="18" />
+          批量导入
+        </button>
         <button @click="$emit('create-student')" class="btn-primary">
-          <i class="icon-plus"></i>
+          <Icon name="plus" :size="18" />
           创建学生
         </button>
       </div>
@@ -32,7 +36,7 @@
         <p>正在加载学生列表...</p>
       </div>
       <div v-else-if="filteredStudents.length === 0" class="empty-state">
-        <div class="empty-icon">👤</div>
+        <Icon name="user" :size="64" class="empty-icon" />
         <h3>暂无学生</h3>
         <p>当前筛选条件下没有学生</p>
       </div>
@@ -77,7 +81,7 @@
               <td>
                 <div class="action-buttons" @click.stop>
                   <button @click="$emit('view-student', student)" class="btn-action btn-view" title="查看详情">
-                    <span>👀</span>
+                    <Icon name="eye" :size="18" />
                   </button>
                 </div>
               </td>
@@ -92,6 +96,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import BaseTeacherSection from './BaseTeacherSection.vue'
+import Icon from '@/components/Icon.vue'
 
 const props = defineProps<{
   students: any[]
@@ -101,6 +106,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   'bind-student': []
   'create-student': []
+  'batch-create-student': []
   'view-student': [student: any]
 }>()
 
@@ -247,6 +253,10 @@ function getAccuracyClass(accuracy: number) {
 .empty-icon {
   font-size: 64px;
   margin-bottom: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #64748b;
 }
 
 .empty-state h3 {
@@ -363,6 +373,10 @@ function getAccuracyClass(accuracy: number) {
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
   font-size: 14px;
 }
 

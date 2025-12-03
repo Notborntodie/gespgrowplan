@@ -1,16 +1,13 @@
 <template>
   <div class="exam-submissions-container">
-    <div class="submissions-header">
-      <div class="header-left">
-        <button @click="goBack" class="back-btn">
-          ← 返回
-        </button>
-        <h2>{{ examInfo.name }} - 提交记录</h2>
-      </div>
-      <div class="header-right">
-        <span class="submission-count">共 {{ submissions.length }} 次提交</span>
-      </div>
-    </div>
+    <!-- 左侧返回按钮 -->
+    <button 
+      class="back-nav-arrow" 
+      @click="goBack" 
+      title="返回"
+    >
+      <Icon name="arrow-left" :size="32" />
+    </button>
 
     <div class="submissions-content">
       <div v-if="loading" class="loading-state">
@@ -19,7 +16,7 @@
       </div>
       
       <div v-else-if="submissions.length === 0" class="empty-state">
-        <div class="empty-icon">📝</div>
+        <div class="empty-icon"><Icon name="file-text" :size="64" /></div>
         <h3>暂无提交记录</h3>
         <p>您还没有参加过这个考试</p>
         <button @click="startExam" class="btn btn-primary">
@@ -27,59 +24,59 @@
         </button>
       </div>
       
-      <div v-else class="submissions-table-container">
-        <table class="submissions-table">
-          <thead>
-            <tr>
-              <th>尝试次数</th>
-              <th>提交时间</th>
-              <th>分数</th>
-              <th>状态</th>
-              <th>题目数量</th>
-              <th>正确数</th>
-              <th>正确率</th>
-              <th>操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr 
-              v-for="submission in submissions" 
-              :key="submission.id"
-              class="submission-row"
-              @click="viewSubmissionDetail(submission)"
-            >
-              <td>
-                <span class="attempt-number">第 {{ submission.attempt_number }} 次</span>
-              </td>
-              <td class="date-cell">{{ formatDate(submission.submit_time) }}</td>
-              <td>
-                <div class="score-display" :class="getScoreClass(submission.score)">
-                  <span class="score-value">{{ submission.score }}</span>
-                  <span class="score-unit">分</span>
-                </div>
-              </td>
-              <td>
-                <span class="status-badge" :class="getScoreClass(submission.score)">
-                  {{ getScoreText(submission.score) }}
-                </span>
-              </td>
-              <td>{{ submission.total_questions || 0 }}</td>
-              <td>
-                <span class="correct-count">{{ submission.correct_count || 0 }}</span>
-              </td>
-              <td>
-                <span class="pass-rate">{{ submission.total_questions ? Math.round((submission.correct_count / submission.total_questions) * 100) : 0 }}%</span>
-              </td>
-              <td>
-                <div class="action-buttons" @click.stop>
-                  <button @click="viewSubmissionDetail(submission)" class="btn-action btn-view" title="查看详情">
-                    <span>👀</span>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <div v-else class="submissions-by-month">
+        <div v-for="(monthData, monthKey) in groupedSubmissions" :key="monthKey" class="month-group">
+          <div class="month-header">
+            <span class="month-title"><Icon name="calendar" :size="18" /> {{ monthKey }}</span>
+            <span class="month-count">{{ monthData.length }} 次提交</span>
+          </div>
+          <div class="submissions-table-container">
+            <table class="submissions-table">
+              <thead>
+                <tr>
+                  <th>尝试次数</th>
+                  <th>提交时间</th>
+                  <th>分数</th>
+                  <th>状态</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr 
+                  v-for="submission in monthData" 
+                  :key="submission.id"
+                  class="submission-row"
+                >
+                  <td>
+                    <span class="attempt-number">第 {{ submission.attempt_number }} 次</span>
+                  </td>
+                  <td class="date-cell">{{ formatDate(submission.submit_time) }}</td>
+                  <td>
+                    <div class="score-display" :class="getScoreClass(submission.score)">
+                      <span class="score-value">{{ submission.score }}</span>
+                      <span class="score-unit">分</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="status-badge" :class="getScoreClass(submission.score)">
+                      {{ getScoreText(submission.score) }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="action-buttons">
+                      <button class="btn-action btn-view" @click="viewSubmissionDetail(submission)">
+                        <Icon name="eye" :size="16" /> 查看详情
+                      </button>
+                      <button class="btn-action btn-export-row" @click="exportWrongQuestionsForSubmission(submission)">
+                        <Icon name="download" :size="16" /> 导出错题
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -197,18 +194,42 @@
         </div>
         <div class="modal-footer">
           <button @click="closeDetailDialog" class="btn btn-secondary">关闭</button>
-          <button @click="startExam" class="btn btn-primary">重新考试</button>
+          <button 
+            v-if="wrongQuestions.length > 0"
+            @click="showExportDialog" 
+            class="btn btn-export"
+          >
+            <Icon name="download" :size="16" /> 导出错题
+          </button>
         </div>
       </div>
+    </div>
+
+    <!-- 导出错题对话框 -->
+    <ExportWrongQuestionsDialog
+      :visible="showExportWrongQuestionsDialog"
+      :submission="selectedSubmission"
+      :wrongQuestions="wrongQuestions"
+      @confirm="handleExportConfirm"
+      @cancel="handleExportCancel"
+    />
+
+    <!-- 底部 Header -->
+    <div class="submissions-header-bottom">
+      <h2>{{ examInfo.name }} - 提交记录</h2>
+      <span class="submission-count">共 {{ submissions.length }} 次提交</span>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">import { BASE_URL } from '@/config/api'
 
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
+import ExportWrongQuestionsDialog from '@/components/admin/Dialog/ExportWrongQuestionsDialog.vue'
+import docxExportService from '@/services/docxExportService'
+import Icon from '@/components/Icon.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -223,6 +244,28 @@ const loading = ref(false)
 const showDetailDialog = ref(false)
 const selectedSubmission = ref<any>(null)
 const submissionAnswers = ref<any[]>([])
+const showExportWrongQuestionsDialog = ref(false)
+
+// 计算错题列表
+const wrongQuestions = computed(() => {
+  return submissionAnswers.value.filter((answer: any) => 
+    !(answer.is_correct === 1 || answer.is_correct === true)
+  )
+})
+
+// 按月份分组提交记录
+const groupedSubmissions = computed(() => {
+  const groups: Record<string, any[]> = {}
+  submissions.value.forEach((submission: any) => {
+    const date = new Date(submission.submit_time)
+    const monthKey = `${date.getFullYear()}年${date.getMonth() + 1}月`
+    if (!groups[monthKey]) {
+      groups[monthKey] = []
+    }
+    groups[monthKey].push(submission)
+  })
+  return groups
+})
 
 // 获取考试信息
 async function fetchExamInfo() {
@@ -323,7 +366,18 @@ function getScoreText(score: number) {
 
 // 返回上一页
 function goBack() {
-  router.push(`/level-exams/${examInfo.value.level}`)
+  // 检查是否从任务页面跳转过来
+  const from = route.query.from as string
+  const planId = route.query.planId as string
+  const taskId = route.query.taskId as string
+  
+  if (from === 'taskview' && planId && taskId) {
+    // 从任务页面跳转过来的，返回到任务页面
+    router.push(`/plan/${planId}/tasks/${taskId}`)
+  } else {
+    // 默认返回到客观题选择页面
+    router.push(`/level-exams/${examInfo.value.level}`)
+  }
 }
 
 // 开始考试
@@ -343,6 +397,55 @@ function closeDetailDialog() {
   showDetailDialog.value = false
   selectedSubmission.value = null
   submissionAnswers.value = []
+  showExportWrongQuestionsDialog.value = false
+}
+
+// 显示导出对话框
+function showExportDialog() {
+  showExportWrongQuestionsDialog.value = true
+}
+
+// 处理导出确认
+async function handleExportConfirm(customFilename?: string) {
+  try {
+    if (!selectedSubmission.value || wrongQuestions.value.length === 0) {
+      alert('没有错题可导出')
+      return
+    }
+    
+    await docxExportService.exportWrongQuestions(
+      selectedSubmission.value,
+      wrongQuestions.value,
+      customFilename
+    )
+    
+    showExportWrongQuestionsDialog.value = false
+    alert('错题导出成功！文件已下载到您的设备。')
+  } catch (error: any) {
+    console.error('导出错题失败:', error)
+    alert('导出错题失败: ' + (error.message || '未知错误'))
+  }
+}
+
+// 处理导出取消
+function handleExportCancel() {
+  showExportWrongQuestionsDialog.value = false
+}
+
+// 直接从列表导出某次提交的错题
+async function exportWrongQuestionsForSubmission(submission: any) {
+  try {
+    selectedSubmission.value = submission
+    await fetchSubmissionDetail(submission.id)
+    if (wrongQuestions.value.length === 0) {
+      alert('该次提交没有错题')
+      return
+    }
+    showExportWrongQuestionsDialog.value = true
+  } catch (error: any) {
+    console.error('获取提交详情失败:', error)
+    alert('获取提交详情失败: ' + (error.response?.data?.error || error.message))
+  }
 }
 
 onMounted(() => {
@@ -364,66 +467,70 @@ onMounted(() => {
   overflow-x: hidden;
 }
 
-.submissions-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 30px;
-  background: linear-gradient(135deg, #87ceeb 0%, #f8fafc 100%);
-  border-bottom: 2px solid #e2e8f0;
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+/* 左侧返回按钮样式 - 固定定位 */
+.back-nav-arrow {
   position: fixed;
-  top: 48px; /* NavBar 的高度 */
+  left: 20px;
+  top: 80px;
+  background: rgba(30, 144, 255, 0.15);
+  backdrop-filter: blur(10px);
+  color: #1e90ff;
+  border: 2px solid rgba(30, 144, 255, 0.3);
+  border-radius: 12px;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(30, 144, 255, 0.2);
+  z-index: 100;
+}
+
+.back-nav-arrow:hover {
+  background: rgba(30, 144, 255, 0.2);
+  border-color: rgba(30, 144, 255, 0.5);
+  color: #0c7cd5;
+  transform: scale(1.1);
+  box-shadow: 0 4px 16px rgba(30, 144, 255, 0.3);
+}
+
+.back-nav-arrow:active {
+  transform: scale(0.95);
+}
+
+.back-nav-arrow :deep(.lucide-icon) {
+  flex-shrink: 0;
+}
+
+/* 底部固定 Header */
+.submissions-header-bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  border-top: 2px solid #e2e8f0;
+  position: fixed;
+  bottom: 0;
   left: 0;
   right: 0;
   z-index: 999;
   backdrop-filter: blur(10px);
-  background: linear-gradient(135deg, rgba(135, 206, 235, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+  background: rgba(135, 206, 235, 0.95);
   width: 100%;
+  gap: 4px;
   box-sizing: border-box;
-  flex-shrink: 0;
 }
 
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.back-btn {
-  background: linear-gradient(135deg, #1e90ff 0%, #38bdf8 100%);
-  border: none;
-  color: white;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  padding: 10px 16px;
-  border-radius: 10px;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(30,144,255,0.2);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.back-btn:hover {
-  background: linear-gradient(135deg, #38bdf8 0%, #1e90ff 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(30,144,255,0.3);
-}
-
-.header-left h2 {
+.submissions-header-bottom h2 {
   margin: 0;
   color: #1e293b;
   font-weight: 700;
-  font-size: 1.8rem;
+  font-size: 1.4rem;
   letter-spacing: 0.01em;
-  font-family: 'SF Pro Display', 'Inter', 'Segoe UI', 'Roboto', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-  text-align: left;
-  line-height: 1.3;
-  position: relative;
-  padding-left: 0;
-  margin-left: 0;
+  text-align: center;
 }
 
 .submission-count {
@@ -435,11 +542,13 @@ onMounted(() => {
 .submissions-content {
   flex: 1;
   padding: 24px 32px;
+  padding-left: 100px; /* 为左侧返回按钮留出空间 */
+  padding-bottom: 100px; /* 为底部固定的header留出空间 */
   width: 100%;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  margin-top: 128px; /* 为固定的header留出空间：48px(NavBar) + 80px(header) */
+  margin-top: 20px; /* 减少顶部间距，让卡片上移 */
 }
 
 .loading-state {
@@ -493,15 +602,51 @@ onMounted(() => {
   font-size: 16px;
 }
 
-/* 表格容器 */
-.submissions-table-container {
-  background: white;
-  border-radius: 12px;
-  border: 1.5px solid #e2e8f0;
-  overflow: hidden;
+/* 按月份分组 */
+.submissions-by-month {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
+}
+
+.month-group {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.month-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.month-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.month-count {
+  font-size: 14px;
+  color: #64748b;
+  background: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-weight: 500;
+}
+
+/* 表格容器 */
+.submissions-table-container {
+  overflow: hidden;
+  width: 100%;
 }
 
 .submissions-table {
@@ -531,11 +676,13 @@ onMounted(() => {
 
 .submission-row {
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .submission-row:hover {
-  background: #f8fafc;
+  background: #f1f5f9;
+  transform: translateX(2px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .attempt-number {
@@ -646,6 +793,16 @@ onMounted(() => {
   transform: translateY(-1px);
 }
 
+.btn-export-row {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+}
+
+.btn-export-row:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  transform: translateY(-1px);
+}
+
 .btn {
   padding: 12px 24px;
   border: none;
@@ -681,6 +838,18 @@ onMounted(() => {
   background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(107,114,128,0.3);
+}
+
+.btn-export {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.btn-export:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
 }
 
 /* 模态框样式 */
@@ -1162,14 +1331,30 @@ onMounted(() => {
 }
 
 @media (max-width: 768px) {
-  .submissions-header {
-    padding: 15px 20px;
-    top: 48px;
+  .back-nav-arrow {
+    width: 48px;
+    height: 48px;
+    left: 16px;
+    top: 70px;
+  }
+
+  .back-nav-arrow :deep(.lucide-icon) {
+    width: 24px;
+    height: 24px;
   }
   
   .submissions-content {
-    margin-top: 108px;
+    margin-top: 50px;
     padding: 20px 16px;
+    padding-bottom: 90px;
+  }
+
+  .submissions-header-bottom {
+    padding: 10px 16px;
+  }
+
+  .submissions-header-bottom h2 {
+    font-size: 1.2rem;
   }
 
   .submissions-table-container {

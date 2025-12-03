@@ -23,15 +23,16 @@ import FeynmanSummaryView from '../views/FeynmanSummaryView.vue'
 const routes = [
   { path: '/login', component: LoginView },
   { path: '/register', component: RegisterView },
-  { path: '/', component: homeView },
+  { path: '/', redirect: '/plan' },
+  { path: '/home', component: homeView },
   { path: '/plan', component: PlanView },
   { path: '/plan/:planId/tasks', component: TaskListView },
   { path: '/plan/:planId/tasks/:taskId', component: TaskView },
-  { path: '/select', component: SelectLevelView },
+  { path: '/select', redirect: '/level-exams/0' },
   { path: '/csp', component: CspLevelView },
   { path: '/smartoj', component: SmartOJLevelView }, // 题目列表页
   { path: '/smartoj/:problemId', component: SmartOJView }, // 单个题目做题页
-  { path: '/select-level', component: SelectLevelView },
+  { path: '/select-level', redirect: '/level-exams/0' },
   { path: '/level-exams/:level', component: LevelExamsView },
   { path: '/practice/:examId', component: GESPEaxmView },
   { path: '/exam/:examId', component: GESPEaxmView },

@@ -23,15 +23,59 @@ if [ -f ".deploy-config" ]; then
     source .deploy-config
 fi
 
-# 服务器配置（可通过环境变量或配置文件覆盖）
-SERVER_IP="${DEPLOY_SERVER_IP:-106.14.143.27}"
+# 服务器配置（必须通过 .deploy-config 或环境变量配置）
+SERVER_IP="${DEPLOY_SERVER_IP:-}"
 SERVER_USER="${DEPLOY_SERVER_USER:-root}"
 DEPLOY_PATH="${DEPLOY_PATH:-/var/www/gesp-frontend}"
 NGINX_CONFIG_PATH="${NGINX_CONFIG_PATH:-/etc/nginx/conf.d/gesp-frontend.conf}"
 
-# API配置（用于构建时设置环境变量）
-API_BASE_URL="${API_BASE_URL:-http://106.14.143.27:3000/api}"
-AI_API_BASE_URL="${AI_API_BASE_URL:-http://106.14.143.27:8000/api}"
+# HTTPS/SSL配置（可选，如果配置了SSL证书路径，则启用HTTPS）
+DOMAIN_NAME="${DOMAIN_NAME:-}"
+SSL_CERT_PATH="${SSL_CERT_PATH:-}"
+SSL_KEY_PATH="${SSL_KEY_PATH:-}"
+ENABLE_HTTPS="${ENABLE_HTTPS:-false}"
+
+# API配置（必须通过 .deploy-config 或环境变量配置）
+API_BASE_URL="${API_BASE_URL:-}"
+AI_API_BASE_URL="${AI_API_BASE_URL:-}"
+OJ_API_CONFIGS="${OJ_API_CONFIGS:-}"
+
+# 验证必需配置
+validate_config() {
+    local has_error=false
+    
+    if [ -z "${SERVER_IP}" ]; then
+        log_error "DEPLOY_SERVER_IP 未设置！请在 .deploy-config 文件中配置 DEPLOY_SERVER_IP"
+        has_error=true
+    fi
+    
+    if [ -z "${API_BASE_URL}" ]; then
+        log_error "API_BASE_URL 未设置！请在 .deploy-config 文件中配置 API_BASE_URL"
+        has_error=true
+    fi
+    
+    if [ -z "${AI_API_BASE_URL}" ]; then
+        log_error "AI_API_BASE_URL 未设置！请在 .deploy-config 文件中配置 AI_API_BASE_URL"
+        has_error=true
+    fi
+    
+    if [ "$has_error" = true ]; then
+        echo ""
+        log_error "配置验证失败！请检查 .deploy-config 文件或环境变量"
+        echo ""
+        log_info "配置示例（.deploy-config 文件）："
+        echo "  DEPLOY_SERVER_IP=your-server-ip"
+        echo "  API_BASE_URL=http://your-server-ip:3000/api"
+        echo "  AI_API_BASE_URL=http://your-server-ip:8000/api"
+        echo ""
+        exit 1
+    fi
+    
+    # 如果 DOMAIN_NAME 未配置，使用 SERVER_IP
+    if [ -z "${DOMAIN_NAME}" ]; then
+        DOMAIN_NAME="${SERVER_IP}"
+    fi
+}
 
 log_success() {
     echo -e "${GREEN}[SUCCESS]${NC} $1"
@@ -51,9 +95,20 @@ build_frontend() {
     log_info "API地址: ${API_BASE_URL}"
     log_info "AI API地址: ${AI_API_BASE_URL}"
     
+    if [ -n "${OJ_API_CONFIGS}" ]; then
+        log_info "判题机配置: ${OJ_API_CONFIGS}"
+    else
+        log_info "判题机配置: 未设置（将使用默认配置）"
+    fi
+    
     # 设置环境变量并构建
     export VITE_API_BASE_URL="${API_BASE_URL}"
     export VITE_AI_API_BASE_URL="${AI_API_BASE_URL}"
+    
+    # 如果配置了判题机列表，设置环境变量
+    if [ -n "${OJ_API_CONFIGS}" ]; then
+        export VITE_OJ_API_CONFIGS="${OJ_API_CONFIGS}"
+    fi
     
     npm run build
     
@@ -105,29 +160,163 @@ upload_files() {
 configure_nginx() {
     log_info "配置Nginx..."
     
+    # 检查是否启用HTTPS
+    local enable_https_check=false
+    if [ "$ENABLE_HTTPS" = "true" ] || [ -n "$SSL_CERT_PATH" ] || [ -n "$SSL_KEY_PATH" ]; then
+        enable_https_check=true
+    fi
+    
+    # 如果配置了SSL证书路径，验证证书文件是否存在
+    if [ "$enable_https_check" = "true" ] && [ -n "$SSL_CERT_PATH" ] && [ -n "$SSL_KEY_PATH" ]; then
+        log_info "检测到SSL证书配置，启用HTTPS..."
+        
+        # 检查服务器上的证书文件是否存在
+        if ! ssh ${SERVER_USER}@${SERVER_IP} "test -f ${SSL_CERT_PATH}" 2>/dev/null; then
+            log_error "SSL证书文件不存在: ${SSL_CERT_PATH}"
+            log_warning "HTTPS配置将被跳过，使用HTTP模式"
+            enable_https_check=false
+        elif ! ssh ${SERVER_USER}@${SERVER_IP} "test -f ${SSL_KEY_PATH}" 2>/dev/null; then
+            log_error "SSL密钥文件不存在: ${SSL_KEY_PATH}"
+            log_warning "HTTPS配置将被跳过，使用HTTP模式"
+            enable_https_check=false
+        else
+            log_success "SSL证书文件验证通过"
+        fi
+    fi
+    
     # 创建Nginx配置文件
-    cat > /tmp/gesp-frontend.conf << EOF
+    if [ "$enable_https_check" = "true" ] && [ -n "$SSL_CERT_PATH" ] && [ -n "$SSL_KEY_PATH" ]; then
+        # HTTPS配置（包含HTTP到HTTPS重定向）
+        cat > /tmp/gesp-frontend.conf << EOF
+# HTTP服务器 - 重定向到HTTPS
 server {
     listen 80;
-    server_name ${SERVER_IP};
+    server_name ${DOMAIN_NAME};
+    
+    # 重定向所有HTTP请求到HTTPS
+    return 301 https://\$server_name\$request_uri;
+}
+
+# HTTPS服务器
+server {
+    listen 443 ssl http2;
+    server_name ${DOMAIN_NAME};
     root ${DEPLOY_PATH};
     index index.html;
+
+    # SSL证书配置
+    ssl_certificate ${SSL_CERT_PATH};
+    ssl_certificate_key ${SSL_KEY_PATH};
+    
+    # SSL协议和加密套件配置
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers 'ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384';
+    ssl_prefer_server_ciphers off;
+    
+    # SSL会话配置
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_timeout 10m;
+    ssl_session_tickets off;
+    
+    # OCSP Stapling
+    ssl_stapling on;
+    ssl_stapling_verify on;
+    
+    # 超时设置（解决低版本Chrome连接超时问题）
+    client_body_timeout 60s;
+    client_header_timeout 60s;
+    keepalive_timeout 75s;
+    send_timeout 60s;
+    
+    # HTTP/1.1 优化（兼容低版本浏览器）
+    keepalive_requests 100;
+    
+    # 缓冲区设置
+    client_body_buffer_size 128k;
+    client_max_body_size 10m;
+    client_header_buffer_size 1k;
+    large_client_header_buffers 4 16k;
 
     # 启用gzip压缩
     gzip on;
     gzip_vary on;
     gzip_min_length 1024;
     gzip_types text/plain text/css text/xml text/javascript application/javascript application/xml+rss application/json;
+    gzip_comp_level 6;
+    gzip_disable "msie6";
 
     # 处理Vue Router的history模式
     location / {
         try_files \$uri \$uri/ /index.html;
+        
+        # 为HTML文件禁用缓存
+        add_header Cache-Control "no-cache, no-store, must-revalidate";
+        add_header Pragma "no-cache";
+        add_header Expires "0";
     }
 
     # 静态资源缓存
-    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg)$ {
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
         expires 1y;
         add_header Cache-Control "public, immutable";
+        access_log off;
+    }
+
+    # 安全头
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+}
+EOF
+    else
+        # HTTP配置（原始配置，保持向后兼容）
+        cat > /tmp/gesp-frontend.conf << EOF
+server {
+    listen 80;
+    server_name ${DOMAIN_NAME};
+    root ${DEPLOY_PATH};
+    index index.html;
+
+    # 超时设置（解决低版本Chrome连接超时问题）
+    client_body_timeout 60s;
+    client_header_timeout 60s;
+    keepalive_timeout 75s;
+    send_timeout 60s;
+    
+    # HTTP/1.1 优化（兼容低版本浏览器）
+    keepalive_requests 100;
+    
+    # 缓冲区设置
+    client_body_buffer_size 128k;
+    client_max_body_size 10m;
+    client_header_buffer_size 1k;
+    large_client_header_buffers 4 16k;
+
+    # 启用gzip压缩
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_types text/plain text/css text/xml text/javascript application/javascript application/xml+rss application/json;
+    gzip_comp_level 6;
+    gzip_disable "msie6";
+
+    # 处理Vue Router的history模式
+    location / {
+        try_files \$uri \$uri/ /index.html;
+        
+        # 为HTML文件禁用缓存
+        add_header Cache-Control "no-cache, no-store, must-revalidate";
+        add_header Pragma "no-cache";
+        add_header Expires "0";
+    }
+
+    # 静态资源缓存
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        access_log off;
     }
 
     # 安全头
@@ -136,6 +325,7 @@ server {
     add_header X-XSS-Protection "1; mode=block" always;
 }
 EOF
+    fi
 
     # 上传配置文件到服务器
     scp /tmp/gesp-frontend.conf ${SERVER_USER}@${SERVER_IP}:${NGINX_CONFIG_PATH}
@@ -148,19 +338,38 @@ EOF
     # 清理临时文件
     rm /tmp/gesp-frontend.conf
     
-    log_success "Nginx配置完成"
+    if [ "$enable_https_check" = "true" ] && [ -n "$SSL_CERT_PATH" ] && [ -n "$SSL_KEY_PATH" ]; then
+        log_success "Nginx HTTPS配置完成"
+    else
+        log_success "Nginx HTTP配置完成"
+        log_warning "如需启用HTTPS，请配置SSL证书路径（SSL_CERT_PATH 和 SSL_KEY_PATH）"
+    fi
 }
 
 # 设置文件权限
 set_permissions() {
     log_info "设置文件权限..."
     
+    # 自动检测Nginx用户（支持Debian/Ubuntu的www-data和CentOS/RHEL的nginx）
+    local nginx_user="www-data"
+    if ! ssh ${SERVER_USER}@${SERVER_IP} "id -u www-data >/dev/null 2>&1"; then
+        if ssh ${SERVER_USER}@${SERVER_IP} "id -u nginx >/dev/null 2>&1"; then
+            nginx_user="nginx"
+            log_info "检测到使用 nginx 用户（CentOS/RHEL系统）"
+        else
+            log_warning "未找到 www-data 或 nginx 用户，使用 root 用户"
+            nginx_user="root"
+        fi
+    else
+        log_info "检测到使用 www-data 用户（Debian/Ubuntu系统）"
+    fi
+    
     ssh ${SERVER_USER}@${SERVER_IP} "
-        chown -R www-data:www-data ${DEPLOY_PATH}
+        chown -R ${nginx_user}:${nginx_user} ${DEPLOY_PATH}
         chmod -R 755 ${DEPLOY_PATH}
     "
     
-    log_success "文件权限设置完成"
+    log_success "文件权限设置完成（使用用户: ${nginx_user}）"
 }
 
 # 健康检查
@@ -169,11 +378,22 @@ health_check() {
     
     sleep 5
     
-    if curl -f http://${SERVER_IP}/ > /dev/null 2>&1; then
+    # 根据是否启用HTTPS选择检查协议
+    local check_url=""
+    if [ "$ENABLE_HTTPS" = "true" ] || ([ -n "$SSL_CERT_PATH" ] && [ -n "$SSL_KEY_PATH" ]); then
+        check_url="https://${DOMAIN_NAME}/"
+        log_info "使用HTTPS进行健康检查..."
+    else
+        check_url="http://${DOMAIN_NAME}/"
+        log_info "使用HTTP进行健康检查..."
+    fi
+    
+    if curl -f -k ${check_url} > /dev/null 2>&1; then
         log_success "健康检查通过！"
-        log_success "前端应用已成功部署到: http://${SERVER_IP}"
+        log_success "前端应用已成功部署到: ${check_url}"
     else
         log_warning "健康检查失败，请检查服务器状态"
+        log_info "尝试检查地址: ${check_url}"
     fi
 }
 
@@ -184,13 +404,29 @@ show_deployment_info() {
     echo "部署信息："
     echo "  - 服务器地址: ${SERVER_IP}"
     echo "  - 部署路径: ${DEPLOY_PATH}"
-    echo "  - 访问地址: http://${SERVER_IP}"
+    
+    if [ "$ENABLE_HTTPS" = "true" ] || ([ -n "$SSL_CERT_PATH" ] && [ -n "$SSL_KEY_PATH" ]); then
+        echo "  - 访问地址: https://${DOMAIN_NAME}"
+        echo "  - HTTP自动重定向到HTTPS: 已启用"
+    else
+        echo "  - 访问地址: http://${DOMAIN_NAME}"
+        echo "  - HTTPS: 未启用"
+    fi
+    
     echo "  - Nginx配置: ${NGINX_CONFIG_PATH}"
     echo ""
     echo "管理命令："
     echo "  - 查看Nginx状态: ssh ${SERVER_USER}@${SERVER_IP} 'systemctl status nginx'"
     echo "  - 查看Nginx日志: ssh ${SERVER_USER}@${SERVER_IP} 'tail -f /var/log/nginx/error.log'"
     echo "  - 重新加载Nginx: ssh ${SERVER_USER}@${SERVER_IP} 'systemctl reload nginx'"
+    
+    if [ "$ENABLE_HTTPS" != "true" ] && [ -z "$SSL_CERT_PATH" ]; then
+        echo ""
+        log_warning "HTTPS未启用！如需启用HTTPS，请配置SSL证书："
+        echo "  1. 获取SSL证书（推荐使用Let's Encrypt免费证书）"
+        echo "  2. 在 .deploy-config 中配置 SSL_CERT_PATH 和 SSL_KEY_PATH"
+        echo "  3. 重新运行部署脚本"
+    fi
     echo ""
 }
 
@@ -200,18 +436,49 @@ show_config() {
     echo "  - 服务器IP: ${SERVER_IP}"
     echo "  - 服务器用户: ${SERVER_USER}"
     echo "  - 部署路径: ${DEPLOY_PATH}"
+    echo "  - 域名: ${DOMAIN_NAME}"
     echo "  - API地址: ${API_BASE_URL}"
     echo "  - AI API地址: ${AI_API_BASE_URL}"
+    if [ -n "${OJ_API_CONFIGS}" ]; then
+        echo "  - 判题机配置: ${OJ_API_CONFIGS}"
+    else
+        echo "  - 判题机配置: 未设置（使用默认）"
+    fi
+    
+    if [ "$ENABLE_HTTPS" = "true" ] || [ -n "$SSL_CERT_PATH" ] || [ -n "$SSL_KEY_PATH" ]; then
+        echo "  - HTTPS: 已启用"
+        if [ -n "$SSL_CERT_PATH" ]; then
+            echo "  - SSL证书: ${SSL_CERT_PATH}"
+        fi
+        if [ -n "$SSL_KEY_PATH" ]; then
+            echo "  - SSL密钥: ${SSL_KEY_PATH}"
+        fi
+    else
+        echo "  - HTTPS: 未启用（仅HTTP）"
+    fi
+    
     echo ""
     log_info "提示: 可以通过以下方式自定义配置："
     echo "  1. 创建 .deploy-config 文件并设置变量"
     echo "  2. 使用环境变量: DEPLOY_SERVER_IP, API_BASE_URL 等"
     echo "  3. 在命令行中设置: DEPLOY_SERVER_IP=xxx ./deploy-frontend.sh"
     echo ""
+    log_info "启用HTTPS:"
+    echo "  在 .deploy-config 文件中设置："
+    echo "    DOMAIN_NAME=your-domain.com"
+    echo "    SSL_CERT_PATH=/etc/ssl/certs/your-cert.crt"
+    echo "    SSL_KEY_PATH=/etc/ssl/private/your-key.key"
+    echo "    或使用 Let's Encrypt:"
+    echo "    SSL_CERT_PATH=/etc/letsencrypt/live/your-domain.com/fullchain.pem"
+    echo "    SSL_KEY_PATH=/etc/letsencrypt/live/your-domain.com/privkey.pem"
+    echo ""
 }
 
 # 主函数
 main() {
+    # 验证必需配置
+    validate_config
+    
     log_info "开始部署GESP前端到 ${SERVER_IP}"
     
     show_config

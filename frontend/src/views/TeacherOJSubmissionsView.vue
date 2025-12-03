@@ -1,16 +1,13 @@
 <template>
   <div class="oj-submissions-container">
-    <div class="submissions-header">
-      <div class="header-left">
-        <button @click="goBack" class="back-btn">
-          ← 返回
-        </button>
-        <h2>{{ problemInfo.title ? problemInfo.title + ' - 学生提交记录' : '学生提交记录' }}</h2>
-      </div>
-      <div class="header-right">
-        <span class="submission-count">共 {{ submissions.length }} 次提交</span>
-      </div>
-    </div>
+    <!-- 左侧返回按钮 -->
+    <button 
+      class="back-nav-arrow" 
+      @click="goBack" 
+      title="返回"
+    >
+      <Icon name="arrow-left" :size="32" />
+    </button>
 
     <div class="submissions-content">
       <div v-if="loading" class="loading-state">
@@ -19,91 +16,79 @@
       </div>
       
       <div v-else-if="submissions.length === 0" class="empty-state">
-        <div class="empty-icon">📝</div>
+        <div class="empty-icon"><Icon name="file-text" :size="64" /></div>
         <h3>暂无提交记录</h3>
         <p>您的学生还没有提交过这道题目</p>
       </div>
       
-      <div v-else class="submissions-table-container">
-        <table class="submissions-table">
-          <thead>
-            <tr>
-              <th>提交ID</th>
-              <th>学生姓名</th>
-              <th>用户名</th>
-              <th>提交时间</th>
-              <th>语言</th>
-              <th>状态</th>
-              <th>判题结果</th>
-              <th>通过测试</th>
-              <th>运行时间</th>
-              <th>任务信息</th>
-              <th>操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr 
-              v-for="submission in submissions" 
-              :key="submission.id"
-              class="submission-row"
-              @click="viewSubmissionDetail(submission)"
-            >
-              <td>#{{ submission.id }}</td>
-              <td>
-                <div class="student-name-cell">
-                  <span class="student-name-text">{{ submission.real_name || '未知' }}</span>
-                </div>
-              </td>
-              <td>
-                <span class="username-text">{{ submission.username || '未知' }}</span>
-              </td>
-              <td class="date-cell">{{ formatDateTime(submission.submit_time) }}</td>
-              <td>
-                <span class="language-badge">{{ getLanguageName(submission.language) }}</span>
-              </td>
-              <td>
-                <span class="status-badge" :class="getStatusClass(submission.status)">
-                  {{ getStatusText(submission.status) }}
-                </span>
-              </td>
-              <td>
-                <span class="verdict-badge" :class="getVerdictClass(submission.verdict)">
-                  {{ getVerdictText(submission.verdict) }}
-                </span>
-              </td>
-              <td>
-                <span v-if="submission.total_tests" class="test-info">
-                  {{ submission.passed_tests || 0 }}/{{ submission.total_tests }}
-                </span>
-                <span v-else>-</span>
-              </td>
-              <td>
-                <span v-if="submission.judge_duration" class="runtime-info">
-                  {{ submission.judge_duration }}ms
-                </span>
-                <span v-else>-</span>
-              </td>
-              <td>
-                <div v-if="submission.task_id" class="task-info-cell">
-                  <div class="task-badge">
-                    <span class="task-icon">📋</span>
-                    <span class="task-name">{{ submission.task_name || '任务' }}</span>
-                  </div>
-                  <div v-if="submission.plan_name" class="plan-name">{{ submission.plan_name }}</div>
-                </div>
-                <span v-else class="no-task">自主练习</span>
-              </td>
-              <td>
-                <div class="action-buttons" @click.stop>
-                  <button @click="viewSubmissionDetail(submission)" class="btn-action btn-view" title="查看详情">
-                    <span>👀</span>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <div v-else class="submissions-by-month">
+        <div v-for="(monthData, monthKey) in groupedSubmissions" :key="monthKey" class="month-group">
+          <div class="month-header">
+            <span class="month-title"><Icon name="calendar" :size="18" /> {{ monthKey }}</span>
+            <span class="month-count">{{ monthData.length }} 次提交</span>
+          </div>
+          <div class="submissions-table-container">
+            <table class="submissions-table">
+              <thead>
+                <tr>
+                  <th>提交ID</th>
+                  <th>学生姓名</th>
+                  <th>用户名</th>
+                  <th>提交时间</th>
+                  <th>语言</th>
+                  <th>状态</th>
+                  <th>判题结果</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr 
+                  v-for="submission in monthData" 
+                  :key="submission.id"
+                  class="submission-row"
+                >
+                  <td>#{{ submission.id }}</td>
+                  <td>
+                    <div class="student-name-cell">
+                      <span class="student-name-text">{{ submission.real_name || '未知' }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="username-text">{{ submission.username || '未知' }}</span>
+                  </td>
+                  <td class="date-cell">{{ formatDateTime(submission.submit_time) }}</td>
+                  <td>
+                    <span class="language-badge">{{ getLanguageName(submission.language) }}</span>
+                  </td>
+                  <td>
+                    <span class="status-badge" :class="getStatusClass(submission.status)">
+                      {{ getStatusText(submission.status) }}
+                    </span>
+                  </td>
+                  <td>
+                    <span class="verdict-badge" :class="getVerdictClass(submission.verdict)">
+                      {{ getVerdictText(submission.verdict) }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="action-buttons">
+                      <button @click="viewSubmissionDetail(submission)" class="btn-action btn-view" title="查看详情">
+                        <Icon name="eye" :size="16" /> 查看详情
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
+    </div>
+
+    <!-- 底部 Header -->
+    <div class="submissions-header-bottom">
+      <h2>{{ problemInfo.title ? problemInfo.title + ' - 学生提交记录' : '学生提交记录' }}</h2>
+      <span class="submission-count">共 {{ submissions.length }} 次提交</span>
     </div>
 
     <!-- 提交详情弹窗 -->
@@ -119,6 +104,19 @@
             <p>加载详情中...</p>
           </div>
           <div v-else-if="submissionDetail">
+            <!-- 提交的代码 - 放在最前面 -->
+            <div v-if="submissionDetail.code" class="code-section">
+              <div class="code-header">
+                <h4>提交的代码</h4>
+                <button @click="copyCode" class="btn-copy" :class="{ copied: codeCopied }" title="复制代码">
+                  <Icon name="copy" :size="16" /> {{ codeCopied ? '已复制' : '复制代码' }}
+                </button>
+              </div>
+              <div class="code-container">
+                <pre><code>{{ submissionDetail.code }}</code></pre>
+              </div>
+            </div>
+
             <!-- 基本信息 -->
             <div class="detail-summary">
               <div class="summary-header">
@@ -147,31 +145,6 @@
                         {{ getVerdictText(submissionDetail.verdict) }}
                       </span>
                     </span>
-                  </div>
-                  <div class="summary-stats" v-if="submissionDetail.total_tests">
-                    <span class="stat-item">
-                      <span class="stat-label">通过测试:</span>
-                      <span class="stat-value" :class="submissionDetail.passed_tests === submissionDetail.total_tests ? 'correct' : 'incorrect'">
-                        {{ submissionDetail.passed_tests }}/{{ submissionDetail.total_tests }}
-                      </span>
-                    </span>
-                    <span class="stat-item" v-if="submissionDetail.judge_duration">
-                      <span class="stat-label">运行时间:</span>
-                      <span class="stat-value">{{ submissionDetail.judge_duration }}ms</span>
-                    </span>
-                  </div>
-                  <div v-if="submissionDetail.task_id" class="task-info-summary">
-                    <div class="task-info-item">
-                      <span class="task-label">任务:</span>
-                      <span class="task-value">{{ submissionDetail.task_name || '未知任务' }}</span>
-                    </div>
-                    <div v-if="submissionDetail.plan_name" class="task-info-item">
-                      <span class="task-label">计划:</span>
-                      <span class="task-value">{{ submissionDetail.plan_name }}</span>
-                    </div>
-                  </div>
-                  <div v-else class="task-info-summary">
-                    <span class="no-task-text">自主练习</span>
                   </div>
                 </div>
               </div>
@@ -215,14 +188,6 @@
               </div>
             </div>
 
-            <!-- 提交的代码 -->
-            <div v-if="submissionDetail.code" class="code-section">
-              <h4>提交的代码</h4>
-              <div class="code-container">
-                <pre><code class="language-{{ submissionDetail.language }}">{{ submissionDetail.code }}</code></pre>
-              </div>
-            </div>
-
             <!-- 错误信息 -->
             <div v-if="submissionDetail.error_message" class="error-section">
               <h4>错误信息</h4>
@@ -242,9 +207,10 @@
 
 <script setup lang="ts">import { BASE_URL } from '@/config/api'
 
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
+import Icon from '@/components/Icon.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -252,6 +218,9 @@ const router = useRouter()
 // 从路由参数获取教师ID和题目ID
 const teacherId = ref<number | null>(route.params.teacherId ? parseInt(route.params.teacherId as string) : null)
 const problemId = ref<number | null>(route.params.problemId ? parseInt(route.params.problemId as string) : null)
+
+// 从查询参数获取学生ID（用于筛选）
+const studentId = ref<number | null>(route.query.student_id ? parseInt(route.query.student_id as string) : null)
 
 // 数据状态
 const problemInfo = ref<any>({})
@@ -261,6 +230,21 @@ const showDetailDialog = ref(false)
 const selectedSubmission = ref<any>(null)
 const submissionDetail = ref<any>(null)
 const detailLoading = ref(false)
+const codeCopied = ref(false)
+
+// 按月份分组提交记录
+const groupedSubmissions = computed(() => {
+  const groups: Record<string, any[]> = {}
+  submissions.value.forEach((submission: any) => {
+    const date = new Date(submission.submit_time)
+    const monthKey = `${date.getFullYear()}年${date.getMonth() + 1}月`
+    if (!groups[monthKey]) {
+      groups[monthKey] = []
+    }
+    groups[monthKey].push(submission)
+  })
+  return groups
+})
 
 // 获取题目信息
 async function fetchProblemInfo() {
@@ -293,6 +277,12 @@ async function fetchSubmissions() {
     // 如果指定了题目ID，添加过滤
     if (problemId.value) {
       params.problemId = problemId.value
+    }
+    
+    // 如果指定了学生ID，添加过滤（从查询参数获取）
+    // 注意：后端接口使用 studentId 作为参数名
+    if (studentId.value) {
+      params.studentId = studentId.value.toString()
     }
     
     const response = await axios.get(`${BASE_URL}/teacher/${teacherId.value}/oj-submissions`, { params })
@@ -346,6 +336,34 @@ async function fetchSubmissionDetail(submission: any) {
     }
   } finally {
     detailLoading.value = false
+  }
+}
+
+// 复制代码
+async function copyCode() {
+  if (!submissionDetail.value?.code) return
+  try {
+    // 优先使用 Clipboard API（需要 HTTPS）
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(submissionDetail.value.code)
+    } else {
+      // 降级方案：使用 textarea + execCommand
+      const textarea = document.createElement('textarea')
+      textarea.value = submissionDetail.value.code
+      textarea.style.position = 'fixed'
+      textarea.style.left = '-9999px'
+      document.body.appendChild(textarea)
+      textarea.select()
+      document.execCommand('copy')
+      document.body.removeChild(textarea)
+    }
+    codeCopied.value = true
+    setTimeout(() => {
+      codeCopied.value = false
+    }, 2000)
+  } catch (err) {
+    console.error('复制失败:', err)
+    alert('复制失败，请手动选择复制')
   }
 }
 
@@ -432,7 +450,19 @@ function closeDetailDialog() {
   showDetailDialog.value = false
   selectedSubmission.value = null
   submissionDetail.value = null
+  codeCopied.value = false
 }
+
+// 监听路由查询参数变化，更新 studentId
+watch(() => route.query.student_id, (newStudentId) => {
+  if (newStudentId) {
+    studentId.value = parseInt(newStudentId as string)
+  } else {
+    studentId.value = null
+  }
+  // 重新获取提交记录
+  fetchSubmissions()
+}, { immediate: true })
 
 onMounted(() => {
   if (problemId.value) {
@@ -455,63 +485,70 @@ onMounted(() => {
   overflow-x: hidden;
 }
 
-.submissions-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 30px;
-  background: linear-gradient(135deg, #87ceeb 0%, #f8fafc 100%);
-  border-bottom: 2px solid #e2e8f0;
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+/* 左侧返回按钮样式 - 固定定位 */
+.back-nav-arrow {
   position: fixed;
-  top: 48px; /* NavBar 的高度 */
+  left: 20px;
+  top: 80px;
+  background: rgba(30, 144, 255, 0.15);
+  backdrop-filter: blur(10px);
+  color: #1e90ff;
+  border: 2px solid rgba(30, 144, 255, 0.3);
+  border-radius: 12px;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(30, 144, 255, 0.2);
+  z-index: 100;
+}
+
+.back-nav-arrow:hover {
+  background: rgba(30, 144, 255, 0.2);
+  border-color: rgba(30, 144, 255, 0.5);
+  color: #0c7cd5;
+  transform: scale(1.1);
+  box-shadow: 0 4px 16px rgba(30, 144, 255, 0.3);
+}
+
+.back-nav-arrow:active {
+  transform: scale(0.95);
+}
+
+.back-nav-arrow :deep(.lucide-icon) {
+  flex-shrink: 0;
+}
+
+/* 底部固定 Header */
+.submissions-header-bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  border-top: 2px solid #e2e8f0;
+  position: fixed;
+  bottom: 0;
   left: 0;
   right: 0;
   z-index: 999;
   backdrop-filter: blur(10px);
-  background: linear-gradient(135deg, rgba(135, 206, 235, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+  background: rgba(135, 206, 235, 0.95);
   width: 100%;
+  gap: 4px;
   box-sizing: border-box;
-  flex-shrink: 0;
 }
 
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.back-btn {
-  background: linear-gradient(135deg, #1e90ff 0%, #38bdf8 100%);
-  border: none;
-  color: white;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  padding: 10px 16px;
-  border-radius: 10px;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(30,144,255,0.2);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.back-btn:hover {
-  background: linear-gradient(135deg, #38bdf8 0%, #1e90ff 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(30,144,255,0.3);
-}
-
-.header-left h2 {
+.submissions-header-bottom h2 {
   margin: 0;
   color: #1e293b;
   font-weight: 700;
-  font-size: 1.8rem;
+  font-size: 1.4rem;
   letter-spacing: 0.01em;
-  font-family: 'SF Pro Display', 'Inter', 'Segoe UI', 'Roboto', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-  text-align: left;
-  line-height: 1.3;
+  text-align: center;
 }
 
 .submission-count {
@@ -523,11 +560,13 @@ onMounted(() => {
 .submissions-content {
   flex: 1;
   padding: 24px 32px;
+  padding-left: 100px;
+  padding-bottom: 100px;
   width: 100%;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  margin-top: 128px; /* 为固定的header留出空间：48px(NavBar) + 80px(header) */
+  margin-top: 20px;
 }
 
 .loading-state {
@@ -581,15 +620,51 @@ onMounted(() => {
   font-size: 16px;
 }
 
-/* 表格容器 */
-.submissions-table-container {
-  background: white;
-  border-radius: 12px;
-  border: 1.5px solid #e2e8f0;
-  overflow: hidden;
+/* 按月份分组 */
+.submissions-by-month {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
+}
+
+.month-group {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.month-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.month-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.month-count {
+  font-size: 14px;
+  color: #64748b;
+  background: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-weight: 500;
+}
+
+/* 表格容器 */
+.submissions-table-container {
+  overflow: hidden;
+  width: 100%;
 }
 
 .submissions-table {
@@ -618,7 +693,6 @@ onMounted(() => {
 }
 
 .submission-row {
-  cursor: pointer;
   transition: background-color 0.2s ease;
 }
 
@@ -719,96 +793,6 @@ onMounted(() => {
   background: rgba(107, 114, 128, 0.9);
 }
 
-.test-info {
-  font-weight: 600;
-  color: #1e293b;
-}
-
-.runtime-info {
-  color: #64748b;
-  font-size: 13px;
-}
-
-.task-info-cell {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.task-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
-  background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
-  color: white;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.task-icon {
-  font-size: 14px;
-}
-
-.task-name {
-  font-weight: 600;
-}
-
-.plan-name {
-  font-size: 11px;
-  color: #64748b;
-  font-weight: 500;
-  margin-top: 2px;
-}
-
-.no-task {
-  color: #94a3b8;
-  font-size: 12px;
-  font-style: italic;
-}
-
-.task-info-summary {
-  margin: 12px 0;
-  padding: 12px;
-  background: #f8fafc;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
-}
-
-.task-info-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 6px;
-}
-
-.task-info-item:last-child {
-  margin-bottom: 0;
-}
-
-.task-label {
-  font-size: 13px;
-  color: #64748b;
-  font-weight: 500;
-}
-
-.task-value {
-  font-size: 13px;
-  color: #1e293b;
-  font-weight: 600;
-  padding: 4px 8px;
-  background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
-  color: white;
-  border-radius: 6px;
-}
-
-.no-task-text {
-  font-size: 13px;
-  color: #94a3b8;
-  font-style: italic;
-}
-
 .action-buttons {
   display: flex;
   gap: 8px;
@@ -846,17 +830,6 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   gap: 6px;
-}
-
-.btn-primary {
-  background: linear-gradient(135deg, #1e90ff 0%, #38bdf8 100%);
-  color: white;
-}
-
-.btn-primary:hover {
-  background: linear-gradient(135deg, #38bdf8 0%, #1e90ff 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(30,144,255,0.3);
 }
 
 .btn-secondary {
@@ -942,6 +915,68 @@ onMounted(() => {
   color: #64748b;
 }
 
+/* 代码区域 - 放在最前面 */
+.code-section {
+  margin-bottom: 24px;
+}
+
+.code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.code-section h4 {
+  margin: 0;
+  color: #1e293b;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.btn-copy {
+  padding: 6px 12px;
+  background: linear-gradient(135deg, #1e90ff 0%, #38bdf8 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.btn-copy:hover {
+  background: linear-gradient(135deg, #0284c7 0%, #0ea5e9 100%);
+  transform: translateY(-1px);
+}
+
+.btn-copy.copied {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+}
+
+.code-container {
+  background: #1e293b;
+  border-radius: 12px;
+  padding: 16px;
+  overflow-x: auto;
+  border: 2px solid #334155;
+}
+
+.code-container pre {
+  margin: 0;
+  padding: 0;
+}
+
+.code-container code {
+  color: #e2e8f0;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
 .detail-summary {
   margin-bottom: 24px;
   padding: 20px;
@@ -1016,12 +1051,28 @@ onMounted(() => {
   color: #1e293b;
 }
 
-.stat-value.correct {
+.stat-value.correct, .stat-value.completed, .stat-value.accepted {
   color: #22c55e;
 }
 
-.stat-value.incorrect {
+.stat-value.incorrect, .stat-value.error, .stat-value.wrong-answer, .stat-value.runtime-error {
   color: #ef4444;
+}
+
+.stat-value.judging {
+  color: #3b82f6;
+}
+
+.stat-value.tle {
+  color: #f59e0b;
+}
+
+.stat-value.mle {
+  color: #8b5cf6;
+}
+
+.stat-value.compile-error {
+  color: #9ca3af;
 }
 
 .test-results-section {
@@ -1133,11 +1184,11 @@ onMounted(() => {
   color: #dc2626;
 }
 
-.code-section, .error-section {
+.error-section {
   margin-top: 24px;
 }
 
-.code-section h4, .error-section h4 {
+.error-section h4 {
   margin: 0 0 16px 0;
   color: #1e293b;
   font-size: 16px;
@@ -1146,33 +1197,25 @@ onMounted(() => {
   padding-bottom: 8px;
 }
 
-.code-container, .error-container {
-  background: #1e293b;
+.error-container {
+  background: #fef2f2;
   border-radius: 8px;
   padding: 16px;
   overflow-x: auto;
 }
 
-.code-container pre, .error-container pre {
+.error-container pre {
   margin: 0;
   padding: 0;
 }
 
-.code-container code, .error-container code {
-  color: #e2e8f0;
+.error-container code {
+  color: #dc2626;
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
   font-size: 13px;
   line-height: 1.5;
   white-space: pre-wrap;
   word-wrap: break-word;
-}
-
-.error-container {
-  background: #fef2f2;
-}
-
-.error-container code {
-  color: #dc2626;
 }
 
 .modal-footer {
@@ -1184,26 +1227,32 @@ onMounted(() => {
 }
 
 /* 响应式设计 */
-@media (max-width: 1200px) {
-  .submissions-table {
-    font-size: 13px;
-  }
-  
-  .submissions-table th,
-  .submissions-table td {
-    padding: 12px 8px;
-  }
-}
-
 @media (max-width: 768px) {
-  .submissions-header {
-    padding: 15px 20px;
-    top: 48px;
+  .back-nav-arrow {
+    width: 48px;
+    height: 48px;
+    left: 16px;
+    top: 70px;
+  }
+
+  .back-nav-arrow :deep(.lucide-icon) {
+    width: 24px;
+    height: 24px;
   }
   
   .submissions-content {
-    margin-top: 108px;
+    margin-top: 50px;
     padding: 20px 16px;
+    padding-left: 16px;
+    padding-bottom: 90px;
+  }
+
+  .submissions-header-bottom {
+    padding: 10px 16px;
+  }
+
+  .submissions-header-bottom h2 {
+    font-size: 1.2rem;
   }
 
   .submissions-table-container {
@@ -1232,17 +1281,9 @@ onMounted(() => {
 }
 
 @media (max-width: 480px) {
-  .submissions-header {
-    padding: 16px;
-  }
-
   .submissions-content {
     padding: 16px;
-    margin-top: 100px;
-  }
-
-  .submissions-table-container {
-    border-radius: 8px;
+    padding-bottom: 90px;
   }
 
   .submissions-table th,
@@ -1252,4 +1293,3 @@ onMounted(() => {
   }
 }
 </style>
-

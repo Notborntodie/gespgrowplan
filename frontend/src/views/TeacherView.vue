@@ -55,6 +55,7 @@
         :loading="studentsLoading"
         @bind-student="handleBindStudent"
         @create-student="showCreateStudentDialog = true"
+        @batch-create-student="showBatchCreateDialog = true"
         @view-student="showStudentDetail"
       />
       
@@ -178,7 +179,7 @@
                   placeholder="搜索学生用户名、真实姓名或邮箱..."
                   class="search-input"
                 />
-                <i class="search-icon">🔍</i>
+                <Icon name="search" :size="18" class="search-icon" />
               </div>
               
               <!-- 搜索结果提示 -->
@@ -229,6 +230,50 @@
             </div>
           </div>
 
+    <!-- 批量导入学生对话框 -->
+    <div v-if="showBatchCreateDialog" class="dialog-overlay" @click="closeBatchCreateDialog">
+      <div class="dialog dialog-large" @click.stop>
+        <div class="dialog-header">
+          <h3>批量导入学生</h3>
+          <button @click="closeBatchCreateDialog" class="btn-close">&times;</button>
+        </div>
+        <div class="dialog-body">
+          <div class="batch-info">
+            <p>输入学生真实姓名，系统将自动生成用户名（拼音+随机数字）和初始密码（123456）</p>
+          </div>
+          <div class="batch-students-list">
+            <div v-for="(item, index) in batchStudents" :key="index" class="batch-student-item">
+              <input 
+                v-model="item.real_name" 
+                type="text" 
+                placeholder="请输入学生真实姓名"
+                class="batch-input"
+              />
+              <button @click="removeBatchStudent(index)" class="btn-remove" title="删除">
+                <Icon name="x" :size="18" />
+              </button>
+            </div>
+          </div>
+          <button @click="addBatchStudent" class="btn-add-student">
+            <Icon name="plus" :size="18" />
+            添加学生
+          </button>
+          <div class="dialog-actions">
+            <button type="button" @click="closeBatchCreateDialog" class="btn-secondary">
+              取消
+            </button>
+            <button 
+              @click="batchCreateStudents" 
+              class="btn-primary" 
+              :disabled="isBatchCreating || validBatchStudents.length === 0"
+            >
+              {{ isBatchCreating ? '创建中...' : `创建 ${validBatchStudents.length} 个学生` }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- 成功消息弹窗 -->
     <SuccessMessageDialog 
       :visible="showSuccessDialog" 
@@ -267,21 +312,21 @@
             
             <div class="student-detail-stats">
               <div class="stat-card">
-                <div class="stat-icon">📊</div>
+                <Icon name="bar-chart-3" :size="32" class="stat-icon" />
                 <div class="stat-content">
                   <div class="stat-number">{{ selectedStudent.total_submissions || 0 }}</div>
                   <div class="stat-label">总提交次数</div>
                   </div>
                     </div>
               <div class="stat-card">
-                <div class="stat-icon">✅</div>
+                <Icon name="check-circle" :size="32" class="stat-icon" />
                 <div class="stat-content">
                   <div class="stat-number">{{ selectedStudent.accuracy_rate || 0 }}%</div>
                   <div class="stat-label">正确率</div>
                     </div>
                   </div>
               <div class="stat-card">
-                <div class="stat-icon">🎯</div>
+                <Icon name="target" :size="32" class="stat-icon" />
                 <div class="stat-content">
                   <div class="stat-number">{{ selectedStudent.completed_exams || 0 }}</div>
                   <div class="stat-label">完成考试</div>
@@ -292,6 +337,9 @@
             <div class="student-detail-actions">
               <button @click="closeStudentDetailDialog" class="btn-secondary">
                 关闭
+              </button>
+              <button @click="resetStudentPassword(selectedStudent.id)" class="btn-warning">
+                重置密码
               </button>
               <button @click="unbindStudent(selectedStudent.id)" class="btn-danger">
                 解除绑定
@@ -439,28 +487,28 @@
               <h4>错题统计</h4>
               <div class="statistics-grid">
                 <div class="stat-card">
-                  <div class="stat-icon">📊</div>
+                  <Icon name="bar-chart-3" :size="32" class="stat-icon" />
                   <div class="stat-content">
                     <div class="stat-number">{{ studentSubmissionHistory.statistics.total_attempts }}</div>
                     <div class="stat-label">总尝试次数</div>
                   </div>
                 </div>
                 <div class="stat-card">
-                  <div class="stat-icon">❌</div>
+                  <Icon name="x-circle" :size="32" class="stat-icon" />
                   <div class="stat-content">
                     <div class="stat-number">{{ studentSubmissionHistory.statistics.total_wrong_questions }}</div>
                     <div class="stat-label">错题数量</div>
                   </div>
                 </div>
                 <div class="stat-card">
-                  <div class="stat-icon">📈</div>
+                  <Icon name="trending-up" :size="32" class="stat-icon" />
                   <div class="stat-content">
                     <div class="stat-number">{{ Math.round((studentSubmissionHistory.statistics.total_wrong_questions / studentSubmissionHistory.exam_info.total_questions) * 100) }}%</div>
                     <div class="stat-label">错误率</div>
                   </div>
                 </div>
                 <div class="stat-card">
-                  <div class="stat-icon">✅</div>
+                  <Icon name="check-circle" :size="32" class="stat-icon" />
                   <div class="stat-content">
                     <div class="stat-number">{{ studentSubmissionHistory.exam_info.total_questions - studentSubmissionHistory.statistics.total_wrong_questions }}</div>
                     <div class="stat-label">正确题数</div>
@@ -500,7 +548,7 @@
                     </div>
                     <div class="answer-row">
                       <span class="answer-label">正确性:</span>
-                      <span class="correctness wrong">❌ 错误</span>
+                      <span class="correctness wrong"><Icon name="x" :size="14" /> 错误</span>
                     </div>
                   </div>
                   
@@ -524,6 +572,7 @@
   </template>
   
   <script setup lang="ts">import { BASE_URL } from '@/config/api'
+import { pinyin } from 'pinyin-pro'
 
 import { ref, onMounted, watch, reactive, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
@@ -535,6 +584,7 @@ import OJSubmissionsSection from '@/components/teacher/OJSubmissionsSection.vue'
 import StudentManagementSection from '@/components/teacher/StudentManagementSection.vue'
 import LearningPlanManagementSection from '@/components/teacher/LearningPlanManagementSection.vue'
 import PlanProgressSection from '@/components/teacher/PlanProgressSection.vue'
+import Icon from '@/components/Icon.vue'
   
   // 路由
   const router = useRouter()
@@ -548,11 +598,14 @@ import PlanProgressSection from '@/components/teacher/PlanProgressSection.vue'
   const studentsLoading = ref(false)
   const showCreateStudentDialog = ref(false)
   const showBindStudentDialog = ref(false)
+  const showBatchCreateDialog = ref(false)
   const isCreatingStudent = ref(false)
   const isBindingStudent = ref(false)
+  const isBatchCreating = ref(false)
   const availableStudents = ref<any[]>([])
   const selectedStudentIds = ref<number[]>([])
   const bindStudentSearchQuery = ref('')
+  const batchStudents = ref<{real_name: string}[]>([{ real_name: '' }])
   
   // 成功消息弹窗
   const showSuccessDialog = ref(false)
@@ -712,6 +765,11 @@ import PlanProgressSection from '@/components/teacher/PlanProgressSection.vue'
   // 已提交学生列表（只显示已提交的学生）
   const submittedStudents = computed(() => {
     return examStudents.value.filter(student => student.submission_status === 'submitted')
+  })
+  
+  // 有效的批量学生（过滤空姓名）
+  const validBatchStudents = computed(() => {
+    return batchStudents.value.filter(s => s.real_name.trim())
   })
   
   // 获取用户信息
@@ -1013,6 +1071,31 @@ import PlanProgressSection from '@/components/teacher/PlanProgressSection.vue'
     }
   }
   
+  // 重置学生密码
+  const resetStudentPassword = async (studentId: number) => {
+    try {
+      const response = await fetch(`${BASE_URL}/users/${studentId}/reset-password`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          admin_user_id: userInfo.value?.id
+        })
+      })
+      
+      if (response.ok) {
+        showSuccess('密码重置成功！新密码为: 123456')
+      } else {
+        const error = await response.json()
+        alert('重置密码失败: ' + (error.message || '未知错误'))
+      }
+    } catch (error: any) {
+      console.error('重置密码失败:', error)
+      alert('重置密码失败: ' + error.message)
+    }
+  }
+  
   // 解绑学生
   const unbindStudent = async (studentId: number) => {
     if (!userInfo.value) return
@@ -1062,6 +1145,106 @@ import PlanProgressSection from '@/components/teacher/PlanProgressSection.vue'
     showBindStudentDialog.value = false
     selectedStudentIds.value = []
     bindStudentSearchQuery.value = ''
+  }
+  
+  // 关闭批量创建对话框
+  const closeBatchCreateDialog = () => {
+    showBatchCreateDialog.value = false
+    batchStudents.value = [{ real_name: '' }]
+  }
+  
+  // 添加批量学生
+  const addBatchStudent = () => {
+    batchStudents.value.push({ real_name: '' })
+  }
+  
+  // 移除批量学生
+  const removeBatchStudent = (index: number) => {
+    if (batchStudents.value.length > 1) {
+      batchStudents.value.splice(index, 1)
+    }
+  }
+  
+  // 汉字转拼音（使用 pinyin-pro 库）
+  const toPinyin = (name: string): string => {
+    return pinyin(name, { toneType: 'none', type: 'array' }).join('').toLowerCase()
+  }
+  
+  // 生成用户名
+  const generateUsername = (realName: string): string => {
+    const pinyin = toPinyin(realName)
+    const randomNum = Math.floor(Math.random() * 90 + 10) // 10-99
+    return `${pinyin}${randomNum}`
+  }
+  
+  // 批量创建学生
+  const batchCreateStudents = async () => {
+    if (validBatchStudents.value.length === 0) return
+    
+    isBatchCreating.value = true
+    const results: { name: string; success: boolean; username?: string; error?: string }[] = []
+    
+    try {
+      for (const student of validBatchStudents.value) {
+        const username = generateUsername(student.real_name)
+        const studentData = {
+          username,
+          password: '123456',
+          real_name: student.real_name,
+          role_id: 2
+        }
+        
+        try {
+          const response = await fetch(`${BASE_URL}/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(studentData)
+          })
+          
+          if (response.ok) {
+            const result = await response.json()
+            const studentId = result.id || result.data?.id || result.user_id
+            
+            // 自动绑定到教师
+            if (studentId && userInfo.value) {
+              await axios.post(`${BASE_URL}/teacher/${userInfo.value.id}/students`, {
+                student_ids: [studentId]
+              })
+            }
+            
+            results.push({ name: student.real_name, success: true, username })
+          } else {
+            const error = await response.json()
+            results.push({ name: student.real_name, success: false, error: error.message })
+          }
+        } catch (err: any) {
+          results.push({ name: student.real_name, success: false, error: err.message })
+        }
+      }
+      
+      const successCount = results.filter(r => r.success).length
+      const failCount = results.filter(r => !r.success).length
+      
+      let message = `批量创建完成！成功: ${successCount}`
+      if (failCount > 0) {
+        message += `，失败: ${failCount}`
+      }
+      
+      // 显示详细结果
+      const successList = results.filter(r => r.success).map(r => `${r.name}(${r.username})`).join('、')
+      if (successList) {
+        message += `\n\n成功创建: ${successList}\n初始密码: 123456`
+      }
+      
+      alert(message)
+      closeBatchCreateDialog()
+      await fetchStudents()
+    } catch (error: any) {
+      console.error('批量创建学生失败:', error)
+      alert('批量创建学生失败: ' + error.message)
+    } finally {
+      isBatchCreating.value = false
+    }
   }
   
   // 重置新学生表单
@@ -2053,6 +2236,11 @@ import PlanProgressSection from '@/components/teacher/PlanProgressSection.vue'
     color: #64748b;
     font-size: 16px;
     pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: 50%;
+    transform: translateY(-50%);
   }
 
   .btn-primary {
@@ -2497,6 +2685,8 @@ import PlanProgressSection from '@/components/teacher/PlanProgressSection.vue'
     display: flex;
     align-items: center;
     justify-content: center;
+    color: #0ea5e9;
+    flex-shrink: 0;
     background: linear-gradient(135deg, rgba(30, 144, 255, 0.1) 0%, rgba(135, 206, 235, 0.05) 100%);
     border-radius: 12px;
   }
@@ -2524,6 +2714,26 @@ import PlanProgressSection from '@/components/teacher/PlanProgressSection.vue'
     justify-content: flex-end;
     padding-top: 20px;
     border-top: 1px solid #e2e8f0;
+  }
+
+  .btn-warning {
+    background: #f59e0b;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-warning:hover {
+    background: #d97706;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
   }
 
   .btn-danger {
@@ -3259,10 +3469,18 @@ import PlanProgressSection from '@/components/teacher/PlanProgressSection.vue'
   .correctness {
     font-weight: 600;
     font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
   }
 
   .correctness.wrong {
     color: #dc2626;
+  }
+
+  .correctness :deep(.lucide-icon) {
+    flex-shrink: 0;
+    color: inherit;
   }
 
   .explanation-section {
@@ -3285,6 +3503,89 @@ import PlanProgressSection from '@/components/teacher/PlanProgressSection.vue'
     color: #0c4a6e;
   }
 
+  /* 批量导入学生样式 */
+  .batch-info {
+    background: #f0f9ff;
+    border: 1px solid #bae6fd;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+  }
+
+  .batch-info p {
+    margin: 0;
+    color: #0369a1;
+    font-size: 14px;
+  }
+
+  .batch-students-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-height: 400px;
+    overflow-y: auto;
+    margin-bottom: 16px;
+  }
+
+  .batch-student-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .batch-input {
+    flex: 1;
+    padding: 12px 16px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+  }
+
+  .batch-input:focus {
+    outline: none;
+    border-color: #1e90ff;
+    box-shadow: 0 0 0 3px rgba(30, 144, 255, 0.1);
+  }
+
+  .btn-remove {
+    background: #fee2e2;
+    color: #dc2626;
+    border: none;
+    padding: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .btn-remove:hover {
+    background: #fecaca;
+  }
+
+  .btn-add-student {
+    background: #f0f9ff;
+    color: #0369a1;
+    border: 1px dashed #bae6fd;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    margin-bottom: 24px;
+  }
+
+  .btn-add-student:hover {
+    background: #e0f2fe;
+    border-color: #7dd3fc;
+  }
 
   /* 响应式设计 */
   @media (max-width: 768px) {

@@ -1,6 +1,6 @@
 <template>
   <section class="content-section learning-plan-section">
-    <LeaningPlanManagement />
+    <LeaningPlanManagement mode="teacher" />
   </section>
 </template>
 

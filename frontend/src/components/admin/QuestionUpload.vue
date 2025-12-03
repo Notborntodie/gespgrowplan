@@ -9,12 +9,12 @@
       <div class="upload-card elevate-card">
         <div class="card-header" @click="openSingleUploadDialog">
           <div class="card-title">
-            <div class="card-icon">📝</div>
+            <Icon name="file-text" :size="32" class="card-icon" />
             <h3>单个题目上传</h3>
           </div>
           <div class="card-actions">
             <button class="btn-icon" title="打开">
-              ➕
+              <Icon name="plus" :size="20" />
             </button>
           </div>
         </div>
@@ -39,12 +39,12 @@
       <div class="upload-card elevate-card">
         <div class="card-header" @click="openAIUploadDialog">
           <div class="card-title">
-            <div class="card-icon">🤖</div>
+            <Icon name="bot" :size="32" class="card-icon" />
             <h3>AI上传题目</h3>
           </div>
           <div class="card-actions">
             <button class="btn-icon" title="打开">
-              ➕
+              <Icon name="plus" :size="20" />
             </button>
           </div>
         </div>
@@ -80,6 +80,7 @@ import { ref, onMounted } from 'vue'
 import SingleUploadDialog from './Dialog/SingleUploadDialog.vue'
 import BatchUploadDialog from './Dialog/BatchUploadDialog.vue'
 import AIUploadDialog from './Dialog/AIUploadDialog.vue'
+import Icon from '@/components/Icon.vue'
 
 // 弹窗状态管理
 const showSingleUploadDialog = ref(false)
@@ -238,6 +239,11 @@ function closeAIUploadDialog() {
 
 .card-icon {
   font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #0ea5e9;
+  flex-shrink: 0;
 }
 
 .card-title h3 {

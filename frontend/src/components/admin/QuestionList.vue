@@ -5,15 +5,15 @@
       <div class="header-info">
         <span class="question-count">共 {{ questions.length }} 道题目</span>
         <span v-if="questionStore.isCacheValid && questionStore.hasQuestions" class="cache-indicator">
-          📦 使用缓存数据
+          <Icon name="package" :size="16" /> 使用缓存数据
         </span>
       </div>
       <div class="action-buttons">
         <button @click="openCreateExamDialog" class="btn btn-primary">
-          <span class="btn-icon">+</span> 创建考试
+          <Icon name="plus" :size="18" /> 创建考试
         </button>
         <button @click="refreshQuestions" class="btn btn-secondary" title="刷新题目列表">
-          <span class="btn-icon">↻</span> 刷新
+          <Icon name="refresh-cw" :size="18" /> 刷新
         </button>
       </div>
     </div>
@@ -149,13 +149,13 @@
             <td @click.stop>
               <div class="action-buttons">
                 <button @click="viewQuestionDetails(q.id)" class="btn-action btn-view" title="查看详情">
-                  <span class="action-icon">👀</span>
+                  <Icon name="eye" :size="18" />
               </button>
                 <button @click="openEditDialog(q)" class="btn-action btn-edit" title="编辑">
-                  <span class="action-icon">📝</span>
+                  <Icon name="edit" :size="18" />
                 </button>
                 <button @click="deleteQuestion(q.id)" class="btn-action btn-delete" title="删除">
-                  <span class="action-icon">🗑</span>
+                  <Icon name="trash-2" :size="18" />
               </button>
             </div>
             </td>
@@ -351,6 +351,7 @@ import SuccessMessageDialog from './Dialog/SuccessMessageDialog.vue'
 import CreateExamDialog from './Dialog/CreateExamDialog.vue'
 import BatchEditDialog from './Dialog/BatchEditDialog.vue'
 import { useQuestionStore } from '../../stores/questionStore'
+import Icon from '@/components/Icon.vue'
 
 // Props 定义
 interface Props {
@@ -1166,6 +1167,10 @@ onMounted(async () => {
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
   font-size: 14px;
 }
 
@@ -1540,6 +1545,14 @@ onMounted(async () => {
 
 .action-icon {
   font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-action :deep(.lucide-icon) {
+  flex-shrink: 0;
+  color: inherit;
 }
 
 /* 图片模态框样式 */

@@ -2,14 +2,14 @@
   <div v-if="visible" class="dialog-overlay" @click="handleOverlayClick">
     <div class="dialog-container" @click.stop>
       <div class="dialog-header">
-        <div class="dialog-icon">🎯</div>
+        <Icon name="target" :size="32" class="dialog-icon" />
         <h3 class="dialog-title">{{ title }}</h3>
       </div>
       <div class="dialog-content">
         <p>{{ message }}</p>
         <div class="practice-info">
           <div class="info-item">
-            <span class="info-icon">📚</span>
+            <Icon name="book-open" :size="18" class="info-icon" />
             <span class="info-text">题目数量：{{ questionCount }}</span>
           </div>
         </div>
@@ -23,14 +23,14 @@
               :class="{ 'selected': selectedMode === 'review' }"
               @click="selectMode('review')"
             >
-              <div class="mode-icon">📚</div>
+              <Icon name="book-open" :size="36" class="mode-icon" />
               <div class="mode-content">
                 <h5 class="mode-name">复习模式</h5>
                 <p class="mode-description">学习模式，实时查看答案解析</p>
                 <ul class="mode-features">
-                  <li>✓ 随时查看解析</li>
+                  <li><Icon name="check" :size="14" /> 随时查看解析</li>
               
-                  <li>✓ 自由跳转题目</li>
+                  <li><Icon name="check" :size="14" /> 自由跳转题目</li>
                  
                 </ul>
               </div>
@@ -41,15 +41,15 @@
               :class="{ 'selected': selectedMode === 'exam' }"
               @click="selectMode('exam')"
             >
-              <div class="mode-icon">📝</div>
+              <Icon name="file-text" :size="36" class="mode-icon" />
               <div class="mode-content">
                 <h5 class="mode-name">考试模式</h5>
                 <p class="mode-description">模拟真实考试，计时答题</p>
                 <ul class="mode-features">
-                  <li>✓ 计时答题</li>
-                  <li>✓ 提交评分</li>
-                  <li>✓ 成绩统计</li>
-                  <li>✗ 无答案解析</li>
+                  <li><Icon name="check" :size="14" /> 计时答题</li>
+                  <li><Icon name="check" :size="14" /> 提交评分</li>
+                  <li><Icon name="check" :size="14" /> 成绩统计</li>
+                  <li><Icon name="x" :size="14" /> 无答案解析</li>
                 </ul>
               </div>
             </div>
@@ -59,15 +59,15 @@
               :class="{ 'selected': selectedMode === 'classroom' }"
               @click="selectMode('classroom')"
             >
-              <div class="mode-icon">🏫</div>
+              <Icon name="school" :size="36" class="mode-icon" />
               <div class="mode-content">
                 <h5 class="mode-name">课堂模式</h5>
                 <p class="mode-description">适合课堂教学使用</p>
                 <ul class="mode-features">
-                  <li>✓ 无解析干扰</li>
-                  <li>✓ 专注答题</li>
-                  <li>✓ 课堂氛围</li>
-                  <li>✗ 不能提交</li>
+                  <li><Icon name="check" :size="14" /> 无解析干扰</li>
+                  <li><Icon name="check" :size="14" /> 专注答题</li>
+                  <li><Icon name="check" :size="14" /> 课堂氛围</li>
+                  <li><Icon name="x" :size="14" /> 不能提交</li>
                 </ul>
               </div>
             </div>
@@ -88,6 +88,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import Icon from '@/components/Icon.vue'
 
 const props = defineProps<{
   visible: boolean
@@ -194,6 +195,9 @@ function handleOverlayClick() {
 .dialog-icon {
   font-size: 32px;
   animation: pulse 2s infinite;
+  display: flex;
+  align-items: center;
+  color: #0ea5e9;
 }
 
 @keyframes pulse {
@@ -246,6 +250,10 @@ function handleOverlayClick() {
 
 .info-icon {
   font-size: 18px;
+  display: flex;
+  align-items: center;
+  color: #0ea5e9;
+  flex-shrink: 0;
 }
 
 .info-text {
@@ -313,6 +321,9 @@ function handleOverlayClick() {
   color: #0ea5e9;
   margin-bottom: 14px;
   filter: drop-shadow(0 2px 4px rgba(14, 165, 233, 0.2));
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .mode-content {
@@ -347,11 +358,16 @@ function handleOverlayClick() {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 6px;
   color: #495057;
   font-size: 12px;
   margin-bottom: 3px;
   text-align: center;
+}
+
+.mode-features li :deep(.lucide-icon) {
+  flex-shrink: 0;
+  color: inherit;
 }
 
 .mode-features li:last-child {

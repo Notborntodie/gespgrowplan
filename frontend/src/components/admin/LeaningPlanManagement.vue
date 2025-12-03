@@ -2,7 +2,7 @@
     <div class="plan-management">
       <div class="section-header">
         <h2>学习计划管理</h2>
-        <button @click="showCreateDialog = true" class="btn btn-primary">
+        <button v-if="mode === 'admin'" @click="showCreateDialog = true" class="btn btn-primary">
           <i class="fas fa-plus"></i> 创建新计划
         </button>
       </div>
@@ -75,18 +75,30 @@
               </td>
               <td>
                 <div class="action-buttons">
-                  <button @click="viewPlan(plan.id)" class="btn-action btn-view" title="查看详情">
-                    <span class="action-icon">👀</span>
-                  </button>
-                  <button @click="editPlan(plan.id)" class="btn-action btn-edit" title="编辑">
-                    <i class="fas fa-edit"></i>
-                  </button>
-                  <button @click="togglePlanStatus(plan)" class="btn-action btn-toggle" :title="plan.is_active ? '停用' : '激活'">
-                    <i :class="plan.is_active ? 'fas fa-toggle-on' : 'fas fa-toggle-off'"></i>
-                  </button>
-                  <button @click="deletePlan(plan.id)" class="btn-action btn-delete" title="删除">
-                    <i class="fas fa-trash"></i>
-                  </button>
+                  <!-- 管理后台模式：显示所有操作按钮 -->
+                  <template v-if="mode === 'admin'">
+                    <button @click="viewPlan(plan.id)" class="btn-action btn-view" title="查看详情">
+                      <Icon name="eye" :size="18" />
+                    </button>
+                    <button @click="editPlan(plan.id)" class="btn-action btn-edit" title="编辑">
+                      <Icon name="edit" :size="18" />
+                    </button>
+                    <button @click="togglePlanStatus(plan)" class="btn-action btn-toggle" :title="plan.is_active ? '停用' : '激活'">
+                      <Icon :name="plan.is_active ? 'toggle-right' : 'toggle-left'" :size="18" />
+                    </button>
+                    <button @click="copyPlan(plan)" class="btn-action btn-copy" title="复制">
+                      <Icon name="copy" :size="18" />
+                    </button>
+                    <button @click="deletePlan(plan.id)" class="btn-action btn-delete" title="删除">
+                      <Icon name="trash-2" :size="18" />
+                    </button>
+                  </template>
+                  <!-- 教师模式：只显示添加学生按钮 -->
+                  <template v-else>
+                    <button @click="openAddStudentsDialog(plan)" class="btn-action btn-add-students" title="添加学生">
+                      <Icon name="user-plus" :size="18" />
+                    </button>
+                  </template>
                 </div>
               </td>
             </tr>
@@ -94,7 +106,7 @@
         </table>
   
         <div v-else class="empty-state">
-          <i class="fas fa-inbox"></i>
+          <Icon name="inbox" :size="64" class="empty-icon" />
           <p>暂无学习计划</p>
         </div>
       </div>
@@ -113,16 +125,71 @@
         :plan-id="viewingPlanId"
         @close="showDetailDialog = false; viewingPlanId = null"
       />
+
+      <!-- 添加学生对话框 -->
+      <div v-if="showAddStudentsDialog" class="dialog-overlay" @click="showAddStudentsDialog = false">
+        <div class="dialog add-students-dialog" @click.stop>
+          <div class="dialog-header">
+            <h3>添加学生到计划: {{ selectedPlanForStudents?.name }}</h3>
+            <button @click="showAddStudentsDialog = false" class="btn-close">&times;</button>
+          </div>
+          <div class="dialog-body">
+            <div v-if="loadingStudents" class="loading-state">
+              <i class="fas fa-spinner fa-spin"></i>
+              <p>加载学生列表...</p>
+            </div>
+            <div v-else-if="teacherStudents.length === 0" class="empty-state">
+              <p>暂无绑定的学生</p>
+            </div>
+            <div v-else class="students-list">
+              <div class="select-all">
+                <label>
+                  <input type="checkbox" v-model="selectAllStudents" @change="toggleSelectAll" />
+                  全选
+                </label>
+              </div>
+              <div class="student-item" v-for="student in teacherStudents" :key="student.id">
+                <label>
+                  <input type="checkbox" v-model="selectedStudentIds" :value="student.id" />
+                  {{ student.real_name || student.username }} ({{ student.username }})
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="dialog-footer">
+            <button @click="showAddStudentsDialog = false" class="btn btn-secondary">取消</button>
+            <button @click="addStudentsToPlan" class="btn btn-primary" :disabled="selectedStudentIds.length === 0 || addingStudents">
+              {{ addingStudents ? '添加中...' : `添加 (${selectedStudentIds.length})` }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 成功消息弹窗 -->
+      <SuccessMessageDialog 
+        :visible="showSuccessDialog" 
+        :message="successMessage"
+        @close="showSuccessDialog = false"
+      />
     </div>
   </template>
   
   <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import axios from 'axios'
 import CreatePlanDialog from './Dialog/CreatePlanDialog.vue'
 import PlanDetailDialog from './Dialog/PlanDetailDialog.vue'
+import SuccessMessageDialog from './Dialog/SuccessMessageDialog.vue'
+import Icon from '@/components/Icon.vue'
 
 import { BASE_URL } from '@/config/api'
+
+// Props
+const props = withDefaults(defineProps<{
+  mode?: 'admin' | 'teacher'
+}>(), {
+  mode: 'admin'
+})
 
 const selectedLevel = ref('')
 const selectedStatus = ref('1') // 默认显示激活的计划
@@ -134,8 +201,29 @@ const showDetailDialog = ref(false)
 const editingPlan = ref<any>(null)
 const viewingPlanId = ref<number | null>(null)
 
+// 教师模式：添加学生相关
+const showAddStudentsDialog = ref(false)
+const selectedPlanForStudents = ref<any>(null)
+const teacherStudents = ref<any[]>([])
+const selectedStudentIds = ref<number[]>([])
+const loadingStudents = ref(false)
+const addingStudents = ref(false)
+const selectAllStudents = computed({
+  get: () => selectedStudentIds.value.length === teacherStudents.value.length && teacherStudents.value.length > 0,
+  set: () => {}
+})
+
 // 获取用户信息
 const userInfo = ref<any>(null)
+
+// 成功消息弹窗
+const showSuccessDialog = ref(false)
+const successMessage = ref('')
+
+const showSuccess = (message: string) => {
+  successMessage.value = message
+  showSuccessDialog.value = true
+}
 
 // 获取计划列表
 async function fetchPlans() {
@@ -225,10 +313,12 @@ async function editPlan(id: number) {
           name: task.name,
           description: task.description,
           review_content: task.review_content,
+          review_content_type: task.review_content_type || 'text',
           review_video_url: task.review_video_url,
           start_time: task.start_time,
           end_time: task.end_time,
           task_order: task.task_order,
+          is_exam_mode: task.is_exam_mode || false,
           // 保留试卷的所有详细信息
           exams: (task.exams || []).map((exam: any) => ({
             exam_id: exam.exam_id,
@@ -284,6 +374,25 @@ async function togglePlanStatus(plan: any) {
   }
 }
 
+// 复制计划
+async function copyPlan(plan: any) {
+  const newName = prompt('请输入新计划名称（留空则自动添加"(副本)"后缀）：', `${plan.name}(副本)`)
+  if (newName === null) return // 用户取消
+  
+  try {
+    const params: any = {}
+    if (newName.trim()) {
+      params.name = newName.trim()
+    }
+    await axios.post(`${BASE_URL}/learning-plans/${plan.id}/copy`, params)
+    alert('计划复制成功')
+    fetchPlans()
+  } catch (error: any) {
+    console.error('复制计划失败:', error)
+    alert('复制计划失败: ' + (error.response?.data?.error || error.message))
+  }
+}
+
 // 删除计划
 async function deletePlan(id: number) {
   if (!confirm('确定要删除这个学习计划吗？此操作不可恢复！')) {
@@ -311,6 +420,91 @@ function handleDialogClose() {
 function handleSuccess() {
   handleDialogClose()
   fetchPlans()
+}
+
+// 教师模式：打开添加学生弹窗
+async function openAddStudentsDialog(plan: any) {
+  selectedPlanForStudents.value = plan
+  selectedStudentIds.value = []
+  showAddStudentsDialog.value = true
+  
+  // 加载教师的学生列表
+  loadingStudents.value = true
+  try {
+    const teacherId = userInfo.value?.id
+    if (!teacherId) {
+      alert('无法获取教师信息')
+      return
+    }
+    const response = await axios.get(`${BASE_URL}/teacher/${teacherId}/students`)
+    // 处理不同的响应格式
+    let studentList = []
+    if (response.data.data?.students) {
+      studentList = response.data.data.students
+    } else if (response.data.students) {
+      studentList = response.data.students
+    } else if (Array.isArray(response.data.data)) {
+      studentList = response.data.data
+    } else if (Array.isArray(response.data)) {
+      studentList = response.data
+    }
+    teacherStudents.value = studentList
+  } catch (error: any) {
+    console.error('获取学生列表失败:', error)
+    alert('获取学生列表失败')
+  } finally {
+    loadingStudents.value = false
+  }
+}
+
+// 全选/取消全选
+function toggleSelectAll() {
+  if (selectedStudentIds.value.length === teacherStudents.value.length) {
+    selectedStudentIds.value = []
+  } else {
+    selectedStudentIds.value = teacherStudents.value.map((s: any) => s.id)
+  }
+}
+
+// 添加学生到计划
+async function addStudentsToPlan() {
+  if (selectedStudentIds.value.length === 0) return
+  
+  addingStudents.value = true
+  try {
+    const teacherId = userInfo.value?.id
+    const planId = selectedPlanForStudents.value?.id
+    
+    const response = await axios.post(`${BASE_URL}/teacher/${teacherId}/learning-plans/${planId}/add-students`, {
+      student_ids: selectedStudentIds.value
+    })
+    
+    if (response.data.success) {
+      const results = response.data.data?.results || response.data.results || []
+      const successCount = results.filter((r: any) => r.status === 'success').length
+      const alreadyJoinedCount = results.filter((r: any) => r.status === 'already_joined').length
+      
+      let message = ''
+      if (results.length > 0) {
+        message = `添加完成！成功添加: ${successCount} 个学生`
+        if (alreadyJoinedCount > 0) {
+          message += `，已在计划中: ${alreadyJoinedCount} 个`
+        }
+      } else {
+        message = `成功添加 ${selectedStudentIds.value.length} 个学生到计划`
+      }
+      showAddStudentsDialog.value = false
+      showSuccess(message)
+    } else if (response.data.message) {
+      showAddStudentsDialog.value = false
+      showSuccess(response.data.message)
+    }
+  } catch (error: any) {
+    console.error('添加学生失败:', error)
+    alert('添加学生失败: ' + (error.response?.data?.error || error.message))
+  } finally {
+    addingStudents.value = false
+  }
 }
 
 onMounted(() => {
@@ -495,6 +689,10 @@ onMounted(() => {
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
     font-size: 14px;
   }
   
@@ -525,6 +723,16 @@ onMounted(() => {
   
   .btn-toggle:hover {
     background: #7c3aed;
+    transform: translateY(-1px);
+  }
+
+  .btn-copy {
+    background: #10b981;
+    color: white;
+  }
+  
+  .btn-copy:hover {
+    background: #059669;
     transform: translateY(-1px);
   }
 
@@ -599,6 +807,118 @@ onMounted(() => {
   .empty-state p {
     font-size: 18px;
     font-weight: 500;
+  }
+
+  .btn-add-students {
+    background: #6366f1;
+    color: white;
+  }
+  
+  .btn-add-students:hover {
+    background: #4f46e5;
+    transform: translateY(-1px);
+  }
+
+  /* 添加学生弹窗样式 */
+  .dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+
+  .dialog {
+    background: white;
+    border-radius: 12px;
+    width: 500px;
+    max-width: 90vw;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .dialog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .dialog-header h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #1e293b;
+  }
+
+  .btn-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #64748b;
+  }
+
+  .dialog-body {
+    padding: 20px;
+    overflow-y: auto;
+    flex: 1;
+  }
+
+  .dialog-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 16px 20px;
+    border-top: 1px solid #e2e8f0;
+  }
+
+  .btn-secondary {
+    background: #e2e8f0;
+    color: #1e293b;
+  }
+
+  .btn-secondary:hover {
+    background: #cbd5e1;
+  }
+
+  .students-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .select-all {
+    padding: 8px 12px;
+    background: #f1f5f9;
+    border-radius: 8px;
+    margin-bottom: 8px;
+  }
+
+  .student-item {
+    padding: 8px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+  }
+
+  .student-item label,
+  .select-all label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+  }
+
+  .student-item input[type="checkbox"],
+  .select-all input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
   }
   </style>
   

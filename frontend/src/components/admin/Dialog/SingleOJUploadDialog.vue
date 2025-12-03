@@ -46,7 +46,12 @@
               <label>数据范围：</label>
               <textarea v-model="problem.data_range" placeholder="如：2 ≤ n ≤ 1000" rows="3"></textarea>
             </div>
-  
+
+            <div class="form-group">
+              <label>视频讲解链接：</label>
+              <input v-model="problem.video_url" placeholder="如：https://example.com/video.mp4" />
+            </div>
+
             <!-- 限制条件 -->
             <div class="form-row">
               <div class="form-group">
@@ -151,6 +156,7 @@
     input_format: '',
     output_format: '',
     data_range: '',
+    video_url: '',
     time_limit: 1000,
     memory_limit: 256,
     level: '3',
@@ -226,6 +232,7 @@
       input_format: '',
       output_format: '',
       data_range: '',
+      video_url: '',
       time_limit: 1000,
       memory_limit: 256,
       level: '3',
