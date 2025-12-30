@@ -255,7 +255,7 @@ PDF文本：
                                 yield question_obj
                                 break
                         except json.JSONDecodeError:
-                            continue
+                        continue
     
     async def parse_streaming_json_async(self, stream_generator: AsyncGenerator[str, None]) -> AsyncGenerator[Dict[str, Any], None]:
         """异步解析流式JSON响应，使用分割符实时提取完整题目"""
@@ -311,7 +311,7 @@ PDF文本：
                                 yield question_obj
                                 break
                         except json.JSONDecodeError:
-                            continue
+                        continue
     
     def is_valid_question(self, obj: Dict[str, Any]) -> bool:
         """检查是否是有效的题目对象"""
@@ -577,7 +577,7 @@ PDF文本：
                     "expected": expected_questions,
                     "actual": total_questions,
                     "missing": missing_count
-                }
+            }
             
             # 发送处理完成消息
             complete_message = f"🎉 处理完成！总共提取到 {total_questions} 个题目"
@@ -670,7 +670,7 @@ PDF文本：
                     "expected": expected_questions,
                     "actual": total_questions,
                     "missing": missing_count
-                }
+            }
             
             # 发送处理完成消息
             complete_message = f"🎉 处理完成！总共提取到 {total_questions} 个题目"
