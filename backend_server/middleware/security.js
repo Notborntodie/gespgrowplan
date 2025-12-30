@@ -36,10 +36,26 @@ const securityMiddleware = {
   
   // CORS 配置
   cors: (req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-    res.header('Access-Control-Allow-Credentials', true);
+    // 允许所有来源的跨域请求
+    const origin = req.get('Origin');
+    
+    // 如果请求有Origin头，则设置为该Origin；否则允许所有来源
+    if (origin) {
+      res.header('Access-Control-Allow-Origin', origin);
+    } else {
+      res.header('Access-Control-Allow-Origin', '*');
+    }
+    
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, X-Requested-With');
+    
+    // 注意：当使用通配符 '*' 时，不能设置 credentials 为 true
+    // 如果请求有Origin，可以设置credentials；否则不设置
+    if (origin) {
+      res.header('Access-Control-Allow-Credentials', 'true');
+    }
+    
+    res.header('Access-Control-Max-Age', '86400'); // 24小时
     
     if (req.method === 'OPTIONS') {
       res.sendStatus(200);
@@ -174,11 +190,9 @@ const securityMiddleware = {
   
   // 请求来源验证
   originValidation: (req, res, next) => {
-    const allowedOrigins = [
-      'http://localhost:3000',
-      'http://localhost:5173',
-      'https://yourdomain.com'
-    ];
+    // 从环境变量读取允许的来源，支持逗号分隔的多个来源
+    const allowedOriginsEnv = process.env.ALLOWED_ORIGINS || 'http://localhost:3000,http://localhost:5173';
+    const allowedOrigins = allowedOriginsEnv.split(',').map(origin => origin.trim()).filter(origin => origin);
     
     const origin = req.get('Origin');
     
@@ -193,4 +207,5 @@ const securityMiddleware = {
 };
 
 module.exports = securityMiddleware;
+
 

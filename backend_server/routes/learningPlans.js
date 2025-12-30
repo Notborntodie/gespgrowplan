@@ -5,6 +5,7 @@ const path = require('path');
 const fs = require('fs');
 const { pool } = require('../config/database');
 const { logger } = require('../config/logger');
+const { cacheUtils } = require('../config/cache');
 const { submitExamInternal } = require('./submissions');
 const { submitOjInternal } = require('./oj');
 
@@ -13,6 +14,8 @@ const reviewUploadDir = 'uploads/review/';
 if (!fs.existsSync(reviewUploadDir)) {
   fs.mkdirSync(reviewUploadDir, { recursive: true });
 }
+
+
 
 const reviewStorage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -756,6 +759,11 @@ router.post('/learning-tasks/:taskId/complete', async (req, res) => {
           updated_at = NOW()
       `, [user_id, taskId]);
       
+      const plan_id = taskRows[0].plan_id;
+      
+      // 异步更新计划完成状态并清除缓存
+      await updatePlanCompletionStatus(connection, user_id, plan_id);
+      
       await connection.commit();
       connection.release();
       
@@ -1239,6 +1247,9 @@ router.put('/learning-plans/:planId', async (req, res) => {
       await connection.commit();
       connection.release();
       
+      // 清除该计划的排名缓存（因为计划内容已更新）
+      await clearPlanRankingCache(planId);
+      
       res.json({
         success: true,
         message: '学习计划更新成功',
@@ -1574,8 +1585,12 @@ async function updateTaskCompletionStatus(connection, user_id, task_id) {
     logger.info(`任务完成状态检查 - 无OJ题`, { user_id, task_id });
   }
   
-  // 5. 如果都完成了，更新任务完成状态
-  const isTaskCompleted = allExamsCompleted && allOjsCompleted;
+  // 5. 如果任务内没有客观题和OJ题，任务不应该被标记为已完成
+  const hasExams = taskExams.length > 0;
+  const hasOjs = taskOjs.length > 0;
+  
+  // 只有当任务至少有一种题目类型，且所有题目都完成时，任务才算完成
+  const isTaskCompleted = (hasExams || hasOjs) && allExamsCompleted && allOjsCompleted;
   
   if (isTaskCompleted) {
     await connection.execute(`
@@ -1594,6 +1609,20 @@ async function updateTaskCompletionStatus(connection, user_id, task_id) {
       allExamsCompleted,
       allOjsCompleted
     });
+  }
+}
+
+// ==================== 辅助函数：清除计划排名缓存 ====================
+async function clearPlanRankingCache(plan_id) {
+  try {
+    const cacheKey = `cache:learning-plan:global-ranking:${plan_id}`;
+    const classRankingCacheKey = `cache:learning-plan:class-ranking:${plan_id}`;
+    await cacheUtils.del(cacheKey);
+    await cacheUtils.del(classRankingCacheKey);
+    logger.info(`已清除计划排名缓存: planId=${plan_id}`);
+  } catch (error) {
+    logger.error('清除计划排名缓存失败:', error.message);
+    // 缓存清除失败不影响主流程
   }
 }
 
@@ -1640,6 +1669,9 @@ async function updatePlanCompletionStatus(connection, user_id, plan_id) {
     isPlanCompleted ? 1 : 0, completedCount, totalCount,
     isPlanCompleted ? 1 : 0
   ]);
+  
+  // 4. 清除排名缓存（因为排名数据已更新）
+  await clearPlanRankingCache(plan_id);
 }
 
 // ==================== 13. 获取计划完成情况 ====================
@@ -2466,6 +2498,726 @@ router.get('/learning-plans/:planId/students/:studentId/progress', async (req, r
     res.status(500).json({ 
       success: false,
       error: '获取学生详细完成情况失败',
+      message: error.message 
+    });
+  }
+});
+
+// ==================== 18. 学生查看班级排名 ====================
+router.get('/learning-plans/:planId/class-ranking', async (req, res) => {
+  try {
+    const { planId } = req.params;
+    const { user_id } = req.query;
+    
+    // 验证必需参数
+    if (!user_id) {
+      return res.status(400).json({ 
+        success: false,
+        error: '缺少必需参数: user_id'
+      });
+    }
+    
+    const connection = await pool.getConnection();
+    
+    try {
+      // 1. 验证计划是否存在
+      const [planRows] = await connection.execute(
+        'SELECT * FROM learning_plans WHERE id = ?',
+        [planId]
+      );
+      
+      if (planRows.length === 0) {
+        connection.release();
+        return res.status(404).json({ 
+          success: false,
+          error: '学习计划不存在' 
+        });
+      }
+      
+      // 2. 验证学生是否存在
+      const [studentRows] = await connection.execute(
+        'SELECT id, username, real_name FROM users WHERE id = ?',
+        [user_id]
+      );
+      
+      if (studentRows.length === 0) {
+        connection.release();
+        return res.status(404).json({ 
+          success: false,
+          error: '学生不存在' 
+        });
+      }
+      
+      const currentStudent = studentRows[0];
+      
+      // 3. 找到该学生的老师
+      const [teacherRows] = await connection.execute(`
+        SELECT DISTINCT ts.teacher_id, u.username, u.real_name
+        FROM teacher_students ts
+        JOIN users u ON ts.teacher_id = u.id
+        WHERE ts.student_id = ?
+      `, [user_id]);
+      
+      if (teacherRows.length === 0) {
+        connection.release();
+        return res.status(404).json({ 
+          success: false,
+          error: '该学生未绑定任何老师' 
+        });
+      }
+      
+      // 如果学生有多个老师，取第一个（或者可以返回多个老师的数据，这里先取第一个）
+      const teacher = teacherRows[0];
+      const teacherId = teacher.teacher_id;
+      
+      // 4. 获取该老师的所有学生（包括当前学生）
+      const [allStudents] = await connection.execute(`
+        SELECT DISTINCT u.id, u.username, u.real_name
+        FROM users u
+        JOIN teacher_students ts ON u.id = ts.student_id
+        WHERE ts.teacher_id = ?
+      `, [teacherId]);
+      
+      if (allStudents.length === 0) {
+        connection.release();
+        return res.json({
+          success: true,
+          data: {
+            plan: planRows[0],
+            teacher: {
+              teacher_id: teacherId,
+              username: teacher.username,
+              real_name: teacher.real_name
+            },
+            students: [],
+            current_student_rank: null
+          }
+        });
+      }
+      
+      // 5. 获取计划的所有任务
+      const [tasks] = await connection.execute(
+        'SELECT id, name, task_order FROM learning_tasks WHERE plan_id = ? ORDER BY task_order',
+        [planId]
+      );
+      
+      const totalTasks = tasks.length;
+      
+      // 6. 为每个学生获取完成情况并计算排名
+      const studentsProgress = [];
+      
+      for (const student of allStudents) {
+        // 检查学生是否加入了该计划
+        const [joined] = await connection.execute(
+          'SELECT * FROM user_learning_plans WHERE user_id = ? AND plan_id = ?',
+          [student.id, planId]
+        );
+        
+        if (joined.length === 0) {
+          // 学生未加入该计划，跳过（或者可以标记为未加入）
+          continue;
+        }
+        
+        // 获取计划完成进度
+        const [planProgressRows] = await connection.execute(
+          'SELECT * FROM user_plan_progress WHERE user_id = ? AND plan_id = ?',
+          [student.id, planId]
+        );
+        
+        const planProgress = planProgressRows[0] || {
+          is_completed: false,
+          completed_tasks: 0,
+          total_tasks: totalTasks
+        };
+        
+        // 计算完成的任务数
+        let completedTasksCount = planProgress.completed_tasks || 0;
+        
+        // 如果进度表中没有数据，从任务进度表中统计
+        if (completedTasksCount === 0 && totalTasks > 0) {
+          const taskIds = tasks.map(t => t.id);
+          const placeholders = taskIds.map(() => '?').join(',');
+          const [completedTasksRows] = await connection.execute(
+            `SELECT COUNT(*) as count FROM user_task_progress 
+             WHERE user_id = ? AND task_id IN (${placeholders}) AND is_completed = 1`,
+            [student.id, ...taskIds]
+          );
+          completedTasksCount = completedTasksRows[0]?.count || 0;
+        }
+        
+        // 计算进度百分比
+        const progressRate = totalTasks > 0 
+          ? Math.round((completedTasksCount / totalTasks) * 100) 
+          : 0;
+        
+        // 获取计划完成时间（如果已完成）
+        const completedAt = planProgress.is_completed 
+          ? (planProgress.completed_at || null)
+          : null;
+        
+        studentsProgress.push({
+          student_id: student.id,
+          username: student.username,
+          real_name: student.real_name,
+          plan_progress: {
+            is_completed: planProgress.is_completed === 1 || planProgress.is_completed === true,
+            completed_tasks: completedTasksCount,
+            total_tasks: totalTasks,
+            progress_rate: progressRate,
+            completed_at: completedAt
+          }
+        });
+      }
+      
+      // 7. 按完成情况排序
+      // 排序规则：1. 已完成优先 2. 完成的任务数多的优先 3. 完成时间早的优先（如果都完成了）
+      studentsProgress.sort((a, b) => {
+        // 已完成优先
+        if (a.plan_progress.is_completed && !b.plan_progress.is_completed) return -1;
+        if (!a.plan_progress.is_completed && b.plan_progress.is_completed) return 1;
+        
+        // 如果都已完成，按完成时间排序（早完成的排名靠前）
+        if (a.plan_progress.is_completed && b.plan_progress.is_completed) {
+          const timeA = a.plan_progress.completed_at ? new Date(a.plan_progress.completed_at).getTime() : 0;
+          const timeB = b.plan_progress.completed_at ? new Date(b.plan_progress.completed_at).getTime() : 0;
+          return timeA - timeB;
+        }
+        
+        // 都未完成，按完成的任务数和进度百分比排序
+        if (a.plan_progress.completed_tasks !== b.plan_progress.completed_tasks) {
+          return b.plan_progress.completed_tasks - a.plan_progress.completed_tasks;
+        }
+        
+        return b.plan_progress.progress_rate - a.plan_progress.progress_rate;
+      });
+      
+      // 8. 添加排名并找到当前学生的排名
+      let currentStudentRank = null;
+      studentsProgress.forEach((student, index) => {
+        student.rank = index + 1;
+        if (student.student_id === parseInt(user_id)) {
+          currentStudentRank = index + 1;
+        }
+      });
+      
+      connection.release();
+      
+      res.json({
+        success: true,
+        data: {
+          plan: planRows[0],
+          teacher: {
+            teacher_id: teacherId,
+            username: teacher.username,
+            real_name: teacher.real_name
+          },
+          current_student: {
+            student_id: currentStudent.id,
+            username: currentStudent.username,
+            real_name: currentStudent.real_name,
+            rank: currentStudentRank,
+            total_students: studentsProgress.length
+          },
+          students: studentsProgress
+        }
+      });
+      
+    } catch (error) {
+      connection.release();
+      throw error;
+    }
+    
+  } catch (error) {
+    logger.error('获取班级排名失败:', error);
+    res.status(500).json({ 
+      success: false,
+      error: '获取班级排名失败',
+      message: error.message 
+    });
+  }
+});
+
+// ==================== 19. 学生查看全局排名 ====================
+router.get('/learning-plans/:planId/global-ranking', async (req, res) => {
+  try {
+    const { planId } = req.params;
+    const { user_id } = req.query;
+    
+    // 验证必需参数
+    if (!user_id) {
+      return res.status(400).json({ 
+        success: false,
+        error: '缺少必需参数: user_id'
+      });
+    }
+    
+    // Redis 缓存键：基于计划ID（排名列表对所有用户都一样，只需要基于planId）
+    const cacheKey = `cache:learning-plan:global-ranking:${planId}`;
+    const cacheDuration = 600; // 缓存600秒（10分钟，减少数据库查询压力）
+    
+    // 尝试从缓存获取排名列表
+    try {
+      const cached = await cacheUtils.get(cacheKey);
+      if (cached && cached.students && cached.plan) {
+        logger.info(`全局排名缓存命中: planId=${planId}`);
+        
+        // 从缓存中找到当前学生的排名信息和教师信息
+        let currentStudentRank = null;
+        let currentStudentTeachers = [];
+        const studentsProgress = cached.students || [];
+        
+        studentsProgress.forEach((student, index) => {
+          if (student.student_id === parseInt(user_id)) {
+            currentStudentRank = index + 1;
+            currentStudentTeachers = student.teachers || [];
+          }
+        });
+        
+        // 获取当前学生的基本信息
+        const connection = await pool.getConnection();
+        let currentStudent = null;
+        try {
+          const [studentRows] = await connection.execute(
+            'SELECT id, username, real_name FROM users WHERE id = ?',
+            [user_id]
+          );
+          if (studentRows.length > 0) {
+            currentStudent = studentRows[0];
+          }
+        } catch (error) {
+          logger.error('查询当前学生信息失败:', error);
+        } finally {
+          connection.release();
+        }
+        
+        // 如果当前学生不在列表中，需要单独查询其教师信息（这种情况较少）
+        if (currentStudentRank === null && currentStudent) {
+          const connection2 = await pool.getConnection();
+          try {
+            const [teacherRows] = await connection2.execute(`
+              SELECT DISTINCT u.id as teacher_id, u.username, u.real_name
+              FROM users u
+              JOIN teacher_students ts ON u.id = ts.teacher_id
+              WHERE ts.student_id = ?
+            `, [user_id]);
+            currentStudentTeachers = teacherRows.map(teacher => ({
+              teacher_id: teacher.teacher_id,
+              username: teacher.username,
+              real_name: teacher.real_name
+            }));
+          } catch (error) {
+            logger.error('查询当前学生教师信息失败:', error);
+          } finally {
+            connection2.release();
+          }
+        }
+        
+        if (!currentStudent) {
+          return res.status(404).json({ 
+            success: false,
+            error: '学生不存在' 
+          });
+        }
+        
+        return res.json({
+          success: true,
+          data: {
+            plan: cached.plan,
+            current_student: {
+              student_id: currentStudent.id,
+              username: currentStudent.username,
+              real_name: currentStudent.real_name,
+              rank: currentStudentRank,
+              total_students: studentsProgress.length,
+              teachers: currentStudentTeachers
+            },
+            students: studentsProgress
+          }
+        });
+      }
+    } catch (cacheError) {
+      logger.warn('读取缓存失败，继续查询数据库:', cacheError.message);
+      // 缓存读取失败时继续执行数据库查询
+    }
+    
+    const connection = await pool.getConnection();
+    
+    try {
+      // 1. 验证计划是否存在
+      const [planRows] = await connection.execute(
+        'SELECT * FROM learning_plans WHERE id = ?',
+        [planId]
+      );
+      
+      if (planRows.length === 0) {
+        connection.release();
+        return res.status(404).json({ 
+          success: false,
+          error: '学习计划不存在' 
+        });
+      }
+      
+      // 2. 验证学生是否存在
+      const [studentRows] = await connection.execute(
+        'SELECT id, username, real_name FROM users WHERE id = ?',
+        [user_id]
+      );
+      
+      if (studentRows.length === 0) {
+        connection.release();
+        return res.status(404).json({ 
+          success: false,
+          error: '学生不存在' 
+        });
+      }
+      
+      const currentStudent = studentRows[0];
+      
+      // 3. 获取该计划内所有加入的学生
+      const [allStudents] = await connection.execute(`
+        SELECT DISTINCT u.id, u.username, u.real_name
+        FROM users u
+        JOIN user_learning_plans ulp ON u.id = ulp.user_id
+        WHERE ulp.plan_id = ?
+      `, [planId]);
+      
+      if (allStudents.length === 0) {
+        // 获取当前学生的教师信息
+        const [teacherRows] = await connection.execute(`
+          SELECT DISTINCT u.id as teacher_id, u.username, u.real_name
+          FROM users u
+          JOIN teacher_students ts ON u.id = ts.teacher_id
+          WHERE ts.student_id = ?
+        `, [user_id]);
+        const currentStudentTeachers = teacherRows.map(teacher => ({
+          teacher_id: teacher.teacher_id,
+          username: teacher.username,
+          real_name: teacher.real_name
+        }));
+        
+        connection.release();
+        return res.json({
+          success: true,
+          data: {
+            plan: planRows[0],
+            current_student: {
+              student_id: currentStudent.id,
+              username: currentStudent.username,
+              real_name: currentStudent.real_name,
+              rank: null,
+              total_students: 0,
+              teachers: currentStudentTeachers
+            },
+            students: []
+          }
+        });
+      }
+      
+      // 4. 获取计划的所有任务
+      const [tasks] = await connection.execute(
+        'SELECT id, name, task_order FROM learning_tasks WHERE plan_id = ? ORDER BY task_order',
+        [planId]
+      );
+      
+      const totalTasks = tasks.length;
+      
+      // 5. 为每个学生获取完成情况并计算排名
+      const studentsProgress = [];
+      
+      for (const student of allStudents) {
+        // 获取计划完成进度
+        const [planProgressRows] = await connection.execute(
+          'SELECT * FROM user_plan_progress WHERE user_id = ? AND plan_id = ?',
+          [student.id, planId]
+        );
+        
+        const planProgress = planProgressRows[0] || {
+          is_completed: false,
+          completed_tasks: 0,
+          total_tasks: totalTasks
+        };
+        
+        // 计算完成的任务数（整数，用于兼容性）
+        let completedTasksCount = planProgress.completed_tasks || 0;
+        
+        // 如果进度表中没有数据，从任务进度表中统计
+        if (completedTasksCount === 0 && totalTasks > 0) {
+          const taskIds = tasks.map(t => t.id);
+          const placeholders = taskIds.map(() => '?').join(',');
+          const [completedTasksRows] = await connection.execute(
+            `SELECT COUNT(*) as count FROM user_task_progress 
+             WHERE user_id = ? AND task_id IN (${placeholders}) AND is_completed = 1`,
+            [student.id, ...taskIds]
+          );
+          completedTasksCount = completedTasksRows[0]?.count || 0;
+        }
+        
+        // 统计计划内所有任务的客观题和OJ题完成情况，并计算精确的任务完成数
+        let totalExams = 0;
+        let completedExams = 0;
+        let totalOjs = 0;
+        let completedOjs = 0;
+        let completedTasksPrecise = 0; // 精确的任务完成数（可以是小数）
+        
+        if (tasks.length > 0) {
+          const taskIds = tasks.map(t => t.id);
+          const placeholders = taskIds.map(() => '?').join(',');
+          
+          // 统计客观题总数和完成数
+          const [examStats] = await connection.execute(`
+            SELECT 
+              COUNT(*) as total,
+              SUM(CASE WHEN uep.is_completed = 1 THEN 1 ELSE 0 END) as completed
+            FROM task_exams te
+            LEFT JOIN user_exam_progress uep ON te.exam_id = uep.exam_id 
+              AND uep.user_id = ? AND uep.task_id = te.task_id
+            WHERE te.task_id IN (${placeholders})
+          `, [student.id, ...taskIds]);
+          
+          totalExams = Number(examStats[0]?.total || 0);
+          completedExams = Number(examStats[0]?.completed || 0);
+          
+          // 统计OJ题总数和完成数
+          const [ojStats] = await connection.execute(`
+            SELECT 
+              COUNT(*) as total,
+              SUM(CASE WHEN uop.is_completed = 1 THEN 1 ELSE 0 END) as completed
+            FROM task_oj_problems top
+            LEFT JOIN user_oj_progress uop ON top.problem_id = uop.problem_id 
+              AND uop.user_id = ? AND uop.task_id = top.task_id
+            WHERE top.task_id IN (${placeholders})
+          `, [student.id, ...taskIds]);
+          
+          totalOjs = Number(ojStats[0]?.total || 0);
+          completedOjs = Number(ojStats[0]?.completed || 0);
+          
+          // 计算每个任务的完成比例，累加得到精确的任务完成数
+          // 优化：使用批量查询减少数据库查询次数
+          if (taskIds.length > 0) {
+            // 批量获取所有任务的客观题和OJ题总数
+            const [taskExamTotals] = await connection.execute(`
+              SELECT task_id, COUNT(*) as count 
+              FROM task_exams 
+              WHERE task_id IN (${placeholders})
+              GROUP BY task_id
+            `, [...taskIds]);
+            
+            const [taskOjTotals] = await connection.execute(`
+              SELECT task_id, COUNT(*) as count 
+              FROM task_oj_problems 
+              WHERE task_id IN (${placeholders})
+              GROUP BY task_id
+            `, [...taskIds]);
+            
+            // 批量获取该学生所有任务的完成情况
+            const [taskExamCompleted] = await connection.execute(`
+              SELECT te.task_id, COUNT(*) as count 
+              FROM task_exams te
+              JOIN user_exam_progress uep ON te.exam_id = uep.exam_id 
+                AND uep.user_id = ? AND uep.task_id = te.task_id AND uep.is_completed = 1
+              WHERE te.task_id IN (${placeholders})
+              GROUP BY te.task_id
+            `, [student.id, ...taskIds]);
+            
+            const [taskOjCompleted] = await connection.execute(`
+              SELECT top.task_id, COUNT(*) as count 
+              FROM task_oj_problems top
+              JOIN user_oj_progress uop ON top.problem_id = uop.problem_id 
+                AND uop.user_id = ? AND uop.task_id = top.task_id AND uop.is_completed = 1
+              WHERE top.task_id IN (${placeholders})
+              GROUP BY top.task_id
+            `, [student.id, ...taskIds]);
+            
+            // 转换为Map以便快速查找
+            const examTotalMap = new Map();
+            taskExamTotals.forEach(row => {
+              examTotalMap.set(row.task_id, Number(row.count || 0));
+            });
+            
+            const ojTotalMap = new Map();
+            taskOjTotals.forEach(row => {
+              ojTotalMap.set(row.task_id, Number(row.count || 0));
+            });
+            
+            const examCompletedMap = new Map();
+            taskExamCompleted.forEach(row => {
+              examCompletedMap.set(row.task_id, Number(row.count || 0));
+            });
+            
+            const ojCompletedMap = new Map();
+            taskOjCompleted.forEach(row => {
+              ojCompletedMap.set(row.task_id, Number(row.count || 0));
+            });
+            
+            // 遍历所有任务，计算完成比例
+            for (const task of tasks) {
+              const taskExamTotal = examTotalMap.get(task.id) || 0;
+              const taskOjTotal = ojTotalMap.get(task.id) || 0;
+              const taskTotalQuestions = taskExamTotal + taskOjTotal;
+              
+              // 如果任务没有题目，跳过（不计算进度）
+              if (taskTotalQuestions === 0) {
+                continue;
+              }
+              
+              const taskCompletedExams = examCompletedMap.get(task.id) || 0;
+              const taskCompletedOjs = ojCompletedMap.get(task.id) || 0;
+              const taskCompletedQuestions = taskCompletedExams + taskCompletedOjs;
+              
+              // 计算该任务的完成比例（0-1之间）
+              const taskProgressRatio = taskCompletedQuestions / taskTotalQuestions;
+              
+              // 累加到精确的任务完成数
+              completedTasksPrecise += taskProgressRatio;
+            }
+          }
+          
+          // 保留2位小数
+          completedTasksPrecise = Math.round(completedTasksPrecise * 100) / 100;
+        }
+        
+        // 计算进度百分比（基于精确的任务完成数）
+        const progressRate = totalTasks > 0 
+          ? Math.round((completedTasksPrecise / totalTasks) * 100) 
+          : 0;
+        
+        // 获取计划完成时间（如果已完成）
+        const completedAt = planProgress.is_completed 
+          ? (planProgress.completed_at || null)
+          : null;
+        
+        // 获取学生绑定的教师信息
+        const [teacherRows] = await connection.execute(`
+          SELECT DISTINCT u.id as teacher_id, u.username, u.real_name
+          FROM users u
+          JOIN teacher_students ts ON u.id = ts.teacher_id
+          WHERE ts.student_id = ?
+        `, [student.id]);
+        
+        const teachers = teacherRows.map(teacher => ({
+          teacher_id: teacher.teacher_id,
+          username: teacher.username,
+          real_name: teacher.real_name
+        }));
+        
+        studentsProgress.push({
+          student_id: student.id,
+          username: student.username,
+          real_name: student.real_name,
+          teachers: teachers,
+          plan_progress: {
+            is_completed: planProgress.is_completed === 1 || planProgress.is_completed === true,
+            completed_tasks: completedTasksCount,
+            completed_tasks_precise: completedTasksPrecise, // 精确的任务完成数（可以是小数，如2.33）
+            total_tasks: totalTasks,
+            progress_rate: progressRate,
+            completed_at: completedAt,
+            // 添加客观题统计
+            completed_exams: completedExams,
+            total_exams: totalExams,
+            // 添加OJ题统计
+            completed_ojs: completedOjs,
+            total_ojs: totalOjs
+          }
+        });
+      }
+      
+      // 6. 按完成情况排序
+      // 排序规则：1. 已完成优先 2. 按精确的任务完成数（completed_tasks_precise）排序，多的优先 3. 完成时间早的优先（如果都完成了）
+      studentsProgress.sort((a, b) => {
+        // 已完成优先
+        if (a.plan_progress.is_completed && !b.plan_progress.is_completed) return -1;
+        if (!a.plan_progress.is_completed && b.plan_progress.is_completed) return 1;
+        
+        // 如果都已完成，按完成时间排序（早完成的排名靠前）
+        if (a.plan_progress.is_completed && b.plan_progress.is_completed) {
+          const timeA = a.plan_progress.completed_at ? new Date(a.plan_progress.completed_at).getTime() : 0;
+          const timeB = b.plan_progress.completed_at ? new Date(b.plan_progress.completed_at).getTime() : 0;
+          return timeA - timeB;
+        }
+        
+        // 都未完成，按精确的任务完成数排序（支持小数，如2.33）
+        const preciseA = a.plan_progress.completed_tasks_precise || 0;
+        const preciseB = b.plan_progress.completed_tasks_precise || 0;
+        if (preciseA !== preciseB) {
+          return preciseB - preciseA; // 降序排列，完成数多的在前
+        }
+        
+        // 如果精确任务完成数相同，按进度百分比排序
+        return b.plan_progress.progress_rate - a.plan_progress.progress_rate;
+      });
+      
+      // 7. 添加排名并找到当前学生的排名，同时获取当前学生的教师信息
+      let currentStudentRank = null;
+      let currentStudentTeachers = [];
+      
+      studentsProgress.forEach((student, index) => {
+        student.rank = index + 1;
+        if (student.student_id === parseInt(user_id)) {
+          currentStudentRank = index + 1;
+          currentStudentTeachers = student.teachers; // 获取当前学生的教师信息
+        }
+      });
+      
+      // 如果当前学生不在排名列表中，单独获取其教师信息
+      if (currentStudentRank === null) {
+        const [teacherRows] = await connection.execute(`
+          SELECT DISTINCT u.id as teacher_id, u.username, u.real_name
+          FROM users u
+          JOIN teacher_students ts ON u.id = ts.teacher_id
+          WHERE ts.student_id = ?
+        `, [user_id]);
+        currentStudentTeachers = teacherRows.map(teacher => ({
+          teacher_id: teacher.teacher_id,
+          username: teacher.username,
+          real_name: teacher.real_name
+        }));
+      }
+      
+      connection.release();
+      
+      // 将排名列表和计划信息存入缓存（异步，不阻塞响应）
+      // 缓存内容不包括当前学生的特定信息，因为不同用户请求时当前学生不同
+      const cacheData = {
+        plan: planRows[0],
+        students: studentsProgress
+      };
+      
+      cacheUtils.set(cacheKey, cacheData, cacheDuration)
+        .then(() => {
+          logger.info(`全局排名缓存已写入: planId=${planId}, 缓存时间=${cacheDuration}秒`);
+        })
+        .catch(error => {
+          logger.error('写入缓存失败:', error.message);
+          // 缓存失败不影响响应
+        });
+      
+      res.json({
+        success: true,
+        data: {
+          plan: planRows[0],
+          current_student: {
+            student_id: currentStudent.id,
+            username: currentStudent.username,
+            real_name: currentStudent.real_name,
+            rank: currentStudentRank,
+            total_students: studentsProgress.length,
+            teachers: currentStudentTeachers // 添加当前学生的教师信息
+          },
+          students: studentsProgress
+        }
+      });
+      
+    } catch (error) {
+      connection.release();
+      throw error;
+    }
+    
+  } catch (error) {
+    logger.error('获取全局排名失败:', error);
+    res.status(500).json({ 
+      success: false,
+      error: '获取全局排名失败',
       message: error.message 
     });
   }

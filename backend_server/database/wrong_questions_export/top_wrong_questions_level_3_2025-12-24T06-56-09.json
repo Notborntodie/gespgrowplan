@@ -1,0 +1,2998 @@
+{
+  "level": 3,
+  "export_time": "2025-12-24T06:56:09.807Z",
+  "question_count": 50,
+  "statistics": {
+    "total_wrong_count": "02822702582472452382382372352171821431321301291281271271271231221091051051031021009998928785848482787877717070676766636363616060",
+    "total_attempts": "032638932638932631731731831738918418613313113112912912912918413313314012912913313112912913113612915512914018813513213113412912910613615510410010010478",
+    "average_wrong_rate": "0.00"
+  },
+  "questions": [
+    {
+      "level": 3,
+      "question_id": 1507,
+      "question_text": "执行下面C++代码后输出的第一个数是（    ）。",
+      "question_type": "code",
+      "difficulty": "medium",
+      "correct_answer": "A",
+      "wrong_count": "282",
+      "total_attempts": "326",
+      "correct_count": "44",
+      "wrong_rate": "86.50",
+      "correct_rate": "13.50",
+      "rank_in_level": "1",
+      "question_code": "int main()\n{\n    int a[20],i;\n    for(i = 0; i < 20; i++)\n        a[i] = i+1;\n\n    for( ; i > 0; i--)\n        cout << a[i-1] << \" \";\n\n    cout << endl;\n    return 0;\n}",
+      "explanation": "循环变量i在第一个for结束后为20，第二个for从i=20开始递减，输出a[19]=20作为第一个数。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "20"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "19"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "1"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "不确定"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "19",
+          "wrong_count": "235"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "1",
+          "wrong_count": "35"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "不确定",
+          "wrong_count": "12"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "19",
+        "wrong_count": "235"
+      }
+    },
+    {
+      "level": 3,
+      "question_id": 1251,
+      "question_text": "以下关于C++数组的说法，错误的是（ ）。",
+      "question_type": "text",
+      "difficulty": "easy",
+      "correct_answer": "D",
+      "wrong_count": "270",
+      "total_attempts": "389",
+      "correct_count": "119",
+      "wrong_rate": "69.41",
+      "correct_rate": "30.59",
+      "rank_in_level": "2",
+      "question_code": "",
+      "explanation": "int arr[5]; 声明了一个包含5个元素的数组，下标从0到4。arr[5]访问的是第6个元素，超出了数组边界，是非法的。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "数组的下标通常从 0 开始。"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "int arr[5]; 声明了一个包含5个整数的数组。"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "数组的大小必须在编译时确定，不能使用变量定义大小。"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "可以通过 arr[5] 来访问 int arr[5]; 数组的最后一个元素。"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "数组的下标通常从 0 开始。",
+          "wrong_count": "210"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "数组的大小必须在编译时确定，不能使用变量定义大小。",
+          "wrong_count": "34"
+        },
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "int arr[5]; 声明了一个包含5个整数的数组。",
+          "wrong_count": "26"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "数组的下标通常从 0 开始。",
+        "wrong_count": "210"
+      }
+    },
+    {
+      "level": 3,
+      "question_id": 1511,
+      "question_text": "下面C++程序执行的结果是（    ）。",
+      "question_type": "code",
+      "difficulty": "hard",
+      "correct_answer": "D",
+      "wrong_count": "258",
+      "total_attempts": "326",
+      "correct_count": "68",
+      "wrong_rate": "79.14",
+      "correct_rate": "20.86",
+      "rank_in_level": "3",
+      "question_code": "int main()\n{\n    int a[20],i;\n    int cnt=0;\n    for(i = 0; i < 20; i++)\n        a[i] = i+1;\n\n\n    for( ; i > 1; i--)\n        if((a[i-1]+a[i-2])%3)\n            cnt++;\n    cout << cnt << endl;\n\n    cout << endl;\n    return 0;\n}",
+      "explanation": "i初始为20，循环从i=20到i=2，共19次迭代。每次判断a[i-1]+a[i-2]是否模3非零。例如i=20时判断a[19]+a[18]=20+19=39%3==0，不满足；依次类推，统计满足条件的次数，经计算共有12次满足。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "5"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "6"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "10"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "12"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "5",
+          "wrong_count": "213"
+        },
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "6",
+          "wrong_count": "26"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "10",
+          "wrong_count": "19"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "5",
+        "wrong_count": "213"
+      }
+    },
+    {
+      "level": 3,
+      "question_id": 1262,
+      "question_text": "以下C++代码中存在几处错误（ ）。",
+      "question_type": "code",
+      "difficulty": "medium",
+      "correct_answer": "C",
+      "wrong_count": "247",
+      "total_attempts": "389",
+      "correct_count": "142",
+      "wrong_rate": "63.50",
+      "correct_rate": "36.50",
+      "rank_in_level": "4",
+      "question_code": "#include <iostream>\nusing namespace std;\n\nint main() {\n    const int SIZE = 5;\n    int arr[SIZE];\n    for (int i = 0; i <= SIZE; i++) { \n        arr[i] = i * 2;\n    }\n    cout << arr[SIZE] << endl;\n    return 0;\n}",
+      "explanation": "两处错误：1. for循环条件i <= SIZE导致i从0到5，当i=5时arr[5]越界（数组大小为5，下标0-4）；2. 最后输出arr[SIZE]即arr[5]也越界。共2处错误。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "0处"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "1处"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "2处"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "3处"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "0处",
+          "wrong_count": "219"
+        },
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "1处",
+          "wrong_count": "18"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "3处",
+          "wrong_count": "10"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "0处",
+        "wrong_count": "219"
+      }
+    },
+    {
+      "level": 3,
+      "question_id": 1522,
+      "question_text": "在C++语言中，字符数组被定义时，它的大小可以调整。",
+      "question_type": "text",
+      "difficulty": "easy",
+      "correct_answer": "B",
+      "wrong_count": "245",
+      "total_attempts": "326",
+      "correct_count": "81",
+      "wrong_rate": "75.15",
+      "correct_rate": "24.85",
+      "rank_in_level": "5",
+      "question_code": "",
+      "explanation": "普通字符数组一旦定义，其大小固定不可变。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "正确"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "错误"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "正确",
+          "wrong_count": "245"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "正确",
+        "wrong_count": "245"
+      }
+    },
+    {
+      "level": 3,
+      "question_id": 1141,
+      "question_text": "下面的程序中，会输出（ ）。",
+      "question_type": "code",
+      "difficulty": "medium",
+      "correct_answer": "D",
+      "wrong_count": "238",
+      "total_attempts": "317",
+      "correct_count": "79",
+      "wrong_rate": "75.08",
+      "correct_rate": "24.92",
+      "rank_in_level": "6",
+      "question_code": "int a[10]={1,2,3,4,5,6,7,8,9,10};\ncout<<a[10]<<endl;",
+      "explanation": "数组a的大小为10，合法下标为0到9。a[10]是越界访问，读取的是数组之后的内存位置，其值不确定，可能是任意垃圾值。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "1"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "0"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "10"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "不确定的值"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "1",
+          "wrong_count": "210"
+        },
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "0",
+          "wrong_count": "22"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "10",
+          "wrong_count": "6"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "1",
+        "wrong_count": "210"
+      }
+    },
+    {
+      "level": 3,
+      "question_id": 1150,
+      "question_text": "下列程序将输出1。（ ）",
+      "question_type": "code",
+      "difficulty": "easy",
+      "correct_answer": "B",
+      "wrong_count": "238",
+      "total_attempts": "317",
+      "correct_count": "79",
+      "wrong_rate": "75.08",
+      "correct_rate": "24.92",
+      "rank_in_level": "7",
+      "question_code": "int a[10]={1};\ncout<<a[1]<<endl;",
+      "explanation": "数组初始化int a[10]={1}表示第一个元素为1，其余元素自动初始化为0。因此a[1]为0，输出0，不是1。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "正确"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "错误"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "正确",
+          "wrong_count": "238"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "正确",
+        "wrong_count": "238"
+      }
+    },
+    {
+      "level": 3,
+      "question_id": 1040,
+      "question_text": "以下代码的功能是将数组中的奇数和偶数分别放在数组的前半部分和后半部分,横线处应该填入的是（）",
+      "question_type": "code",
+      "difficulty": "hard",
+      "correct_answer": "D",
+      "wrong_count": "237",
+      "total_attempts": "318",
+      "correct_count": "81",
+      "wrong_rate": "74.53",
+      "correct_rate": "25.47",
+      "rank_in_level": "8",
+      "question_code": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int arr[] = {1, 2, 3, 4, 5};\n    int left = 0, right = 4;\n    while (left < right) {\n        while (arr[left] % 2 == 1 && left < right) left++;\n        // ————————————————————————————————————————————————————\n        if (left < right) {\n            swap(arr[left], arr[right]);\n        }\n    }\n    for (int i = 0; i < 5; i++) {\n        cout << arr[i] << \" \";\n    }\n    return 0;\n}",
+      "explanation": "左指针left指向奇数，跳过所有奇数；右指针right应从右边开始跳过所有偶数，直到遇到奇数为止，所以条件是while (arr[right] % 2 == 0 && left < right) right--;",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "while (arr[left] % 2 == 0 && left < right) right--;"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "while (arr[right] % 2 == 0 && left < right) left--;"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "while (arr[right] % 2 != 0 && left < right) right--;"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "while (arr[right] % 2 == 0 && left < right) right--;"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "while (arr[left] % 2 == 0 && left < right) right--;",
+          "wrong_count": "215"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "while (arr[right] % 2 != 0 && left < right) right--;",
+          "wrong_count": "12"
+        },
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "while (arr[right] % 2 == 0 && left < right) left--;",
+          "wrong_count": "10"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "while (arr[left] % 2 == 0 && left < right) right--;",
+        "wrong_count": "215"
+      }
+    },
+    {
+      "level": 3,
+      "question_id": 1140,
+      "question_text": "关于一维数组，下列程序能够正确执行的是（ ）。",
+      "question_type": "text",
+      "difficulty": "hard",
+      "correct_answer": "C",
+      "wrong_count": "235",
+      "total_attempts": "317",
+      "correct_count": "82",
+      "wrong_rate": "74.13",
+      "correct_rate": "25.87",
+      "rank_in_level": "9",
+      "question_code": "int a[10]={1,2,3,4,5,6,7,8,9,10};\nint sum=0;\nfor(int i=0;i<10;i++) {\n    um=sum+a[i];\n}",
+      "explanation": "选项C正确是因为数组下标从0开始，到9结束，循环条件为i<10，确保访问的每个元素都在数组范围内。其他选项均存在越界访问的问题，可能导致程序崩溃或未定义行为。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "int a[10];\nint sum=0;\nfor(int i=0;i<=10;i++) {\n    sum=sum+a[i];\n}"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "int a[10]={1,2,3,4,5,6,7,8,9,10};\nint sum=0;\nfor(int i=0;i<=10;i++) {\n    sum=sum+a[i];\n}"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "int a[10]={1,2,3,4,5,6,7,8,9,10};\nint sum=0;\nfor(int i=0;i<10;i++) {\n    sum=sum+a[i];\n}"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "int a[10]={0};\nint sum=0;\nfor(int i=0;i<=10;i++) {\n    sum=sum+a[i];\n}"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "int a[10];\nint sum=0;\nfor(int i=0;i<=10;i++) {\n    sum=sum+a[i];\n}",
+          "wrong_count": "214"
+        },
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "int a[10]={1,2,3,4,5,6,7,8,9,10};\nint sum=0;\nfor(int i=0;i<=10;i++) {\n    sum=sum+a[i];\n}",
+          "wrong_count": "19"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "int a[10]={0};\nint sum=0;\nfor(int i=0;i<=10;i++) {\n    sum=sum+a[i];\n}",
+          "wrong_count": "2"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "int a[10];\nint sum=0;\nfor(int i=0;i<=10;i++) {\n    sum=sum+a[i];\n}",
+        "wrong_count": "214"
+      }
+    },
+    {
+      "level": 3,
+      "question_id": 1254,
+      "question_text": "执行以下C++代码后，数组 arr 的内容是（ ）。",
+      "question_type": "code",
+      "difficulty": "easy",
+      "correct_answer": "B",
+      "wrong_count": "217",
+      "total_attempts": "389",
+      "correct_count": "172",
+      "wrong_rate": "55.78",
+      "correct_rate": "44.22",
+      "rank_in_level": "10",
+      "question_code": "int arr[4] = {1, 2, 3};\narr[3] = arr[0] + arr[2];",
+      "explanation": "arr[4] 初始化为 {1,2,3}，则 arr[0]=1, arr[1]=2, arr[2]=3, arr[3]=0（自动补0）。然后 arr[3] = arr[0] + arr[2] = 1 + 3 = 4。所以最终数组为 {1,2,3,4}。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "{1, 2, 3, 3}"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "{1, 2, 3, 4}"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "{1, 2, 3, 5}"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "{1, 2, 3, 6}"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "{1, 2, 3, 3}",
+          "wrong_count": "212"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "{1, 2, 3, 5}",
+          "wrong_count": "4"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "{1, 2, 3, 6}",
+          "wrong_count": "1"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "{1, 2, 3, 3}",
+        "wrong_count": "212"
+      }
+    },
+    {
+      "level": 3,
+      "question_id": 1098,
+      "question_text": "下列程序输出的是 A",
+      "question_type": "code",
+      "difficulty": "hard",
+      "correct_answer": "A",
+      "wrong_count": "182",
+      "total_attempts": "184",
+      "correct_count": "2",
+      "wrong_rate": "98.91",
+      "correct_rate": "1.09",
+      "rank_in_level": "11",
+      "question_code": "char x = 65;\nx = x & 00001111;\ncout << x << endl;",
+      "explanation": "在 C/C++ 中，当一个整数字面量以 数字 0 开头​ 时，它表示这是一个八进制数。00001111是八进制数，等于十进制 585。\n\nchar x=65的二进制是 01000001，585 的二进制低 8 位是 01001001，两者按位与后结果为 01000001，即十进制 65，对应 ASCII 字符 'A'。\n\n所以程序输出是 A，题目给出的答案正确。\n",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "正确"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "错误"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "false",
+          "option_label": "false",
+          "option_text": "",
+          "wrong_count": "107"
+        },
+        {
+          "option_value": "true",
+          "option_label": "true",
+          "option_text": "",
+          "wrong_count": "73"
+        },
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "错误",
+          "wrong_count": "2"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "false",
+        "option_label": "false",
+        "option_text": "",
+        "wrong_count": "107"
+      }
+    },
+    {
+      "level": 3,
+      "question_id": 1086,
+      "question_text": "a|10（a与10都是10进制，且二进制表示最高位为1）运算的结果是（ ）。",
+      "question_type": "text",
+      "difficulty": "hard",
+      "correct_answer": "A",
+      "wrong_count": "143",
+      "total_attempts": "186",
+      "correct_count": "43",
+      "wrong_rate": "76.88",
+      "correct_rate": "23.12",
+      "rank_in_level": "12",
+      "question_code": "",
+      "explanation": "10的二进制是1010，从右往左第二位是1。按位或操作会将a的这一位设为1，其他位不变。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "使a的二进制表示从右往左的第二位为1"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "使a的二进制表示从右往左的第一位为0"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "使a的二进制表示从右往左第二位为0"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "使a的二进制表示最高位为0"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "使a的二进制表示从右往左的第一位为0",
+          "wrong_count": "56"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "使a的二进制表示最高位为0",
+          "wrong_count": "49"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "使a的二进制表示从右往左第二位为0",
+          "wrong_count": "38"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "使a的二进制表示从右往左的第一位为0",
+        "wrong_count": "56"
+      }
+    },
+    {
+      "level": 3,
+      "question_id": 1096,
+      "question_text": "反码计算加减法：加法与减法结果都是正确的，只是解决不了 -0 的问题",
+      "question_type": "text",
+      "difficulty": "hard",
+      "correct_answer": "A",
+      "wrong_count": "132",
+      "total_attempts": "133",
+      "correct_count": "1",
+      "wrong_rate": "99.25",
+      "correct_rate": "0.75",
+      "rank_in_level": "13",
+      "question_code": "",
+      "explanation": "解析：题目指出反码计算加减法结果正确，但无法解决-0的问题。反码在表示负数时确实存在正负零的不同形式，导致-0的问题无法统一处理。因此，该说法是正确的，选项A正确。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "正确"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "错误"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "true",
+          "option_label": "true",
+          "option_text": "",
+          "wrong_count": "67"
+        },
+        {
+          "option_value": "false",
+          "option_label": "false",
+          "option_text": "",
+          "wrong_count": "64"
+        },
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "错误",
+          "wrong_count": "1"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "true",
+        "option_label": "true",
+        "option_text": "",
+        "wrong_count": "67"
+      }
+    },
+    {
+      "level": 3,
+      "question_id": 1097,
+      "question_text": "10 进制数 63，在转换成⼆进制的计算过程中，产⽣了如下的式⼦：\n63/2=31 余 1\n31/2=15 余 1\n15/2=7 余 1\n7/2=3 余 1\n3/2=1 余 1\n1/2=0 余 1\n按照从前往后的顺序，获得 63 的⼆进制值是 111111",
+      "question_type": "text",
+      "difficulty": "easy",
+      "correct_answer": "B",
+      "wrong_count": "130",
+      "total_attempts": "131",
+      "correct_count": "1",
+      "wrong_rate": "99.24",
+      "correct_rate": "0.76",
+      "rank_in_level": "14",
+      "question_code": "",
+      "explanation": "解析：题目中给出的计算过程虽然每一步的余数都是1，但最终的二进制结果应按从后往前的顺序排列余数，即最后得到的余数是最高位。因此，正确的二进制表示应为111111，但题干描述的“从前往后的顺序”是错误的，导致答案不准确，故选B。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "正确"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "错误"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "false",
+          "option_label": "false",
+          "option_text": "",
+          "wrong_count": "73"
+        },
+        {
+          "option_value": "true",
+          "option_label": "true",
+          "option_text": "",
+          "wrong_count": "56"
+        },
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "正确",
+          "wrong_count": "1"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "false",
+        "option_label": "false",
+        "option_text": "",
+        "wrong_count": "73"
+      }
+    },
+    {
+      "level": 3,
+      "question_id": 1103,
+      "question_text": "CCF(⼗六进制) = 12363(七进制)",
+      "question_type": "text",
+      "difficulty": "hard",
+      "correct_answer": "A",
+      "wrong_count": "129",
+      "total_attempts": "131",
+      "correct_count": "2",
+      "wrong_rate": "98.47",
+      "correct_rate": "1.53",
+      "rank_in_level": "15",
+      "question_code": "",
+      "explanation": "将CCF十六进制转换为十进制，再转换为七进制，结果与12363七进制一致，因此选项A正确。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "正确"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "错误"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "true",
+          "option_label": "true",
+          "option_text": "",
+          "wrong_count": "75"
+        },
+        {
+          "option_value": "false",
+          "option_label": "false",
+          "option_text": "",
+          "wrong_count": "54"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "true",
+        "option_label": "true",
+        "option_text": "",
+        "wrong_count": "75"
+      }
+    },
+    {
+      "level": 3,
+      "question_id": 1100,
+      "question_text": "string ch=\"chen\";\ncout<<ch[4]<<endl;\n该段程序将不能正确执⾏",
+      "question_type": "code",
+      "difficulty": "medium",
+      "correct_answer": "B",
+      "wrong_count": "128",
+      "total_attempts": "129",
+      "correct_count": "1",
+      "wrong_rate": "99.22",
+      "correct_rate": "0.78",
+      "rank_in_level": "16",
+      "question_code": "string ch = \"chen\";\ncout << ch[4] << endl;",
+      "explanation": "字符串\"chen\"有5个字符：'c','h','e','n','\\0'，索引0~4。ch[4]是'\\0'，虽然不可见，但访问合法，程序能正常执行并输出空字符。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "正确"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "错误"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "false",
+          "option_label": "false",
+          "option_text": "",
+          "wrong_count": "76"
+        },
+        {
+          "option_value": "true",
+          "option_label": "true",
+          "option_text": "",
+          "wrong_count": "51"
+        },
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "正确",
+          "wrong_count": "1"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "false",
+        "option_label": "false",
+        "option_text": "",
+        "wrong_count": "76"
+      }
+    },
+    {
+      "level": 3,
+      "question_id": 1099,
+      "question_text": "下列可执⾏程序段中，最后 pos 的值是 4",
+      "question_type": "code",
+      "difficulty": "hard",
+      "correct_answer": "A",
+      "wrong_count": "127",
+      "total_attempts": "129",
+      "correct_count": "2",
+      "wrong_rate": "98.45",
+      "correct_rate": "1.55",
+      "rank_in_level": "17",
+      "question_code": "string str = \"chenADai\";\nint pos = str.find('D');\n--pos & 11;",
+      "explanation": "解析：代码中str.find('D')返回字符'D'在字符串中的位置，即3。执行--pos后pos变为2，再执行2 & 11结果为2，但题目中给出的pos值为4，因此该程序段最后pos的值不可能是4，故答案应为B.错误。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "正确"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "错误"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "false",
+          "option_label": "false",
+          "option_text": "",
+          "wrong_count": "65"
+        },
+        {
+          "option_value": "true",
+          "option_label": "true",
+          "option_text": "",
+          "wrong_count": "62"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "false",
+        "option_label": "false",
+        "option_text": "",
+        "wrong_count": "65"
+      }
+    },
+    {
+      "level": 3,
+      "question_id": 1101,
+      "question_text": "下面代码将输出 97",
+      "question_type": "code",
+      "difficulty": "easy",
+      "correct_answer": "A",
+      "wrong_count": "127",
+      "total_attempts": "129",
+      "correct_count": "2",
+      "wrong_rate": "98.45",
+      "correct_rate": "1.55",
+      "rank_in_level": "18",
+      "question_code": "char a = 'A';\na = a + 32;\ncout << (int)a << endl;",
+      "explanation": "'A'的ASCII码是65，加32得97，对应字符'a'。强制转型为int输出97，正确。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "正确"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "错误"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "true",
+          "option_label": "true",
+          "option_text": "",
+          "wrong_count": "89"
+        },
+        {
+          "option_value": "false",
+          "option_label": "false",
+          "option_text": "",
+          "wrong_count": "38"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "true",
+        "option_label": "true",
+        "option_text": "",
+        "wrong_count": "89"
+      }
+    },
+    {
+      "level": 3,
+      "question_id": 1102,
+      "question_text": "⾃然界中，最⼩的素数是 2",
+      "question_type": "text",
+      "difficulty": "easy",
+      "correct_answer": "A",
+      "wrong_count": "127",
+      "total_attempts": "129",
+      "correct_count": "2",
+      "wrong_rate": "98.45",
+      "correct_rate": "1.55",
+      "rank_in_level": "19",
+      "question_code": "",
+      "explanation": "素数定义为大于1且只能被1和自身整除的自然数。最小的素数是2。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "正确"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "错误"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "true",
+          "option_label": "true",
+          "option_text": "",
+          "wrong_count": "82"
+        },
+        {
+          "option_value": "false",
+          "option_label": "false",
+          "option_text": "",
+          "wrong_count": "43"
+        },
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "错误",
+          "wrong_count": "2"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "true",
+        "option_label": "true",
+        "option_text": "",
+        "wrong_count": "82"
+      }
+    },
+    {
+      "level": 3,
+      "question_id": 1083,
+      "question_text": "下⾯逻辑运算中，正确的是（ ）",
+      "question_type": "text",
+      "difficulty": "medium",
+      "correct_answer": "D",
+      "wrong_count": "123",
+      "total_attempts": "184",
+      "correct_count": "61",
+      "wrong_rate": "66.85",
+      "correct_rate": "33.15",
+      "rank_in_level": "20",
+      "question_code": "",
+      "explanation": "5&3按位与：101 & 011 = 001，即1，但选项写成0001可能是强调二进制形式；其他选项语法或逻辑错误明显。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "5&&3==0"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "5|3==8"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "5||3==11"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "5&3==0001"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "5|3==8",
+          "wrong_count": "76"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "5||3==11",
+          "wrong_count": "25"
+        },
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "5&&3==0",
+          "wrong_count": "22"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "5|3==8",
+        "wrong_count": "76"
+      }
+    },
+    {
+      "level": 3,
+      "question_id": 1094,
+      "question_text": "为了简化计算机基本运算电路，使加减法都只需要通过加法电路实现，也就是让减去⼀个正数或加上⼀个负数这样的运算可以⽤加上⼀个正数来代替。于是改变负数存储的形式，存储成⼀种可以直接当成正数来相加的形式，这种形式就是补码。",
+      "question_type": "text",
+      "difficulty": "medium",
+      "correct_answer": "A",
+      "wrong_count": "122",
+      "total_attempts": "133",
+      "correct_count": "11",
+      "wrong_rate": "91.73",
+      "correct_rate": "8.27",
+      "rank_in_level": "21",
+      "question_code": "",
+      "explanation": "补码的设计目的正是为了让减法可以通过加法电路实现，从而简化计算机的运算逻辑。通过将负数转换为补码形式，可以直接用加法运算代替减法，使硬件设计更高效。因此，题目描述符合补码的实际用途，选项A正确。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "正确"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "错误"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "错误",
+          "wrong_count": "55"
+        },
+        {
+          "option_value": "true",
+          "option_label": "true",
+          "option_text": "",
+          "wrong_count": "45"
+        },
+        {
+          "option_value": "false",
+          "option_label": "false",
+          "option_text": "",
+          "wrong_count": "15"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "",
+          "wrong_count": "6"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "",
+          "wrong_count": "1"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "错误",
+        "wrong_count": "55"
+      }
+    },
+    {
+      "level": 3,
+      "question_id": 1095,
+      "question_text": "使⽤原码进⾏的计算，2+(-1) 的结果是 -3",
+      "question_type": "text",
+      "difficulty": "hard",
+      "correct_answer": "A",
+      "wrong_count": "109",
+      "total_attempts": "133",
+      "correct_count": "24",
+      "wrong_rate": "81.95",
+      "correct_rate": "18.05",
+      "rank_in_level": "22",
+      "question_code": "",
+      "explanation": "原码计算中，2的原码为0010，-1的原码为1001。相加时符号位直接相加，导致结果符号位为1，数值部分为11，即-3。因此，题目中给出的结果-3是正确的。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "正确"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "错误"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "true",
+          "option_label": "true",
+          "option_text": "",
+          "wrong_count": "42"
+        },
+        {
+          "option_value": "false",
+          "option_label": "false",
+          "option_text": "",
+          "wrong_count": "41"
+        },
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "错误",
+          "wrong_count": "24"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "",
+          "wrong_count": "1"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "",
+          "wrong_count": "1"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "true",
+        "option_label": "true",
+        "option_text": "",
+        "wrong_count": "42"
+      }
+    },
+    {
+      "level": 3,
+      "question_id": 1501,
+      "question_text": "整数-5的16位补码表示是(  )。",
+      "question_type": "text",
+      "difficulty": "medium",
+      "correct_answer": "D",
+      "wrong_count": "105",
+      "total_attempts": "140",
+      "correct_count": "35",
+      "wrong_rate": "75.00",
+      "correct_rate": "25.00",
+      "rank_in_level": "24",
+      "question_code": "",
+      "explanation": "整数-5的16位补码计算方式：先写出5的二进制16位表示0000 0000 0000 0101，取反得1111 1111 1111 1010，再加1得1111 1111 1111 1011，转换为十六进制即FFFB。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "1005"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "1006"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "FFFA"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "FFFB"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "1005",
+          "wrong_count": "67"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "FFFA",
+          "wrong_count": "19"
+        },
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "1006",
+          "wrong_count": "19"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "1005",
+        "wrong_count": "67"
+      }
+    },
+    {
+      "level": 3,
+      "question_id": 1091,
+      "question_text": "兔⼦五元⼀只，鸡三元⼀只，⼩鸭⼦⼀元三只，现在你有⼀百元要买⼀百只，兔⼦、鸡、鸭⼦，问兔⼦、鸡、鸭⼦各买多少只，每种必须⾄少⼀只，下列哪个程序能实现。（ ）。",
+      "question_type": "code",
+      "difficulty": "hard",
+      "correct_answer": "D",
+      "wrong_count": "105",
+      "total_attempts": "129",
+      "correct_count": "24",
+      "wrong_rate": "81.40",
+      "correct_rate": "18.60",
+      "rank_in_level": "23",
+      "question_code": "// A\nfor(int i = 0; i <= 100; i++){\n    for(int j = 0; j <= 100; j++){\n        for(int k = 0; k <= 100; k++){\n            if(i + j + k == 100 && 25 * i + 10 * j + k == 300)\n                cout << i << \" \" << j << \" \" << k << endl;\n        }\n    }\n}\n\n// B\nfor(int i = 0; i <= 100; i++){\n    for(int j = 0; j <= 100; j++){\n        for(int k = 0; k <= 100; k++){\n            if(i + j + k == 100 && 20 * i + 10 * j + k == 300)\n                cout << i << \" \" << j << \" \" << k << endl;\n        }\n    }\n}\n\n// C\nfor(int i = 0; i <= 20; i++){\n    for(int j = 0; j <= 34; j++){\n        for(int k = 0; k <= 20; k++){\n            if(i + j + k == 100 && 15 * i + 9 * j + k == 300)\n                cout << i << \" \" << j << \" \" << k << endl;\n        }\n    }\n}\n\n// D\nfor(int i = 0; i <= 100; i++){\n    for(int j = 0; j <= 100; j++){\n        for(int k = 0; k <= 100; k++){\n            if(i + j + k == 100 && 15 * i + 9 * j + k == 300)\n                cout << i << \" \" << j << \" \" << k << endl;\n        }\n    }\n}",
+      "explanation": "兔子5元/只 → 总价5i；鸡3元/只 → 3j；鸭子1元3只 → 每只1/3元，总价k/3。总钱数：5i+3j+k/3=100 → 乘以3得15i+9j+k=300。D选项条件正确，且循环范围合理。A/B/C价格系数错误。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "版本A"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "版本B"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "版本C"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "版本D"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "版本C",
+          "wrong_count": "55"
+        },
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "版本B",
+          "wrong_count": "41"
+        },
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "版本A",
+          "wrong_count": "9"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "C",
+        "option_label": "C",
+        "option_text": "版本C",
+        "wrong_count": "55"
+      }
+    },
+    {
+      "level": 3,
+      "question_id": 1088,
+      "question_text": "下列程序中，假设一个字符占用的内存空间是1，下列程序中，ch占用的内存空间是( )",
+      "question_type": "code",
+      "difficulty": "easy",
+      "correct_answer": "D",
+      "wrong_count": "103",
+      "total_attempts": "129",
+      "correct_count": "26",
+      "wrong_rate": "79.84",
+      "correct_rate": "20.16",
+      "rank_in_level": "25",
+      "question_code": "char ch[] = \"hello world\";\nsize_t ret = strlen(ch);\ncout << ret << endl;",
+      "explanation": "字符串 \"hello world\" 包含 11 个字符，但 ch 作为字符数组会存储这个字符串及其终止符 '\\0'，因此实际占用的内存空间是 12 字节，故选 D。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "11"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "10"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "13"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "12"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "10",
+          "wrong_count": "52"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "13",
+          "wrong_count": "30"
+        },
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "11",
+          "wrong_count": "21"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "10",
+        "wrong_count": "52"
+      }
+    },
+    {
+      "level": 3,
+      "question_id": 1080,
+      "question_text": "关于计算机中的编码，下列说法中错误的是（）",
+      "question_type": "text",
+      "difficulty": "easy",
+      "correct_answer": "D",
+      "wrong_count": "102",
+      "total_attempts": "133",
+      "correct_count": "31",
+      "wrong_rate": "76.69",
+      "correct_rate": "23.31",
+      "rank_in_level": "26",
+      "question_code": "",
+      "explanation": "负数的反码是在其原码基础上，符号位不变，其余各位取反。选项D未说明符号位保持为1，因此描述不准确。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "对于⽆符号数，原码就是真值"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "正数的反码是其本⾝"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "负数的反码和补码是不⼀样的"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "负数的反码，在其原码的基础上, 各个位取反"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "负数的反码和补码是不⼀样的",
+          "wrong_count": "39"
+        },
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "正数的反码是其本⾝",
+          "wrong_count": "37"
+        },
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "对于⽆符号数，原码就是真值",
+          "wrong_count": "26"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "C",
+        "option_label": "C",
+        "option_text": "负数的反码和补码是不⼀样的",
+        "wrong_count": "39"
+      }
+    },
+    {
+      "level": 3,
+      "question_id": 1139,
+      "question_text": "陈A歹种植一批农作物，第一天需要浇水一次，随后的两天（第2、第3天），每天需要浇水2次，再随后的3天（第4、第5、第6天），需要每天浇水3次，这样持续下去，随后的n天，每天需要浇水n次。请问在100天里，总共浇了多少次水（ ）",
+      "question_type": "text",
+      "difficulty": "hard",
+      "correct_answer": "D",
+      "wrong_count": "100",
+      "total_attempts": "131",
+      "correct_count": "31",
+      "wrong_rate": "76.34",
+      "correct_rate": "23.66",
+      "rank_in_level": "27",
+      "question_code": "",
+      "explanation": "这是一个分段求和问题。第1天：1×1=1次；第2-3天：2天×2次=4次；第4-6天：3天×3次=9次；……直到累计天数不超过100。设第k段有k天，每天空k次，则总次数为Σ(k²)，k从1到m，其中Σk ≤ 100。计算得m=13时，总天数为91天，第14段只能取9天。总次数=Σ(k² from 1 to 13) + 14×9 = 819 + 126 = 945。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "994"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "996"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "995"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "945"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "996",
+          "wrong_count": "55"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "995",
+          "wrong_count": "31"
+        },
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "994",
+          "wrong_count": "14"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "996",
+        "wrong_count": "55"
+      }
+    },
+    {
+      "level": 3,
+      "question_id": 1087,
+      "question_text": "下列程序输出的是（ ）",
+      "question_type": "code",
+      "difficulty": "medium",
+      "correct_answer": "A",
+      "wrong_count": "99",
+      "total_attempts": "129",
+      "correct_count": "30",
+      "wrong_rate": "76.74",
+      "correct_rate": "23.26",
+      "rank_in_level": "28",
+      "question_code": "string ch = \"hello\";\nif (ch[5] == NULL)\n{\n    cout << \"right\" << endl;\n}\nelse if (ch[5] == '\\0')\n{\n    cout << \"wrong\" << endl;\n}\nelse\n{\n    cout << \"hello\" << endl;\n}",
+      "explanation": "C++中字符串\"hello\"长度为5，索引0~4有效，ch[5]是结束符'\\0'。NULL通常定义为0或nullptr，与'\\0'比较可能成立，取决于实现。但在多数系统中，NULL==0且'\\0'==0，所以第一个条件成立，输出\"right\"。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "right"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "wrong"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "hello"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "不能正确执行"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "wrong",
+          "wrong_count": "51"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "hello",
+          "wrong_count": "39"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "不能正确执行",
+          "wrong_count": "9"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "wrong",
+        "wrong_count": "51"
+      }
+    },
+    {
+      "level": 3,
+      "question_id": 1089,
+      "question_text": "下列程序最后输出的是（）",
+      "question_type": "code",
+      "difficulty": "medium",
+      "correct_answer": "D",
+      "wrong_count": "98",
+      "total_attempts": "129",
+      "correct_count": "31",
+      "wrong_rate": "75.97",
+      "correct_rate": "24.03",
+      "rank_in_level": "29",
+      "question_code": "int a = 65;\ncout << tolower(a) << endl;",
+      "explanation": "tolower函数将大写字母转为小写。ASCII中'A'=65，'a'=97。tolower(65)返回97，直接输出为整数97。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "65"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "A"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "a"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "97"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "A",
+          "wrong_count": "50"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "a",
+          "wrong_count": "26"
+        },
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "65",
+          "wrong_count": "22"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "A",
+        "wrong_count": "50"
+      }
+    },
+    {
+      "level": 3,
+      "question_id": 1081,
+      "question_text": "16进制数B2025转换成8进制数是（）",
+      "question_type": "text",
+      "difficulty": "medium",
+      "correct_answer": "A",
+      "wrong_count": "92",
+      "total_attempts": "131",
+      "correct_count": "39",
+      "wrong_rate": "70.23",
+      "correct_rate": "29.77",
+      "rank_in_level": "30",
+      "question_code": "",
+      "explanation": "B2025(16) = 10110010000000100101(2)，每三位一组转为八进制：010 110 010 000 000 100 101 → 2620045(8)",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "2620045"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "2004526"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "729125"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "2420045"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "2004526",
+          "wrong_count": "65"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "729125",
+          "wrong_count": "17"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "2420045",
+          "wrong_count": "10"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "2004526",
+        "wrong_count": "65"
+      }
+    },
+    {
+      "level": 3,
+      "question_id": 1030,
+      "question_text": "UTF-8 编码规则如下：\n1 字节：0xxxxxxx\n2 字节：110xxxxx 10xxxxxx\n3 字节：1110xxxx 10xxxxxx 10xxxxxx\n4 字节：11110xxx 10xxxxxx 10xxxxxx 10xxxxxx\n以下哪个字节序列是合法的 UTF-8 编码（ ）",
+      "question_type": "text",
+      "difficulty": "hard",
+      "correct_answer": "B",
+      "wrong_count": "87",
+      "total_attempts": "136",
+      "correct_count": "49",
+      "wrong_rate": "63.97",
+      "correct_rate": "36.03",
+      "rank_in_level": "31",
+      "question_code": "",
+      "explanation": "选项 B: 0xF0 0x90 0x80 0x80 是一个合法的4字节UTF-8编码，起始字节11110xxx表示4字节字符，后续三个字节以10开头，符合规范。其他选项不符合UTF-8编码格式。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "0xC0 0x80"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "0xF0 0x90 0x80 0x80"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "0x80 0x80 0x80"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "0xFF 0xFE 0xFD"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "0x80 0x80 0x80",
+          "wrong_count": "60"
+        },
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "0xC0 0x80",
+          "wrong_count": "15"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "0xFF 0xFE 0xFD",
+          "wrong_count": "12"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "C",
+        "option_label": "C",
+        "option_text": "0x80 0x80 0x80",
+        "wrong_count": "60"
+      }
+    },
+    {
+      "level": 3,
+      "question_id": 1093,
+      "question_text": "工人工作一天，会得到一个金环作为工资报酬，某个工作需要15天完成，一条15个环的金环项链，为了严格执行每天工作结束时，完成对工人工资的结算，最少需要将金环项链剪裁成几段，每段几个金环（ ）",
+      "question_type": "text",
+      "difficulty": "hard",
+      "correct_answer": "A",
+      "wrong_count": "85",
+      "total_attempts": "129",
+      "correct_count": "44",
+      "wrong_rate": "65.89",
+      "correct_rate": "34.11",
+      "rank_in_level": "32",
+      "question_code": "",
+      "explanation": "采用二进制思想：1,2,4,8 四段可组合出1~15的所有天数。例如第1天给1；第2天给2换回1；第3天再给1……共需剪4次形成5段？不对，1+2+4+8=15，正好四段即可表示任意数量。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "4段，分别是1、2，4，8"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "15段，每段1个"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "6段，分别是3、3、3、3、2、1"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "9段，分别是2、2、2、2、2、2、1、1、1"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "15段，每段1个",
+          "wrong_count": "58"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "6段，分别是3、3、3、3、2、1",
+          "wrong_count": "17"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "9段，分别是2、2、2、2、2、2、1、1、1",
+          "wrong_count": "10"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "15段，每段1个",
+        "wrong_count": "58"
+      }
+    },
+    {
+      "level": 3,
+      "question_id": 820,
+      "question_text": "x是浮点数，(x >> 1) 等价于 x / 2",
+      "question_type": "text",
+      "difficulty": "hard",
+      "correct_answer": "B",
+      "wrong_count": "84",
+      "total_attempts": "155",
+      "correct_count": "71",
+      "wrong_rate": "54.19",
+      "correct_rate": "45.81",
+      "rank_in_level": "33",
+      "question_code": "",
+      "explanation": "右移运算符>>只能用于整数类型，不能用于浮点数。浮点数不能直接进行位移操作。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "正确"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "错误"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "正确",
+          "wrong_count": "84"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "正确",
+        "wrong_count": "84"
+      }
+    },
+    {
+      "level": 3,
+      "question_id": 1085,
+      "question_text": "下列代码输出的是",
+      "question_type": "code",
+      "difficulty": "medium",
+      "correct_answer": "C",
+      "wrong_count": "84",
+      "total_attempts": "129",
+      "correct_count": "45",
+      "wrong_rate": "65.12",
+      "correct_rate": "34.88",
+      "rank_in_level": "34",
+      "question_code": "string s = \"1234@@chenadai\";\nstring str = \"12345\";\ns.replace(1, 5, str);\ncout << s << endl;",
+      "explanation": "s.replace(pos, len, str) 表示从位置1开始替换长度为5的子串。原字符串s=\"1234@@chenadai\"，从索引1开始5个字符是\"234@@\"，被替换为\"12345\"，结果为\"1\"+\"12345\"+\"chenadai\"= \"112345chenadai\"",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "12345"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "2345@"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "112345chenadai"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "12345chenadai"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "2345@",
+          "wrong_count": "62"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "12345chenadai",
+          "wrong_count": "11"
+        },
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "12345",
+          "wrong_count": "11"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "2345@",
+        "wrong_count": "62"
+      }
+    },
+    {
+      "level": 3,
+      "question_id": 1516,
+      "question_text": "任意整数a的二进制反码与补码都有1位不同。",
+      "question_type": "text",
+      "difficulty": "hard",
+      "correct_answer": "B",
+      "wrong_count": "82",
+      "total_attempts": "140",
+      "correct_count": "58",
+      "wrong_rate": "58.57",
+      "correct_rate": "41.43",
+      "rank_in_level": "35",
+      "question_code": "",
+      "explanation": "反码是对原码按位取反，补码是反码加1。对于非负数，反码和补码相同；对于负数，补码比反码多1，可能导致多位变化（如进位），并非仅1位不同。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "正确"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "错误"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "正确",
+          "wrong_count": "81"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "",
+          "wrong_count": "1"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "正确",
+        "wrong_count": "81"
+      }
+    },
+    {
+      "level": 3,
+      "question_id": 1084,
+      "question_text": "补码1111 1101进行运算1111 1101>>1以后得到的结果是（）",
+      "question_type": "text",
+      "difficulty": "hard",
+      "correct_answer": "B",
+      "wrong_count": "78",
+      "total_attempts": "188",
+      "correct_count": "110",
+      "wrong_rate": "41.49",
+      "correct_rate": "58.51",
+      "rank_in_level": "37",
+      "question_code": "",
+      "explanation": "右移一位是算术右移，符号位扩展：1111 1101 >> 1 → 1111 1110，对应十进制为-2（补码表示）。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "1111 1100"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "-2"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "1111 1101"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "1111 1010"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "1111 1101",
+          "wrong_count": "46"
+        },
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "1111 1100",
+          "wrong_count": "17"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "1111 1010",
+          "wrong_count": "15"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "C",
+        "option_label": "C",
+        "option_text": "1111 1101",
+        "wrong_count": "46"
+      }
+    },
+    {
+      "level": 3,
+      "question_id": 1079,
+      "question_text": "下列⼆进制表⽰的⼗进制数值分别是（ ）\n[10000011]原=（ ）\n[10000011]补=（ ）",
+      "question_type": "text",
+      "difficulty": "medium",
+      "correct_answer": "B",
+      "wrong_count": "78",
+      "total_attempts": "135",
+      "correct_count": "57",
+      "wrong_rate": "57.78",
+      "correct_rate": "42.22",
+      "rank_in_level": "36",
+      "question_code": "",
+      "explanation": "原码[10000011]表示负数，其绝对值为0000011即3，所以是-3；补码[10000011]先转为反码[10000010]，再转原码[11111101]即-125。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "-125，-3"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "-3, -125"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "-3，-3"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "-125，-125"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "-125，-3",
+          "wrong_count": "39"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "-3，-3",
+          "wrong_count": "35"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "-125，-125",
+          "wrong_count": "4"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "-125，-3",
+        "wrong_count": "39"
+      }
+    },
+    {
+      "level": 3,
+      "question_id": 1036,
+      "question_text": "下列程序的作用是（）",
+      "question_type": "code",
+      "difficulty": "easy",
+      "correct_answer": "A",
+      "wrong_count": "77",
+      "total_attempts": "132",
+      "correct_count": "55",
+      "wrong_rate": "58.33",
+      "correct_rate": "41.67",
+      "rank_in_level": "38",
+      "question_code": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int decimal = 25;\n    cout << oct << decimal;\n    return 0;\n}",
+      "explanation": "程序中将整数`decimal`赋值为25，然后使用`oct`操纵符输出该数。`oct`表示以八进制形式输出，因此程序的作用是将十进制数转换成八进制数，故正确答案是A。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "将十进制数转换成八进制数"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "将八进制数转换成十进制数"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "将二进制数转换成八进制数"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "将八进制数转换成16进制数"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "将八进制数转换成十进制数",
+          "wrong_count": "61"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "将八进制数转换成16进制数",
+          "wrong_count": "9"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "将二进制数转换成八进制数",
+          "wrong_count": "7"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "将八进制数转换成十进制数",
+        "wrong_count": "61"
+      }
+    },
+    {
+      "level": 3,
+      "question_id": 1082,
+      "question_text": "625.625变成⼆进制是（ ）。",
+      "question_type": "text",
+      "difficulty": "medium",
+      "correct_answer": "A",
+      "wrong_count": "71",
+      "total_attempts": "131",
+      "correct_count": "60",
+      "wrong_rate": "54.20",
+      "correct_rate": "45.80",
+      "rank_in_level": "39",
+      "question_code": "",
+      "explanation": "整数部分625 ÷ 2得余数序列1001110001；小数部分0.625×2=1.25→1，0.25×2=0.5→0，0.5×2=1→1，结果为101，合并后为1001110001.101",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "1001110001.101"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "101.101"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "101.1001110001"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "1001110001.1101"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "101.101",
+          "wrong_count": "33"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "101.1001110001",
+          "wrong_count": "20"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "1001110001.1101",
+          "wrong_count": "18"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "101.101",
+        "wrong_count": "33"
+      }
+    },
+    {
+      "level": 3,
+      "question_id": 1052,
+      "question_text": "k 进制，逢 k 进第二位， k^2 进百位，k^3 进千位；",
+      "question_type": "text",
+      "difficulty": "easy",
+      "correct_answer": "B",
+      "wrong_count": "70",
+      "total_attempts": "134",
+      "correct_count": "64",
+      "wrong_rate": "52.24",
+      "correct_rate": "47.76",
+      "rank_in_level": "40",
+      "question_code": "",
+      "explanation": "题目描述中提到“k^2 进百位，k^3 进千位”，这一说法不符合进制的基本规则。在k进制中，每一位的权值应为k的幂次，但“百位”和“千位”是十进制中的概念，不能直接套用于其他进制。因此，该描述存在逻辑错误，选项B正确。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "正确"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "错误"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "正确",
+          "wrong_count": "70"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "正确",
+        "wrong_count": "70"
+      }
+    },
+    {
+      "level": 3,
+      "question_id": 1092,
+      "question_text": "求⼩于等于N的素数的⽅法中，有⼀种⽅法是将所有从2到它本⾝减1的数都除⼀遍，如果不能整除，就是素数。下列哪个程序，体现了这种⽅法（）",
+      "question_type": "code",
+      "difficulty": "hard",
+      "correct_answer": "C",
+      "wrong_count": "70",
+      "total_attempts": "129",
+      "correct_count": "59",
+      "wrong_rate": "54.26",
+      "correct_rate": "45.74",
+      "rank_in_level": "41",
+      "question_code": "// A\nif(N >= 3){\n    cout<<2<<endl;\n    for(int i = 2;i <= N;i ++){\n        for(int j = 2;j < i;j ++){\n            if(i % j != 0){\n                flag = 1;\n            }\n        }\n        if(flag == 0){\n            cout<<i<<endl;\n        }\n        flag = 0;\n    }\n}\n\n// B\nif(N >= 2){\n    for(int i = 3;i <= N;i ++){\n        for(int j = 2;j < i;j ++){\n            if(i % j == 0){\n                flag = 1;\n            }\n        }\n        if(flag == 0){\n            cout<<i<<endl;\n        }\n        flag = 0;\n    }\n}\n\n// C\nif(N >= 2){\n    cout<<2<<endl;\n    for(int i = 3;i <= N;i ++){\n        for(int j = 2;j < i;j ++){\n            if(i % j == 0){\n                flag = 1;\n            }\n        }\n        if(flag == 0){\n            cout<<i<<endl;\n        }\n        flag = 0;\n    }\n}\n\n// D\nif(N >= 2){\n    cout<<2<<endl;\n    for(int i = 3;i <= N;i ++){\n        for(int j = 2;j < i;j ++){\n            if(i % j == 0){\n                flag = 1;\n            }\n        }\n        if(flag == 0){\n            cout<<i<<endl;\n        }\n    }\n}",
+      "explanation": "正确方法应判断是否有因子：若存在j∈[2,i)使得i%j==0，则非素数。flag用于标记是否找到因子。C正确输出2，并对3~N检查，每次重置flag。D缺少flag=0重置，影响后续判断。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "版本A"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "版本B"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "版本C"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "版本D"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "版本B",
+          "wrong_count": "43"
+        },
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "版本A",
+          "wrong_count": "17"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "版本D",
+          "wrong_count": "10"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "版本B",
+        "wrong_count": "43"
+      }
+    },
+    {
+      "level": 3,
+      "question_id": 1090,
+      "question_text": "想要计算从数字n到数字m之间（包含n和m）有多少个数字d出现，下列程序哪个能够实现（ ）。",
+      "question_type": "code",
+      "difficulty": "hard",
+      "correct_answer": "C",
+      "wrong_count": "67",
+      "total_attempts": "129",
+      "correct_count": "62",
+      "wrong_rate": "51.94",
+      "correct_rate": "48.06",
+      "rank_in_level": "43",
+      "question_code": "// A\nint n,m,res,d;\ncin >> n >> m >> d;\nfor(int i = n+1; i <= m; i++){\n    int temp = i;\n    while(temp){\n        if(temp % 10 == d) res++;\n        temp /= 10;\n    }\n}\ncout << res << endl;\nreturn 0;\n\n// B\nint n,m,res,d;\ncin >> n >> m >> d;\nfor(int i = n; i <= m; i++){\n    int temp = i;\n    while(temp){\n        if(temp % 10 = d) res++;\n        temp /= 10;\n    }\n}\ncout << res << endl;\nreturn 0;\n\n// C\nint n,m,res=0,d;\ncin >> n >> m >> d;\nfor(int i = n; i <= m; i++){\n    int temp = i;\n    while(temp){\n        if(temp % 10 == d) res++;\n        temp /= 10;\n    }\n}\ncout << res << endl;\nreturn 0;\n\n// D\nint n,m,res=0,d;\ncin >> n >> m >> d;\nfor(int i = n; i <= m; i++){\n    while(temp){\n        if(temp % 10 == d) res++;\n        temp /= 10;\n    }\n}\ncout << res << endl;\nreturn 0;",
+      "explanation": "选项C正确，因为其初始化了`res`为0，确保计数器从零开始。其他选项存在错误：A的循环从n+1开始，漏掉n；B的条件判断使用赋值符=而非比较符==；D未定义变量temp，导致编译错误。只有C的逻辑完整且无语法错误，能正确统计数字d的出现次数。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "版本A"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "版本B"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "版本C"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "版本D"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "版本B",
+          "wrong_count": "43"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "版本D",
+          "wrong_count": "12"
+        },
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "版本A",
+          "wrong_count": "12"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "版本B",
+        "wrong_count": "43"
+      }
+    },
+    {
+      "level": 3,
+      "question_id": 803,
+      "question_text": "8位二进制原码能表示的最小整数是：",
+      "question_type": "text",
+      "difficulty": "medium",
+      "correct_answer": "A",
+      "wrong_count": "67",
+      "total_attempts": "106",
+      "correct_count": "39",
+      "wrong_rate": "63.21",
+      "correct_rate": "36.79",
+      "rank_in_level": "42",
+      "question_code": "",
+      "explanation": "8位二进制原码中，最高位为符号位，其余7位表示数值。正数范围是0到+127，负数范围是-0到-127。因此最小整数是-127。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "-127"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "-128"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "-255"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "-256"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "-128",
+          "wrong_count": "28"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "-255",
+          "wrong_count": "25"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "-256",
+          "wrong_count": "14"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "-128",
+        "wrong_count": "28"
+      }
+    },
+    {
+      "level": 3,
+      "question_id": 1130,
+      "question_text": "关于计算机中的编码，下列说法中正确的是（）",
+      "question_type": "text",
+      "difficulty": "easy",
+      "correct_answer": "C",
+      "wrong_count": "66",
+      "total_attempts": "136",
+      "correct_count": "70",
+      "wrong_rate": "48.53",
+      "correct_rate": "51.47",
+      "rank_in_level": "44",
+      "question_code": "",
+      "explanation": "机器数是带符号的二进制数表示形式，用于计算机内部运算。原码、反码、补码都是机器数的表现形式。选项C正确描述了机器数的基本特性。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "机器数的形式值和真值是一致的"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "原码就是符号位加上真值"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "机器数是带符号的"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "[-1]=[1000 0001]原=[1111 1111]反"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "原码就是符号位加上真值",
+          "wrong_count": "39"
+        },
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "机器数的形式值和真值是一致的",
+          "wrong_count": "18"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "[-1]=[1000 0001]原=[1111 1111]反",
+          "wrong_count": "9"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "原码就是符号位加上真值",
+        "wrong_count": "39"
+      }
+    },
+    {
+      "level": 3,
+      "question_id": 811,
+      "question_text": "以下哪个位运算可以交换两个变量的值（无需临时变量）",
+      "question_type": "text",
+      "difficulty": "hard",
+      "correct_answer": "A",
+      "wrong_count": "63",
+      "total_attempts": "155",
+      "correct_count": "92",
+      "wrong_rate": "40.65",
+      "correct_rate": "59.35",
+      "rank_in_level": "45",
+      "question_code": "",
+      "explanation": "使用异或操作：a = a ^ b; b = a ^ b (即 a ^ b ^ b = a); a = a ^ b (即 a ^ b ^ a = b)，可实现交换。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "a = a ^ b; b = a ^ b; a = a ^ b;"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "a = a & b; b = a | b; a = a & b;"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "a = a | b; b = a ^ b; a = a ^ b;"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "a = ~a; b = ~b; a = ~a;"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "a = a & b; b = a | b; a = a & b;",
+          "wrong_count": "36"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "a = a | b; b = a ^ b; a = a ^ b;",
+          "wrong_count": "17"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "a = ~a; b = ~b; a = ~a;",
+          "wrong_count": "10"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "a = a & b; b = a | b; a = a & b;",
+        "wrong_count": "36"
+      }
+    },
+    {
+      "level": 3,
+      "question_id": 1512,
+      "question_text": "定义字符数组char str[20] = {'G', 'E', 'S', 'P'};，则str的字符串长度为（  ）。",
+      "question_type": "text",
+      "difficulty": "easy",
+      "correct_answer": "A",
+      "wrong_count": "63",
+      "total_attempts": "104",
+      "correct_count": "41",
+      "wrong_rate": "60.58",
+      "correct_rate": "39.42",
+      "rank_in_level": "47",
+      "question_code": "",
+      "explanation": "虽然数组大小为20，但只初始化了前4个字符，且没有显式添加'\\0'，但在C++中这种初始化会自动补'\\0'，因此strlen(str)=4。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "4"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "5"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "19"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "20"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "20",
+          "wrong_count": "46"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "19",
+          "wrong_count": "9"
+        },
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "5",
+          "wrong_count": "8"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "D",
+        "option_label": "D",
+        "option_text": "20",
+        "wrong_count": "46"
+      }
+    },
+    {
+      "level": 3,
+      "question_id": 815,
+      "question_text": "C++代码string s = \"GESP考试\";，s占据的字节数是",
+      "question_type": "text",
+      "difficulty": "hard",
+      "correct_answer": "D",
+      "wrong_count": "63",
+      "total_attempts": "100",
+      "correct_count": "37",
+      "wrong_rate": "63.00",
+      "correct_rate": "37.00",
+      "rank_in_level": "46",
+      "question_code": "",
+      "explanation": "字符串字节数取决于编码方式。若为UTF-8，中文字符占3字节，则\"GESP考试\"共4字母+2汉字=4*1+2*3=10字节；若为GBK，汉字占2字节，则为8字节。因此取决于编码。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "10"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "8"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "8或10"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "取决于计算机采用什么编码"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "8",
+          "wrong_count": "27"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "8或10",
+          "wrong_count": "20"
+        },
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "10",
+          "wrong_count": "16"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "8",
+        "wrong_count": "27"
+      }
+    },
+    {
+      "level": 3,
+      "question_id": 1029,
+      "question_text": "Base64 编码将每3字节的输入数据编码为 4 字节的输出数据。如果输入数据长度不是 3 的倍数，会用=号填充。在Base64编码中，如果输入字符串的长度为10字节，编码后的字符串长度是多少（ ）",
+      "question_type": "text",
+      "difficulty": "medium",
+      "correct_answer": "D",
+      "wrong_count": "61",
+      "total_attempts": "100",
+      "correct_count": "39",
+      "wrong_rate": "61.00",
+      "correct_rate": "39.00",
+      "rank_in_level": "48",
+      "question_code": "",
+      "explanation": "每3字节编码为4字节，10字节包含3组完整的3字节和1个剩余字节。3组编码为12字节，剩下1字节需要补足到3字节进行编码，因此按3字节处理，编码后为4字节，总共12 + 4 = 16字节。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "12 字节"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "13 字节"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "14 字节"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "16 字节"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "13 字节",
+          "wrong_count": "27"
+        },
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "12 字节",
+          "wrong_count": "27"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "14 字节",
+          "wrong_count": "7"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "13 字节",
+        "wrong_count": "27"
+      }
+    },
+    {
+      "level": 3,
+      "question_id": 1518,
+      "question_text": "下面C++代码可以计算1到100的累加和，采用的是穷举法。",
+      "question_type": "code",
+      "difficulty": "easy",
+      "correct_answer": "B",
+      "wrong_count": "60",
+      "total_attempts": "104",
+      "correct_count": "44",
+      "wrong_rate": "57.69",
+      "correct_rate": "42.31",
+      "rank_in_level": "50",
+      "question_code": "int main()\n{\n    int i,sum=0;\n    for(int i = 1; i <= 100 ; i++)\n        sum += i;\n    cout << sum  << endl;\n\n    cout << endl;\n    return 0;\n}",
+      "explanation": "B是正确答案，因为代码中存在变量重复定义的问题。在main函数内，先声明了`int i`，随后在for循环中又使用`int i = 1`重新定义了循环变量i，这导致同一作用域内对变量i进行了两次定义，违反了C++的语法规则，会引发编译错误。尽管算法思路正确，但由于语法错误程序无法通过编译，因此不能正确计算1到100的累加和。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "正确"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "错误"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "正确",
+          "wrong_count": "59"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "",
+          "wrong_count": "1"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "正确",
+        "wrong_count": "59"
+      }
+    },
+    {
+      "level": 3,
+      "question_id": 1133,
+      "question_text": "下面说法正确的是（ ）",
+      "question_type": "text",
+      "difficulty": "medium",
+      "correct_answer": "C",
+      "wrong_count": "60",
+      "total_attempts": "78",
+      "correct_count": "18",
+      "wrong_rate": "76.92",
+      "correct_rate": "23.08",
+      "rank_in_level": "49",
+      "question_code": "",
+      "explanation": "(23|10) 表示按位或操作。23的二进制是10111，10的二进制是01010，进行或操作后得到11111，即十进制31。其他选项错误：(22&01)为0，(22&&01)为true；(23|11)=31而非30；(23|01)=23。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "(22&01)==(22&&01)成立"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "(23|11)==30"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "(23|10)==31"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "(23|01)==31"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "(22&01)==(22&&01)成立",
+          "wrong_count": "45"
+        },
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "(23|11)==30",
+          "wrong_count": "9"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "(23|01)==31",
+          "wrong_count": "6"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "(22&01)==(22&&01)成立",
+        "wrong_count": "45"
+      }
+    }
+  ]
+}

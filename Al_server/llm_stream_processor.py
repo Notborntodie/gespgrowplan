@@ -14,7 +14,8 @@ class LLMStreamProcessor:
         self.api_key = api_key or os.getenv("DASHSCOPE_API_KEY")
         self.api_url = "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions"
         self.model = model or os.getenv("LLM_MODEL", "qwen-plus-latest")
-        self.max_tokens = max_tokens
+        # 增加默认max_tokens，确保长文本也能完整输出
+        self.max_tokens = max_tokens if max_tokens else 32000
     
     def create_question_prompt(self, pdf_text: str, expected_questions: int = None) -> str:
         """创建提取题目的prompt"""
@@ -22,12 +23,15 @@ class LLMStreamProcessor:
         if expected_questions is not None:
             calibration_text = f"""
 
-重要提醒：
+⚠️⚠️⚠️ 极其重要的要求 ⚠️⚠️⚠️：
 - 预期题目数量：{expected_questions} 个
+- 你必须生成完整的 {expected_questions} 个题目，一个都不能少！
 - 请仔细检查整个PDF文本，确保提取所有题目
 - 如果当前提取的题目数量少于 {expected_questions} 个，请继续仔细检查文本内容
 - 不要遗漏任何题目，即使题目格式略有不同
-- 每个题目都要完整提取，包括题目文本、选项、正确答案和解释"""
+- 每个题目都要完整提取，包括题目文本、选项、正确答案和解释
+- 在生成完所有 {expected_questions} 个题目之前，不要停止输出
+- 如果遇到困难，请重新检查PDF文本，确保没有遗漏任何题目"""
         
         return f"""请将以下PDF文本中的题目转换为标准JSON格式。
 
@@ -100,14 +104,19 @@ PDF文本：
                 "Authorization": f"Bearer {self.api_key}"
             }
             
+            # 根据prompt长度动态调整max_tokens，确保有足够的输出空间
+            # 估算：每个题目大约需要500-1000 tokens，加上prompt本身
+            estimated_output_tokens = len(prompt) // 2  # 粗略估算输出token数
+            dynamic_max_tokens = max(self.max_tokens, estimated_output_tokens + 10000)
+            
             data = {
                 "model": self.model,
                 "messages": [
-                    {"role": "system", "content": "你是一个专业的题目解析助手。"},
+                    {"role": "system", "content": "你是一个专业的题目解析助手。你必须完整提取所有题目，不能遗漏任何一道题。"},
                     {"role": "user", "content": prompt}
                 ],
                 "temperature": 0,
-                "max_tokens": self.max_tokens,  # 设置最大输出token数
+                "max_tokens": min(dynamic_max_tokens, 32000),  # 设置最大输出token数，但不超过模型限制
                 "stream": True  # 启用流式输出
             }
             
@@ -149,14 +158,19 @@ PDF文本：
                 "Authorization": f"Bearer {self.api_key}"
             }
             
+            # 根据prompt长度动态调整max_tokens，确保有足够的输出空间
+            # 估算：每个题目大约需要500-1000 tokens，加上prompt本身
+            estimated_output_tokens = len(prompt) // 2  # 粗略估算输出token数
+            dynamic_max_tokens = max(self.max_tokens, estimated_output_tokens + 10000)
+            
             data = {
                 "model": self.model,
                 "messages": [
-                    {"role": "system", "content": "你是一个专业的题目解析助手。"},
+                    {"role": "system", "content": "你是一个专业的题目解析助手。你必须完整提取所有题目，不能遗漏任何一道题。"},
                     {"role": "user", "content": prompt}
                 ],
                 "temperature": 0,
-                "max_tokens": self.max_tokens,  # 设置最大输出token数
+                "max_tokens": min(dynamic_max_tokens, 32000),  # 设置最大输出token数，但不超过模型限制
                 "stream": True  # 启用流式输出
             }
             
@@ -216,6 +230,32 @@ PDF文本：
                         print(f"JSON解析错误: {e}")
                         print(f"问题JSON: {question_json[:200]}...")
                         continue
+        
+        # 流结束后，处理buffer中剩余的最后一个题目（可能没有分隔符）
+        if buffer.strip():
+            # 尝试提取可能的JSON对象
+            buffer = buffer.strip()
+            # 尝试找到最后一个完整的JSON对象
+            try:
+                # 尝试直接解析整个buffer
+                question_obj = json.loads(buffer)
+                if self.is_valid_question(question_obj):
+                    yield question_obj
+            except json.JSONDecodeError:
+                # 如果直接解析失败，尝试找到最后一个完整的JSON对象
+                # 查找最后一个 { 和对应的 }
+                last_open = buffer.rfind('{')
+                if last_open != -1:
+                    # 尝试从最后一个 { 开始解析
+                    for i in range(len(buffer), last_open, -1):
+                        try:
+                            potential_json = buffer[last_open:i]
+                            question_obj = json.loads(potential_json)
+                            if self.is_valid_question(question_obj):
+                                yield question_obj
+                                break
+                        except json.JSONDecodeError:
+                            continue
     
     async def parse_streaming_json_async(self, stream_generator: AsyncGenerator[str, None]) -> AsyncGenerator[Dict[str, Any], None]:
         """异步解析流式JSON响应，使用分割符实时提取完整题目"""
@@ -246,6 +286,32 @@ PDF文本：
                         print(f"JSON解析错误: {e}")
                         print(f"问题JSON: {question_json[:200]}...")
                         continue
+        
+        # 流结束后，处理buffer中剩余的最后一个题目（可能没有分隔符）
+        if buffer.strip():
+            # 尝试提取可能的JSON对象
+            buffer = buffer.strip()
+            # 尝试找到最后一个完整的JSON对象
+            try:
+                # 尝试直接解析整个buffer
+                question_obj = json.loads(buffer)
+                if self.is_valid_question(question_obj):
+                    yield question_obj
+            except json.JSONDecodeError:
+                # 如果直接解析失败，尝试找到最后一个完整的JSON对象
+                # 查找最后一个 { 和对应的 }
+                last_open = buffer.rfind('{')
+                if last_open != -1:
+                    # 尝试从最后一个 { 开始解析
+                    for i in range(len(buffer), last_open, -1):
+                        try:
+                            potential_json = buffer[last_open:i]
+                            question_obj = json.loads(potential_json)
+                            if self.is_valid_question(question_obj):
+                                yield question_obj
+                                break
+                        except json.JSONDecodeError:
+                            continue
     
     def is_valid_question(self, obj: Dict[str, Any]) -> bool:
         """检查是否是有效的题目对象"""
@@ -500,12 +566,30 @@ PDF文本：
                 "chunk_questions": chunk_question_count
             }
             
+            # 检查题目数量是否达到预期
+            warning_message = ""
+            if expected_questions and total_questions < expected_questions:
+                missing_count = expected_questions - total_questions
+                warning_message = f"⚠️ 警告：预期生成 {expected_questions} 个题目，但只提取到 {total_questions} 个，缺少 {missing_count} 个题目。可能的原因：1) PDF文本中实际题目数量不足；2) LLM输出被截断；3) 部分题目格式识别困难。"
+                yield {
+                    "type": "warning",
+                    "message": warning_message,
+                    "expected": expected_questions,
+                    "actual": total_questions,
+                    "missing": missing_count
+                }
+            
             # 发送处理完成消息
+            complete_message = f"🎉 处理完成！总共提取到 {total_questions} 个题目"
+            if warning_message:
+                complete_message += f"\n{warning_message}"
+            
             yield {
                 "type": "process_complete",
-                "message": f"🎉 处理完成！总共提取到 {total_questions} 个题目",
+                "message": complete_message,
                 "total_questions": total_questions,
-                "chunk_count": 1
+                "chunk_count": 1,
+                "expected_questions": expected_questions
             }
             
         except Exception as e:
@@ -575,12 +659,30 @@ PDF文本：
                 "chunk_questions": chunk_question_count
             }
             
+            # 检查题目数量是否达到预期
+            warning_message = ""
+            if expected_questions and total_questions < expected_questions:
+                missing_count = expected_questions - total_questions
+                warning_message = f"⚠️ 警告：预期生成 {expected_questions} 个题目，但只提取到 {total_questions} 个，缺少 {missing_count} 个题目。可能的原因：1) PDF文本中实际题目数量不足；2) LLM输出被截断；3) 部分题目格式识别困难。"
+                yield {
+                    "type": "warning",
+                    "message": warning_message,
+                    "expected": expected_questions,
+                    "actual": total_questions,
+                    "missing": missing_count
+                }
+            
             # 发送处理完成消息
+            complete_message = f"🎉 处理完成！总共提取到 {total_questions} 个题目"
+            if warning_message:
+                complete_message += f"\n{warning_message}"
+            
             yield {
                 "type": "process_complete",
-                "message": f"🎉 处理完成！总共提取到 {total_questions} 个题目",
+                "message": complete_message,
                 "total_questions": total_questions,
-                "chunk_count": 1
+                "chunk_count": 1,
+                "expected_questions": expected_questions
             }
             
         except Exception as e:
