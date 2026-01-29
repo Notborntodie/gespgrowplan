@@ -1,0 +1,2912 @@
+{
+  "level": 1,
+  "export_time": "2025-12-24T06:38:30.902Z",
+  "question_count": 50,
+  "statistics": {
+    "total_wrong_count": "0563496416405404391388383374370359347345342341339328325323315309301299287281280275275270268262262261257255249244242241240238238238235234232232231226224",
+    "total_attempts": "0823823823823823823823823823773773823823823752823752773823773823823721773721823752414823435752721823721823823752587752773752587465383435823465587721435",
+    "average_wrong_rate": "68.40"
+  },
+  "questions": [
+    {
+      "level": 1,
+      "question_id": 1213,
+      "question_text": "下面C++代码用于记录多个输入数中的最大数和最小数（输入 -999 则输入结束），相关说法错误的是（    ）。",
+      "question_type": "code",
+      "difficulty": "hard",
+      "correct_answer": "D",
+      "wrong_count": "563",
+      "total_attempts": "823",
+      "correct_count": "260",
+      "wrong_rate": "68.41",
+      "correct_rate": "31.59",
+      "rank_in_level": "1",
+      "question_code": "cin >> now_num;\nmin_num = max_num = now_num;\n\nwhile (now_num != -999){\n    if (max_num < now_num)\n        max_num = now_num;\n\n    if (min_num > now_num)\n        min_num = now_num;\n\n    cin >> now_num;\n}\ncout << min_num << ' ' << max_num;",
+      "explanation": "D选项错误，因为如果把cin >> now_num移到while内部开头，会导致第一次输入未读取就进入循环，逻辑错误。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "程序运行时如果第一个数输入 -999，则输出将是-999 -999"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "程序输入过程中，如果输入的第一个数不是 -999，则如果待输入的数据中没有 -999，则程序能求出已输入整数中的最大数和最小数"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "如果用于输入考试成绩，即成绩中不可能有 -999，则程序能求出已输入成绩中的最高成绩和最低成绩"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "可以将cin >> now_num;移动到while (now_num != -999) {下面，结果不变"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "如果用于输入考试成绩，即成绩中不可能有 -999，则程序能求出已输入成绩中的最高成绩和最低成绩",
+          "wrong_count": "280"
+        },
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "程序输入过程中，如果输入的第一个数不是 -999，则如果待输入的数据中没有 -999，则程序能求出已输入整数中的最大数和最小数",
+          "wrong_count": "176"
+        },
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "程序运行时如果第一个数输入 -999，则输出将是-999 -999",
+          "wrong_count": "107"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "C",
+        "option_label": "C",
+        "option_text": "如果用于输入考试成绩，即成绩中不可能有 -999，则程序能求出已输入成绩中的最高成绩和最低成绩",
+        "wrong_count": "280"
+      }
+    },
+    {
+      "level": 1,
+      "question_id": 1211,
+      "question_text": "下面C++代码用于获得正整数N的第M位数，约定个位数为第1位，如N等于1234，M等于2，则输出3。假设M的值是大于等于1且小于等于N的位数。横线处应填入的代码是(  )。",
+      "question_type": "code",
+      "difficulty": "hard",
+      "correct_answer": "D",
+      "wrong_count": "496",
+      "total_attempts": "823",
+      "correct_count": "327",
+      "wrong_rate": "60.27",
+      "correct_rate": "39.73",
+      "rank_in_level": "2",
+      "question_code": "int N, M, div=1;\ncout << \"请输入一个正整数：\";\ncin >> N;\ncout <<\"请输入从右到左取第几位数：\";\ncin >> M;\n\nfor (int i = 0; i < (M - 1); i++) div *= 10;\n\ncout << (______________);",
+      "explanation": "要获取第M位数字，先构造div=10^(M-1)，然后用(N / div) % 10即可得到该位数字。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "N % div / 10"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "N / div / 10"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "N % div % 10"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "N / div % 10"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "N % div / 10",
+          "wrong_count": "197"
+        },
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "N / div / 10",
+          "wrong_count": "165"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "N % div % 10",
+          "wrong_count": "134"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "N % div / 10",
+        "wrong_count": "197"
+      }
+    },
+    {
+      "level": 1,
+      "question_id": 1208,
+      "question_text": "下面C++代码执行后输出是（    ）。",
+      "question_type": "code",
+      "difficulty": "medium",
+      "correct_answer": "A",
+      "wrong_count": "416",
+      "total_attempts": "823",
+      "correct_count": "407",
+      "wrong_rate": "50.55",
+      "correct_rate": "49.45",
+      "rank_in_level": "3",
+      "question_code": "int i;\nfor(i = 1; i < 5; i++){\n    if(i % 3 == 0)\n        break;\n    printf(\"%d#\",i);\n}\nif(i > 5) printf(\"END\\n\");",
+      "explanation": "i=1时输出1#，i=2时输出2#，i=3时触发break退出循环。此时i=3，不满足i>5，不会输出END。最终输出1#2#。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "1#2#"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "1#2#END"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "1#2"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "1#2#3#4#END"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "1#2#END",
+          "wrong_count": "158"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "1#2",
+          "wrong_count": "144"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "1#2#3#4#END",
+          "wrong_count": "114"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "1#2#END",
+        "wrong_count": "158"
+      }
+    },
+    {
+      "level": 1,
+      "question_id": 1205,
+      "question_text": "当前是9月，编写C++代码求N个月后的月份。横线处应填入的代码是（    ）。",
+      "question_type": "code",
+      "difficulty": "medium",
+      "correct_answer": "D",
+      "wrong_count": "405",
+      "total_attempts": "823",
+      "correct_count": "418",
+      "wrong_rate": "49.21",
+      "correct_rate": "50.79",
+      "rank_in_level": "4",
+      "question_code": "int N, M;\ncin >> N;\nM = _____________;\nif (M == 0)\n    printf(\"%d个月后12月\", N);\nelse\n    printf(\"%d个月后是%d月\", N, M);",
+      "explanation": "当前是9月，N个月后是(9+N)个月，对12取模可得到对应月份。若结果为0则表示12月。因此应填(9 + N) % 12。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "N % 12"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "9 + N % 12"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "(9 + N) / 12"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "(9 + N) % 12"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "9 + N % 12",
+          "wrong_count": "157"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "(9 + N) / 12",
+          "wrong_count": "143"
+        },
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "N % 12",
+          "wrong_count": "105"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "9 + N % 12",
+        "wrong_count": "157"
+      }
+    },
+    {
+      "level": 1,
+      "question_id": 1212,
+      "question_text": "下面C++代码执行后输出是（     ）。",
+      "question_type": "code",
+      "difficulty": "medium",
+      "correct_answer": "A",
+      "wrong_count": "404",
+      "total_attempts": "823",
+      "correct_count": "419",
+      "wrong_rate": "49.09",
+      "correct_rate": "50.91",
+      "rank_in_level": "5",
+      "question_code": "num = 0;\nwhile (num <= 5){\n    num += 1;\n    if (num == 3)\n        continue;\n    printf(\"%d#\", num);\n}",
+      "explanation": "num从1到6，当num==3时跳过输出，其余都输出。输出序列：1#2#4#5#6#。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "1#2#4#5#6#"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "1#2#4#5#6"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "1#2#3#4#5#6#"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "1#2#3#4#5#6"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "1#2#4#5#6",
+          "wrong_count": "175"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "1#2#3#4#5#6#",
+          "wrong_count": "155"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "1#2#3#4#5#6",
+          "wrong_count": "74"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "1#2#4#5#6",
+        "wrong_count": "175"
+      }
+    },
+    {
+      "level": 1,
+      "question_id": 1209,
+      "question_text": "下面的C++代码用于求N的镜面数（N的个位到最高位的各位数字依次反过来出现在数字中，但高位0将被忽略，不输出），如输入1234，则将输出4321，又如输入120，则将输出21，错误的选项是（    ）。",
+      "question_type": "code",
+      "difficulty": "hard",
+      "correct_answer": "C",
+      "wrong_count": "391",
+      "total_attempts": "823",
+      "correct_count": "432",
+      "wrong_rate": "47.51",
+      "correct_rate": "52.49",
+      "rank_in_level": "6",
+      "question_code": "cout << \"请输入个位数不为0的正整数：\";\ncin >> N;\nrst = 0; // 保存逆序结果\nwhile (______________){\n    rst = rst * 10 + N % 10;\n    N  = N / 10;\n}\ncout << rst << endl;",
+      "explanation": "C选项N=0是赋值操作，永远为true，会导致无限循环。其他选项都是判断N是否非零，正确。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "N != 0"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "not (N == 0)"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "N = 0"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "N > 0"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "N != 0",
+          "wrong_count": "170"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "N > 0",
+          "wrong_count": "116"
+        },
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "not (N == 0)",
+          "wrong_count": "105"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "N != 0",
+        "wrong_count": "170"
+      }
+    },
+    {
+      "level": 1,
+      "question_id": 1202,
+      "question_text": "下列C++代码中a和b都是整型变量，执行后，其结果是(  )。",
+      "question_type": "code",
+      "difficulty": "medium",
+      "correct_answer": "C",
+      "wrong_count": "388",
+      "total_attempts": "823",
+      "correct_count": "435",
+      "wrong_rate": "47.14",
+      "correct_rate": "52.86",
+      "rank_in_level": "7",
+      "question_code": "a = 13;\nb = 5;\ncout << a / b << a %// b << a % b;\na*b;",
+      "explanation": "C是正确答案",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "2 3"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "23"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "20"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "以上都不准确"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "以上都不准确",
+          "wrong_count": "261"
+        },
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "23",
+          "wrong_count": "79"
+        },
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "2 3",
+          "wrong_count": "48"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "D",
+        "option_label": "D",
+        "option_text": "以上都不准确",
+        "wrong_count": "261"
+      }
+    },
+    {
+      "level": 1,
+      "question_id": 1218,
+      "question_text": "将下面C++代码中的 L1 行的i = 0修改为i = 1， 其输出与当前代码输出相同。（  ）",
+      "question_type": "code",
+      "difficulty": "medium",
+      "correct_answer": "A",
+      "wrong_count": "383",
+      "total_attempts": "823",
+      "correct_count": "440",
+      "wrong_rate": "46.54",
+      "correct_rate": "53.46",
+      "rank_in_level": "8",
+      "question_code": "cnt = 0;\nfor (int i = 0; i < 100; i++) // L1\n    cnt += i;\ncout << cnt",
+      "explanation": "将L1行的i = 0改为i = 1后，循环从i=1开始，求和范围变为1到99。原代码中i从0开始，0对累加无贡献，因此两种情况下cnt累加的值均为1+2+...+99，结果相同。输出一致，故A正确。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "正确"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "错误"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "错误",
+          "wrong_count": "383"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "错误",
+        "wrong_count": "383"
+      }
+    },
+    {
+      "level": 1,
+      "question_id": 1204,
+      "question_text": "下面的C++代码中变量N和M都是整型，则执行时如果先输入10并输入一个制表符后输入20并回车，其输出的数值是(  )。",
+      "question_type": "code",
+      "difficulty": "easy",
+      "correct_answer": "A",
+      "wrong_count": "374",
+      "total_attempts": "823",
+      "correct_count": "449",
+      "wrong_rate": "45.44",
+      "correct_rate": "54.56",
+      "rank_in_level": "9",
+      "question_code": "scanf(\"%d\", &N);\nscanf(\"%d\", &M);\nprintf(\"{%d}\",N+M);",
+      "explanation": "scanf会自动跳过空白字符（包括制表符和空格），所以能正确读取10和20，N+M=30，输出{30}。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "{30}"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "1020"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "{N+M}"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "不输出，继续等待输入"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "{N+M}",
+          "wrong_count": "157"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "不输出，继续等待输入",
+          "wrong_count": "110"
+        },
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "1020",
+          "wrong_count": "107"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "C",
+        "option_label": "C",
+        "option_text": "{N+M}",
+        "wrong_count": "157"
+      }
+    },
+    {
+      "level": 1,
+      "question_id": 1357,
+      "question_text": "下面C++代码执行后输出是（    ）。",
+      "question_type": "code",
+      "difficulty": "medium",
+      "correct_answer": "C",
+      "wrong_count": "370",
+      "total_attempts": "773",
+      "correct_count": "403",
+      "wrong_rate": "47.87",
+      "correct_rate": "52.13",
+      "rank_in_level": "10",
+      "question_code": "int Sum = 0, i = 0;\nfor (; i < 10; )\n    Sum += i++;\ncout << i << \" \" << Sum;",
+      "explanation": "循环从i=0开始，每次执行Sum += i++，即先使用i再自增。共执行10次（i=0到9），Sum=0+1+...+9=45，i最终为10。输出\"10 45\"。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "9 45"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "10 55"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "10 45"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "11 55"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "10 55",
+          "wrong_count": "220"
+        },
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "9 45",
+          "wrong_count": "136"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "11 55",
+          "wrong_count": "14"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "10 55",
+        "wrong_count": "220"
+      }
+    },
+    {
+      "level": 1,
+      "question_id": 1360,
+      "question_text": "如果一个整数N能够表示为 X*X 的形式，那么它就是一个完全平方数，下面C++代码用于完成判断N是否为一个完全平方数，在横线处应填入的代码是（    ）。",
+      "question_type": "code",
+      "difficulty": "medium",
+      "correct_answer": "D",
+      "wrong_count": "359",
+      "total_attempts": "773",
+      "correct_count": "414",
+      "wrong_rate": "46.44",
+      "correct_rate": "53.56",
+      "rank_in_level": "11",
+      "question_code": "int N;\n\ncin >> N;\nfor(int i = 0; i <= N; i++)\n    if(___________________)\n        cout << N << \"是一个完全平方数\\n\";",
+      "explanation": "要判断N是否为完全平方数，需要检查是否存在i使得i*i==N。因此填入i*i == N。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "i == N*N"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "i*10 == N"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "i+i == N"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "i*i == N"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "i == N*N",
+          "wrong_count": "138"
+        },
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "i*10 == N",
+          "wrong_count": "111"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "i+i == N",
+          "wrong_count": "110"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "i == N*N",
+        "wrong_count": "138"
+      }
+    },
+    {
+      "level": 1,
+      "question_id": 1210,
+      "question_text": "下面C++代码用于交换两个正整数a和b的值，不能实现交换的代码是（    ）。",
+      "question_type": "code",
+      "difficulty": "medium",
+      "correct_answer": "D",
+      "wrong_count": "347",
+      "total_attempts": "823",
+      "correct_count": "476",
+      "wrong_rate": "42.16",
+      "correct_rate": "57.84",
+      "rank_in_level": "12",
+      "question_code": "cout << \"输入第一个正整数: \";\ncin >> a;\ncout <<\"输入第二个正整数: \";\ncin >> b;\ntemp = a;\na = b;\nb = temp;\ncout << \"a=\" << a << \" b=\" << b << endl;",
+      "explanation": "D选项中'a, b = b, a;'是Python语法，在C++中无效，无法编译。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "使用临时变量temp进行交换"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "使用减法实现交换"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "使用加减法实现交换"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "a, b = b, a;"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "使用加减法实现交换",
+          "wrong_count": "157"
+        },
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "使用减法实现交换",
+          "wrong_count": "97"
+        },
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "使用临时变量temp进行交换",
+          "wrong_count": "93"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "C",
+        "option_label": "C",
+        "option_text": "使用加减法实现交换",
+        "wrong_count": "157"
+      }
+    },
+    {
+      "level": 1,
+      "question_id": 1206,
+      "question_text": "下面C++代码执行后的输出是（ ）。",
+      "question_type": "code",
+      "difficulty": "medium",
+      "correct_answer": "C",
+      "wrong_count": "345",
+      "total_attempts": "823",
+      "correct_count": "478",
+      "wrong_rate": "41.92",
+      "correct_rate": "58.08",
+      "rank_in_level": "13",
+      "question_code": "int n = 0;\nfor (int i = 0; i < 100; i++)\n    n += i % 2;\ncout << n;",
+      "explanation": "i % 2 在i为奇数时返回1，偶数时返回0。0到99中共有50个奇数，所以n累加了50次1，结果为50。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "5050"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "4950"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "50"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "49"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "4950",
+          "wrong_count": "147"
+        },
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "5050",
+          "wrong_count": "102"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "49",
+          "wrong_count": "96"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "4950",
+        "wrong_count": "147"
+      }
+    },
+    {
+      "level": 1,
+      "question_id": 1223,
+      "question_text": "下列C++代码用于求斐波那契数列，即第1个数为0，第2个数为1，从第三个数开始，依次是其前两个数之和。如果输入的值为大于1的正整数，该代码能实现所求。（  ）",
+      "question_type": "code",
+      "difficulty": "hard",
+      "correct_answer": "A",
+      "wrong_count": "342",
+      "total_attempts": "823",
+      "correct_count": "481",
+      "wrong_rate": "41.56",
+      "correct_rate": "58.44",
+      "rank_in_level": "14",
+      "question_code": "cin >> n;\na = 0, b = 1;\nfor (int j = 0; j < n; j++){\n    cout << a << \" \";\n    b = b + a;\n    a = b - a;\n}",
+      "explanation": "该算法正确实现了斐波那契数列：每次输出a，更新b=a+b，再更新a为旧的b值（通过a=b-a恢复），逻辑正确。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "正确"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "错误"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "错误",
+          "wrong_count": "342"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "错误",
+        "wrong_count": "342"
+      }
+    },
+    {
+      "level": 1,
+      "question_id": 1351,
+      "question_text": "在C++中，假设N为正整数，则表达式cout << (N % 3 + N % 7)可能输出的最大值是(  )。",
+      "question_type": "text",
+      "difficulty": "medium",
+      "correct_answer": "B",
+      "wrong_count": "341",
+      "total_attempts": "752",
+      "correct_count": "411",
+      "wrong_rate": "45.35",
+      "correct_rate": "54.65",
+      "rank_in_level": "15",
+      "question_code": "",
+      "explanation": "N%3最大为2，N%7最大为6，所以和最大为8。当N≡2(mod3)且N≡6(mod7)时取得，例如N=20。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "6"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "8"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "9"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "10"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "6",
+          "wrong_count": "154"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "9",
+          "wrong_count": "99"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "10",
+          "wrong_count": "88"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "6",
+        "wrong_count": "154"
+      }
+    },
+    {
+      "level": 1,
+      "question_id": 1215,
+      "question_text": "执行C++表达式10 % 0.5将报错，因为 0.5 所在位置只能是整数。(   )",
+      "question_type": "text",
+      "difficulty": "medium",
+      "correct_answer": "A",
+      "wrong_count": "339",
+      "total_attempts": "823",
+      "correct_count": "484",
+      "wrong_rate": "41.19",
+      "correct_rate": "58.81",
+      "rank_in_level": "16",
+      "question_code": "",
+      "explanation": "取模运算符%要求两个操作数都为整型，浮点数不能参与%，因此会编译错误。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "正确"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "错误"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "错误",
+          "wrong_count": "339"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "错误",
+        "wrong_count": "339"
+      }
+    },
+    {
+      "level": 1,
+      "question_id": 1366,
+      "question_text": "定义C++的float型变量N，则语句cin >> N; cout << int(float(N))可以输入正负整数和浮点数，并将其转换为整数后输出。（  ）",
+      "question_type": "text",
+      "difficulty": "medium",
+      "correct_answer": "A",
+      "wrong_count": "328",
+      "total_attempts": "752",
+      "correct_count": "424",
+      "wrong_rate": "43.62",
+      "correct_rate": "56.38",
+      "rank_in_level": "17",
+      "question_code": "",
+      "explanation": "答案A正确。语句 `cin >> N; cout << int(float(N))` 中，`cin >> N` 可以接收用户输入的正负整数或浮点数并存储到 float 类型变量 N 中；随后 `float(N)` 实际上是冗余但合法的类型转换，而 `int(float(N))` 会将其强制转换为整数，即截断小数部分，只保留整数部分。因此，无论输入的是整数还是浮点数，最终都会被正确转换为整数输出，符合题目描述。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "正确"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "错误"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "错误",
+          "wrong_count": "328"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "错误",
+        "wrong_count": "328"
+      }
+    },
+    {
+      "level": 1,
+      "question_id": 1359,
+      "question_text": "下面的C++代码用于求1~N之间所有奇数之和，其中N为正整数，如果N为奇数，则求和时包括N。有关描述错误的是（    ）。",
+      "question_type": "code",
+      "difficulty": "hard",
+      "correct_answer": "C",
+      "wrong_count": "325",
+      "total_attempts": "773",
+      "correct_count": "448",
+      "wrong_rate": "42.04",
+      "correct_rate": "57.96",
+      "rank_in_level": "18",
+      "question_code": "int N;\ncout << \"请输入正整数：\";\ncin >> N;\n\nint i = 1, Sum = 0;\n\nwhile (i <= N){\n    if (i % 2 == 1)\n        Sum += i;\n    i += 1;\n}\n\ncout << i << \" \" << Sum;",
+      "explanation": "C选项错误的原因是：将`i += 1`移到`if`语句之前，会导致每次循环先自增i，再判断条件并累加。此时i在判断前已改变，例如初始i=1，进入循环后立即变为2，再执行判断时使用的是改变后的值，导致奇数判断和累加基于错误的i值，从而可能跳过或错误处理某些数字，破坏了求和逻辑。因此无法正确实现题目要求的功能。其他选项中，A、B输出结果正确，D通过步长为2直接遍历奇数，也能正确求和。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "执行代码时如果输入10，则最后一行输出将是11 25"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "执行代码时如果输入5，则最后一行输出将是6 9"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "将i += 1移到if (i % 2 == 1)前一行，同样能实现题目要求"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "删除if (i % 2 == 1)，并将i += 1改为i += 2，同样可以实现题目要求"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "执行代码时如果输入5，则最后一行输出将是6 9",
+          "wrong_count": "159"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "删除if (i % 2 == 1)，并将i += 1改为i += 2，同样可以实现题目要求",
+          "wrong_count": "105"
+        },
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "执行代码时如果输入10，则最后一行输出将是11 25",
+          "wrong_count": "61"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "执行代码时如果输入5，则最后一行输出将是6 9",
+        "wrong_count": "159"
+      }
+    },
+    {
+      "level": 1,
+      "question_id": 1207,
+      "question_text": "下面的C++代码执行后输出是（ ）。",
+      "question_type": "code",
+      "difficulty": "hard",
+      "correct_answer": "C",
+      "wrong_count": "323",
+      "total_attempts": "823",
+      "correct_count": "500",
+      "wrong_rate": "39.25",
+      "correct_rate": "60.75",
+      "rank_in_level": "19",
+      "question_code": "int N = 0, i;\nfor (i = -100; i < 100; i++)\n    N += i % 10;\ncout << N;",
+      "explanation": "i从-100到99，i%10在正负范围内对称分布，每10个数的余数之和为0，整体累加结果为0。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "900"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "100"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "0"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "-100"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "100",
+          "wrong_count": "136"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "-100",
+          "wrong_count": "106"
+        },
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "900",
+          "wrong_count": "81"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "100",
+        "wrong_count": "136"
+      }
+    },
+    {
+      "level": 1,
+      "question_id": 1361,
+      "question_text": "执行下面C++代码后输出的cnt的值是（   ）。",
+      "question_type": "code",
+      "difficulty": "medium",
+      "correct_answer": "C",
+      "wrong_count": "315",
+      "total_attempts": "773",
+      "correct_count": "458",
+      "wrong_rate": "40.75",
+      "correct_rate": "59.25",
+      "rank_in_level": "20",
+      "question_code": "int cnt = 0;\n\nfor(int i = 0; i * i < 64; i += 2)\n    cnt++;\ncout << cnt;",
+      "explanation": "i从0开始，每次加2，直到i*i >= 64。i取值：0,2,4,6 → i*i分别为0,4,16,36，均小于64；下一个i=8，i*i=64不小于64，循环结束。共执行4次，cnt=4。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "8"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "7"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "4"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "1"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "8",
+          "wrong_count": "153"
+        },
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "7",
+          "wrong_count": "137"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "1",
+          "wrong_count": "25"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "8",
+        "wrong_count": "153"
+      }
+    },
+    {
+      "level": 1,
+      "question_id": 1220,
+      "question_text": "下面的C++代码执行后将输出 45。（  ）",
+      "question_type": "code",
+      "difficulty": "medium",
+      "correct_answer": "B",
+      "wrong_count": "309",
+      "total_attempts": "823",
+      "correct_count": "514",
+      "wrong_rate": "37.55",
+      "correct_rate": "62.45",
+      "rank_in_level": "21",
+      "question_code": "int n, i;\nn = i = 0;\nwhile (i < 10){\n    i += 1;\n    n += i;\n}\ncout << n;",
+      "explanation": "代码执行时，i 从 0 开始，每次循环先自增 1，再将 i 的值加到 n 上。循环共执行 10 次，i 依次变为 1 到 10，n 累加的是 1+2+...+10，结果为 55。因此程序输出 55，而不是 45。题干说输出 45 是错误的，故正确答案是 B。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "正确"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "错误"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "正确",
+          "wrong_count": "309"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "正确",
+        "wrong_count": "309"
+      }
+    },
+    {
+      "level": 1,
+      "question_id": 1217,
+      "question_text": "下面C++代码执行后将输出 55。（  ）",
+      "question_type": "code",
+      "difficulty": "hard",
+      "correct_answer": "B",
+      "wrong_count": "301",
+      "total_attempts": "823",
+      "correct_count": "522",
+      "wrong_rate": "36.57",
+      "correct_rate": "63.43",
+      "rank_in_level": "22",
+      "question_code": "n = 0;\nfor (int i = 0; i > -10; i--)\n    n = n + i * -1;\ncout << n;",
+      "explanation": "i从0开始递减到-9共10次，每次加(-i)，即0+1+2+...+9=45，输出45而非55，故说法错误。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "正确"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "错误"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "正确",
+          "wrong_count": "301"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "正确",
+        "wrong_count": "301"
+      }
+    },
+    {
+      "level": 1,
+      "question_id": 1353,
+      "question_text": "对整型变量i，执行C++语句cin >> i, cout << i时如果输入5+2，下述说法正确的是（    ）。",
+      "question_type": "text",
+      "difficulty": "easy",
+      "correct_answer": "B",
+      "wrong_count": "299",
+      "total_attempts": "721",
+      "correct_count": "422",
+      "wrong_rate": "41.47",
+      "correct_rate": "58.53",
+      "rank_in_level": "23",
+      "question_code": "",
+      "explanation": "cin >> i 只会读取第一个整数5，遇到'+'停止，因此输出为5。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "将输出整数7"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "将输出5"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "语句执行将报错，输入表达式不能作为输出的参数"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "语句能执行，但输出内容不确定"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "语句执行将报错，输入表达式不能作为输出的参数",
+          "wrong_count": "145"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "语句能执行，但输出内容不确定",
+          "wrong_count": "83"
+        },
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "将输出整数7",
+          "wrong_count": "71"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "C",
+        "option_label": "C",
+        "option_text": "语句执行将报错，输入表达式不能作为输出的参数",
+        "wrong_count": "145"
+      }
+    },
+    {
+      "level": 1,
+      "question_id": 1358,
+      "question_text": "下面C++代码用于判断N是否为质数（只能被1和它本身整除的正整数）。程序执行后，下面有关描述正确的是（    ）。",
+      "question_type": "code",
+      "difficulty": "medium",
+      "correct_answer": "C",
+      "wrong_count": "287",
+      "total_attempts": "773",
+      "correct_count": "486",
+      "wrong_rate": "37.13",
+      "correct_rate": "62.87",
+      "rank_in_level": "24",
+      "question_code": "int N;\ncout << \"请输入整数：\";\ncin >> N;\n\nbool Flag = false;\n\nif (N >= 2){\n    Flag = true;\n    for (int i = 2; i < N; i++)\n        if (N % i == 0){\n            Flag = false;\n            break;\n        }\n}\n\nif (Flag)\n    cout << \"是质数\";\nelse\n    cout << \"不是质数\";",
+      "explanation": "当输入2时，满足N>=2，Flag=true；但由于i从2开始且i<N不成立（2<2为假），循环体未执行，直接输出“是质数”，这是正确的。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "如果输入负整数，可能输出“是质数”"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "如果输入2，将输出“不是质数”，因为此时循环不起作用"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "如果输入2，将输出“是质数”，即便此时循环体没有被执行"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "如果将if (N >= 2)改为if (N > 2)将能正确判断N是否质数"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "如果输入2，将输出“不是质数”，因为此时循环不起作用",
+          "wrong_count": "135"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "如果将if (N >= 2)改为if (N > 2)将能正确判断N是否质数",
+          "wrong_count": "94"
+        },
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "如果输入负整数，可能输出“是质数”",
+          "wrong_count": "58"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "如果输入2，将输出“不是质数”，因为此时循环不起作用",
+        "wrong_count": "135"
+      }
+    },
+    {
+      "level": 1,
+      "question_id": 1356,
+      "question_text": "下面C++代码执行时输入10后，正确的输出是（    ）。",
+      "question_type": "code",
+      "difficulty": "medium",
+      "correct_answer": "C",
+      "wrong_count": "281",
+      "total_attempts": "721",
+      "correct_count": "440",
+      "wrong_rate": "38.97",
+      "correct_rate": "61.03",
+      "rank_in_level": "25",
+      "question_code": "int N;\ncout << \"请输入正整数：\";\ncin >> N;\nif (N % 3)\n    printf(\"第5行代码%2d\", N % 3);\nelse\n    printf(\"第6行代码%2d\", N % 3);",
+      "explanation": "输入10，N%3=1≠0，进入if分支，打印\"第5行代码%2d\"，其中%2d表示右对齐占两位，输出空格+1，即\" 1\"，因此整体输出为\"第5行代码 1\"。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "第5行代码1"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "第6行代码1"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "第5行代码 1"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "第6行代码 1"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "第6行代码1",
+          "wrong_count": "114"
+        },
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "第5行代码1",
+          "wrong_count": "88"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "第6行代码 1",
+          "wrong_count": "79"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "第6行代码1",
+        "wrong_count": "114"
+      }
+    },
+    {
+      "level": 1,
+      "question_id": 1222,
+      "question_text": "下面C++代码执行时将导致无限循环（也称死循环）。（  ）",
+      "question_type": "code",
+      "difficulty": "medium",
+      "correct_answer": "B",
+      "wrong_count": "280",
+      "total_attempts": "823",
+      "correct_count": "543",
+      "wrong_rate": "34.02",
+      "correct_rate": "65.98",
+      "rank_in_level": "26",
+      "question_code": "int count = 0;\nwhile (count < 5){\n    count += 1;\n    if (count == 3)\n        continue;\n    cout << count << ' ';\n}",
+      "explanation": "count从1到5正常递增，最终会退出循环，不会死循环。continue只是跳过输出3，不影响计数。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "正确"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "错误"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "正确",
+          "wrong_count": "280"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "正确",
+        "wrong_count": "280"
+      }
+    },
+    {
+      "level": 1,
+      "question_id": 1355,
+      "question_text": "表达式9/4 - 6 % (6 - 2) * 10的值是(  )。",
+      "question_type": "text",
+      "difficulty": "medium",
+      "correct_answer": "B",
+      "wrong_count": "275",
+      "total_attempts": "752",
+      "correct_count": "477",
+      "wrong_rate": "36.57",
+      "correct_rate": "63.43",
+      "rank_in_level": "28",
+      "question_code": "",
+      "explanation": "计算顺序：9/4=2（整除），6-2=4，6%4=2，2*10=20，最后2-20=-18。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "-17.75"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "-18"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "-14"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "-12.75"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "-14",
+          "wrong_count": "134"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "-12.75",
+          "wrong_count": "76"
+        },
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "-17.75",
+          "wrong_count": "65"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "C",
+        "option_label": "C",
+        "option_text": "-14",
+        "wrong_count": "134"
+      }
+    },
+    {
+      "level": 1,
+      "question_id": 991,
+      "question_text": "int类型变量a的值是一个正方形的边长，正方形的四条边长都为4，则下列哪个语句执行后能够使得正方形的周长（四条边长的和）增加4？（ ）。\n\n",
+      "question_type": "text",
+      "difficulty": "medium",
+      "correct_answer": "D",
+      "wrong_count": "275",
+      "total_attempts": "414",
+      "correct_count": "139",
+      "wrong_rate": "66.43",
+      "correct_rate": "33.57",
+      "rank_in_level": "27",
+      "question_code": "+ + + + +\n+     +\n+     +\n+     +\n+ + + + +",
+      "explanation": "正方形周长为4*a。若要使周长增加4，则新的周长为4*(a+1)，即边长增加1。因此需要将a加1，唯一实现此操作的是++a。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "a*4;"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "a+4;"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "a+1;"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "++a;"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "a*4;",
+          "wrong_count": "104"
+        },
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "a+4;",
+          "wrong_count": "94"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "a+1;",
+          "wrong_count": "77"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "a*4;",
+        "wrong_count": "104"
+      }
+    },
+    {
+      "level": 1,
+      "question_id": 1200,
+      "question_text": "小杨这学期刚开学就选修了一门编程课，然后就想编写程序来计算1到10001之间的所有偶数的和。他希望程序采用简单累加整数的方法，同时希望源程序尽可能清晰、简洁，则下面关于实现累加时采用的主要控制结构的哪个说法最不合适（  ）。",
+      "question_type": "text",
+      "difficulty": "easy",
+      "correct_answer": "C",
+      "wrong_count": "270",
+      "total_attempts": "823",
+      "correct_count": "553",
+      "wrong_rate": "32.81",
+      "correct_rate": "67.19",
+      "rank_in_level": "29",
+      "question_code": "",
+      "explanation": "仅使用顺序结构无法完成重复累加任务，必须使用循环结构。因此选项C是最不合适的。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "使用循环结构"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "使用循环和分支的组合"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "仅使用顺序结构"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "不使用分支结构"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "使用循环和分支的组合",
+          "wrong_count": "118"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "不使用分支结构",
+          "wrong_count": "96"
+        },
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "使用循环结构",
+          "wrong_count": "56"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "使用循环和分支的组合",
+        "wrong_count": "118"
+      }
+    },
+    {
+      "level": 1,
+      "question_id": 986,
+      "question_text": "下面C++代码执行后输出是（ ）。",
+      "question_type": "code",
+      "difficulty": "medium",
+      "correct_answer": "C",
+      "wrong_count": "268",
+      "total_attempts": "435",
+      "correct_count": "167",
+      "wrong_rate": "61.61",
+      "correct_rate": "38.39",
+      "rank_in_level": "30",
+      "question_code": "int N = 0, i;\nfor (i = 1; i < 10; i++)\n    N += 1;\ncout << (N + i);",
+      "explanation": "循环从i=1到i<10共执行9次，每次N加1，最终N=9；循环结束后i=10，所以输出N+i=9+10=19。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "54"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "20"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "19"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "18"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "54",
+          "wrong_count": "116"
+        },
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "20",
+          "wrong_count": "89"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "18",
+          "wrong_count": "63"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "54",
+        "wrong_count": "116"
+      }
+    },
+    {
+      "level": 1,
+      "question_id": 1371,
+      "question_text": "在C++中有整型变量N，则表达式N += 8/4//2相当于N += 8/(4/2)。（  ）",
+      "question_type": "text",
+      "difficulty": "hard",
+      "correct_answer": "B",
+      "wrong_count": "262",
+      "total_attempts": "752",
+      "correct_count": "490",
+      "wrong_rate": "34.84",
+      "correct_rate": "65.16",
+      "rank_in_level": "32",
+      "question_code": "",
+      "explanation": "8/4//2 中 // 是单行注释开始，其后内容被视为注释，导致语法错误。而8/(4/2)=8/2=4。两者完全不同。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "正确"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "错误"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "正确",
+          "wrong_count": "262"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "正确",
+        "wrong_count": "262"
+      }
+    },
+    {
+      "level": 1,
+      "question_id": 1370,
+      "question_text": "在C++代码中，不可以将变量命名为printf，因为printf是C++语言的关键字。（  ）",
+      "question_type": "text",
+      "difficulty": "medium",
+      "correct_answer": "B",
+      "wrong_count": "262",
+      "total_attempts": "721",
+      "correct_count": "459",
+      "wrong_rate": "36.34",
+      "correct_rate": "63.66",
+      "rank_in_level": "31",
+      "question_code": "",
+      "explanation": "printf并不是C++语言的关键字，而是C标准库中的一个函数名（定义在cstdio头文件中）。C++允许将变量命名为printf，尽管这会与库函数同名并可能引起混淆或命名冲突，但并不会违反语法规定。因此，认为“不能将变量命名为printf是因为它是关键字”的说法是错误的。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "正确"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "错误"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "正确",
+          "wrong_count": "257"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "",
+          "wrong_count": "5"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "正确",
+        "wrong_count": "257"
+      }
+    },
+    {
+      "level": 1,
+      "question_id": 1201,
+      "question_text": "下面的C++代码用于输入姓名，然后输出姓名，正确的说法是(  )。",
+      "question_type": "code",
+      "difficulty": "easy",
+      "correct_answer": "C",
+      "wrong_count": "261",
+      "total_attempts": "823",
+      "correct_count": "562",
+      "wrong_rate": "31.71",
+      "correct_rate": "68.29",
+      "rank_in_level": "33",
+      "question_code": "string XingMing;\ncout << \"请输入您的姓名：\";\ncin >> XingMing;\ncout << XingMing;",
+      "explanation": "变量名可以使用拼音，但不能包含空格或连字符。C选项将XingMing改为全小写是合法且推荐的做法。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "XingMing 是汉语拼音，不能作为变量名称"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "可以将 XingMing 改为 Xing Ming"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "可以将 XingMing 改为 xingming"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "可以将 XingMing 改为 Xing-Ming"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "可以将 XingMing 改为 Xing Ming",
+          "wrong_count": "110"
+        },
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "XingMing 是汉语拼音，不能作为变量名称",
+          "wrong_count": "96"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "可以将 XingMing 改为 Xing-Ming",
+          "wrong_count": "55"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "可以将 XingMing 改为 Xing Ming",
+        "wrong_count": "110"
+      }
+    },
+    {
+      "level": 1,
+      "question_id": 1354,
+      "question_text": "下面C++代码执行后的输出是（ ）。",
+      "question_type": "code",
+      "difficulty": "easy",
+      "correct_answer": "C",
+      "wrong_count": "257",
+      "total_attempts": "721",
+      "correct_count": "464",
+      "wrong_rate": "35.64",
+      "correct_rate": "64.36",
+      "rank_in_level": "34",
+      "question_code": "float a;\na = 101.101;\na = 101;\nprintf(\"a+1={%.0f}\", a + 1);",
+      "explanation": "a被赋值为101（浮点数），a+1=102，%.0f输出不带小数位，结果为a+1={102}。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "102={102}"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "a+1={a+1}"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "a+1={102}"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "a先被赋值为浮点数，后被赋值为整数，执行将报错"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "a先被赋值为浮点数，后被赋值为整数，执行将报错",
+          "wrong_count": "134"
+        },
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "a+1={a+1}",
+          "wrong_count": "91"
+        },
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "102={102}",
+          "wrong_count": "32"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "D",
+        "option_label": "D",
+        "option_text": "a先被赋值为浮点数，后被赋值为整数，执行将报错",
+        "wrong_count": "134"
+      }
+    },
+    {
+      "level": 1,
+      "question_id": 1199,
+      "question_text": "人工智能现在非常火，小杨就想多了解一下，其中就经常听人提到“大模型”。那么请问这里说的“大模型”最贴切是指 (   )。",
+      "question_type": "text",
+      "difficulty": "easy",
+      "correct_answer": "D",
+      "wrong_count": "255",
+      "total_attempts": "823",
+      "correct_count": "568",
+      "wrong_rate": "30.98",
+      "correct_rate": "69.02",
+      "rank_in_level": "35",
+      "question_code": "",
+      "explanation": "“大模型”在人工智能领域通常指参数规模巨大、训练数据庞大的语言模型，能够理解和生成自然语言。选项D“大语言模型”准确描述了这一概念，是当前AI技术中“大模型”最贴切的含义。其他选项或过于宽泛，或偏离技术实际，无法精准对应“大模型”的普遍用法。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "大电脑模型"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "大规模智能"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "智能的单位"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "大语言模型"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "大规模智能",
+          "wrong_count": "133"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "智能的单位",
+          "wrong_count": "89"
+        },
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "大电脑模型",
+          "wrong_count": "33"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "大规模智能",
+        "wrong_count": "133"
+      }
+    },
+    {
+      "level": 1,
+      "question_id": 1203,
+      "question_text": "C++表达式3 * 4 % 5 / 6的值是(  )。",
+      "question_type": "text",
+      "difficulty": "easy",
+      "correct_answer": "D",
+      "wrong_count": "249",
+      "total_attempts": "823",
+      "correct_count": "574",
+      "wrong_rate": "30.26",
+      "correct_rate": "69.74",
+      "rank_in_level": "36",
+      "question_code": "",
+      "explanation": "运算优先级：先乘除模，从左到右。3*4=12，12%5=2，2/6=0（整数除法）。最终结果为0。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "10"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "5"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "2"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "0"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "2",
+          "wrong_count": "129"
+        },
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "5",
+          "wrong_count": "78"
+        },
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "10",
+          "wrong_count": "42"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "C",
+        "option_label": "C",
+        "option_text": "2",
+        "wrong_count": "129"
+      }
+    },
+    {
+      "level": 1,
+      "question_id": 1350,
+      "question_text": "C++表达式3 - 3 * 3 / 5的值是(  )。",
+      "question_type": "text",
+      "difficulty": "easy",
+      "correct_answer": "D",
+      "wrong_count": "244",
+      "total_attempts": "752",
+      "correct_count": "508",
+      "wrong_rate": "32.45",
+      "correct_rate": "67.55",
+      "rank_in_level": "37",
+      "question_code": "",
+      "explanation": "根据运算优先级，先算乘除后加减：3 * 3 = 9，9 / 5 = 1（整数除法），然后3 - 1 = 2。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "-1.2"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "1"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "0"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "2"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "1",
+          "wrong_count": "129"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "0",
+          "wrong_count": "73"
+        },
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "-1.2",
+          "wrong_count": "42"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "1",
+        "wrong_count": "129"
+      }
+    },
+    {
+      "level": 1,
+      "question_id": 1402,
+      "question_text": "下⾯C++代码执⾏后的输出是（ ）。",
+      "question_type": "code",
+      "difficulty": "easy",
+      "correct_answer": "A",
+      "wrong_count": "242",
+      "total_attempts": "587",
+      "correct_count": "345",
+      "wrong_rate": "41.23",
+      "correct_rate": "58.77",
+      "rank_in_level": "38",
+      "question_code": "int a = 1;\ncout << \"a+1= \" << a+1 << endl;",
+      "explanation": "a的值为1，a+1等于2，输出包含空格：\"a+1= 2\"。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "a+1= 2"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "a+1=2"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "2=2"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "2= 2"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "a+1=2",
+          "wrong_count": "184"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "2= 2",
+          "wrong_count": "39"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "2=2",
+          "wrong_count": "19"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "a+1=2",
+        "wrong_count": "184"
+      }
+    },
+    {
+      "level": 1,
+      "question_id": 1365,
+      "question_text": "C++的整型变量N被赋值为10，则语句cout << N / 4 << \"->\" << N % 4 << \"->\" << N / 4.0执行后输出是2->2->2.0。 (   )",
+      "question_type": "text",
+      "difficulty": "easy",
+      "correct_answer": "B",
+      "wrong_count": "241",
+      "total_attempts": "752",
+      "correct_count": "511",
+      "wrong_rate": "32.05",
+      "correct_rate": "67.95",
+      "rank_in_level": "39",
+      "question_code": "",
+      "explanation": "答案B正确，因为输出结果并非“2->2->2.0”。N / 4 是整数除法，结果为2；N % 4 余数为2，前两部分正确。但N / 4.0 是浮点除法，结果为2.5，输出为2.5而非2.0。因此整个输出是“2->2->2.5”，与题中所述不符，故原语句错误。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "正确"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "错误"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "正确",
+          "wrong_count": "238"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "",
+          "wrong_count": "2"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "",
+          "wrong_count": "1"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "正确",
+        "wrong_count": "238"
+      }
+    },
+    {
+      "level": 1,
+      "question_id": 1368,
+      "question_text": "在C++中，break语句用于终止当前层次的循环，循环可以是for循环，也可以是while循环。（  ）",
+      "question_type": "text",
+      "difficulty": "easy",
+      "correct_answer": "A",
+      "wrong_count": "240",
+      "total_attempts": "773",
+      "correct_count": "533",
+      "wrong_rate": "31.05",
+      "correct_rate": "68.95",
+      "rank_in_level": "40",
+      "question_code": "",
+      "explanation": "break语句的作用是立即退出当前所在的循环体，无论是for循环还是while循环，只要程序执行到break，就会终止该层循环的后续迭代，继续执行循环外的代码。题目描述准确反映了break语句的行为特征，因此选项A正确。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "正确"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "错误"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "错误",
+          "wrong_count": "239"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "",
+          "wrong_count": "1"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "错误",
+        "wrong_count": "239"
+      }
+    },
+    {
+      "level": 1,
+      "question_id": 1372,
+      "question_text": "C++中定义变量int N，则表达式(!!N)的值也是N的值。 (   )",
+      "question_type": "text",
+      "difficulty": "medium",
+      "correct_answer": "B",
+      "wrong_count": "238",
+      "total_attempts": "752",
+      "correct_count": "514",
+      "wrong_rate": "31.65",
+      "correct_rate": "68.35",
+      "rank_in_level": "42",
+      "question_code": "",
+      "explanation": "表达式(!!N)将变量N转换为逻辑布尔值。无论N为任何非零值，!!N的结果都为1；当N为0时，!!N的结果也为0。因此，!!N的值只能是0或1，而N本身可能为任意整数值。故(!!N)的值并不总是等于N的值，原命题错误，正确答案为B。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "正确"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "错误"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "正确",
+          "wrong_count": "238"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "正确",
+        "wrong_count": "238"
+      }
+    },
+    {
+      "level": 1,
+      "question_id": 1416,
+      "question_text": "C++函数scanf()必须含有参数，且其参数为字符串型字⾯量，其功能是提⽰输⼊。（  ）",
+      "question_type": "text",
+      "difficulty": "hard",
+      "correct_answer": "B",
+      "wrong_count": "238",
+      "total_attempts": "587",
+      "correct_count": "349",
+      "wrong_rate": "40.55",
+      "correct_rate": "59.45",
+      "rank_in_level": "43",
+      "question_code": "",
+      "explanation": "B是正确答案。scanf()函数的作用是从标准输入读取数据，其第一个参数必须是格式化字符串，但该参数并非用于“提示输入”，程序不会将其内容显示给用户。若要提示用户输入，需配合printf()等输出函数实现。因此题干中“其功能是提示输入”的说法错误，故答案为B。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "正确"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "错误"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "正确",
+          "wrong_count": "228"
+        },
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "错误",
+          "wrong_count": "10"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "正确",
+        "wrong_count": "228"
+      }
+    },
+    {
+      "level": 1,
+      "question_id": 866,
+      "question_text": "下⾯C++代码执⾏后输出的是（ ）。",
+      "question_type": "code",
+      "difficulty": "medium",
+      "correct_answer": "D",
+      "wrong_count": "238",
+      "total_attempts": "465",
+      "correct_count": "227",
+      "wrong_rate": "51.18",
+      "correct_rate": "48.82",
+      "rank_in_level": "41",
+      "question_code": "    int Sum = 0;\n    for (int i = 0; i < 10; i++){\n        if (i % 2 == 0)\n            continue;\n        if (i % 5 == 0)\n            break;\n        Sum += i;\n    }\n    cout << Sum;",
+      "explanation": "循环中，i 从 0 到 9。当 i 为偶数时跳过，奇数时才执行加法。i=1 时 Sum=1，i=3 时 Sum=4，i=5 时触发 break，循环终止。最终 Sum 为 1+3=4，因此答案是 D。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "55"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "15"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "9"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "4"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "15",
+          "wrong_count": "80"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "9",
+          "wrong_count": "79"
+        },
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "55",
+          "wrong_count": "79"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "15",
+        "wrong_count": "80"
+      }
+    },
+    {
+      "level": 1,
+      "question_id": 1373,
+      "question_text": "GESP测试是对认证者的编程能力进行等级认证，同一级别的能力基本上与编程语言无关。（  ）",
+      "question_type": "text",
+      "difficulty": "easy",
+      "correct_answer": "A",
+      "wrong_count": "235",
+      "total_attempts": "383",
+      "correct_count": "148",
+      "wrong_rate": "61.36",
+      "correct_rate": "38.64",
+      "rank_in_level": "44",
+      "question_code": "",
+      "explanation": "GESP测试旨在评估认证者在编程思维、算法设计和问题解决等方面的综合能力，其等级划分侧重于考察编程能力的本质水平，而非对某一特定编程语言的掌握程度。因此，同一级别的认证者应具备相当的问题分析与逻辑构建能力，这种能力是跨语言通用的。题目表述符合GESP的认证理念，故A正确。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "正确"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "错误"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "错误",
+          "wrong_count": "235"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "错误",
+        "wrong_count": "235"
+      }
+    },
+    {
+      "level": 1,
+      "question_id": 990,
+      "question_text": "下面C++代码执行后的输出是（ ）。",
+      "question_type": "code",
+      "difficulty": "hard",
+      "correct_answer": "C",
+      "wrong_count": "234",
+      "total_attempts": "435",
+      "correct_count": "201",
+      "wrong_rate": "53.79",
+      "correct_rate": "46.21",
+      "rank_in_level": "45",
+      "question_code": "int cnt;\n\ncnt = 0;\nfor(int i = 1; i < 10; i++)\n    cnt += i++;\ncout << cnt;\ncout << endl;",
+      "explanation": "循环中i每次增加两次：一次在循环体内i++，一次在for更新部分i++。实际参与累加的是奇数：1,3,5,7,9 → 和为1+3+5+7+9=25。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "54"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "45"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "25"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "10"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "45",
+          "wrong_count": "157"
+        },
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "54",
+          "wrong_count": "57"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "10",
+          "wrong_count": "20"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "45",
+        "wrong_count": "157"
+      }
+    },
+    {
+      "level": 1,
+      "question_id": 1216,
+      "question_text": "下面C++代码执行后将输出 9。 (   )",
+      "question_type": "code",
+      "difficulty": "medium",
+      "correct_answer": "B",
+      "wrong_count": "232",
+      "total_attempts": "823",
+      "correct_count": "591",
+      "wrong_rate": "28.19",
+      "correct_rate": "71.81",
+      "rank_in_level": "47",
+      "question_code": "for (i = 0; i < 10; i++)\n    break;\ncout << i;",
+      "explanation": "循环中立即break，i只执行了初始化i=0，然后跳出，i值仍为0，输出0而不是9。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "正确"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "错误"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "正确",
+          "wrong_count": "232"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "正确",
+        "wrong_count": "232"
+      }
+    },
+    {
+      "level": 1,
+      "question_id": 865,
+      "question_text": "下⾯的C++代码⽤于求N的所有因数（即能将N整除的数），如输⼊12则将输出12,6,4,3,2,1。（ ）。",
+      "question_type": "code",
+      "difficulty": "medium",
+      "correct_answer": "C",
+      "wrong_count": "232",
+      "total_attempts": "465",
+      "correct_count": "233",
+      "wrong_rate": "49.89",
+      "correct_rate": "50.11",
+      "rank_in_level": "46",
+      "question_code": "    int i, N;\n    cin >> N;\n    i = N;\n    while (_______){\n        if (N % i == 0)\n            printf(\"%d,\", i);\n        i -= 1;\n    }\n    printf(\"1\");",
+      "explanation": "正确答案是C，因为循环需要从N开始递减到1，当i大于1时继续循环。若条件为i > 1，则循环会在i=1时停止，避免重复输出1。而选项D虽然也能运行，但会多输出一次1，不符合题目要求。选项B和A会导致循环无法正常终止或逻辑错误。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "i -= 1"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "i == 1"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "i > 1"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "i >= 1"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "i >= 1",
+          "wrong_count": "137"
+        },
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "i -= 1",
+          "wrong_count": "58"
+        },
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "i == 1",
+          "wrong_count": "37"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "D",
+        "option_label": "D",
+        "option_text": "i >= 1",
+        "wrong_count": "137"
+      }
+    },
+    {
+      "level": 1,
+      "question_id": 1401,
+      "question_text": "执⾏C++语句cin >> a时如果输⼊5+2，下述说法正确的是（    ）。",
+      "question_type": "text",
+      "difficulty": "medium",
+      "correct_answer": "D",
+      "wrong_count": "231",
+      "total_attempts": "587",
+      "correct_count": "356",
+      "wrong_rate": "39.35",
+      "correct_rate": "60.65",
+      "rank_in_level": "48",
+      "question_code": "",
+      "explanation": "输入行为依赖于变量a的类型。如果a是整型，则尝试解析5+2会失败或只读取5；如果是字符串，则可能读入整个表达式。未定义变量会导致编译错误。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "变量a将被赋值为整数7"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "变量a将被赋值为字符串，字符串内容为5+2"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "语句执⾏将报错，不能输⼊表达式"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "依赖于变量a的类型。如果没有定义，会有编译错误"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "变量a将被赋值为字符串，字符串内容为5+2",
+          "wrong_count": "118"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "语句执⾏将报错，不能输⼊表达式",
+          "wrong_count": "63"
+        },
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "变量a将被赋值为整数7",
+          "wrong_count": "50"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "变量a将被赋值为字符串，字符串内容为5+2",
+        "wrong_count": "118"
+      }
+    },
+    {
+      "level": 1,
+      "question_id": 1352,
+      "question_text": "C++语句printf(\"5%%2={%d}\\n\",5 % 2)执行后的输出是(  )。",
+      "question_type": "text",
+      "difficulty": "medium",
+      "correct_answer": "C",
+      "wrong_count": "226",
+      "total_attempts": "721",
+      "correct_count": "495",
+      "wrong_rate": "31.35",
+      "correct_rate": "68.65",
+      "rank_in_level": "49",
+      "question_code": "",
+      "explanation": "在格式字符串中，\"%%\"表示输出一个百分号%，因此\"5%%2\"输出为\"5%2\"，而%d被替换为5%2的结果1，最终输出\"5%2={1}\"。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "1={1}"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "5%2={5%2}"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "5%2={1}"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "5 ={1}"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "5%2={5%2}",
+          "wrong_count": "128"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "5 ={1}",
+          "wrong_count": "65"
+        },
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "1={1}",
+          "wrong_count": "33"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "5%2={5%2}",
+        "wrong_count": "128"
+      }
+    },
+    {
+      "level": 1,
+      "question_id": 988,
+      "question_text": "下面C++代码执行后输出的是（ ）。",
+      "question_type": "code",
+      "difficulty": "hard",
+      "correct_answer": "C",
+      "wrong_count": "224",
+      "total_attempts": "435",
+      "correct_count": "211",
+      "wrong_rate": "51.49",
+      "correct_rate": "48.51",
+      "rank_in_level": "50",
+      "question_code": "int N = 0, i;\nint tnt = 0;\nfor (i = 5; i < 100; i += 5) {\n    if (i % 2 == 0)\n        continue;\n    tnt += 1;\n    if (i >= 50)\n        break;\n}\ncout << tnt;",
+      "explanation": "循环从i=5开始，每次加5，直到i<100。其中i为奇数时tnt加1，当i≥50时停止。符合条件的i有5、15、25、35、45，共5个，但i=5时tnt加1，之后i=15、25、35、45各加1，共6次，因此tnt为6，选C。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "10"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "9"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "6"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "5"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "9",
+          "wrong_count": "120"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "5",
+          "wrong_count": "56"
+        },
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "10",
+          "wrong_count": "48"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "9",
+        "wrong_count": "120"
+      }
+    }
+  ]
+}

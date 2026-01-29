@@ -1,0 +1,492 @@
+﻿level,question_id,question_text,question_code,question_type,difficulty,correct_answer,explanation,all_options,all_options_text,option_a_label,option_a_text,option_a_wrong_count,option_b_label,option_b_text,option_b_wrong_count,option_c_label,option_c_text,option_c_wrong_count,option_d_label,option_d_text,option_d_wrong_count,wrong_count,total_attempts,correct_count,wrong_rate,correct_rate,rank_in_level,most_wrong_option_value,most_wrong_option_label,most_wrong_option_text,most_wrong_option_count
+4,1348,以下代码将 Hello 写入文件 data.txt。,"#include <fstream>
+using namespace std;
+
+ofstream file(""data.txt"");
+cout << ""Hello"" << endl;
+file.close();",code,medium,错误,"该代码错误在于：虽然声明了 `ofstream file(""data.txt"")`，但并未实际向文件写入任何内容；`cout << ""Hello"" << endl;` 是将字符串输出到**控制台（标准输出）**，而非文件。文件流对象 `file` 自始至终未被使用（如未调用 `file << ""Hello"";`），因此 `data.txt` 文件要么为空，要么甚至可能因构造失败而未被创建。`file.close()` 无法弥补写入操作的缺失。故代码无法实现“将 Hello 写入文件”的功能，选项 B（错误）是正确答案。",A: 正确 (错误9次); B: 错误 (错误1次),A: 正确; B: 错误,A,正确,0,B,错误,0,,,0,,,0,55,59,4,93.22,6.78,1,true,true,,26
+4,939,下面代码实现了冒泡排序函数，则横线上应填写（ ）。,"//交换数组arr的第i个元素和第j个元素
+void swap(vector<int> &arr, int i, int j) {
+    int tmp = arr[i];
+    arr[i] = arr[j];
+    arr[j] = tmp;
+}
+
+int bubble_sort(vector<int> &arr) {
+    for (int i = arr.size() - 1; i > 0; i--) {
+        bool flag = false; // 标志位
+        ________________________________ { // 在此处填入代码
+
+            if (arr[j] > arr[j + 1]) {
+                swap(arr, i, j);
+                flag = true;
+            }
+        }
+        if (!flag)
+            break; // 此轮“冒泡”未交换任何元素
+    }
+}",code,hard,C,冒泡排序的内层循环应该从 0 开始，到 i 为止，这样可以将最大的元素“冒泡”到数组的末尾。选项 C 正确实现了冒泡排序的内层循环。,A: for (int j = 0; j < arr.size() - 1; j++) (错误25次); B: for (int j = arr.size() - 1; j > 0; j--) (错误14次); C: for (int j = 0; j < i; j++) (错误0次); D: for (int j = i-1; j <=0; j--) (错误3次),A: for (int j = 0; j < arr.size() - 1; j++); B: for (int j = arr.size() - 1; j > 0; j--); C: for (int j = 0; j < i; j++); D: for (int j = i-1; j <=0; j--),A,for (int j = 0; j < arr.size() - 1; j++),25,B,for (int j = arr.size() - 1; j > 0; j--),14,C,for (int j = 0; j < i; j++),0,D,for (int j = i-1; j <=0; j--),3,42,62,20,67.74,32.26,2,A,A,for (int j = 0; j < arr.size() - 1; j++),25
+4,1335,关于插入排序的时间复杂度，下列说法正确的是（   ）。,,text,hard,B,"最好情况：数组已按目标顺序排列，内层循环无需移动元素，仅外层循环遍历 n 个元素，时间复杂度 O (n)。
+最坏情况：数组逆序排列，每个元素i需向前比较i次并移动i个元素，总操作次数为 1+2+...+(n-1) = n (n-1)/2，时间复杂度 O (n²)。",A: 最好情况和最坏情况的时间复杂度都是 O(n²) (错误15次); B: 最好情况是 O(n)，最坏情况是 O(n²) (错误0次); C: 最好情况是 O(n)，最坏情况是O(2ⁿ) (错误15次); D: 最好情况是 O(n²)，最坏情况是O(2ⁿ) (错误2次),A: 最好情况和最坏情况的时间复杂度都是 O(n²); B: 最好情况是 O(n)，最坏情况是 O(n²); C: 最好情况是 O(n)，最坏情况是O(2ⁿ); D: 最好情况是 O(n²)，最坏情况是O(2ⁿ),A,最好情况和最坏情况的时间复杂度都是 O(n²),15,B,最好情况是 O(n)，最坏情况是 O(n²),0,C,最好情况是 O(n)，最坏情况是O(2ⁿ),15,D,最好情况是 O(n²)，最坏情况是O(2ⁿ),2,32,59,27,54.24,45.76,3,C,C,最好情况是 O(n)，最坏情况是O(2ⁿ),15
+4,1336,小杨正在爬楼梯，需要 n 阶才能到达楼顶，每次可以爬 1 阶或 2 阶，求小杨有多少种不同的方法可以爬到楼顶，横线上应填写（  ）。,"int climbStairs(int n) {
+    if (n <= 2) return n;
+    int prev2 = 1;
+    int prev1 = 2;
+    int current = 0;
+    for (int i = 3; i <= n; ++i) {
+        ________________    // 在此处填入代码
+    }
+    return current;
+}",code,hard,B,"爬楼梯问题本质：第n阶的方法数 = 第n-1阶方法数（最后一步爬 1 阶） + 第n-2阶方法数（最后一步爬 2 阶）
+递推公式为dp[n] = dp[n-1] + dp[n-2]，初始条件dp[1] = 1，dp[2] = 2。
+代码优化：用变量prev2（对应dp[i-2]）、prev1（对应dp[i-1]）、current（对应dp[i]）代替数组，降低空间复杂度（从 O (n) 到 O (1)）。
+循环中逻辑：
+计算当前current = prev1 + prev2（dp[i] = dp[i-1] + dp[i-2]）。
+更新下一轮的prev2和prev1：prev2 = prev1（dp[i-2]变为dp[i-1]），prev1 = current（dp[i-1]变为dp[i]）。
+正确顺序为 “current = prev1 + prev2; prev2 = prev1; prev1 = current;”，对应选项 C。","A: prev2 = prev1;
+prev1 = current;
+current = prev1 + prev2; (错误14次); B: current = prev1 + prev2;
+prev2 = prev1;
+prev1 = current; (错误0次); C: current = prev1 + prev2;
+prev1 = current;
+prev2 = prev1; (错误11次); D: prev1 = current;
+prev2 = prev1;
+current = prev1 + prev2; (错误5次)","A: prev2 = prev1;
+prev1 = current;
+current = prev1 + prev2;; B: current = prev1 + prev2;
+prev2 = prev1;
+prev1 = current;; C: current = prev1 + prev2;
+prev1 = current;
+prev2 = prev1;; D: prev1 = current;
+prev2 = prev1;
+current = prev1 + prev2;",A,"prev2 = prev1;
+prev1 = current;
+current = prev1 + prev2;",14,B,"current = prev1 + prev2;
+prev2 = prev1;
+prev1 = current;",0,C,"current = prev1 + prev2;
+prev1 = current;
+prev2 = prev1;",11,D,"prev1 = current;
+prev2 = prev1;
+current = prev1 + prev2;",5,30,59,29,50.85,49.15,4,A,A,"prev2 = prev1;
+prev1 = current;
+current = prev1 + prev2;",14
+4,941,下面代码实现了插入排序函数（升序），则横线上应填写（ ）。,"void insertion_sort(vector<int> &nums) {
+    for (int i = 1; i < nums.size(); i++) {
+        int base = nums[i], j = i - 1;
+
+        ________________________________ { // 在此处填入代码
+            nums[j + 1] = nums[j];
+            j--;
+        }
+        nums[j + 1] = base;
+    }
+}",code,hard,A,正确答案是A，因为插入排序需要将当前元素与前面已排序部分的元素比较，当遇到比它大的元素时，需将其后移。条件`j >= 0 && nums[j] > base`确保在有效范围内且当前元素大于基准值时继续循环，从而正确完成插入操作。其他选项无法满足排序逻辑。,A: while (j >= 0 && nums[j] > base) (错误0次); B: while (j > 0 && nums[j] > base) (错误16次); C: while (j >= 0 && nums[j] < base) (错误6次); D: while (j > 0 && nums[j] < base) (错误7次),A: while (j >= 0 && nums[j] > base); B: while (j > 0 && nums[j] > base); C: while (j >= 0 && nums[j] < base); D: while (j > 0 && nums[j] < base),A,while (j >= 0 && nums[j] > base),0,B,while (j > 0 && nums[j] > base),16,C,while (j >= 0 && nums[j] < base),6,D,while (j > 0 && nums[j] < base),7,29,62,33,46.77,53.23,5,B,B,while (j > 0 && nums[j] > base),16
+4,1340,执行下面C++代码将输出 11。,"int x = 10;
+void f() {
+    int x = x + 1;
+    cout << x << endl;
+}
+
+int main() {
+    f();
+}",code,hard,错误,f()函数中int x = x + 1;存在问题：局部变量x在定义时，右侧的x仍未初始化（此时x是局部变量，而非全局变量x=10），使用未初始化的变量会导致未定义行为（输出随机值，而非 11）。,A: 正确 (错误29次); B: 错误 (错误0次),A: 正确; B: 错误,A,正确,0,B,错误,0,,,0,,,0,29,59,30,49.15,50.85,6,正确,A,正确,29
+4,1332,关于排序算法的稳定性，以下说法错误的是（   ）。,,text,medium,C,选择排序不是稳定排序，因为在选择最小元素交换时可能改变相等元素的相对位置。冒泡和插入排序是稳定的。,A: 稳定的排序算法不改变相等元素的相对位置 (错误11次); B: 冒泡排序是稳定的排序算法 (错误7次); C: 选择排序是稳定的排序算法 (错误0次); D: 插入排序是稳定的排序算法 (错误10次),A: 稳定的排序算法不改变相等元素的相对位置; B: 冒泡排序是稳定的排序算法; C: 选择排序是稳定的排序算法; D: 插入排序是稳定的排序算法,A,稳定的排序算法不改变相等元素的相对位置,11,B,冒泡排序是稳定的排序算法,7,C,选择排序是稳定的排序算法,0,D,插入排序是稳定的排序算法,10,28,59,31,47.46,52.54,7,A,A,稳定的排序算法不改变相等元素的相对位置,11
+4,940,上一题算法的时间复杂度为（ ）。,,text,hard,A,该算法通过双重循环遍历数据，外层循环执行n次，内层循环在最坏情况下也执行n次，因此总操作次数与n²成正比，时间复杂度为O(n²)，故正确答案是A。,A: O(n^2) (错误0次); B: O(2^n) (错误7次); C: O(1) (错误2次); D: O(n) (错误18次),A: O(n^2); B: O(2^n); C: O(1); D: O(n),A,O(n^2),0,B,O(2^n),7,C,O(1),2,D,O(n),18,27,62,35,43.55,56.45,8,D,D,O(n),18
+4,1325,以下关于数组的描述中，（   ）是错误的。,,text,easy,C,数组名是一个指针常量，不能进行自增操作。指针可以自增，但数组名不可以。,A: 数组名是一个指针常量 (错误13次); B: 随机访问数组的元素方便快捷 (错误6次); C: 数组可以像指针一样进行自增操作 (错误0次); D: sizeof(arr) 返回的是整个数组arr占用的字节数 (错误8次),A: 数组名是一个指针常量; B: 随机访问数组的元素方便快捷; C: 数组可以像指针一样进行自增操作; D: sizeof(arr) 返回的是整个数组arr占用的字节数,A,数组名是一个指针常量,13,B,随机访问数组的元素方便快捷,6,C,数组可以像指针一样进行自增操作,0,D,sizeof(arr) 返回的是整个数组arr占用的字节数,8,27,59,32,45.76,54.24,10,A,A,数组名是一个指针常量,13
+4,1326,给定如下定义的数组arr，则*(*(arr + 1) + 2)的值是（   ）。,"int arr[2][3] = {{1, 2, 3}, {4, 5, 6}};",code,medium,D,"首地址arr指向第一行（arr[0]），arr + 1指向第二行（arr[1]）。
+*(arr + 1)等价于arr[1]（第二行的首地址），*(arr + 1) + 2等价于arr[1] + 2（第二行第 3 个元素的地址）。
+*(*(arr + 1) + 2)等价于arr[1][2]，值为 6。",A: 2 (错误14次); B: 5 (错误5次); C: 4 (错误8次); D: 6 (错误0次),A: 2; B: 5; C: 4; D: 6,A,2,14,B,5,5,C,4,8,D,6,0,27,59,32,45.76,54.24,11,A,A,2,14
+4,951,在 C++ 中，如果没有捕获到异常（没有匹配的 catch 块），程序会继续执行而不会终止。,,text,medium,B,如果没有捕获到异常，程序会调用 terminate 函数并终止执行。,A: 正确 (错误27次); B: 错误 (错误0次),A: 正确; B: 错误,A,正确,27,B,错误,0,,,0,,,0,27,37,10,72.97,27.03,9,A,A,正确,27
+4,1526,下列代码中，输出结果是（ ）,"#include <iostream>
+using namespace std;
+int func(int x, int y){
+    int a = x, b = y;
+    int t;
+    t = a;
+    a = b;
+    b = t;
+    cout << a << "" "" << b << "" "";
+}
+int main() {
+    int c, d;
+    int a = 12, b = 24;
+    cout << a << "" "" << b << "" "";
+    swap(a, b);
+    cout << a << "" "" << b << endl;
+    return 0;
+}",code,medium,B,程序先输出a和b的初始值12和24，然后交换a和b的值，再输出交换后的a和b，即24和12。因此输出为：12 24 24 12。,A: 12  24  24  12 (错误26次); B: 24  12  12  24 (错误0次); C: 12  12  24  24 (错误0次); D: 24  24  12  12 (错误1次),A: 12  24  24  12; B: 24  12  12  24; C: 12  12  24  24; D: 24  24  12  12,A,12  24  24  12,26,B,24  12  12  24,0,C,12  12  24  24,0,D,24  24  12  12,1,27,37,10,72.97,27.03,12,A,A,12  24  24  12,26
+4,952,以下代码用递推法求斐波那契数列的第 n 项，时间复杂度为指数级。,"int fibonacci(int n) {
+    if (n == 0) return 0;
+    if (n == 1) return 1;
+
+    int f0 = 0; // F(0)
+    int f1 = 1; // F(1)
+    int current;
+
+    for (int i = 2; i <= n; i++) {
+        current = f0 + f1; // F(n) = F(n-1) + F(n-2)
+        f0 = f1;
+        f1 = current;
+    }
+
+    return current;
+}",code,medium,B,该代码使用递推法计算斐波那契数列，时间复杂度为 O(n)，而不是指数级。,A: 正确 (错误26次); B: 错误 (错误0次),A: 正确; B: 错误,A,正确,26,B,错误,0,,,0,,,0,26,62,36,41.94,58.06,13,A,A,正确,26
+4,1329,下面程序运行的结果是（   ）。,"void increaseA(int x) {
+    x++;
+}
+void increaseB(int* p) {
+    (*p)++;
+}
+int main() {
+    int a = 5;
+    increaseA(a);
+    cout << a << "" "";
+    increaseB(&a);
+    cout << a;
+}",code,medium,C,"increaseA(int x)采用值传递：形参x是实参a的副本，修改x++仅改变副本，不影响原变量a（a仍为 5）。
+increaseB(int* p)采用指针传递：形参p指向a的地址，(*p)++直接修改p指向的变量（即a），a变为 6。
+主函数中a = 5，调用increaseA(a)后a仍为 5，调用increaseB(&a)后a变为 6，输出 “5 6”。",A: 6 7 (错误18次); B: 6 6 (错误8次); C: 5 6 (错误0次); D: 5 5 (错误0次),A: 6 7; B: 6 6; C: 5 6; D: 5 5,A,6 7,18,B,6 6,8,C,5 6,0,D,5 5,0,26,59,33,44.07,55.93,14,A,A,6 7,18
+4,1530,如果下列程序输出的地址是0x6ffe00，则cout<<a+1<<endl;输出的是（）,"#include <iostream>
+using namespace std;
+int main() {
+    int a[2][3] = {0};
+    cout << a << endl;
+    return 0;
+}",code,medium,B,由于a是二维数组的首地址，代表第0行的地址，a+1指向第1行的起始地址。每行有3个int元素，每个int占4字节，因此一行占用12字节（即0xC）。起始地址0x6ffe00加上12字节后为0x6ffe0C，故a+1输出0x6ffe0C，选项B正确。,A: 0x6ffe04 (错误17次); B: 0x6ffe0C (错误0次); C: 0x6ffe08 (错误5次); D: 0x6ffe00 (错误4次),A: 0x6ffe04; B: 0x6ffe0C; C: 0x6ffe08; D: 0x6ffe00,A,0x6ffe04,17,B,0x6ffe0C,0,C,0x6ffe08,5,D,0x6ffe00,4,26,37,11,70.27,29.73,15,A,A,0x6ffe04,17
+4,943,运行下面的代码，屏幕上将输出（ ）。,"#include <iostream>
+using namespace std;
+
+int divide(int a, int b) {
+    if (b == 0) {
+        throw runtime_error(""division by zero error "");
+    }
+    return a / b;
+}
+
+int main() {
+    int x = 10;
+    int y = 0; // 设为 0 会导致除零错误
+
+    try {
+        int result = divide(x, y);
+        cout << ""result: "" << result << endl;
+    } catch (const runtime_error& e) {
+        cout << ""caught an exception: "" << e.what() << endl;
+    }
+
+    return 0;
+}",code,medium,C,代码中y设为0，调用divide函数时会抛出异常。在try块中捕获到该异常后，输出“caught an exception: ”，接着输出异常信息“division by zero error ”。因此，正确输出是“caught an exception: division by zero error”。,A: division by zero error result: caught an exception: (错误18次); B: result: caught an exception: division by zero error (错误5次); C: caught an exception: division by zero error (错误0次); D: division by zero error caught an exception: division by zero error (错误2次),A: division by zero error result: caught an exception:; B: result: caught an exception: division by zero error; C: caught an exception: division by zero error; D: division by zero error caught an exception: division by zero error,A,division by zero error result: caught an exception:,18,B,result: caught an exception: division by zero error,5,C,caught an exception: division by zero error,0,D,division by zero error caught an exception: division by zero error,2,25,37,12,67.57,32.43,16,A,A,division by zero error result: caught an exception:,18
+4,950,插入排序的时间复杂度总是比冒泡排序低。,,text,hard,B,虽然插入排序在某些情况下比冒泡排序快，但在最坏情况下两者的复杂度都是 O(n^2)，因此不能说插入排序的时间复杂度总是比冒泡排序低。,A: 正确 (错误24次); B: 错误 (错误0次),A: 正确; B: 错误,A,正确,24,B,错误,0,,,0,,,0,24,62,38,38.71,61.29,18,A,A,正确,24
+4,1338,关于异常处理，以下说法错误的是（   ）。,,text,medium,D,并非所有异常都必须被捕获。未捕获的异常会导致程序终止，但C++允许异常不被捕获。throw语句抛出异常，try-catch可捕获多个类型。,A: try 块中的代码可能会抛出异常 (错误13次); B: catch 块可以有多个，处理不同类型的异常 (错误4次); C: throw 语句用于抛出异常 (错误7次); D: 所有异常都必须被捕获，否则程序会崩溃 (错误0次),A: try 块中的代码可能会抛出异常; B: catch 块可以有多个，处理不同类型的异常; C: throw 语句用于抛出异常; D: 所有异常都必须被捕获，否则程序会崩溃,A,try 块中的代码可能会抛出异常,13,B,catch 块可以有多个，处理不同类型的异常,4,C,throw 语句用于抛出异常,7,D,所有异常都必须被捕获，否则程序会崩溃,0,24,59,35,40.68,59.32,19,A,A,try 块中的代码可能会抛出异常,13
+4,936,一个二维数组定义为 int arr[3][4];（假设一个int变量占4个字节），则int arr[0]占用（ ）个字节的内存。,,text,medium,D,二维数组 arr[3][4] 表示有 3 行，每行有 4 个 int 类型元素。arr[0] 表示第 0 行，包含 4 个 int 类型元素，每个 int 占用 4 个字节，所以总共占用 4 * 4 = 16 个字节。,A: 3 (错误12次); B: 4 (错误12次); C: 12 (错误0次); D: 16 (错误0次),A: 3; B: 4; C: 12; D: 16,A,3,12,B,4,12,C,12,0,D,16,0,24,37,13,64.86,35.14,17,B,B,4,12
+4,1529,假设变量a的地址是0x6ffe14，下面程序的输出是（  ）。,"#include <iostream>
+using namespace std;
+
+int main() {
+    int *p;
+    int a = 10;
+    p = &a;
+    p++;
+    cout << p << endl;
+}",code,hard,D,由于变量a的地址是0x6ffe14，指针p指向int类型，p++会使地址增加一个int的大小（通常为4字节）。因此，p从0x6ffe14增加4，变为0x6ffe18。最终输出p的值为0x6ffe18，故D正确。,A: 10 (错误5次); B: 0x6ffe14 (错误9次); C: 0x6ffe15 (错误9次); D: 0x6ffe18 (错误0次),A: 10; B: 0x6ffe14; C: 0x6ffe15; D: 0x6ffe18,A,10,5,B,0x6ffe14,9,C,0x6ffe15,9,D,0x6ffe18,0,23,37,14,62.16,37.84,21,C,C,0x6ffe15,9
+4,834,下面的描述中，（ ）不能正确定义一个名为Student的结构体以及一个包含20个元素的结构数组。,"struct Student {
+    string name;
+    int age;
+    float score;
+};
+struct Student students[20];",text,hard,D,选项D中 `Student students = new Student[20];` 语法错误，应使用指针接收动态数组。正确应为 `Student* students = new Student[20];`。,"A: struct Student {
+    string name;
+    int age;
+    float score;
+};
+struct Student students[20]; (错误15次); B: struct Student {
+    string name;
+    int age;
+    float score;
+};
+Student students[20]; (错误5次); C: struct Student {
+    string name;
+    int age;
+    float score;
+};
+Student* students = new Student[20]; (错误3次); D: struct Student {
+    string name;
+    int age;
+    float score;
+};
+Student students = new Student[20]; (错误0次)","A: struct Student {
+    string name;
+    int age;
+    float score;
+};
+struct Student students[20];; B: struct Student {
+    string name;
+    int age;
+    float score;
+};
+Student students[20];; C: struct Student {
+    string name;
+    int age;
+    float score;
+};
+Student* students = new Student[20];; D: struct Student {
+    string name;
+    int age;
+    float score;
+};
+Student students = new Student[20];",A,"struct Student {
+    string name;
+    int age;
+    float score;
+};
+struct Student students[20];",15,B,"struct Student {
+    string name;
+    int age;
+    float score;
+};
+Student students[20];",5,C,"struct Student {
+    string name;
+    int age;
+    float score;
+};
+Student* students = new Student[20];",3,D,"struct Student {
+    string name;
+    int age;
+    float score;
+};
+Student students = new Student[20];",0,23,34,11,67.65,32.35,20,A,A,"struct Student {
+    string name;
+    int age;
+    float score;
+};
+struct Student students[20];",15
+4,938,在排序算法中，稳定性指的是（ ）。,,text,easy,B,排序算法的稳定性是指排序后相同元素的相对顺序保持不变。选项 B 正确描述了排序算法的稳定性。,A: 排序后数据不会丢失 (错误15次); B: 排序后相同元素的相对顺序保持不变 (错误0次); C: 排序后数据不会被修改 (错误2次); D: 排序后数据的时间复杂度不变 (错误5次),A: 排序后数据不会丢失; B: 排序后相同元素的相对顺序保持不变; C: 排序后数据不会被修改; D: 排序后数据的时间复杂度不变,A,排序后数据不会丢失,15,B,排序后相同元素的相对顺序保持不变,0,C,排序后数据不会被修改,2,D,排序后数据的时间复杂度不变,5,22,62,40,35.48,64.52,22,A,A,排序后数据不会丢失,15
+4,1337,假设有一个班级的成绩单，存储在一个长度为 n 的数组 scores 中，每个元素是一个学生的分数。老师想要找出所有满足 scores[i] + scores[j] + scores[k] == 300 的三元组，其中 i < j < k。下面代码实现该功能，请问其时间复杂度是（   ）。,"int cnt = 0;
+for (int i = 0; i < n; i++) {
+    for (int j = i + 1; j < n; j++) {
+        for (int k = j + 1; k < n; k++) {
+            if (scores[i] + scores[j] + scores[k] == 300) {
+                cnt++;
+            }
+        }
+    }
+}",code,hard,C,"代码嵌套三层循环：
+外层循环i：遍历 n 次（0 到 n-1）。
+中层循环j：对每个i，遍历 n-i-1 次（平均约 n/2 次）。
+内层循环k：对每个j，遍历 n-j-1 次（平均约 n/2 次）。
+总操作次数约为 n × (n/2) × (n/2) = n³/4，忽略常数系数后，时间复杂度为 O (n³)。
+",A: O(n) (错误10次); B: O(n²) (错误8次); C: O(n³) (错误0次); D: O(2ⁿ) (错误4次),A: O(n); B: O(n²); C: O(n³); D: O(2ⁿ),A,O(n),10,B,O(n²),8,C,O(n³),0,D,O(2ⁿ),4,22,59,37,37.29,62.71,23,A,A,O(n),10
+4,1343,下面代码将二维数组arr传递给函数f，函数内部用arr[i][j]访问元素，函数参数声明为int arr[][4]是错误的。,"void f(int arr[][4], int rows) {
+    // 访问 arr[i][j]
+}
+
+int main() {
+    int arr[3][4] = { /* 初始化 */ };
+    f(arr, 3);
+}",code,medium,错误,函数参数int arr[][4]合法。二维数组作为函数参数时，第一维的大小可省略（因函数只需知道 “每行有多少个元素” 即可计算地址），第二维大小必须指定（如int arr[][4]表示每行 4 个元素）。main函数中arr[3][4]与参数int arr[][4]匹配，可通过arr[i][j]正常访问元素，因此 “错误” 的说法不正确。,A: 正确 (错误21次); B: 错误 (错误0次),A: 正确; B: 错误,A,正确,0,B,错误,0,,,0,,,0,21,59,38,35.59,64.41,26,正确,A,正确,21
+4,947,二维数组的行的大小必须在定义时确定，列的大小可以动态变化。,,text,medium,B,二维数组的行和列的大小在定义时都需要确定，无法动态变化。,A: 正确 (错误21次); B: 错误 (错误0次),A: 正确; B: 错误,A,正确,21,B,错误,0,,,0,,,0,21,37,16,56.76,43.24,25,A,A,正确,21
+4,835,"假定整型是32位，对一个2行3列的二维整数数组array,假设数组第一个元素在内存中的地址为0x7ffee4065820，则第2行第2个元素的地址&array[1][1]为（ ）。","int array[2][3] = {
+    {0, 1, 2},
+    {3, 4, 5}
+};",code,hard,D,每个整型占4字节，数组第1行的3个元素占据0x7ffee4065820至0x7ffee406582c。第2行第1个元素从0x7ffee4065830开始，第2个元素则在该地址后加4字节，即0x7ffee4065830。因此，&array[1][1]的地址为D选项。,A: 0x7ffee4065824 (错误11次); B: 0x7ffee4065828 (错误3次); C: 0x7ffee406582c (错误7次); D: 0x7ffee4065830 (错误0次),A: 0x7ffee4065824; B: 0x7ffee4065828; C: 0x7ffee406582c; D: 0x7ffee4065830,A,0x7ffee4065824,11,B,0x7ffee4065828,3,C,0x7ffee406582c,7,D,0x7ffee4065830,0,21,34,13,61.76,38.24,24,A,A,0x7ffee4065824,11
+4,1339,以下代码能正确初始化指针。,"int a = 5;
+int *p = a;",code,easy,错误,"int* p = a;
+直接将a（值为 5）赋值给指针p，会将 5 作为地址（非法内存地址），导致编译警告或运行错误。
+指针p需存储变量的地址，应改为int* p = &a;（&a是a的地址）。",A: 正确 (错误16次); B: 错误 (错误0次),A: 正确; B: 错误,A,正确,3,B,错误,1,,,0,,,0,20,59,39,33.90,66.10,30,正确,A,正确,16
+4,1347,以下代码只能捕获int类型异常。,"int main() {
+    try {
+        throw 42; 
+    } catch (...) {
+        cout << ""Caught"" << endl;
+    }
+    return 0;
+}",code,medium,错误,该代码使用 `catch(...)` 捕获所有类型的异常，而不仅限于 int 类型。虽然抛出的是 int 类型异常（`throw 42;`），但 `catch(...)` 是一个通用捕获块，能捕获任何类型异常，因此说它“只能捕获 int 类型异常”是错误的。故正确答案为“错误”。,A: 正确 (错误20次); B: 错误 (错误0次),A: 正确; B: 错误,A,正确,0,B,错误,0,,,0,,,0,20,59,39,33.90,66.10,31,正确,A,正确,20
+4,905,下面的函数接收一个3行4列的二维数组并输出其中元素，则横线上不能填写（ ）。,"void printArray(________) {
+    for (int i = 0; i < 3; ++i)
+        for (int j = 0; j < 4; ++j)
+            std::cout << arr[i][j] << "" "";
+}",code,easy,D,D选项使用`int** arr`作为参数，无法正确访问二维数组的元素。因为`int**`指向的是指针数组，而原函数中`arr[i][j]`需要的是连续内存布局的二维数组，D无法保证这种结构，导致访问错误。其他选项均能正确传递3行4列的二维数组。,A: int arr[3][4] (错误11次); B: int arr[][4] (错误5次); C: int (*arr)[4] (错误4次); D: int** arr (错误0次),A: int arr[3][4]; B: int arr[][4]; C: int (*arr)[4]; D: int** arr,A,int arr[3][4],11,B,int arr[][4],5,C,int (*arr)[4],4,D,int** arr,0,20,37,17,54.05,45.95,28,A,A,int arr[3][4],11
+4,946,指针的大小与其所指向的变量的数据类型的大小相同。,,text,medium,B,指针的大小并不取决于它所指向的变量的数据类型，而是由系统架构决定的。例如，在32位系统中，指针通常为4字节，在64位系统中为8字节。无论指针指向的是整型、浮点型还是其他类型，其大小保持不变。因此，题目中的说法是错误的。,A: 正确 (错误20次); B: 错误 (错误0次),A: 正确; B: 错误,A,正确,20,B,错误,0,,,0,,,0,20,37,17,54.05,45.95,29,A,A,正确,20
+4,832,运行下面代码，屏幕上输出是（ ）。,"double* p_arr = new double[3];
+p_arr[0] = 0.2;
+p_arr[1] = 0.5;
+p_arr[2] = 0.8;
+p_arr += 1;
+cout << p_arr[0] << endl;
+p_arr -= 1;
+delete p_arr;",code,hard,B,解析：p_arr初始指向数组第一个元素，执行p_arr += 1后，指针指向第二个元素0.5，输出p_arr[0]即为0.5。之后p_arr -= 1恢复原位置，delete操作正确释放内存。因此输出结果为0.5，选项B正确。,A: 0.2 (错误9次); B: 0.5 (错误0次); C: 1.2 (错误11次); D: 1.5 (错误0次),A: 0.2; B: 0.5; C: 1.2; D: 1.5,A,0.2,9,B,0.5,0,C,1.2,11,D,1.5,0,20,34,14,58.82,41.18,27,C,C,1.2,11
+4,949,选择排序是稳定的排序算法。,,text,medium,B,选择排序不是稳定的排序算法，因为在交换元素时可能会改变相同元素的相对顺序。,A: 正确 (错误19次); B: 错误 (错误0次),A: 正确; B: 错误,A,正确,19,B,错误,0,,,0,,,0,19,62,43,30.65,69.35,33,A,A,正确,19
+4,1334,下面程序实现插入排序（升序排序），则横线上应分别填写（   ）。,"void insertionSort(int arr[], int n) {
+    for (int i = 1; i < n; i++) {
+        int key = arr[i];
+        int j = i - 1;
+        while ( j >= 0 && ____________________ ) { // 在此处填入代码
+            arr[j + 1] = arr[j];
+            j--;
+        }
+        ____________________; // 在此处填入代码
+    }
+}",code,hard,A,"插入排序中，当当前元素key小于前面的arr[j]时需要后移；最后将key放入正确位置arr[j+1]。插入排序（升序）核心逻辑：
+外层循环：从i = 1开始（默认i=0为已排序区间），取key = nums[i]（待插入元素）。
+内层循环：从j = i-1开始，向前比较，若nums[j] > key（已排序元素比待插入元素大），则将nums[j]后移（nums[j+1] = nums[j]），直到j < 0或nums[j] <= key。
+插入：将key放入最终位置nums[j+1]。
+第一个空（条件）：j >= 0 && nums[j] > key（满足时继续后移元素）；第二个空（操作）：nums[j+1] = key（插入待排序元素）。","A: arr[j] > key
+arr[j + 1] = key (错误0次); B: arr[j] < key
+arr[j + 1] = key (错误3次); C: arr[j] > key
+arr[j] = key (错误13次); D: arr[j] < key
+arr[j] = key (错误3次)","A: arr[j] > key
+arr[j + 1] = key; B: arr[j] < key
+arr[j + 1] = key; C: arr[j] > key
+arr[j] = key; D: arr[j] < key
+arr[j] = key",A,"arr[j] > key
+arr[j + 1] = key",0,B,"arr[j] < key
+arr[j + 1] = key",3,C,"arr[j] > key
+arr[j] = key",13,D,"arr[j] < key
+arr[j] = key",3,19,59,40,32.20,67.80,34,C,C,"arr[j] > key
+arr[j] = key",13
+4,933,运行下面代码片段的结果是（ ）。,"int x = 20;
+int y = 24;
+int* p = &x;
+int* q = &y;
+
+p = q;",code,medium,D,代码中 p 指向 x，q 指向 y。执行 p = q 后，p 指向 y。因此，p 指向了 q 所指向的地址。,A: 将 y 赋值为24 (错误16次); B: 将 x 赋值为20 (错误0次); C: 将 p 指向 x 的地址 (错误3次); D: 将 p 指向 q 所指向的地址 (错误0次),A: 将 y 赋值为24; B: 将 x 赋值为20; C: 将 p 指向 x 的地址; D: 将 p 指向 q 所指向的地址,A,将 y 赋值为24,16,B,将 x 赋值为20,0,C,将 p 指向 x 的地址,3,D,将 p 指向 q 所指向的地址,0,19,37,18,51.35,48.65,32,A,A,将 y 赋值为24,16
+4,1546,函数参数传递过程中，如果传常量值、常量引用和常量指针都是不能被修改的，它们可以防止函数对实参的值或地址进行修改。,,text,medium,A,const修饰的参数（如const int、const int&、const int*）在函数内部不可修改，有效保护实参数据安全。,A: 正确 (错误0次); B: 错误 (错误19次),A: 正确; B: 错误,A,正确,0,B,错误,19,,,0,,,0,19,37,18,51.35,48.65,35,B,B,错误,19
+4,1330,关于结构体初始化，以下哪个选项中正确的是（   ）。,"struct Point {int x,y};",code,easy,B,"选项 A：(1,2)是逗号表达式，值为 2，结构体初始化不能用圆括号，错误。
+选项 B：{1,2}是聚合初始化（aggregate initialization），适用于结构体（无自定义构造函数时），按成员顺序赋值（x=1，y=2），正确。
+选项 C：new用于动态分配内存，返回指针（如Point* p = new Point{1,2};），直接赋值给Point p（非指针）会类型不匹配，错误。
+选项 D：<1,2>是模板参数语法，不用于结构体初始化，错误。","A: Point p = (1,2) (错误9次); B: Point p = {1,2} (错误0次); C: Point p = new {1,2} (错误7次); D: Point p = <1,2> (错误2次)","A: Point p = (1,2); B: Point p = {1,2}; C: Point p = new {1,2}; D: Point p = <1,2>",A,"Point p = (1,2)",9,B,"Point p = {1,2}",0,C,"Point p = new {1,2}",7,D,"Point p = <1,2>",2,18,59,41,30.51,69.49,39,A,A,"Point p = (1,2)",9
+4,1346,"对整数数组{4, 1, 3, 1, 5, 2}进行冒泡排序（将最大元素放到最后），执行一轮之后是{4, 1, 3, 1, 2, 5}。",,text,medium,错误,"执行一轮冒泡排序（将最大元素放到最后）时，会从数组首部开始相邻比较，较大者向后移动。对{4, 1, 3, 1, 5, 2}进行一轮扫描：4与1交换得{1,4,3,1,5,2}；4与3交换得{1,3,4,1,5,2}；4与1交换得{1,3,1,4,5,2}；4与5比较不交换；5与2交换得{1,3,1,4,2,5}。最终结果应为{1,3,1,4,2,5}，而非题目中的{4,1,3,1,2,5}，因此原说法错误。",A: 正确 (错误18次); B: 错误 (错误0次),A: 正确; B: 错误,A,正确,0,B,错误,0,,,0,,,0,18,59,41,30.51,69.49,40,正确,A,正确,18
+4,932,运行下面代码，屏幕上输出是（ ）。,"int arr[3] = {24, 9, 7};
+int* p = arr;
+p++;
+cout << *p << endl;",code,medium,B,"数组 arr 初始化为 {24, 9, 7}，指针 p 指向 arr 的第一个元素 24。p++ 后，指针指向 arr[1]，即 9。因此输出为 9。",A: 24 (错误15次); B: 9 (错误0次); C: 7 (错误1次); D: 不确定 (错误2次),A: 24; B: 9; C: 7; D: 不确定,A,24,15,B,9,0,C,7,1,D,不确定,2,18,37,19,48.65,51.35,38,A,A,24,15
+4,1543,引用是一个指针常量。,,text,hard,A,引用在底层实现上类似于指针常量（如int* const），一旦绑定就不能更改指向，且必须初始化。虽然机制类似，但语法和用途不同。,A: 正确 (错误0次); B: 错误 (错误18次),A: 正确; B: 错误,A,正确,0,B,错误,18,,,0,,,0,18,37,19,48.65,51.35,42,B,B,错误,18
+4,1540,下面程序中，如果语句 cout<<p<<endl; 输出的是0x6ffe00，则cout<<++p<<endl;输出的是（）,"#include <iostream>
+using namespace std;
+int main() {
+    int x[10][10][10] = {{0}};
+    int *p;
+    p = &x[0][0][0];
+    cout << p << endl;
+    cout << ++p << endl;
+    return 0;
+}",code,hard,D,p是指向int的指针，初始指向0x6ffe00。++p会使指针前进一个int大小（通常为4字节），所以新地址为0x6ffe00 + 4 = 0x6ffe04。,A: 0x6ffe0c (错误10次); B: 0x6ffe09 (错误7次); C: 0x6ffe06 (错误1次); D: 0x6ffe04 (错误0次),A: 0x6ffe0c; B: 0x6ffe09; C: 0x6ffe06; D: 0x6ffe04,A,0x6ffe0c,10,B,0x6ffe09,7,C,0x6ffe06,1,D,0x6ffe04,0,18,37,19,48.65,51.35,41,A,A,0x6ffe0c,10
+4,908,在C++中，如果希望通过函数修改传入的结构体对象的内容，应该使用哪种参数传递方式？,,text,easy,C,在C++中，如果希望通过函数修改传入的结构体对象的内容，应该使用引用传递或指针传递。选项C正确。选项A错误，因为值传递不能修改原始对象；选项B错误，同理；选项D错误，因为引用传递也可以修改原始对象。,A: 值传递或引用传递 (错误10次); B: 值传递或指针传递 (错误7次); C: 引用传递或指针传递 (错误0次); D: 仅指针传递 (错误1次),A: 值传递或引用传递; B: 值传递或指针传递; C: 引用传递或指针传递; D: 仅指针传递,A,值传递或引用传递,10,B,值传递或指针传递,7,C,引用传递或指针传递,0,D,仅指针传递,1,18,37,19,48.65,51.35,37,A,A,值传递或引用传递,10
+4,906,在C++中，int arr[3][4] 和 int* arr = new int[12]均可模拟一个3行4列的二维数组。关于这两种方式，下面说法错误的是（ ）。,,text,easy,D,选项D错误，因为int arr[3][4]是在栈上分配空间，当函数返回时会自动释放；而int* arr = new int[12]是在堆上分配空间，需要手动释放(delete[] arr)，不会自动释放。选项A和B分别描述了栈和堆的特点，正确。选项C正确，两种方式申请的内存空间都是连续的。,A: int arr[3][4]在栈上分配空间，适合数组较小的情况 (错误9次); B: int* arr = new int[12]在堆上分配空间，数组较大时也适用 (错误4次); C: 这两种方式申请的内存空间都是连续的 (错误5次); D: 这两种方式申请的内存都能自动释放 (错误0次),A: int arr[3][4]在栈上分配空间，适合数组较小的情况; B: int* arr = new int[12]在堆上分配空间，数组较大时也适用; C: 这两种方式申请的内存空间都是连续的; D: 这两种方式申请的内存都能自动释放,A,int arr[3][4]在栈上分配空间，适合数组较小的情况,9,B,int* arr = new int[12]在堆上分配空间，数组较大时也适用,4,C,这两种方式申请的内存空间都是连续的,5,D,这两种方式申请的内存都能自动释放,0,18,37,19,48.65,51.35,36,A,A,int arr[3][4]在栈上分配空间，适合数组较小的情况,9
+4,1331,运行如下代码会输出（  ）。,"#include <iostream>
+#include <string>
+using namespace std;
+
+struct Cat {
+    string name;
+    int age;
+};
+
+void birthday(Cat& c) {
+    c.age++;
+}
+
+int main() {
+    Cat kitty{""Mimi"", 2};
+    birthday(kitty);
+    cout << kitty.name << "" "" << kitty.age;
+}",code,medium,B,"结构体Cat kitty{""Mimi"", 2}初始化name为 “Mimi”，age为 2。
+函数birthday(Cat& c)的参数c是kitty的引用（而非副本），c.age++直接修改kitty的age，变为 3。
+主函数输出kitty.name（“Mimi”）和kitty.age（3），即 “Mimi 3”。",A: Mimi 2 (错误15次); B: Mimi 3 (错误0次); C: kitty 3 (错误2次); D: kitty 2 (错误0次),A: Mimi 2; B: Mimi 3; C: kitty 3; D: kitty 2,A,Mimi 2,15,B,Mimi 3,0,C,kitty 3,2,D,kitty 2,0,17,59,42,28.81,71.19,44,A,A,Mimi 2,15
+4,1341,以下C++代码合法。,"struct Student {
+    string name;
+    int age;
+    float score;
+};
+Student* students = new Student[20];",code,medium,正确,"代码合法，因为定义了一个包含string、int和float成员的结构体Student，随后使用new操作符动态分配了20个Student对象的数组，并将返回的指针赋给Student类型的指针变量students。
+C++允许通过new创建对象数组，且结构体类型支持默认构造（对于string会自动调用构造函数），因此该代码语法正确，能够成功编译运行。",A: 正确 (错误0次); B: 错误 (错误17次),A: 正确; B: 错误,A,正确,0,B,错误,0,,,0,,,0,17,59,42,28.81,71.19,45,错误,B,错误,17
+4,910,运行如下代码会输出（ ）。,"int value = 100;
+
+void print1() {
+    int value = 50;
+    cout << value << "" "";
+    cout << ::value << "" "";
+}
+
+void print2() {
+    cout << value << "" "";
+}
+
+print1();
+print2();",code,easy,C,代码中定义了一个全局变量value = 100。print1()函数中定义了一个局部变量value = 50，输出局部变量value和全局变量::value，分别是50和100。print2()函数直接输出全局变量value = 100。因此输出为50 100 100。选项C正确。,A: 100 100 100 (错误7次); B: 50 50 50 (错误5次); C: 50 100 100 (错误0次); D: 50 50 100 (错误5次),A: 100 100 100; B: 50 50 50; C: 50 100 100; D: 50 50 100,A,100 100 100,7,B,50 50 50,5,C,50 100 100,0,D,50 50 100,5,17,37,20,45.95,54.05,43,A,A,100 100 100,7
+4,1547,下面代码输出的值等于0。,"#include <iostream>
+using namespace std;
+int main() {
+    int *p = NULL;
+    cout << p << endl;
+}",code,easy,A,当指针被赋值为 NULL 时，表示它不指向任何有效的内存地址，其值为 0。代码中 `int *p = NULL;` 将指针 p 初始化为空指针，其数值为 0。在输出时，`cout << p << endl;` 实际上输出的是指针的值，即 0。因此，程序输出结果为 0，题干描述正确，选项 A 正确。,A: 正确 (错误0次); B: 错误 (错误17次),A: 正确; B: 错误,A,正确,0,B,错误,17,,,0,,,0,17,37,20,45.95,54.05,46,B,B,错误,17
+4,920,"下面C++代码的输出是15。
+
+void foo(int x) {
+    x += 5;
+}
+int main() {
+    int a = 10;
+    foo(a);
+    cout << a << endl;
+}",,text,easy,B,在C++中，函数参数是按值传递的，这意味着函数内部对参数的修改不会影响原始变量。在foo函数中，x的值被修改为15，但这不会影响main函数中的a变量。因此，输出仍然是10，这个判断题是错误的。,A: 正确 (错误16次); B: 错误 (错误0次),A: 正确; B: 错误,A,正确,16,B,错误,0,,,0,,,0,16,37,21,43.24,56.76,50,A,A,正确,16
+4,833,运行下面代码片段后，x和*p的结果分别是（ ）。,"int x = 20;
+int* p = &x;
+*p = *p + 2;",code,medium,D,p指向x的地址，*p即x的值。*p = *p + 2 等价于 x = x + 2，因此x和*p都变为22。,A: 20 20 (错误6次); B: 20 22 (错误8次); C: 22 20 (错误2次); D: 22 22 (错误0次),A: 20 20; B: 20 22; C: 22 20; D: 22 22,A,20 20,6,B,20 22,8,C,22 20,2,D,22 22,0,16,34,18,47.06,52.94,47,B,B,20 22,8
+4,846,函数参数可以通过值传递、引用传递和指针传递，这样函数内对参数的修改可以直接修改传入变量的值。,,text,medium,B,错误。只有引用传递和指针传递可以修改原变量，值传递是副本，不会影响原变量。,A: 正确 (错误16次); B: 错误 (错误0次),A: 正确; B: 错误,A,正确,16,B,错误,0,,,0,,,0,16,34,18,47.06,52.94,49,A,A,正确,16
+4,842,"下面哪种方式不能实现将字符串""Welcome to GESP!""输出重定向到文件log.txt（ ）。","#include <fstream>
+using namespace std;
+
+// A
+freopen(""log.txt"", ""w"", stdout);
+cout << ""Welcome to GESP!"" << endl;
+fclose(stdout);
+
+// B
+std::ofstream outFile(""log.txt"");
+outFile << ""Welcome to GESP!"" << endl;
+outFile.close();
+
+// C
+std::ofstream outFile(""log.txt"");
+cout << ""Welcome to GESP!"" << endl;
+outFile.close();
+
+// D
+ofstream log_file(""log.txt"");
+streambuf* org_cout = cout.rdbuf();
+cout.rdbuf(log_file.rdbuf());
+cout << ""This output will go to the log file."" << endl;
+cout.rdbuf(org_cout);",text,hard,C,选项C中虽然打开了文件，但仍然使用cout输出，未将输出流重定向到文件，因此字符串不会写入log.txt。,"A: freopen(""log.txt"", ""w"", stdout);
+cout << ""Welcome to GESP!"" << endl;
+fclose(stdout); (错误7次); B: std::ofstream outFile(""log.txt"");
+outFile << ""Welcome to GESP!"" << endl;
+outFile.close(); (错误6次); C: std::ofstream outFile(""log.txt"");
+cout << ""Welcome to GESP!"" << endl;
+outFile.close(); (错误0次); D: ofstream log_file(""log.txt"");
+streambuf* org_cout = cout.rdbuf();
+cout.rdbuf(log_file.rdbuf());
+cout << ""This output will go to the log file."" << endl;
+cout.rdbuf(org_cout); (错误3次)","A: freopen(""log.txt"", ""w"", stdout);
+cout << ""Welcome to GESP!"" << endl;
+fclose(stdout);; B: std::ofstream outFile(""log.txt"");
+outFile << ""Welcome to GESP!"" << endl;
+outFile.close();; C: std::ofstream outFile(""log.txt"");
+cout << ""Welcome to GESP!"" << endl;
+outFile.close();; D: ofstream log_file(""log.txt"");
+streambuf* org_cout = cout.rdbuf();
+cout.rdbuf(log_file.rdbuf());
+cout << ""This output will go to the log file."" << endl;
+cout.rdbuf(org_cout);",A,"freopen(""log.txt"", ""w"", stdout);
+cout << ""Welcome to GESP!"" << endl;
+fclose(stdout);",7,B,"std::ofstream outFile(""log.txt"");
+outFile << ""Welcome to GESP!"" << endl;
+outFile.close();",6,C,"std::ofstream outFile(""log.txt"");
+cout << ""Welcome to GESP!"" << endl;
+outFile.close();",0,D,"ofstream log_file(""log.txt"");
+streambuf* org_cout = cout.rdbuf();
+cout.rdbuf(log_file.rdbuf());
+cout << ""This output will go to the log file."" << endl;
+cout.rdbuf(org_cout);",3,16,31,15,51.61,48.39,48,A,A,"freopen(""log.txt"", ""w"", stdout);
+cout << ""Welcome to GESP!"" << endl;
+fclose(stdout);",7

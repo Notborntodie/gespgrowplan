@@ -143,8 +143,9 @@ router.post('/upload-image', upload.single('image'), async (req, res) => {
       return res.status(400).json({ error: '请选择图片文件' });
     }
     
-    const port = process.env.PORT || 3000;
-    const imageUrl = `http://localhost:${port}/uploads/${req.file.filename}`;
+    // 从环境变量读取基础URL，如果没有配置则使用默认值
+    const baseUrl = process.env.BASE_URL || `http://localhost:${process.env.PORT || 3000}`;
+    const imageUrl = `${baseUrl}/uploads/${req.file.filename}`;
     res.json({ 
       message: '图片上传成功',
       imageUrl: imageUrl,

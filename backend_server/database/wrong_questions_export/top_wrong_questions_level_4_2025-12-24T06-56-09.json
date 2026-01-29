@@ -1,0 +1,2810 @@
+{
+  "level": 4,
+  "export_time": "2025-12-24T06:56:09.850Z",
+  "question_count": 50,
+  "statistics": {
+    "total_wrong_count": "05542323029292827272727272626262524242423232222212121202020202019191919181818181818181717171716161616",
+    "total_attempts": "05962595962595962595937376259373762593737346259593734595937373462593737595937373737375959373737343431",
+    "average_wrong_rate": "92.95"
+  },
+  "questions": [
+    {
+      "level": 4,
+      "question_id": 1348,
+      "question_text": "以下代码将 Hello 写入文件 data.txt。",
+      "question_type": "code",
+      "difficulty": "medium",
+      "correct_answer": "错误",
+      "wrong_count": "55",
+      "total_attempts": "59",
+      "correct_count": "4",
+      "wrong_rate": "93.22",
+      "correct_rate": "6.78",
+      "rank_in_level": "1",
+      "question_code": "#include <fstream>\nusing namespace std;\n\nofstream file(\"data.txt\");\ncout << \"Hello\" << endl;\nfile.close();",
+      "explanation": "该代码错误在于：虽然声明了 `ofstream file(\"data.txt\")`，但并未实际向文件写入任何内容；`cout << \"Hello\" << endl;` 是将字符串输出到**控制台（标准输出）**，而非文件。文件流对象 `file` 自始至终未被使用（如未调用 `file << \"Hello\";`），因此 `data.txt` 文件要么为空，要么甚至可能因构造失败而未被创建。`file.close()` 无法弥补写入操作的缺失。故代码无法实现“将 Hello 写入文件”的功能，选项 B（错误）是正确答案。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "正确",
+          "text": "正确"
+        },
+        {
+          "label": "B",
+          "value": "错误",
+          "text": "错误"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "true",
+          "option_label": "true",
+          "option_text": "",
+          "wrong_count": "26"
+        },
+        {
+          "option_value": "false",
+          "option_label": "false",
+          "option_text": "",
+          "wrong_count": "19"
+        },
+        {
+          "option_value": "正确",
+          "option_label": "A",
+          "option_text": "正确",
+          "wrong_count": "9"
+        },
+        {
+          "option_value": "错误",
+          "option_label": "B",
+          "option_text": "错误",
+          "wrong_count": "1"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "true",
+        "option_label": "true",
+        "option_text": "",
+        "wrong_count": "26"
+      }
+    },
+    {
+      "level": 4,
+      "question_id": 939,
+      "question_text": "下面代码实现了冒泡排序函数，则横线上应填写（ ）。",
+      "question_type": "code",
+      "difficulty": "hard",
+      "correct_answer": "C",
+      "wrong_count": "42",
+      "total_attempts": "62",
+      "correct_count": "20",
+      "wrong_rate": "67.74",
+      "correct_rate": "32.26",
+      "rank_in_level": "2",
+      "question_code": "//交换数组arr的第i个元素和第j个元素\nvoid swap(vector<int> &arr, int i, int j) {\n    int tmp = arr[i];\n    arr[i] = arr[j];\n    arr[j] = tmp;\n}\n\nint bubble_sort(vector<int> &arr) {\n    for (int i = arr.size() - 1; i > 0; i--) {\n        bool flag = false; // 标志位\n        ________________________________ { // 在此处填入代码\n\n            if (arr[j] > arr[j + 1]) {\n                swap(arr, i, j);\n                flag = true;\n            }\n        }\n        if (!flag)\n            break; // 此轮“冒泡”未交换任何元素\n    }\n}",
+      "explanation": "冒泡排序的内层循环应该从 0 开始，到 i 为止，这样可以将最大的元素“冒泡”到数组的末尾。选项 C 正确实现了冒泡排序的内层循环。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "for (int j = 0; j < arr.size() - 1; j++)"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "for (int j = arr.size() - 1; j > 0; j--)"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "for (int j = 0; j < i; j++)"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "for (int j = i-1; j <=0; j--)"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "for (int j = 0; j < arr.size() - 1; j++)",
+          "wrong_count": "25"
+        },
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "for (int j = arr.size() - 1; j > 0; j--)",
+          "wrong_count": "14"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "for (int j = i-1; j <=0; j--)",
+          "wrong_count": "3"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "for (int j = 0; j < arr.size() - 1; j++)",
+        "wrong_count": "25"
+      }
+    },
+    {
+      "level": 4,
+      "question_id": 1335,
+      "question_text": "关于插入排序的时间复杂度，下列说法正确的是（   ）。",
+      "question_type": "text",
+      "difficulty": "hard",
+      "correct_answer": "B",
+      "wrong_count": "32",
+      "total_attempts": "59",
+      "correct_count": "27",
+      "wrong_rate": "54.24",
+      "correct_rate": "45.76",
+      "rank_in_level": "3",
+      "question_code": "",
+      "explanation": "最好情况：数组已按目标顺序排列，内层循环无需移动元素，仅外层循环遍历 n 个元素，时间复杂度 O (n)。\n最坏情况：数组逆序排列，每个元素i需向前比较i次并移动i个元素，总操作次数为 1+2+...+(n-1) = n (n-1)/2，时间复杂度 O (n²)。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "最好情况和最坏情况的时间复杂度都是 O(n²)"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "最好情况是 O(n)，最坏情况是 O(n²)"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "最好情况是 O(n)，最坏情况是O(2ⁿ)"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "最好情况是 O(n²)，最坏情况是O(2ⁿ)"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "最好情况是 O(n)，最坏情况是O(2ⁿ)",
+          "wrong_count": "15"
+        },
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "最好情况和最坏情况的时间复杂度都是 O(n²)",
+          "wrong_count": "15"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "最好情况是 O(n²)，最坏情况是O(2ⁿ)",
+          "wrong_count": "2"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "C",
+        "option_label": "C",
+        "option_text": "最好情况是 O(n)，最坏情况是O(2ⁿ)",
+        "wrong_count": "15"
+      }
+    },
+    {
+      "level": 4,
+      "question_id": 1336,
+      "question_text": "小杨正在爬楼梯，需要 n 阶才能到达楼顶，每次可以爬 1 阶或 2 阶，求小杨有多少种不同的方法可以爬到楼顶，横线上应填写（  ）。",
+      "question_type": "code",
+      "difficulty": "hard",
+      "correct_answer": "B",
+      "wrong_count": "30",
+      "total_attempts": "59",
+      "correct_count": "29",
+      "wrong_rate": "50.85",
+      "correct_rate": "49.15",
+      "rank_in_level": "4",
+      "question_code": "int climbStairs(int n) {\n    if (n <= 2) return n;\n    int prev2 = 1;\n    int prev1 = 2;\n    int current = 0;\n    for (int i = 3; i <= n; ++i) {\n        ________________    // 在此处填入代码\n    }\n    return current;\n}",
+      "explanation": "爬楼梯问题本质：第n阶的方法数 = 第n-1阶方法数（最后一步爬 1 阶） + 第n-2阶方法数（最后一步爬 2 阶）\n递推公式为dp[n] = dp[n-1] + dp[n-2]，初始条件dp[1] = 1，dp[2] = 2。\n代码优化：用变量prev2（对应dp[i-2]）、prev1（对应dp[i-1]）、current（对应dp[i]）代替数组，降低空间复杂度（从 O (n) 到 O (1)）。\n循环中逻辑：\n计算当前current = prev1 + prev2（dp[i] = dp[i-1] + dp[i-2]）。\n更新下一轮的prev2和prev1：prev2 = prev1（dp[i-2]变为dp[i-1]），prev1 = current（dp[i-1]变为dp[i]）。\n正确顺序为 “current = prev1 + prev2; prev2 = prev1; prev1 = current;”，对应选项 C。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "prev2 = prev1;\nprev1 = current;\ncurrent = prev1 + prev2;"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "current = prev1 + prev2;\nprev2 = prev1;\nprev1 = current;"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "current = prev1 + prev2;\nprev1 = current;\nprev2 = prev1;"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "prev1 = current;\nprev2 = prev1;\ncurrent = prev1 + prev2;"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "prev2 = prev1;\nprev1 = current;\ncurrent = prev1 + prev2;",
+          "wrong_count": "14"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "current = prev1 + prev2;\nprev1 = current;\nprev2 = prev1;",
+          "wrong_count": "11"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "prev1 = current;\nprev2 = prev1;\ncurrent = prev1 + prev2;",
+          "wrong_count": "5"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "prev2 = prev1;\nprev1 = current;\ncurrent = prev1 + prev2;",
+        "wrong_count": "14"
+      }
+    },
+    {
+      "level": 4,
+      "question_id": 941,
+      "question_text": "下面代码实现了插入排序函数（升序），则横线上应填写（ ）。",
+      "question_type": "code",
+      "difficulty": "hard",
+      "correct_answer": "A",
+      "wrong_count": "29",
+      "total_attempts": "62",
+      "correct_count": "33",
+      "wrong_rate": "46.77",
+      "correct_rate": "53.23",
+      "rank_in_level": "5",
+      "question_code": "void insertion_sort(vector<int> &nums) {\n    for (int i = 1; i < nums.size(); i++) {\n        int base = nums[i], j = i - 1;\n\n        ________________________________ { // 在此处填入代码\n            nums[j + 1] = nums[j];\n            j--;\n        }\n        nums[j + 1] = base;\n    }\n}",
+      "explanation": "正确答案是A，因为插入排序需要将当前元素与前面已排序部分的元素比较，当遇到比它大的元素时，需将其后移。条件`j >= 0 && nums[j] > base`确保在有效范围内且当前元素大于基准值时继续循环，从而正确完成插入操作。其他选项无法满足排序逻辑。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "while (j >= 0 && nums[j] > base)"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "while (j > 0 && nums[j] > base)"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "while (j >= 0 && nums[j] < base)"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "while (j > 0 && nums[j] < base)"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "while (j > 0 && nums[j] > base)",
+          "wrong_count": "16"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "while (j > 0 && nums[j] < base)",
+          "wrong_count": "7"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "while (j >= 0 && nums[j] < base)",
+          "wrong_count": "6"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "while (j > 0 && nums[j] > base)",
+        "wrong_count": "16"
+      }
+    },
+    {
+      "level": 4,
+      "question_id": 1340,
+      "question_text": "执行下面C++代码将输出 11。",
+      "question_type": "code",
+      "difficulty": "hard",
+      "correct_answer": "错误",
+      "wrong_count": "29",
+      "total_attempts": "59",
+      "correct_count": "30",
+      "wrong_rate": "49.15",
+      "correct_rate": "50.85",
+      "rank_in_level": "6",
+      "question_code": "int x = 10;\nvoid f() {\n    int x = x + 1;\n    cout << x << endl;\n}\n\nint main() {\n    f();\n}",
+      "explanation": "f()函数中int x = x + 1;存在问题：局部变量x在定义时，右侧的x仍未初始化（此时x是局部变量，而非全局变量x=10），使用未初始化的变量会导致未定义行为（输出随机值，而非 11）。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "正确",
+          "text": "正确"
+        },
+        {
+          "label": "B",
+          "value": "错误",
+          "text": "错误"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "正确",
+          "option_label": "A",
+          "option_text": "正确",
+          "wrong_count": "29"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "正确",
+        "option_label": "A",
+        "option_text": "正确",
+        "wrong_count": "29"
+      }
+    },
+    {
+      "level": 4,
+      "question_id": 1332,
+      "question_text": "关于排序算法的稳定性，以下说法错误的是（   ）。",
+      "question_type": "text",
+      "difficulty": "medium",
+      "correct_answer": "C",
+      "wrong_count": "28",
+      "total_attempts": "59",
+      "correct_count": "31",
+      "wrong_rate": "47.46",
+      "correct_rate": "52.54",
+      "rank_in_level": "7",
+      "question_code": "",
+      "explanation": "选择排序不是稳定排序，因为在选择最小元素交换时可能改变相等元素的相对位置。冒泡和插入排序是稳定的。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "稳定的排序算法不改变相等元素的相对位置"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "冒泡排序是稳定的排序算法"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "选择排序是稳定的排序算法"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "插入排序是稳定的排序算法"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "稳定的排序算法不改变相等元素的相对位置",
+          "wrong_count": "11"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "插入排序是稳定的排序算法",
+          "wrong_count": "10"
+        },
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "冒泡排序是稳定的排序算法",
+          "wrong_count": "7"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "稳定的排序算法不改变相等元素的相对位置",
+        "wrong_count": "11"
+      }
+    },
+    {
+      "level": 4,
+      "question_id": 940,
+      "question_text": "上一题算法的时间复杂度为（ ）。",
+      "question_type": "text",
+      "difficulty": "hard",
+      "correct_answer": "A",
+      "wrong_count": "27",
+      "total_attempts": "62",
+      "correct_count": "35",
+      "wrong_rate": "43.55",
+      "correct_rate": "56.45",
+      "rank_in_level": "8",
+      "question_code": "",
+      "explanation": "该算法通过双重循环遍历数据，外层循环执行n次，内层循环在最坏情况下也执行n次，因此总操作次数与n²成正比，时间复杂度为O(n²)，故正确答案是A。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "O(n^2)"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "O(2^n)"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "O(1)"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "O(n)"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "O(n)",
+          "wrong_count": "18"
+        },
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "O(2^n)",
+          "wrong_count": "7"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "O(1)",
+          "wrong_count": "2"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "D",
+        "option_label": "D",
+        "option_text": "O(n)",
+        "wrong_count": "18"
+      }
+    },
+    {
+      "level": 4,
+      "question_id": 1325,
+      "question_text": "以下关于数组的描述中，（   ）是错误的。",
+      "question_type": "text",
+      "difficulty": "easy",
+      "correct_answer": "C",
+      "wrong_count": "27",
+      "total_attempts": "59",
+      "correct_count": "32",
+      "wrong_rate": "45.76",
+      "correct_rate": "54.24",
+      "rank_in_level": "10",
+      "question_code": "",
+      "explanation": "数组名是一个指针常量，不能进行自增操作。指针可以自增，但数组名不可以。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "数组名是一个指针常量"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "随机访问数组的元素方便快捷"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "数组可以像指针一样进行自增操作"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "sizeof(arr) 返回的是整个数组arr占用的字节数"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "数组名是一个指针常量",
+          "wrong_count": "13"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "sizeof(arr) 返回的是整个数组arr占用的字节数",
+          "wrong_count": "8"
+        },
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "随机访问数组的元素方便快捷",
+          "wrong_count": "6"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "数组名是一个指针常量",
+        "wrong_count": "13"
+      }
+    },
+    {
+      "level": 4,
+      "question_id": 1326,
+      "question_text": "给定如下定义的数组arr，则*(*(arr + 1) + 2)的值是（   ）。",
+      "question_type": "code",
+      "difficulty": "medium",
+      "correct_answer": "D",
+      "wrong_count": "27",
+      "total_attempts": "59",
+      "correct_count": "32",
+      "wrong_rate": "45.76",
+      "correct_rate": "54.24",
+      "rank_in_level": "11",
+      "question_code": "int arr[2][3] = {{1, 2, 3}, {4, 5, 6}};",
+      "explanation": "首地址arr指向第一行（arr[0]），arr + 1指向第二行（arr[1]）。\n*(arr + 1)等价于arr[1]（第二行的首地址），*(arr + 1) + 2等价于arr[1] + 2（第二行第 3 个元素的地址）。\n*(*(arr + 1) + 2)等价于arr[1][2]，值为 6。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "2"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "5"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "4"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "6"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "2",
+          "wrong_count": "14"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "4",
+          "wrong_count": "8"
+        },
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "5",
+          "wrong_count": "5"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "2",
+        "wrong_count": "14"
+      }
+    },
+    {
+      "level": 4,
+      "question_id": 951,
+      "question_text": "在 C++ 中，如果没有捕获到异常（没有匹配的 catch 块），程序会继续执行而不会终止。",
+      "question_type": "text",
+      "difficulty": "medium",
+      "correct_answer": "B",
+      "wrong_count": "27",
+      "total_attempts": "37",
+      "correct_count": "10",
+      "wrong_rate": "72.97",
+      "correct_rate": "27.03",
+      "rank_in_level": "9",
+      "question_code": "",
+      "explanation": "如果没有捕获到异常，程序会调用 terminate 函数并终止执行。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "正确"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "错误"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "正确",
+          "wrong_count": "27"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "正确",
+        "wrong_count": "27"
+      }
+    },
+    {
+      "level": 4,
+      "question_id": 1526,
+      "question_text": "下列代码中，输出结果是（ ）",
+      "question_type": "code",
+      "difficulty": "medium",
+      "correct_answer": "B",
+      "wrong_count": "27",
+      "total_attempts": "37",
+      "correct_count": "10",
+      "wrong_rate": "72.97",
+      "correct_rate": "27.03",
+      "rank_in_level": "12",
+      "question_code": "#include <iostream>\nusing namespace std;\nint func(int x, int y){\n    int a = x, b = y;\n    int t;\n    t = a;\n    a = b;\n    b = t;\n    cout << a << \" \" << b << \" \";\n}\nint main() {\n    int c, d;\n    int a = 12, b = 24;\n    cout << a << \" \" << b << \" \";\n    swap(a, b);\n    cout << a << \" \" << b << endl;\n    return 0;\n}",
+      "explanation": "程序先输出a和b的初始值12和24，然后交换a和b的值，再输出交换后的a和b，即24和12。因此输出为：12 24 24 12。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "12  24  24  12"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "24  12  12  24"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "12  12  24  24"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "24  24  12  12"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "12  24  24  12",
+          "wrong_count": "26"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "24  24  12  12",
+          "wrong_count": "1"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "12  24  24  12",
+        "wrong_count": "26"
+      }
+    },
+    {
+      "level": 4,
+      "question_id": 952,
+      "question_text": "以下代码用递推法求斐波那契数列的第 n 项，时间复杂度为指数级。",
+      "question_type": "code",
+      "difficulty": "medium",
+      "correct_answer": "B",
+      "wrong_count": "26",
+      "total_attempts": "62",
+      "correct_count": "36",
+      "wrong_rate": "41.94",
+      "correct_rate": "58.06",
+      "rank_in_level": "13",
+      "question_code": "int fibonacci(int n) {\n    if (n == 0) return 0;\n    if (n == 1) return 1;\n\n    int f0 = 0; // F(0)\n    int f1 = 1; // F(1)\n    int current;\n\n    for (int i = 2; i <= n; i++) {\n        current = f0 + f1; // F(n) = F(n-1) + F(n-2)\n        f0 = f1;\n        f1 = current;\n    }\n\n    return current;\n}",
+      "explanation": "该代码使用递推法计算斐波那契数列，时间复杂度为 O(n)，而不是指数级。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "正确"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "错误"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "正确",
+          "wrong_count": "26"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "正确",
+        "wrong_count": "26"
+      }
+    },
+    {
+      "level": 4,
+      "question_id": 1329,
+      "question_text": "下面程序运行的结果是（   ）。",
+      "question_type": "code",
+      "difficulty": "medium",
+      "correct_answer": "C",
+      "wrong_count": "26",
+      "total_attempts": "59",
+      "correct_count": "33",
+      "wrong_rate": "44.07",
+      "correct_rate": "55.93",
+      "rank_in_level": "14",
+      "question_code": "void increaseA(int x) {\n    x++;\n}\nvoid increaseB(int* p) {\n    (*p)++;\n}\nint main() {\n    int a = 5;\n    increaseA(a);\n    cout << a << \" \";\n    increaseB(&a);\n    cout << a;\n}",
+      "explanation": "increaseA(int x)采用值传递：形参x是实参a的副本，修改x++仅改变副本，不影响原变量a（a仍为 5）。\nincreaseB(int* p)采用指针传递：形参p指向a的地址，(*p)++直接修改p指向的变量（即a），a变为 6。\n主函数中a = 5，调用increaseA(a)后a仍为 5，调用increaseB(&a)后a变为 6，输出 “5 6”。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "6 7"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "6 6"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "5 6"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "5 5"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "6 7",
+          "wrong_count": "18"
+        },
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "6 6",
+          "wrong_count": "8"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "6 7",
+        "wrong_count": "18"
+      }
+    },
+    {
+      "level": 4,
+      "question_id": 1530,
+      "question_text": "如果下列程序输出的地址是0x6ffe00，则cout<<a+1<<endl;输出的是（）",
+      "question_type": "code",
+      "difficulty": "medium",
+      "correct_answer": "B",
+      "wrong_count": "26",
+      "total_attempts": "37",
+      "correct_count": "11",
+      "wrong_rate": "70.27",
+      "correct_rate": "29.73",
+      "rank_in_level": "15",
+      "question_code": "#include <iostream>\nusing namespace std;\nint main() {\n    int a[2][3] = {0};\n    cout << a << endl;\n    return 0;\n}",
+      "explanation": "由于a是二维数组的首地址，代表第0行的地址，a+1指向第1行的起始地址。每行有3个int元素，每个int占4字节，因此一行占用12字节（即0xC）。起始地址0x6ffe00加上12字节后为0x6ffe0C，故a+1输出0x6ffe0C，选项B正确。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "0x6ffe04"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "0x6ffe0C"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "0x6ffe08"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "0x6ffe00"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "0x6ffe04",
+          "wrong_count": "17"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "0x6ffe08",
+          "wrong_count": "5"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "0x6ffe00",
+          "wrong_count": "4"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "0x6ffe04",
+        "wrong_count": "17"
+      }
+    },
+    {
+      "level": 4,
+      "question_id": 943,
+      "question_text": "运行下面的代码，屏幕上将输出（ ）。",
+      "question_type": "code",
+      "difficulty": "medium",
+      "correct_answer": "C",
+      "wrong_count": "25",
+      "total_attempts": "37",
+      "correct_count": "12",
+      "wrong_rate": "67.57",
+      "correct_rate": "32.43",
+      "rank_in_level": "16",
+      "question_code": "#include <iostream>\nusing namespace std;\n\nint divide(int a, int b) {\n    if (b == 0) {\n        throw runtime_error(\"division by zero error \");\n    }\n    return a / b;\n}\n\nint main() {\n    int x = 10;\n    int y = 0; // 设为 0 会导致除零错误\n\n    try {\n        int result = divide(x, y);\n        cout << \"result: \" << result << endl;\n    } catch (const runtime_error& e) {\n        cout << \"caught an exception: \" << e.what() << endl;\n    }\n\n    return 0;\n}",
+      "explanation": "代码中y设为0，调用divide函数时会抛出异常。在try块中捕获到该异常后，输出“caught an exception: ”，接着输出异常信息“division by zero error ”。因此，正确输出是“caught an exception: division by zero error”。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "division by zero error result: caught an exception:"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "result: caught an exception: division by zero error"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "caught an exception: division by zero error"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "division by zero error caught an exception: division by zero error"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "division by zero error result: caught an exception:",
+          "wrong_count": "18"
+        },
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "result: caught an exception: division by zero error",
+          "wrong_count": "5"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "division by zero error caught an exception: division by zero error",
+          "wrong_count": "2"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "division by zero error result: caught an exception:",
+        "wrong_count": "18"
+      }
+    },
+    {
+      "level": 4,
+      "question_id": 950,
+      "question_text": "插入排序的时间复杂度总是比冒泡排序低。",
+      "question_type": "text",
+      "difficulty": "hard",
+      "correct_answer": "B",
+      "wrong_count": "24",
+      "total_attempts": "62",
+      "correct_count": "38",
+      "wrong_rate": "38.71",
+      "correct_rate": "61.29",
+      "rank_in_level": "18",
+      "question_code": "",
+      "explanation": "虽然插入排序在某些情况下比冒泡排序快，但在最坏情况下两者的复杂度都是 O(n^2)，因此不能说插入排序的时间复杂度总是比冒泡排序低。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "正确"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "错误"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "正确",
+          "wrong_count": "24"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "正确",
+        "wrong_count": "24"
+      }
+    },
+    {
+      "level": 4,
+      "question_id": 1338,
+      "question_text": "关于异常处理，以下说法错误的是（   ）。",
+      "question_type": "text",
+      "difficulty": "medium",
+      "correct_answer": "D",
+      "wrong_count": "24",
+      "total_attempts": "59",
+      "correct_count": "35",
+      "wrong_rate": "40.68",
+      "correct_rate": "59.32",
+      "rank_in_level": "19",
+      "question_code": "",
+      "explanation": "并非所有异常都必须被捕获。未捕获的异常会导致程序终止，但C++允许异常不被捕获。throw语句抛出异常，try-catch可捕获多个类型。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "try 块中的代码可能会抛出异常"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "catch 块可以有多个，处理不同类型的异常"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "throw 语句用于抛出异常"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "所有异常都必须被捕获，否则程序会崩溃"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "try 块中的代码可能会抛出异常",
+          "wrong_count": "13"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "throw 语句用于抛出异常",
+          "wrong_count": "7"
+        },
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "catch 块可以有多个，处理不同类型的异常",
+          "wrong_count": "4"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "try 块中的代码可能会抛出异常",
+        "wrong_count": "13"
+      }
+    },
+    {
+      "level": 4,
+      "question_id": 936,
+      "question_text": "一个二维数组定义为 int arr[3][4];（假设一个int变量占4个字节），则int arr[0]占用（ ）个字节的内存。",
+      "question_type": "text",
+      "difficulty": "medium",
+      "correct_answer": "D",
+      "wrong_count": "24",
+      "total_attempts": "37",
+      "correct_count": "13",
+      "wrong_rate": "64.86",
+      "correct_rate": "35.14",
+      "rank_in_level": "17",
+      "question_code": "",
+      "explanation": "二维数组 arr[3][4] 表示有 3 行，每行有 4 个 int 类型元素。arr[0] 表示第 0 行，包含 4 个 int 类型元素，每个 int 占用 4 个字节，所以总共占用 4 * 4 = 16 个字节。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "3"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "4"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "12"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "16"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "4",
+          "wrong_count": "12"
+        },
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "3",
+          "wrong_count": "12"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "4",
+        "wrong_count": "12"
+      }
+    },
+    {
+      "level": 4,
+      "question_id": 1529,
+      "question_text": "假设变量a的地址是0x6ffe14，下面程序的输出是（  ）。",
+      "question_type": "code",
+      "difficulty": "hard",
+      "correct_answer": "D",
+      "wrong_count": "23",
+      "total_attempts": "37",
+      "correct_count": "14",
+      "wrong_rate": "62.16",
+      "correct_rate": "37.84",
+      "rank_in_level": "21",
+      "question_code": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int *p;\n    int a = 10;\n    p = &a;\n    p++;\n    cout << p << endl;\n}",
+      "explanation": "由于变量a的地址是0x6ffe14，指针p指向int类型，p++会使地址增加一个int的大小（通常为4字节）。因此，p从0x6ffe14增加4，变为0x6ffe18。最终输出p的值为0x6ffe18，故D正确。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "10"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "0x6ffe14"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "0x6ffe15"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "0x6ffe18"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "0x6ffe15",
+          "wrong_count": "9"
+        },
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "0x6ffe14",
+          "wrong_count": "9"
+        },
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "10",
+          "wrong_count": "5"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "C",
+        "option_label": "C",
+        "option_text": "0x6ffe15",
+        "wrong_count": "9"
+      }
+    },
+    {
+      "level": 4,
+      "question_id": 834,
+      "question_text": "下面的描述中，（ ）不能正确定义一个名为Student的结构体以及一个包含20个元素的结构数组。",
+      "question_type": "text",
+      "difficulty": "hard",
+      "correct_answer": "D",
+      "wrong_count": "23",
+      "total_attempts": "34",
+      "correct_count": "11",
+      "wrong_rate": "67.65",
+      "correct_rate": "32.35",
+      "rank_in_level": "20",
+      "question_code": "struct Student {\n    string name;\n    int age;\n    float score;\n};\nstruct Student students[20];",
+      "explanation": "选项D中 `Student students = new Student[20];` 语法错误，应使用指针接收动态数组。正确应为 `Student* students = new Student[20];`。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "struct Student {\n    string name;\n    int age;\n    float score;\n};\nstruct Student students[20];"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "struct Student {\n    string name;\n    int age;\n    float score;\n};\nStudent students[20];"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "struct Student {\n    string name;\n    int age;\n    float score;\n};\nStudent* students = new Student[20];"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "struct Student {\n    string name;\n    int age;\n    float score;\n};\nStudent students = new Student[20];"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "struct Student {\n    string name;\n    int age;\n    float score;\n};\nstruct Student students[20];",
+          "wrong_count": "15"
+        },
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "struct Student {\n    string name;\n    int age;\n    float score;\n};\nStudent students[20];",
+          "wrong_count": "5"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "struct Student {\n    string name;\n    int age;\n    float score;\n};\nStudent* students = new Student[20];",
+          "wrong_count": "3"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "struct Student {\n    string name;\n    int age;\n    float score;\n};\nstruct Student students[20];",
+        "wrong_count": "15"
+      }
+    },
+    {
+      "level": 4,
+      "question_id": 938,
+      "question_text": "在排序算法中，稳定性指的是（ ）。",
+      "question_type": "text",
+      "difficulty": "easy",
+      "correct_answer": "B",
+      "wrong_count": "22",
+      "total_attempts": "62",
+      "correct_count": "40",
+      "wrong_rate": "35.48",
+      "correct_rate": "64.52",
+      "rank_in_level": "22",
+      "question_code": "",
+      "explanation": "排序算法的稳定性是指排序后相同元素的相对顺序保持不变。选项 B 正确描述了排序算法的稳定性。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "排序后数据不会丢失"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "排序后相同元素的相对顺序保持不变"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "排序后数据不会被修改"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "排序后数据的时间复杂度不变"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "排序后数据不会丢失",
+          "wrong_count": "15"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "排序后数据的时间复杂度不变",
+          "wrong_count": "5"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "排序后数据不会被修改",
+          "wrong_count": "2"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "排序后数据不会丢失",
+        "wrong_count": "15"
+      }
+    },
+    {
+      "level": 4,
+      "question_id": 1337,
+      "question_text": "假设有一个班级的成绩单，存储在一个长度为 n 的数组 scores 中，每个元素是一个学生的分数。老师想要找出所有满足 scores[i] + scores[j] + scores[k] == 300 的三元组，其中 i < j < k。下面代码实现该功能，请问其时间复杂度是（   ）。",
+      "question_type": "code",
+      "difficulty": "hard",
+      "correct_answer": "C",
+      "wrong_count": "22",
+      "total_attempts": "59",
+      "correct_count": "37",
+      "wrong_rate": "37.29",
+      "correct_rate": "62.71",
+      "rank_in_level": "23",
+      "question_code": "int cnt = 0;\nfor (int i = 0; i < n; i++) {\n    for (int j = i + 1; j < n; j++) {\n        for (int k = j + 1; k < n; k++) {\n            if (scores[i] + scores[j] + scores[k] == 300) {\n                cnt++;\n            }\n        }\n    }\n}",
+      "explanation": "代码嵌套三层循环：\n外层循环i：遍历 n 次（0 到 n-1）。\n中层循环j：对每个i，遍历 n-i-1 次（平均约 n/2 次）。\n内层循环k：对每个j，遍历 n-j-1 次（平均约 n/2 次）。\n总操作次数约为 n × (n/2) × (n/2) = n³/4，忽略常数系数后，时间复杂度为 O (n³)。\n",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "O(n)"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "O(n²)"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "O(n³)"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "O(2ⁿ)"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "O(n)",
+          "wrong_count": "10"
+        },
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "O(n²)",
+          "wrong_count": "8"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "O(2ⁿ)",
+          "wrong_count": "4"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "O(n)",
+        "wrong_count": "10"
+      }
+    },
+    {
+      "level": 4,
+      "question_id": 1343,
+      "question_text": "下面代码将二维数组arr传递给函数f，函数内部用arr[i][j]访问元素，函数参数声明为int arr[][4]是错误的。",
+      "question_type": "code",
+      "difficulty": "medium",
+      "correct_answer": "错误",
+      "wrong_count": "21",
+      "total_attempts": "59",
+      "correct_count": "38",
+      "wrong_rate": "35.59",
+      "correct_rate": "64.41",
+      "rank_in_level": "26",
+      "question_code": "void f(int arr[][4], int rows) {\n    // 访问 arr[i][j]\n}\n\nint main() {\n    int arr[3][4] = { /* 初始化 */ };\n    f(arr, 3);\n}",
+      "explanation": "函数参数int arr[][4]合法。二维数组作为函数参数时，第一维的大小可省略（因函数只需知道 “每行有多少个元素” 即可计算地址），第二维大小必须指定（如int arr[][4]表示每行 4 个元素）。main函数中arr[3][4]与参数int arr[][4]匹配，可通过arr[i][j]正常访问元素，因此 “错误” 的说法不正确。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "正确",
+          "text": "正确"
+        },
+        {
+          "label": "B",
+          "value": "错误",
+          "text": "错误"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "正确",
+          "option_label": "A",
+          "option_text": "正确",
+          "wrong_count": "21"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "正确",
+        "option_label": "A",
+        "option_text": "正确",
+        "wrong_count": "21"
+      }
+    },
+    {
+      "level": 4,
+      "question_id": 947,
+      "question_text": "二维数组的行的大小必须在定义时确定，列的大小可以动态变化。",
+      "question_type": "text",
+      "difficulty": "medium",
+      "correct_answer": "B",
+      "wrong_count": "21",
+      "total_attempts": "37",
+      "correct_count": "16",
+      "wrong_rate": "56.76",
+      "correct_rate": "43.24",
+      "rank_in_level": "25",
+      "question_code": "",
+      "explanation": "二维数组的行和列的大小在定义时都需要确定，无法动态变化。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "正确"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "错误"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "正确",
+          "wrong_count": "21"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "正确",
+        "wrong_count": "21"
+      }
+    },
+    {
+      "level": 4,
+      "question_id": 835,
+      "question_text": "假定整型是32位，对一个2行3列的二维整数数组array,假设数组第一个元素在内存中的地址为0x7ffee4065820，则第2行第2个元素的地址&array[1][1]为（ ）。",
+      "question_type": "code",
+      "difficulty": "hard",
+      "correct_answer": "D",
+      "wrong_count": "21",
+      "total_attempts": "34",
+      "correct_count": "13",
+      "wrong_rate": "61.76",
+      "correct_rate": "38.24",
+      "rank_in_level": "24",
+      "question_code": "int array[2][3] = {\n    {0, 1, 2},\n    {3, 4, 5}\n};",
+      "explanation": "每个整型占4字节，数组第1行的3个元素占据0x7ffee4065820至0x7ffee406582c。第2行第1个元素从0x7ffee4065830开始，第2个元素则在该地址后加4字节，即0x7ffee4065830。因此，&array[1][1]的地址为D选项。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "0x7ffee4065824"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "0x7ffee4065828"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "0x7ffee406582c"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "0x7ffee4065830"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "0x7ffee4065824",
+          "wrong_count": "11"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "0x7ffee406582c",
+          "wrong_count": "7"
+        },
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "0x7ffee4065828",
+          "wrong_count": "3"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "0x7ffee4065824",
+        "wrong_count": "11"
+      }
+    },
+    {
+      "level": 4,
+      "question_id": 1339,
+      "question_text": "以下代码能正确初始化指针。",
+      "question_type": "code",
+      "difficulty": "easy",
+      "correct_answer": "错误",
+      "wrong_count": "20",
+      "total_attempts": "59",
+      "correct_count": "39",
+      "wrong_rate": "33.90",
+      "correct_rate": "66.10",
+      "rank_in_level": "30",
+      "question_code": "int a = 5;\nint *p = a;",
+      "explanation": "int* p = a;\n直接将a（值为 5）赋值给指针p，会将 5 作为地址（非法内存地址），导致编译警告或运行错误。\n指针p需存储变量的地址，应改为int* p = &a;（&a是a的地址）。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "正确",
+          "text": "正确"
+        },
+        {
+          "label": "B",
+          "value": "错误",
+          "text": "错误"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "正确",
+          "option_label": "A",
+          "option_text": "正确",
+          "wrong_count": "16"
+        },
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "",
+          "wrong_count": "3"
+        },
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "",
+          "wrong_count": "1"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "正确",
+        "option_label": "A",
+        "option_text": "正确",
+        "wrong_count": "16"
+      }
+    },
+    {
+      "level": 4,
+      "question_id": 1347,
+      "question_text": "以下代码只能捕获int类型异常。",
+      "question_type": "code",
+      "difficulty": "medium",
+      "correct_answer": "错误",
+      "wrong_count": "20",
+      "total_attempts": "59",
+      "correct_count": "39",
+      "wrong_rate": "33.90",
+      "correct_rate": "66.10",
+      "rank_in_level": "31",
+      "question_code": "int main() {\n    try {\n        throw 42; \n    } catch (...) {\n        cout << \"Caught\" << endl;\n    }\n    return 0;\n}",
+      "explanation": "该代码使用 `catch(...)` 捕获所有类型的异常，而不仅限于 int 类型。虽然抛出的是 int 类型异常（`throw 42;`），但 `catch(...)` 是一个通用捕获块，能捕获任何类型异常，因此说它“只能捕获 int 类型异常”是错误的。故正确答案为“错误”。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "正确",
+          "text": "正确"
+        },
+        {
+          "label": "B",
+          "value": "错误",
+          "text": "错误"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "正确",
+          "option_label": "A",
+          "option_text": "正确",
+          "wrong_count": "20"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "正确",
+        "option_label": "A",
+        "option_text": "正确",
+        "wrong_count": "20"
+      }
+    },
+    {
+      "level": 4,
+      "question_id": 905,
+      "question_text": "下面的函数接收一个3行4列的二维数组并输出其中元素，则横线上不能填写（ ）。",
+      "question_type": "code",
+      "difficulty": "easy",
+      "correct_answer": "D",
+      "wrong_count": "20",
+      "total_attempts": "37",
+      "correct_count": "17",
+      "wrong_rate": "54.05",
+      "correct_rate": "45.95",
+      "rank_in_level": "28",
+      "question_code": "void printArray(________) {\n    for (int i = 0; i < 3; ++i)\n        for (int j = 0; j < 4; ++j)\n            std::cout << arr[i][j] << \" \";\n}",
+      "explanation": "D选项使用`int** arr`作为参数，无法正确访问二维数组的元素。因为`int**`指向的是指针数组，而原函数中`arr[i][j]`需要的是连续内存布局的二维数组，D无法保证这种结构，导致访问错误。其他选项均能正确传递3行4列的二维数组。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "int arr[3][4]"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "int arr[][4]"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "int (*arr)[4]"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "int** arr"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "int arr[3][4]",
+          "wrong_count": "11"
+        },
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "int arr[][4]",
+          "wrong_count": "5"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "int (*arr)[4]",
+          "wrong_count": "4"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "int arr[3][4]",
+        "wrong_count": "11"
+      }
+    },
+    {
+      "level": 4,
+      "question_id": 946,
+      "question_text": "指针的大小与其所指向的变量的数据类型的大小相同。",
+      "question_type": "text",
+      "difficulty": "medium",
+      "correct_answer": "B",
+      "wrong_count": "20",
+      "total_attempts": "37",
+      "correct_count": "17",
+      "wrong_rate": "54.05",
+      "correct_rate": "45.95",
+      "rank_in_level": "29",
+      "question_code": "",
+      "explanation": "指针的大小并不取决于它所指向的变量的数据类型，而是由系统架构决定的。例如，在32位系统中，指针通常为4字节，在64位系统中为8字节。无论指针指向的是整型、浮点型还是其他类型，其大小保持不变。因此，题目中的说法是错误的。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "正确"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "错误"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "正确",
+          "wrong_count": "20"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "正确",
+        "wrong_count": "20"
+      }
+    },
+    {
+      "level": 4,
+      "question_id": 832,
+      "question_text": "运行下面代码，屏幕上输出是（ ）。",
+      "question_type": "code",
+      "difficulty": "hard",
+      "correct_answer": "B",
+      "wrong_count": "20",
+      "total_attempts": "34",
+      "correct_count": "14",
+      "wrong_rate": "58.82",
+      "correct_rate": "41.18",
+      "rank_in_level": "27",
+      "question_code": "double* p_arr = new double[3];\np_arr[0] = 0.2;\np_arr[1] = 0.5;\np_arr[2] = 0.8;\np_arr += 1;\ncout << p_arr[0] << endl;\np_arr -= 1;\ndelete p_arr;",
+      "explanation": "解析：p_arr初始指向数组第一个元素，执行p_arr += 1后，指针指向第二个元素0.5，输出p_arr[0]即为0.5。之后p_arr -= 1恢复原位置，delete操作正确释放内存。因此输出结果为0.5，选项B正确。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "0.2"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "0.5"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "1.2"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "1.5"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "1.2",
+          "wrong_count": "11"
+        },
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "0.2",
+          "wrong_count": "9"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "C",
+        "option_label": "C",
+        "option_text": "1.2",
+        "wrong_count": "11"
+      }
+    },
+    {
+      "level": 4,
+      "question_id": 949,
+      "question_text": "选择排序是稳定的排序算法。",
+      "question_type": "text",
+      "difficulty": "medium",
+      "correct_answer": "B",
+      "wrong_count": "19",
+      "total_attempts": "62",
+      "correct_count": "43",
+      "wrong_rate": "30.65",
+      "correct_rate": "69.35",
+      "rank_in_level": "33",
+      "question_code": "",
+      "explanation": "选择排序不是稳定的排序算法，因为在交换元素时可能会改变相同元素的相对顺序。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "正确"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "错误"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "正确",
+          "wrong_count": "19"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "正确",
+        "wrong_count": "19"
+      }
+    },
+    {
+      "level": 4,
+      "question_id": 1334,
+      "question_text": "下面程序实现插入排序（升序排序），则横线上应分别填写（   ）。",
+      "question_type": "code",
+      "difficulty": "hard",
+      "correct_answer": "A",
+      "wrong_count": "19",
+      "total_attempts": "59",
+      "correct_count": "40",
+      "wrong_rate": "32.20",
+      "correct_rate": "67.80",
+      "rank_in_level": "34",
+      "question_code": "void insertionSort(int arr[], int n) {\n    for (int i = 1; i < n; i++) {\n        int key = arr[i];\n        int j = i - 1;\n        while ( j >= 0 && ____________________ ) { // 在此处填入代码\n            arr[j + 1] = arr[j];\n            j--;\n        }\n        ____________________; // 在此处填入代码\n    }\n}",
+      "explanation": "插入排序中，当当前元素key小于前面的arr[j]时需要后移；最后将key放入正确位置arr[j+1]。插入排序（升序）核心逻辑：\n外层循环：从i = 1开始（默认i=0为已排序区间），取key = nums[i]（待插入元素）。\n内层循环：从j = i-1开始，向前比较，若nums[j] > key（已排序元素比待插入元素大），则将nums[j]后移（nums[j+1] = nums[j]），直到j < 0或nums[j] <= key。\n插入：将key放入最终位置nums[j+1]。\n第一个空（条件）：j >= 0 && nums[j] > key（满足时继续后移元素）；第二个空（操作）：nums[j+1] = key（插入待排序元素）。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "arr[j] > key\narr[j + 1] = key"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "arr[j] < key\narr[j + 1] = key"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "arr[j] > key\narr[j] = key"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "arr[j] < key\narr[j] = key"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "arr[j] > key\narr[j] = key",
+          "wrong_count": "13"
+        },
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "arr[j] < key\narr[j + 1] = key",
+          "wrong_count": "3"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "arr[j] < key\narr[j] = key",
+          "wrong_count": "3"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "C",
+        "option_label": "C",
+        "option_text": "arr[j] > key\narr[j] = key",
+        "wrong_count": "13"
+      }
+    },
+    {
+      "level": 4,
+      "question_id": 933,
+      "question_text": "运行下面代码片段的结果是（ ）。",
+      "question_type": "code",
+      "difficulty": "medium",
+      "correct_answer": "D",
+      "wrong_count": "19",
+      "total_attempts": "37",
+      "correct_count": "18",
+      "wrong_rate": "51.35",
+      "correct_rate": "48.65",
+      "rank_in_level": "32",
+      "question_code": "int x = 20;\nint y = 24;\nint* p = &x;\nint* q = &y;\n\np = q;",
+      "explanation": "代码中 p 指向 x，q 指向 y。执行 p = q 后，p 指向 y。因此，p 指向了 q 所指向的地址。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "将 y 赋值为24"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "将 x 赋值为20"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "将 p 指向 x 的地址"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "将 p 指向 q 所指向的地址"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "将 y 赋值为24",
+          "wrong_count": "16"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "将 p 指向 x 的地址",
+          "wrong_count": "3"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "将 y 赋值为24",
+        "wrong_count": "16"
+      }
+    },
+    {
+      "level": 4,
+      "question_id": 1546,
+      "question_text": "函数参数传递过程中，如果传常量值、常量引用和常量指针都是不能被修改的，它们可以防止函数对实参的值或地址进行修改。",
+      "question_type": "text",
+      "difficulty": "medium",
+      "correct_answer": "A",
+      "wrong_count": "19",
+      "total_attempts": "37",
+      "correct_count": "18",
+      "wrong_rate": "51.35",
+      "correct_rate": "48.65",
+      "rank_in_level": "35",
+      "question_code": "",
+      "explanation": "const修饰的参数（如const int、const int&、const int*）在函数内部不可修改，有效保护实参数据安全。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "正确"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "错误"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "错误",
+          "wrong_count": "19"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "错误",
+        "wrong_count": "19"
+      }
+    },
+    {
+      "level": 4,
+      "question_id": 1330,
+      "question_text": "关于结构体初始化，以下哪个选项中正确的是（   ）。",
+      "question_type": "code",
+      "difficulty": "easy",
+      "correct_answer": "B",
+      "wrong_count": "18",
+      "total_attempts": "59",
+      "correct_count": "41",
+      "wrong_rate": "30.51",
+      "correct_rate": "69.49",
+      "rank_in_level": "39",
+      "question_code": "struct Point {int x,y};",
+      "explanation": "选项 A：(1,2)是逗号表达式，值为 2，结构体初始化不能用圆括号，错误。\n选项 B：{1,2}是聚合初始化（aggregate initialization），适用于结构体（无自定义构造函数时），按成员顺序赋值（x=1，y=2），正确。\n选项 C：new用于动态分配内存，返回指针（如Point* p = new Point{1,2};），直接赋值给Point p（非指针）会类型不匹配，错误。\n选项 D：<1,2>是模板参数语法，不用于结构体初始化，错误。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "Point p = (1,2)"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "Point p = {1,2}"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "Point p = new {1,2}"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "Point p = <1,2>"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "Point p = (1,2)",
+          "wrong_count": "9"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "Point p = new {1,2}",
+          "wrong_count": "7"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "Point p = <1,2>",
+          "wrong_count": "2"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "Point p = (1,2)",
+        "wrong_count": "9"
+      }
+    },
+    {
+      "level": 4,
+      "question_id": 1346,
+      "question_text": "对整数数组{4, 1, 3, 1, 5, 2}进行冒泡排序（将最大元素放到最后），执行一轮之后是{4, 1, 3, 1, 2, 5}。",
+      "question_type": "text",
+      "difficulty": "medium",
+      "correct_answer": "错误",
+      "wrong_count": "18",
+      "total_attempts": "59",
+      "correct_count": "41",
+      "wrong_rate": "30.51",
+      "correct_rate": "69.49",
+      "rank_in_level": "40",
+      "question_code": "",
+      "explanation": "执行一轮冒泡排序（将最大元素放到最后）时，会从数组首部开始相邻比较，较大者向后移动。对{4, 1, 3, 1, 5, 2}进行一轮扫描：4与1交换得{1,4,3,1,5,2}；4与3交换得{1,3,4,1,5,2}；4与1交换得{1,3,1,4,5,2}；4与5比较不交换；5与2交换得{1,3,1,4,2,5}。最终结果应为{1,3,1,4,2,5}，而非题目中的{4,1,3,1,2,5}，因此原说法错误。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "正确",
+          "text": "正确"
+        },
+        {
+          "label": "B",
+          "value": "错误",
+          "text": "错误"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "正确",
+          "option_label": "A",
+          "option_text": "正确",
+          "wrong_count": "18"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "正确",
+        "option_label": "A",
+        "option_text": "正确",
+        "wrong_count": "18"
+      }
+    },
+    {
+      "level": 4,
+      "question_id": 932,
+      "question_text": "运行下面代码，屏幕上输出是（ ）。",
+      "question_type": "code",
+      "difficulty": "medium",
+      "correct_answer": "B",
+      "wrong_count": "18",
+      "total_attempts": "37",
+      "correct_count": "19",
+      "wrong_rate": "48.65",
+      "correct_rate": "51.35",
+      "rank_in_level": "38",
+      "question_code": "int arr[3] = {24, 9, 7};\nint* p = arr;\np++;\ncout << *p << endl;",
+      "explanation": "数组 arr 初始化为 {24, 9, 7}，指针 p 指向 arr 的第一个元素 24。p++ 后，指针指向 arr[1]，即 9。因此输出为 9。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "24"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "9"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "7"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "不确定"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "24",
+          "wrong_count": "15"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "不确定",
+          "wrong_count": "2"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "7",
+          "wrong_count": "1"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "24",
+        "wrong_count": "15"
+      }
+    },
+    {
+      "level": 4,
+      "question_id": 1543,
+      "question_text": "引用是一个指针常量。",
+      "question_type": "text",
+      "difficulty": "hard",
+      "correct_answer": "A",
+      "wrong_count": "18",
+      "total_attempts": "37",
+      "correct_count": "19",
+      "wrong_rate": "48.65",
+      "correct_rate": "51.35",
+      "rank_in_level": "42",
+      "question_code": "",
+      "explanation": "引用在底层实现上类似于指针常量（如int* const），一旦绑定就不能更改指向，且必须初始化。虽然机制类似，但语法和用途不同。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "正确"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "错误"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "错误",
+          "wrong_count": "18"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "错误",
+        "wrong_count": "18"
+      }
+    },
+    {
+      "level": 4,
+      "question_id": 1540,
+      "question_text": "下面程序中，如果语句 cout<<p<<endl; 输出的是0x6ffe00，则cout<<++p<<endl;输出的是（）",
+      "question_type": "code",
+      "difficulty": "hard",
+      "correct_answer": "D",
+      "wrong_count": "18",
+      "total_attempts": "37",
+      "correct_count": "19",
+      "wrong_rate": "48.65",
+      "correct_rate": "51.35",
+      "rank_in_level": "41",
+      "question_code": "#include <iostream>\nusing namespace std;\nint main() {\n    int x[10][10][10] = {{0}};\n    int *p;\n    p = &x[0][0][0];\n    cout << p << endl;\n    cout << ++p << endl;\n    return 0;\n}",
+      "explanation": "p是指向int的指针，初始指向0x6ffe00。++p会使指针前进一个int大小（通常为4字节），所以新地址为0x6ffe00 + 4 = 0x6ffe04。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "0x6ffe0c"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "0x6ffe09"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "0x6ffe06"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "0x6ffe04"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "0x6ffe0c",
+          "wrong_count": "10"
+        },
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "0x6ffe09",
+          "wrong_count": "7"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "0x6ffe06",
+          "wrong_count": "1"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "0x6ffe0c",
+        "wrong_count": "10"
+      }
+    },
+    {
+      "level": 4,
+      "question_id": 908,
+      "question_text": "在C++中，如果希望通过函数修改传入的结构体对象的内容，应该使用哪种参数传递方式？",
+      "question_type": "text",
+      "difficulty": "easy",
+      "correct_answer": "C",
+      "wrong_count": "18",
+      "total_attempts": "37",
+      "correct_count": "19",
+      "wrong_rate": "48.65",
+      "correct_rate": "51.35",
+      "rank_in_level": "37",
+      "question_code": "",
+      "explanation": "在C++中，如果希望通过函数修改传入的结构体对象的内容，应该使用引用传递或指针传递。选项C正确。选项A错误，因为值传递不能修改原始对象；选项B错误，同理；选项D错误，因为引用传递也可以修改原始对象。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "值传递或引用传递"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "值传递或指针传递"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "引用传递或指针传递"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "仅指针传递"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "值传递或引用传递",
+          "wrong_count": "10"
+        },
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "值传递或指针传递",
+          "wrong_count": "7"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "仅指针传递",
+          "wrong_count": "1"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "值传递或引用传递",
+        "wrong_count": "10"
+      }
+    },
+    {
+      "level": 4,
+      "question_id": 906,
+      "question_text": "在C++中，int arr[3][4] 和 int* arr = new int[12]均可模拟一个3行4列的二维数组。关于这两种方式，下面说法错误的是（ ）。",
+      "question_type": "text",
+      "difficulty": "easy",
+      "correct_answer": "D",
+      "wrong_count": "18",
+      "total_attempts": "37",
+      "correct_count": "19",
+      "wrong_rate": "48.65",
+      "correct_rate": "51.35",
+      "rank_in_level": "36",
+      "question_code": "",
+      "explanation": "选项D错误，因为int arr[3][4]是在栈上分配空间，当函数返回时会自动释放；而int* arr = new int[12]是在堆上分配空间，需要手动释放(delete[] arr)，不会自动释放。选项A和B分别描述了栈和堆的特点，正确。选项C正确，两种方式申请的内存空间都是连续的。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "int arr[3][4]在栈上分配空间，适合数组较小的情况"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "int* arr = new int[12]在堆上分配空间，数组较大时也适用"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "这两种方式申请的内存空间都是连续的"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "这两种方式申请的内存都能自动释放"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "int arr[3][4]在栈上分配空间，适合数组较小的情况",
+          "wrong_count": "9"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "这两种方式申请的内存空间都是连续的",
+          "wrong_count": "5"
+        },
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "int* arr = new int[12]在堆上分配空间，数组较大时也适用",
+          "wrong_count": "4"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "int arr[3][4]在栈上分配空间，适合数组较小的情况",
+        "wrong_count": "9"
+      }
+    },
+    {
+      "level": 4,
+      "question_id": 1331,
+      "question_text": "运行如下代码会输出（  ）。",
+      "question_type": "code",
+      "difficulty": "medium",
+      "correct_answer": "B",
+      "wrong_count": "17",
+      "total_attempts": "59",
+      "correct_count": "42",
+      "wrong_rate": "28.81",
+      "correct_rate": "71.19",
+      "rank_in_level": "44",
+      "question_code": "#include <iostream>\n#include <string>\nusing namespace std;\n\nstruct Cat {\n    string name;\n    int age;\n};\n\nvoid birthday(Cat& c) {\n    c.age++;\n}\n\nint main() {\n    Cat kitty{\"Mimi\", 2};\n    birthday(kitty);\n    cout << kitty.name << \" \" << kitty.age;\n}",
+      "explanation": "结构体Cat kitty{\"Mimi\", 2}初始化name为 “Mimi”，age为 2。\n函数birthday(Cat& c)的参数c是kitty的引用（而非副本），c.age++直接修改kitty的age，变为 3。\n主函数输出kitty.name（“Mimi”）和kitty.age（3），即 “Mimi 3”。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "Mimi 2"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "Mimi 3"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "kitty 3"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "kitty 2"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "Mimi 2",
+          "wrong_count": "15"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "kitty 3",
+          "wrong_count": "2"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "Mimi 2",
+        "wrong_count": "15"
+      }
+    },
+    {
+      "level": 4,
+      "question_id": 1341,
+      "question_text": "以下C++代码合法。",
+      "question_type": "code",
+      "difficulty": "medium",
+      "correct_answer": "正确",
+      "wrong_count": "17",
+      "total_attempts": "59",
+      "correct_count": "42",
+      "wrong_rate": "28.81",
+      "correct_rate": "71.19",
+      "rank_in_level": "45",
+      "question_code": "struct Student {\n    string name;\n    int age;\n    float score;\n};\nStudent* students = new Student[20];",
+      "explanation": "代码合法，因为定义了一个包含string、int和float成员的结构体Student，随后使用new操作符动态分配了20个Student对象的数组，并将返回的指针赋给Student类型的指针变量students。\nC++允许通过new创建对象数组，且结构体类型支持默认构造（对于string会自动调用构造函数），因此该代码语法正确，能够成功编译运行。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "正确",
+          "text": "正确"
+        },
+        {
+          "label": "B",
+          "value": "错误",
+          "text": "错误"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "错误",
+          "option_label": "B",
+          "option_text": "错误",
+          "wrong_count": "17"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "错误",
+        "option_label": "B",
+        "option_text": "错误",
+        "wrong_count": "17"
+      }
+    },
+    {
+      "level": 4,
+      "question_id": 910,
+      "question_text": "运行如下代码会输出（ ）。",
+      "question_type": "code",
+      "difficulty": "easy",
+      "correct_answer": "C",
+      "wrong_count": "17",
+      "total_attempts": "37",
+      "correct_count": "20",
+      "wrong_rate": "45.95",
+      "correct_rate": "54.05",
+      "rank_in_level": "43",
+      "question_code": "int value = 100;\n\nvoid print1() {\n    int value = 50;\n    cout << value << \" \";\n    cout << ::value << \" \";\n}\n\nvoid print2() {\n    cout << value << \" \";\n}\n\nprint1();\nprint2();",
+      "explanation": "代码中定义了一个全局变量value = 100。print1()函数中定义了一个局部变量value = 50，输出局部变量value和全局变量::value，分别是50和100。print2()函数直接输出全局变量value = 100。因此输出为50 100 100。选项C正确。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "100 100 100"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "50 50 50"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "50 100 100"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "50 50 100"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "100 100 100",
+          "wrong_count": "7"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "50 50 100",
+          "wrong_count": "5"
+        },
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "50 50 50",
+          "wrong_count": "5"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "100 100 100",
+        "wrong_count": "7"
+      }
+    },
+    {
+      "level": 4,
+      "question_id": 1547,
+      "question_text": "下面代码输出的值等于0。",
+      "question_type": "code",
+      "difficulty": "easy",
+      "correct_answer": "A",
+      "wrong_count": "17",
+      "total_attempts": "37",
+      "correct_count": "20",
+      "wrong_rate": "45.95",
+      "correct_rate": "54.05",
+      "rank_in_level": "46",
+      "question_code": "#include <iostream>\nusing namespace std;\nint main() {\n    int *p = NULL;\n    cout << p << endl;\n}",
+      "explanation": "当指针被赋值为 NULL 时，表示它不指向任何有效的内存地址，其值为 0。代码中 `int *p = NULL;` 将指针 p 初始化为空指针，其数值为 0。在输出时，`cout << p << endl;` 实际上输出的是指针的值，即 0。因此，程序输出结果为 0，题干描述正确，选项 A 正确。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "正确"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "错误"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "错误",
+          "wrong_count": "17"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "错误",
+        "wrong_count": "17"
+      }
+    },
+    {
+      "level": 4,
+      "question_id": 920,
+      "question_text": "下面C++代码的输出是15。\n\nvoid foo(int x) {\n    x += 5;\n}\nint main() {\n    int a = 10;\n    foo(a);\n    cout << a << endl;\n}",
+      "question_type": "text",
+      "difficulty": "easy",
+      "correct_answer": "B",
+      "wrong_count": "16",
+      "total_attempts": "37",
+      "correct_count": "21",
+      "wrong_rate": "43.24",
+      "correct_rate": "56.76",
+      "rank_in_level": "50",
+      "question_code": "",
+      "explanation": "在C++中，函数参数是按值传递的，这意味着函数内部对参数的修改不会影响原始变量。在foo函数中，x的值被修改为15，但这不会影响main函数中的a变量。因此，输出仍然是10，这个判断题是错误的。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "正确"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "错误"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "正确",
+          "wrong_count": "16"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "正确",
+        "wrong_count": "16"
+      }
+    },
+    {
+      "level": 4,
+      "question_id": 833,
+      "question_text": "运行下面代码片段后，x和*p的结果分别是（ ）。",
+      "question_type": "code",
+      "difficulty": "medium",
+      "correct_answer": "D",
+      "wrong_count": "16",
+      "total_attempts": "34",
+      "correct_count": "18",
+      "wrong_rate": "47.06",
+      "correct_rate": "52.94",
+      "rank_in_level": "47",
+      "question_code": "int x = 20;\nint* p = &x;\n*p = *p + 2;",
+      "explanation": "p指向x的地址，*p即x的值。*p = *p + 2 等价于 x = x + 2，因此x和*p都变为22。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "20 20"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "20 22"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "22 20"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "22 22"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "20 22",
+          "wrong_count": "8"
+        },
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "20 20",
+          "wrong_count": "6"
+        },
+        {
+          "option_value": "C",
+          "option_label": "C",
+          "option_text": "22 20",
+          "wrong_count": "2"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "B",
+        "option_label": "B",
+        "option_text": "20 22",
+        "wrong_count": "8"
+      }
+    },
+    {
+      "level": 4,
+      "question_id": 846,
+      "question_text": "函数参数可以通过值传递、引用传递和指针传递，这样函数内对参数的修改可以直接修改传入变量的值。",
+      "question_type": "text",
+      "difficulty": "medium",
+      "correct_answer": "B",
+      "wrong_count": "16",
+      "total_attempts": "34",
+      "correct_count": "18",
+      "wrong_rate": "47.06",
+      "correct_rate": "52.94",
+      "rank_in_level": "49",
+      "question_code": "",
+      "explanation": "错误。只有引用传递和指针传递可以修改原变量，值传递是副本，不会影响原变量。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "正确"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "错误"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "正确",
+          "wrong_count": "16"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "正确",
+        "wrong_count": "16"
+      }
+    },
+    {
+      "level": 4,
+      "question_id": 842,
+      "question_text": "下面哪种方式不能实现将字符串\"Welcome to GESP!\"输出重定向到文件log.txt（ ）。",
+      "question_type": "text",
+      "difficulty": "hard",
+      "correct_answer": "C",
+      "wrong_count": "16",
+      "total_attempts": "31",
+      "correct_count": "15",
+      "wrong_rate": "51.61",
+      "correct_rate": "48.39",
+      "rank_in_level": "48",
+      "question_code": "#include <fstream>\nusing namespace std;\n\n// A\nfreopen(\"log.txt\", \"w\", stdout);\ncout << \"Welcome to GESP!\" << endl;\nfclose(stdout);\n\n// B\nstd::ofstream outFile(\"log.txt\");\noutFile << \"Welcome to GESP!\" << endl;\noutFile.close();\n\n// C\nstd::ofstream outFile(\"log.txt\");\ncout << \"Welcome to GESP!\" << endl;\noutFile.close();\n\n// D\nofstream log_file(\"log.txt\");\nstreambuf* org_cout = cout.rdbuf();\ncout.rdbuf(log_file.rdbuf());\ncout << \"This output will go to the log file.\" << endl;\ncout.rdbuf(org_cout);",
+      "explanation": "选项C中虽然打开了文件，但仍然使用cout输出，未将输出流重定向到文件，因此字符串不会写入log.txt。",
+      "all_options": [
+        {
+          "label": "A",
+          "value": "A",
+          "text": "freopen(\"log.txt\", \"w\", stdout);\ncout << \"Welcome to GESP!\" << endl;\nfclose(stdout);"
+        },
+        {
+          "label": "B",
+          "value": "B",
+          "text": "std::ofstream outFile(\"log.txt\");\noutFile << \"Welcome to GESP!\" << endl;\noutFile.close();"
+        },
+        {
+          "label": "C",
+          "value": "C",
+          "text": "std::ofstream outFile(\"log.txt\");\ncout << \"Welcome to GESP!\" << endl;\noutFile.close();"
+        },
+        {
+          "label": "D",
+          "value": "D",
+          "text": "ofstream log_file(\"log.txt\");\nstreambuf* org_cout = cout.rdbuf();\ncout.rdbuf(log_file.rdbuf());\ncout << \"This output will go to the log file.\" << endl;\ncout.rdbuf(org_cout);"
+        }
+      ],
+      "options_statistics": [
+        {
+          "option_value": "A",
+          "option_label": "A",
+          "option_text": "freopen(\"log.txt\", \"w\", stdout);\ncout << \"Welcome to GESP!\" << endl;\nfclose(stdout);",
+          "wrong_count": "7"
+        },
+        {
+          "option_value": "B",
+          "option_label": "B",
+          "option_text": "std::ofstream outFile(\"log.txt\");\noutFile << \"Welcome to GESP!\" << endl;\noutFile.close();",
+          "wrong_count": "6"
+        },
+        {
+          "option_value": "D",
+          "option_label": "D",
+          "option_text": "ofstream log_file(\"log.txt\");\nstreambuf* org_cout = cout.rdbuf();\ncout.rdbuf(log_file.rdbuf());\ncout << \"This output will go to the log file.\" << endl;\ncout.rdbuf(org_cout);",
+          "wrong_count": "3"
+        }
+      ],
+      "most_wrong_option": {
+        "option_value": "A",
+        "option_label": "A",
+        "option_text": "freopen(\"log.txt\", \"w\", stdout);\ncout << \"Welcome to GESP!\" << endl;\nfclose(stdout);",
+        "wrong_count": "7"
+      }
+    }
+  ]
+}

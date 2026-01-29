@@ -14,7 +14,7 @@ const Redis = require('ioredis');
 const redisConfig = {
   host: process.env.REDIS_HOST || '127.0.0.1',
   port: parseInt(process.env.REDIS_PORT) || 6379,
-  password: process.env.REDIS_PASSWORD || null, // 如果有密码，请设置
+  password: process.env.REDIS_PASSWORD && process.env.REDIS_PASSWORD.trim() !== '' ? process.env.REDIS_PASSWORD.trim() : null, // 如果有密码，请设置
   db: parseInt(process.env.REDIS_DB) || 0,
   // 连接配置
   lazyConnect: false, // 改为false，立即建立连接

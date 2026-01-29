@@ -120,6 +120,13 @@ tmp/
 temp/
 *.tmp
 
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
 # Package lock files (optional - some prefer to include them)
 # package-lock.json
 # yarn.lock
