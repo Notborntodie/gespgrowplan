@@ -32,3 +32,30 @@ Thumbs.db
 *.tmp
 *.temp
 
+# Python 缓存文件
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# 临时脚本文件
+*.py
+*.cpp
+add_plan_completion_rate.py
+process_samples_strong.py
+generate_input_123_strong.cpp
+
+# HTTPS/部署相关文档和配置
+README-HTTPS.md
+docs/HTTPS*.md
+docs/*配置*.md
+docs/*问题*.md
+nginx-backend*.conf
+
+# 临时测试脚本
+scripts/test_db_connection.js
+scripts/setup-https.sh
+scripts/add_plan_completion_rate.js
+scripts/update_samples_123.js
+
