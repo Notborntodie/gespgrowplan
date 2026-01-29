@@ -40,6 +40,41 @@ API_BASE_URL="${API_BASE_URL:-}"
 AI_API_BASE_URL="${AI_API_BASE_URL:-}"
 OJ_API_CONFIGS="${OJ_API_CONFIGS:-}"
 
+# 检测是否为本地部署模式
+detect_local_deploy() {
+    LOCAL_DEPLOY=false
+    
+    # 获取当前服务器的IP地址（内网IP）
+    local current_internal_ip=""
+    if command -v hostname >/dev/null 2>&1; then
+        current_internal_ip=$(hostname -I 2>/dev/null | awk '{print $1}' || echo "")
+    fi
+    
+    # 获取当前服务器的公网IP
+    local current_public_ip=""
+    if command -v curl >/dev/null 2>&1; then
+        current_public_ip=$(curl -s --connect-timeout 2 ifconfig.me 2>/dev/null || curl -s --connect-timeout 2 ipinfo.io/ip 2>/dev/null || echo "")
+    fi
+    
+    # 检查是否为本地部署
+    if [ "${SERVER_IP}" = "localhost" ] || [ "${SERVER_IP}" = "127.0.0.1" ]; then
+        LOCAL_DEPLOY=true
+        log_info "检测到本地部署模式（localhost）"
+    elif [ -n "${current_internal_ip}" ] && [ "${SERVER_IP}" = "${current_internal_ip}" ]; then
+        LOCAL_DEPLOY=true
+        log_info "检测到本地部署模式（内网IP匹配: ${current_internal_ip}）"
+    elif [ -n "${current_public_ip}" ] && [ "${SERVER_IP}" = "${current_public_ip}" ]; then
+        LOCAL_DEPLOY=true
+        log_info "检测到本地部署模式（公网IP匹配: ${current_public_ip}）"
+    elif [ "${SERVER_IP}" = "$(hostname -f 2>/dev/null || hostname 2>/dev/null || echo '')" ]; then
+        LOCAL_DEPLOY=true
+        log_info "检测到本地部署模式（主机名匹配）"
+    else
+        LOCAL_DEPLOY=false
+        log_info "使用远程部署模式（目标服务器: ${SERVER_IP}）"
+    fi
+}
+
 # 验证必需配置
 validate_config() {
     local has_error=false
@@ -75,6 +110,9 @@ validate_config() {
     if [ -z "${DOMAIN_NAME}" ]; then
         DOMAIN_NAME="${SERVER_IP}"
     fi
+    
+    # 检测部署模式
+    detect_local_deploy
 }
 
 log_success() {
@@ -89,6 +127,23 @@ log_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
+# 检查并安装依赖
+check_dependencies() {
+    log_info "检查项目依赖..."
+    
+    if [ ! -d "node_modules" ] || [ ! -f "node_modules/.bin/vite" ]; then
+        log_warning "依赖未安装，正在安装..."
+        npm install
+        if [ $? -ne 0 ]; then
+            log_error "依赖安装失败！请检查网络连接和npm配置"
+            exit 1
+        fi
+        log_success "依赖安装完成"
+    else
+        log_success "依赖检查通过"
+    fi
+}
+
 # 构建前端（带环境变量）
 build_frontend() {
     log_info "开始构建前端应用..."
@@ -100,6 +155,9 @@ build_frontend() {
     else
         log_info "判题机配置: 未设置（将使用默认配置）"
     fi
+    
+    # 检查并安装依赖
+    check_dependencies
     
     # 设置环境变量并构建
     export VITE_API_BASE_URL="${API_BASE_URL}"
@@ -136,24 +194,40 @@ check_build_files() {
 
 # 创建部署目录
 create_deploy_directory() {
-    log_info "在服务器上创建部署目录..."
+    log_info "创建部署目录..."
     
-    ssh ${SERVER_USER}@${SERVER_IP} "mkdir -p ${DEPLOY_PATH}"
+    if [ "$LOCAL_DEPLOY" = true ]; then
+        mkdir -p ${DEPLOY_PATH}
+    else
+        ssh ${SERVER_USER}@${SERVER_IP} "mkdir -p ${DEPLOY_PATH}"
+    fi
     
     log_success "部署目录创建完成"
 }
 
 # 上传文件到服务器
 upload_files() {
-    log_info "上传文件到服务器..."
-    
-    # 先清空服务器上的目录
-    ssh ${SERVER_USER}@${SERVER_IP} "rm -rf ${DEPLOY_PATH}/*"
-    
-    # 使用scp上传文件
-    scp -r dist/* ${SERVER_USER}@${SERVER_IP}:${DEPLOY_PATH}/
-    
-    log_success "文件上传完成"
+    if [ "$LOCAL_DEPLOY" = true ]; then
+        log_info "复制文件到部署目录..."
+        
+        # 先清空部署目录
+        rm -rf ${DEPLOY_PATH}/*
+        
+        # 复制文件
+        cp -r dist/* ${DEPLOY_PATH}/
+        
+        log_success "文件复制完成"
+    else
+        log_info "上传文件到服务器..."
+        
+        # 先清空服务器上的目录
+        ssh ${SERVER_USER}@${SERVER_IP} "rm -rf ${DEPLOY_PATH}/*"
+        
+        # 使用scp上传文件
+        scp -r dist/* ${SERVER_USER}@${SERVER_IP}:${DEPLOY_PATH}/
+        
+        log_success "文件上传完成"
+    fi
 }
 
 # 配置Nginx
@@ -171,16 +245,30 @@ configure_nginx() {
         log_info "检测到SSL证书配置，启用HTTPS..."
         
         # 检查服务器上的证书文件是否存在
-        if ! ssh ${SERVER_USER}@${SERVER_IP} "test -f ${SSL_CERT_PATH}" 2>/dev/null; then
-            log_error "SSL证书文件不存在: ${SSL_CERT_PATH}"
-            log_warning "HTTPS配置将被跳过，使用HTTP模式"
-            enable_https_check=false
-        elif ! ssh ${SERVER_USER}@${SERVER_IP} "test -f ${SSL_KEY_PATH}" 2>/dev/null; then
-            log_error "SSL密钥文件不存在: ${SSL_KEY_PATH}"
-            log_warning "HTTPS配置将被跳过，使用HTTP模式"
-            enable_https_check=false
+        if [ "$LOCAL_DEPLOY" = true ]; then
+            if [ ! -f "${SSL_CERT_PATH}" ]; then
+                log_error "SSL证书文件不存在: ${SSL_CERT_PATH}"
+                log_warning "HTTPS配置将被跳过，使用HTTP模式"
+                enable_https_check=false
+            elif [ ! -f "${SSL_KEY_PATH}" ]; then
+                log_error "SSL密钥文件不存在: ${SSL_KEY_PATH}"
+                log_warning "HTTPS配置将被跳过，使用HTTP模式"
+                enable_https_check=false
+            else
+                log_success "SSL证书文件验证通过"
+            fi
         else
-            log_success "SSL证书文件验证通过"
+            if ! ssh ${SERVER_USER}@${SERVER_IP} "test -f ${SSL_CERT_PATH}" 2>/dev/null; then
+                log_error "SSL证书文件不存在: ${SSL_CERT_PATH}"
+                log_warning "HTTPS配置将被跳过，使用HTTP模式"
+                enable_https_check=false
+            elif ! ssh ${SERVER_USER}@${SERVER_IP} "test -f ${SSL_KEY_PATH}" 2>/dev/null; then
+                log_error "SSL密钥文件不存在: ${SSL_KEY_PATH}"
+                log_warning "HTTPS配置将被跳过，使用HTTP模式"
+                enable_https_check=false
+            else
+                log_success "SSL证书文件验证通过"
+            fi
         fi
     fi
     
@@ -367,12 +455,19 @@ EOF
     fi
 
     # 上传配置文件到服务器
-    scp /tmp/gesp-frontend.conf ${SERVER_USER}@${SERVER_IP}:${NGINX_CONFIG_PATH}
-    
-    # 测试配置并重载Nginx
-    ssh ${SERVER_USER}@${SERVER_IP} "
+    if [ "$LOCAL_DEPLOY" = true ]; then
+        cp /tmp/gesp-frontend.conf ${NGINX_CONFIG_PATH}
+        
+        # 测试配置并重载Nginx
         nginx -t && systemctl reload nginx
-    "
+    else
+        scp /tmp/gesp-frontend.conf ${SERVER_USER}@${SERVER_IP}:${NGINX_CONFIG_PATH}
+        
+        # 测试配置并重载Nginx
+        ssh ${SERVER_USER}@${SERVER_IP} "
+            nginx -t && systemctl reload nginx
+        "
+    fi
     
     # 清理临时文件
     rm /tmp/gesp-frontend.conf
@@ -391,22 +486,39 @@ set_permissions() {
     
     # 自动检测Nginx用户（支持Debian/Ubuntu的www-data和CentOS/RHEL的nginx）
     local nginx_user="www-data"
-    if ! ssh ${SERVER_USER}@${SERVER_IP} "id -u www-data >/dev/null 2>&1"; then
-        if ssh ${SERVER_USER}@${SERVER_IP} "id -u nginx >/dev/null 2>&1"; then
-            nginx_user="nginx"
-            log_info "检测到使用 nginx 用户（CentOS/RHEL系统）"
+    if [ "$LOCAL_DEPLOY" = true ]; then
+        if ! id -u www-data >/dev/null 2>&1; then
+            if id -u nginx >/dev/null 2>&1; then
+                nginx_user="nginx"
+                log_info "检测到使用 nginx 用户（CentOS/RHEL系统）"
+            else
+                log_warning "未找到 www-data 或 nginx 用户，使用 root 用户"
+                nginx_user="root"
+            fi
         else
-            log_warning "未找到 www-data 或 nginx 用户，使用 root 用户"
-            nginx_user="root"
+            log_info "检测到使用 www-data 用户（Debian/Ubuntu系统）"
         fi
-    else
-        log_info "检测到使用 www-data 用户（Debian/Ubuntu系统）"
-    fi
-    
-    ssh ${SERVER_USER}@${SERVER_IP} "
+        
         chown -R ${nginx_user}:${nginx_user} ${DEPLOY_PATH}
         chmod -R 755 ${DEPLOY_PATH}
-    "
+    else
+        if ! ssh ${SERVER_USER}@${SERVER_IP} "id -u www-data >/dev/null 2>&1"; then
+            if ssh ${SERVER_USER}@${SERVER_IP} "id -u nginx >/dev/null 2>&1"; then
+                nginx_user="nginx"
+                log_info "检测到使用 nginx 用户（CentOS/RHEL系统）"
+            else
+                log_warning "未找到 www-data 或 nginx 用户，使用 root 用户"
+                nginx_user="root"
+            fi
+        else
+            log_info "检测到使用 www-data 用户（Debian/Ubuntu系统）"
+        fi
+        
+        ssh ${SERVER_USER}@${SERVER_IP} "
+            chown -R ${nginx_user}:${nginx_user} ${DEPLOY_PATH}
+            chmod -R 755 ${DEPLOY_PATH}
+        "
+    fi
     
     log_success "文件权限设置完成（使用用户: ${nginx_user}）"
 }

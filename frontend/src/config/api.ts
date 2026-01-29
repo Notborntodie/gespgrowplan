@@ -39,7 +39,17 @@ const getApiBaseUrl = (): string => {
 export const BASE_URL = getApiBaseUrl()
 
 // 导出不带/api后缀的基础URL（用于图片等静态资源）
-export const API_SERVER_BASE = BASE_URL.replace('/api', '')
+// 如果BASE_URL是相对路径（以/开头），则API_SERVER_BASE也是相对路径（空字符串表示当前域名）
+// 如果BASE_URL是完整URL，则提取协议和域名部分
+export const API_SERVER_BASE = (() => {
+  const baseUrl = BASE_URL
+  // 如果是相对路径（以/开头）
+  if (baseUrl.startsWith('/')) {
+    return '' // 空字符串表示当前域名，用于相对路径
+  }
+  // 如果是完整URL，提取协议和域名部分
+  return baseUrl.replace('/api', '')
+})()
 
 // 导出AI服务的基础URL（如果有单独的AI服务）
 const getAiApiBaseUrl = (): string => {
