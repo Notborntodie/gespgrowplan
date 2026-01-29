@@ -94,16 +94,37 @@ router.get('/users/:userId', async (req, res) => {
 router.put('/users/:userId/roles', async (req, res) => {
   try {
     const { userId } = req.params;
-    const { role_ids } = req.body;
+    const { role_ids, admin_user_id } = req.body;
     
     if (!Array.isArray(role_ids)) {
       return res.status(400).json({ error: 'role_ids 必须是数组' });
+    }
+    
+    // 验证必需参数：需要管理员用户ID
+    if (!admin_user_id) {
+      return res.status(400).json({ 
+        error: '缺少必需参数',
+        required: ['admin_user_id']
+      });
     }
     
     const connection = await pool.getConnection();
     
     try {
       await connection.beginTransaction();
+      
+      // 检查操作者是否为超级管理员（角色ID=4）
+      const [superAdminCheck] = await connection.execute(`
+        SELECT COUNT(*) as is_super_admin
+        FROM user_roles
+        WHERE user_id = ? AND role_id = 4
+      `, [admin_user_id]);
+      
+      if (superAdminCheck[0].is_super_admin === 0) {
+        await connection.rollback();
+        connection.release();
+        return res.status(403).json({ error: '只有超级管理员才能修改用户权限' });
+      }
       
       // 检查用户是否存在
       const [userExists] = await connection.execute(
@@ -172,12 +193,33 @@ router.put('/users/:userId/roles', async (req, res) => {
 router.put('/users/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
-    const { username, email, real_name } = req.body;
+    const { username, email, real_name, admin_user_id } = req.body;
+    
+    // 验证必需参数：需要管理员用户ID
+    if (!admin_user_id) {
+      return res.status(400).json({ 
+        error: '缺少必需参数',
+        required: ['admin_user_id']
+      });
+    }
     
     const connection = await pool.getConnection();
     
     try {
       await connection.beginTransaction();
+      
+      // 检查操作者是否为超级管理员（角色ID=4）
+      const [superAdminCheck] = await connection.execute(`
+        SELECT COUNT(*) as is_super_admin
+        FROM user_roles
+        WHERE user_id = ? AND role_id = 4
+      `, [admin_user_id]);
+      
+      if (superAdminCheck[0].is_super_admin === 0) {
+        await connection.rollback();
+        connection.release();
+        return res.status(403).json({ error: '只有超级管理员才能修改用户信息' });
+      }
       
       // 检查用户是否存在
       const [userExists] = await connection.execute(
@@ -295,21 +337,27 @@ router.delete('/users/:userId', async (req, res) => {
       
       const user = userRows[0];
       
-      // 如果提供了管理员用户ID，验证管理员权限
-      if (admin_user_id) {
-        const [adminPermission] = await connection.execute(`
-          SELECT COUNT(*) as has_permission
-          FROM permissions p
-          JOIN role_permissions rp ON p.id = rp.permission_id
-          JOIN user_roles ur ON rp.role_id = ur.role_id
-          WHERE ur.user_id = ? AND p.name = 'user.delete'
-        `, [admin_user_id]);
-        
-        if (adminPermission[0].has_permission === 0) {
-          await connection.rollback();
-          connection.release();
-          return res.status(403).json({ error: '没有权限删除用户' });
-        }
+      // 验证必需参数：需要管理员用户ID
+      if (!admin_user_id) {
+        await connection.rollback();
+        connection.release();
+        return res.status(400).json({ 
+          error: '缺少必需参数',
+          required: ['admin_user_id']
+        });
+      }
+      
+      // 检查操作者是否为超级管理员（角色ID=4）
+      const [superAdminCheck] = await connection.execute(`
+        SELECT COUNT(*) as is_super_admin
+        FROM user_roles
+        WHERE user_id = ? AND role_id = 4
+      `, [admin_user_id]);
+      
+      if (superAdminCheck[0].is_super_admin === 0) {
+        await connection.rollback();
+        connection.release();
+        return res.status(403).json({ error: '只有超级管理员才能删除用户' });
       }
       
       // 检查是否有答题记录，如果有则不允许删除
@@ -473,19 +521,17 @@ router.put('/users/:userId/reset-password', async (req, res) => {
       
       const user = userRows[0];
       
-      // 验证管理员权限
-      const [adminPermission] = await connection.execute(`
-        SELECT COUNT(*) as has_permission
-        FROM permissions p
-        JOIN role_permissions rp ON p.id = rp.permission_id
-        JOIN user_roles ur ON rp.role_id = ur.role_id
-        WHERE ur.user_id = ? AND p.name = 'user.reset_password'
+      // 检查操作者是否为超级管理员（角色ID=4）
+      const [superAdminCheck] = await connection.execute(`
+        SELECT COUNT(*) as is_super_admin
+        FROM user_roles
+        WHERE user_id = ? AND role_id = 4
       `, [admin_user_id]);
       
-      if (adminPermission[0].has_permission === 0) {
+      if (superAdminCheck[0].is_super_admin === 0) {
         await connection.rollback();
         connection.release();
-        return res.status(403).json({ error: '没有权限重置用户密码' });
+        return res.status(403).json({ error: '只有超级管理员才能重置用户密码' });
       }
       
       // 重置密码

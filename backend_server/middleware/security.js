@@ -36,25 +36,38 @@ const securityMiddleware = {
   
   // CORS 配置
   cors: (req, res, next) => {
-    // 允许所有来源的跨域请求
+    // 允许的源列表（从环境变量读取，如果没有则使用默认值）
+    const allowedOriginsEnv = process.env.ALLOWED_ORIGINS;
+    const defaultOrigins = [
+      'http://localhost:3000',
+      'http://localhost:5173',
+      'http://106.14.143.27',
+      'http://106.14.143.27:80',
+      'https://106.14.143.27',
+      'https://106.14.143.27:443'
+    ];
+    const allowedOrigins = allowedOriginsEnv 
+      ? allowedOriginsEnv.split(',').map(origin => origin.trim()).filter(origin => origin)
+      : defaultOrigins;
+    
     const origin = req.get('Origin');
     
-    // 如果请求有Origin头，则设置为该Origin；否则允许所有来源
-    if (origin) {
+    // 如果请求有Origin头且在允许列表中，则设置该Origin并允许credentials
+    // 如果Origin不在列表中但存在，也允许访问（开发/测试环境）
+    if (origin && allowedOrigins.includes(origin)) {
       res.header('Access-Control-Allow-Origin', origin);
+      res.header('Access-Control-Allow-Credentials', 'true');
+    } else if (origin) {
+      // 对于其他源，也允许访问（开发/测试环境）
+      res.header('Access-Control-Allow-Origin', origin);
+      res.header('Access-Control-Allow-Credentials', 'true');
     } else {
+      // 没有 Origin 头（同源请求），允许所有来源
       res.header('Access-Control-Allow-Origin', '*');
     }
     
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, X-Requested-With');
-    
-    // 注意：当使用通配符 '*' 时，不能设置 credentials 为 true
-    // 如果请求有Origin，可以设置credentials；否则不设置
-    if (origin) {
-      res.header('Access-Control-Allow-Credentials', 'true');
-    }
-    
     res.header('Access-Control-Max-Age', '86400'); // 24小时
     
     if (req.method === 'OPTIONS') {
@@ -191,8 +204,18 @@ const securityMiddleware = {
   // 请求来源验证
   originValidation: (req, res, next) => {
     // 从环境变量读取允许的来源，支持逗号分隔的多个来源
-    const allowedOriginsEnv = process.env.ALLOWED_ORIGINS || 'http://localhost:3000,http://localhost:5173';
-    const allowedOrigins = allowedOriginsEnv.split(',').map(origin => origin.trim()).filter(origin => origin);
+    const allowedOriginsEnv = process.env.ALLOWED_ORIGINS;
+    const defaultOrigins = [
+      'http://localhost:3000',
+      'http://localhost:5173',
+      'http://106.14.143.27',
+      'http://106.14.143.27:80',
+      'https://106.14.143.27',
+      'https://106.14.143.27:443'
+    ];
+    const allowedOrigins = allowedOriginsEnv 
+      ? allowedOriginsEnv.split(',').map(origin => origin.trim()).filter(origin => origin)
+      : defaultOrigins;
     
     const origin = req.get('Origin');
     
