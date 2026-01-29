@@ -19,9 +19,6 @@
         <div class="empty-icon"><Icon name="file-text" :size="64" /></div>
         <h3>暂无提交记录</h3>
         <p>您还没有参加过这个考试</p>
-        <button @click="startExam" class="btn btn-primary">
-          开始考试
-        </button>
       </div>
       
       <div v-else class="submissions-by-month">
@@ -372,8 +369,8 @@ function goBack() {
   const taskId = route.query.taskId as string
   
   if (from === 'taskview' && planId && taskId) {
-    // 从任务页面跳转过来的，返回到任务页面
-    router.push(`/plan/${planId}/tasks/${taskId}`)
+    // 从任务页面跳转过来的，返回到任务页面的专项练习题标签
+    router.push(`/plan/${planId}/tasks/${taskId}?tab=exercises`)
   } else {
     // 默认返回到客观题选择页面
     router.push(`/level-exams/${examInfo.value.level}`)

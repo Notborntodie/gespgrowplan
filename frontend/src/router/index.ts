@@ -5,7 +5,9 @@ import SelectLevelView from '../views/SelectLevelView.vue'
 import CspLevelView from '../views/CspLevelView.vue'
 import SmartOJLevelView from '../views/SmartOJLevelView.vue'
 import SmartOJView from '../views/SmartOJView.vue'
+import PlanSmartOJView from '../views/PlanSmartOJView.vue'
 import GESPEaxmView from '../views/GESPEaxmView.vue'
+import PlanExamView from '../views/PlanExamView.vue'
 import AdminView from '../views/AdminView.vue'
 import TeacherView from '../views/TeacherView.vue'
 import LevelExamsView from '../views/LevelExamsView.vue'
@@ -19,6 +21,10 @@ import TaskListView from '../views/TaskListView.vue'
 import TaskView from '../views/TaskView.vue'
 import homeView from '../views/homeView.vue'
 import FeynmanSummaryView from '../views/FeynmanSummaryView.vue'
+import StudentPlanProgressView from '../views/StudentPlanProgressView.vue'
+import AnimationDemoView from '../views/AnimationDemoView.vue'
+import AnimationView from '../views/AnimationView.vue'
+import TopWrongQuestionsView from '../views/TopWrongQuestionsView.vue'
 
 const routes = [
   { path: '/login', component: LoginView },
@@ -32,10 +38,12 @@ const routes = [
   { path: '/csp', component: CspLevelView },
   { path: '/smartoj', component: SmartOJLevelView }, // 题目列表页
   { path: '/smartoj/:problemId', component: SmartOJView }, // 单个题目做题页
+  { path: '/plan-smartoj/:problemId', component: PlanSmartOJView }, // 任务内编程题做题页
   { path: '/select-level', redirect: '/level-exams/0' },
   { path: '/level-exams/:level', component: LevelExamsView },
   { path: '/practice/:examId', component: GESPEaxmView },
   { path: '/exam/:examId', component: GESPEaxmView },
+  { path: '/plan-exam/:examId', component: PlanExamView }, // 任务内考试页
   { path: '/exam-submissions/:examId', component: ExamSubmissionsView },
   { path: '/teacher/:teacherId/submissions', component: StudentSubmissionsView },
   { path: '/teacher/:teacherId/oj-submissions/:problemId', component: TeacherOJSubmissionsView },
@@ -44,8 +52,13 @@ const routes = [
   { path: '/profile', component: ProfileView },
   { path: '/gesp5', redirect: '/practice/1' }, // 保持向后兼容
   { path: '/admin', component: AdminView },
-  { path: '/teacher', component: TeacherView }
-  ,{ path: '/feynman-summary', component: FeynmanSummaryView }
+  { path: '/teacher', component: TeacherView },
+  { path: '/teacher/:teacherId/student/:studentId/plan-progress', component: StudentPlanProgressView },
+  { path: '/feynman-summary', component: FeynmanSummaryView },
+  { path: '/animation-demo', component: AnimationDemoView },
+  { path: '/animation/:id', component: AnimationView },
+  { path: '/top-wrong-questions', redirect: '/top-wrong-questions/1' },
+  { path: '/top-wrong-questions/:level', component: TopWrongQuestionsView }
 ]
 
 const router = createRouter({
@@ -57,13 +70,15 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true'
   // 允许未登录访问的页面
-  const publicPages = ['/login', '/register']
-  const isPublic = publicPages.includes(to.path)
+  const publicPages = ['/login', '/register', '/home', '/top-wrong-questions']
+  // 动画页面路径（支持动态ID）也允许公开访问
+  // 易错题页面路径（支持动态级别）也允许公开访问
+  const isPublic = publicPages.includes(to.path) || to.path.startsWith('/animation/') || to.path.startsWith('/top-wrong-questions/')
 
   if (!isLoggedIn && !isPublic) {
     // 未登录且访问受保护页面，跳转到登录
     next('/login')
-  } else if (isLoggedIn && isPublic) {
+  } else if (isLoggedIn && (to.path === '/login' || to.path === '/register')) {
     // 已登录访问登录/注册页，跳转到主页面
     next('/')
   } else {

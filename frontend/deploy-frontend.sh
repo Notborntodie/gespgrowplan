@@ -199,7 +199,7 @@ server {
 
 # HTTPS服务器
 server {
-    listen 443 ssl http2;
+    listen 443 ssl;
     server_name ${DOMAIN_NAME};
     root ${DEPLOY_PATH};
     index index.html;
@@ -208,19 +208,28 @@ server {
     ssl_certificate ${SSL_CERT_PATH};
     ssl_certificate_key ${SSL_KEY_PATH};
     
-    # SSL协议和加密套件配置
+    # SSL协议和加密套件配置（兼容更多浏览器，特别是Safari）
     ssl_protocols TLSv1.2 TLSv1.3;
-    ssl_ciphers 'ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384';
+    # 使用更兼容的加密套件配置（包含更多选项以支持不同客户端）
+    ssl_ciphers 'ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-SHA256:ECDHE-RSA-AES256-SHA384';
     ssl_prefer_server_ciphers off;
     
     # SSL会话配置
     ssl_session_cache shared:SSL:10m;
     ssl_session_timeout 10m;
-    ssl_session_tickets off;
+    ssl_session_tickets on;
     
-    # OCSP Stapling
-    ssl_stapling on;
-    ssl_stapling_verify on;
+    # 提高兼容性的额外 SSL 配置
+    ssl_buffer_size 8k;
+    ssl_early_data off;
+    
+    # OCSP Stapling配置（已禁用，因为Let's Encrypt R12证书不包含OCSP responder URL）
+    # 如果证书包含OCSP信息，可以取消注释以下行：
+    # ssl_stapling on;
+    # ssl_stapling_verify on;
+    # ssl_trusted_certificate ${SSL_CERT_PATH};
+    # resolver 8.8.8.8 8.8.4.4 valid=300s ipv6=off;
+    # resolver_timeout 3s;
     
     # 超时设置（解决低版本Chrome连接超时问题）
     client_body_timeout 60s;
@@ -244,6 +253,21 @@ server {
     gzip_types text/plain text/css text/xml text/javascript application/javascript application/xml+rss application/json;
     gzip_comp_level 6;
     gzip_disable "msie6";
+
+    # API反向代理
+    location /api {
+        proxy_pass http://${SERVER_IP}:3000/api;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_cache_bypass \$http_upgrade;
+        proxy_read_timeout 300s;
+        proxy_connect_timeout 75s;
+    }
 
     # 处理Vue Router的history模式
     location / {
@@ -301,6 +325,21 @@ server {
     gzip_types text/plain text/css text/xml text/javascript application/javascript application/xml+rss application/json;
     gzip_comp_level 6;
     gzip_disable "msie6";
+
+    # API反向代理
+    location /api {
+        proxy_pass http://${SERVER_IP}:3000/api;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_cache_bypass \$http_upgrade;
+        proxy_read_timeout 300s;
+        proxy_connect_timeout 75s;
+    }
 
     # 处理Vue Router的history模式
     location / {
@@ -383,17 +422,58 @@ health_check() {
     if [ "$ENABLE_HTTPS" = "true" ] || ([ -n "$SSL_CERT_PATH" ] && [ -n "$SSL_KEY_PATH" ]); then
         check_url="https://${DOMAIN_NAME}/"
         log_info "使用HTTPS进行健康检查..."
+        
+        # 先检查HTTP是否可访问（用于诊断）
+        log_info "检查HTTP连接（端口80）..."
+        if curl -f -s -o /dev/null -w "%{http_code}" --connect-timeout 5 "http://${DOMAIN_NAME}/" > /dev/null 2>&1; then
+            log_info "HTTP连接正常"
+        else
+            log_warning "HTTP连接失败"
+        fi
+        
+        # 详细检查HTTPS连接
+        log_info "检查HTTPS连接（端口443）..."
+        local curl_output=$(curl -v -k --connect-timeout 10 -s -o /dev/null -w "\nHTTP状态码: %{http_code}\n连接时间: %{time_connect}s\n总时间: %{time_total}s" "${check_url}" 2>&1)
+        local curl_exit_code=$?
+        
+        if [ $curl_exit_code -eq 0 ]; then
+            log_success "健康检查通过！"
+            log_success "前端应用已成功部署到: ${check_url}"
+            echo "$curl_output" | grep -E "(HTTP状态码|连接时间|总时间)" || true
+        else
+            log_error "健康检查失败！"
+            log_info "HTTPS连接诊断信息："
+            echo "$curl_output" | tail -20
+            echo ""
+            log_warning "可能的原因："
+            echo "  1. Nginx未正常运行或配置有误"
+            echo "  2. SSL证书配置问题（证书路径、权限等）"
+            echo "  3. 防火墙/安全组未开放443端口"
+            echo "  4. SSL/TLS协议版本不兼容"
+            echo ""
+            log_info "请执行以下命令进行诊断："
+            echo "  ssh ${SERVER_USER}@${SERVER_IP} 'systemctl status nginx'"
+            echo "  ssh ${SERVER_USER}@${SERVER_IP} 'nginx -t'"
+            echo "  ssh ${SERVER_USER}@${SERVER_IP} 'tail -50 /var/log/nginx/error.log'"
+            echo "  ssh ${SERVER_USER}@${SERVER_IP} 'netstat -tlnp | grep 443'"
+            echo "  ssh ${SERVER_USER}@${SERVER_IP} 'test -f ${SSL_CERT_PATH} && echo \"证书存在\" || echo \"证书不存在\"'"
+            echo "  ssh ${SERVER_USER}@${SERVER_IP} 'test -f ${SSL_KEY_PATH} && echo \"密钥存在\" || echo \"密钥不存在\"'"
+        fi
     else
         check_url="http://${DOMAIN_NAME}/"
         log_info "使用HTTP进行健康检查..."
-    fi
-    
-    if curl -f -k ${check_url} > /dev/null 2>&1; then
-        log_success "健康检查通过！"
-        log_success "前端应用已成功部署到: ${check_url}"
-    else
-        log_warning "健康检查失败，请检查服务器状态"
-        log_info "尝试检查地址: ${check_url}"
+        
+        local curl_output=$(curl -v -f -s -o /dev/null -w "\nHTTP状态码: %{http_code}\n连接时间: %{time_connect}s\n总时间: %{time_total}s" "${check_url}" 2>&1)
+        local curl_exit_code=$?
+        
+        if [ $curl_exit_code -eq 0 ]; then
+            log_success "健康检查通过！"
+            log_success "前端应用已成功部署到: ${check_url}"
+        else
+            log_warning "健康检查失败，请检查服务器状态"
+            log_info "尝试检查地址: ${check_url}"
+            echo "$curl_output" | tail -10
+        fi
     fi
 }
 

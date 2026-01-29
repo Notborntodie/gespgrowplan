@@ -30,10 +30,10 @@
                   <Icon name="calendar" :size="16" />
                   <span>{{ formatDate(currentProblem.date) }}</span>
                 </span>
-                <!-- 自由练习状态标识 -->
-                <span class="submission-mode-badge free-practice-badge" title="自由练习模式，可以随时练习">
-                  <Icon name="zap" :size="14" />
-                  <span>自由</span>
+                <!-- 任务内提交状态标识 -->
+                <span class="submission-mode-badge task-submission-badge" title="任务内提交，提交后会更新任务进度">
+                  <Icon name="clipboard-check" :size="14" />
+                  <span>计划</span>
                 </span>
               </div>
               <div class="header-buttons">
@@ -352,7 +352,7 @@
       <div v-if="showRocketLaunch" class="rocket-launch-container">
         <div class="rocket-trail"></div>
         <div class="rocket-icon">
-          <Icon name="rocket" :size="32" />
+          <Icon name="rocket" :size="64" />
         </div>
         <div class="rocket-particles">
           <div class="particle" v-for="n in 15" :key="n" :style="getParticleStyle(n)"></div>
@@ -1250,46 +1250,28 @@ const confirmAndSubmit = async () => {
       
       console.log('发送到后端的提交数据:', requestData)
   
-      // 判断是否使用任务内提交接口
-      let submitUrl = '/api/oj/submit'
-      let useFallback = true
-      
-      // 检查是否是任务内提交：from=taskview 且 taskId 存在且不为空
-      const isTaskSubmission = fromTaskView && taskId && taskId.trim() !== ''
-      
-      if (isTaskSubmission) {
-        // 任务内提交仍然使用原 BASE_URL（不使用故障切换）
-        submitUrl = `${BASE_URL}/learning-tasks/${taskId}/submit-oj`
-        useFallback = false
-        console.log('✅ [SmartOJView] 使用任务内提交接口:', submitUrl, {
-          fromTaskView,
-          taskId,
-          planId
-        })
-      } else {
-        console.log('⚠️ [SmartOJView] 使用 OJ 判题服务接口（支持故障切换）', {
-          fromTaskView,
-          taskId,
-          planId,
-          reason: !fromTaskView ? '不是从任务页面进入' : !taskId ? '缺少taskId参数' : 'taskId为空'
-        })
+      // PlanSmartOJView 始终使用任务内提交接口
+      if (!taskId || taskId.trim() === '') {
+        alert('错误：缺少任务ID，无法提交代码。请从任务页面进入。')
+        console.error('❌ [PlanSmartOJView] 缺少taskId参数，无法提交')
+        isSubmitting.value = false
+        return
       }
+      
+      // 任务内提交使用原 BASE_URL（不使用故障切换）
+      const submitUrl = `${BASE_URL}/learning-tasks/${taskId}/submit-oj`
+      console.log('✅ [PlanSmartOJView] 使用任务内提交接口:', submitUrl, {
+        taskId,
+        planId
+      })
 
-      const submitResponse = useFallback 
-        ? await apiRequestWithFallback(submitUrl, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(requestData),
-          })
-        : await fetch(submitUrl, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(requestData),
-          })
+      const submitResponse = await fetch(submitUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      })
   
       if (!submitResponse.ok) {
         const errorText = await submitResponse.text()
@@ -1518,15 +1500,19 @@ const confirmAndSubmit = async () => {
     submitResult.value = null
   }
   
-  // 退出OJ（直接退出，无需确认）
-  const exitOJ = () => {
-    // 如果是从计划页面进入的，返回到计划页面
-    if (fromPlan) {
-      console.log('从计划页面进入，返回到计划页面')
+  // 处理 NavBar 触发的退出请求（直接退出，无需确认）
+  const handleExitOJRequest = () => {
+    // 如果是从任务页面进入的，返回到任务页面并激活编程题标签
+    const hasValidTaskParams = fromTaskView && planId && planId.trim() !== '' && taskId && taskId.trim() !== ''
+    if (hasValidTaskParams) {
+      console.log('✅ [PlanSmartOJView] 从任务页面退出，返回到任务页面（编程题标签）', { planId, taskId })
+      router.push(`/plan/${planId}/tasks/${taskId}?tab=programming`)
+    } else if (fromPlan) {
+      console.log('✅ [PlanSmartOJView] 从计划页面退出，返回到计划页面')
       router.push('/plan')
     } else {
       // 其他情况，返回到上一页
-      console.log('返回到上一页')
+      console.log('⚠️ [PlanSmartOJView] 返回到上一页', { fromTaskView, fromPlan, planId, taskId })
       window.history.back()
     }
   }
@@ -1552,7 +1538,7 @@ const confirmAndSubmit = async () => {
   // 生成粒子样式
   const getParticleStyle = (index: number) => {
     const angle = (360 / 15) * index
-    const distance = 50 + Math.random() * 40
+    const distance = 30 + Math.random() * 20
     const x = Math.cos((angle * Math.PI) / 180) * distance
     const y = Math.sin((angle * Math.PI) / 180) * distance
     const delay = Math.random() * 0.3
@@ -1707,7 +1693,7 @@ const confirmAndSubmit = async () => {
     {
       '&': {
         height: '100%',
-        fontSize: fontSize.value + 'px',
+        fontSize: '14px',
         backgroundColor: 'transparent',
       },
       '&.cm-editor.cm-focused': {
@@ -2043,6 +2029,8 @@ const confirmAndSubmit = async () => {
     document.body.scrollTop = 0
     // 启动冷却时间定时器
     startCooldownTimer()
+    // 监听 NavBar 触发的退出请求
+    window.addEventListener('exitOJRequest', handleExitOJRequest)
     // 初始化字体大小
     setTimeout(() => {
       updateFontSize()
@@ -2065,6 +2053,8 @@ const confirmAndSubmit = async () => {
       clearInterval(cooldownTimer)
       cooldownTimer = null
     }
+    // 移除退出事件监听器
+    window.removeEventListener('exitOJRequest', handleExitOJRequest)
   })
   </script>
   
@@ -2862,19 +2852,27 @@ const confirmAndSubmit = async () => {
     box-shadow: 0 6px 16px rgba(255,255,255,0.3);
   }
   
-  /* 自由练习徽章 - 紫色主题（更醒目） */
-  .free-practice-badge {
-    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  /* 任务内提交徽章 - 橙色主题（更醒目） */
+  .task-submission-badge {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
     color: white;
-    border-color: rgba(139, 92, 246, 0.6);
-    box-shadow: 0 4px 16px rgba(139, 92, 246, 0.4);
+    border-color: rgba(245, 158, 11, 0.6);
+    box-shadow: 0 4px 16px rgba(245, 158, 11, 0.4);
+    animation: taskBadgePulse 2s ease-in-out infinite;
   }
   
-  .free-practice-badge:hover {
-    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6);
+  @keyframes taskBadgePulse {
+    0%, 100% {
+      box-shadow: 0 4px 16px rgba(245, 158, 11, 0.4);
+      transform: scale(1);
+    }
+    50% {
+      box-shadow: 0 6px 20px rgba(245, 158, 11, 0.6);
+      transform: scale(1.02);
+    }
   }
   
-  .free-practice-badge :deep(.lucide-icon) {
+  .task-submission-badge :deep(.lucide-icon) {
     color: white;
   }
   
@@ -5668,7 +5666,17 @@ const confirmAndSubmit = async () => {
     transform: translateX(-50%);
     color: #1e90ff;
     animation: rocketLaunch 2s ease-out forwards;
-    filter: drop-shadow(0 0 10px rgba(30, 144, 255, 0.8));
+    filter: drop-shadow(0 0 20px rgba(30, 144, 255, 0.9));
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .rocket-icon :deep(svg) {
+    width: 64px !important;
+    height: 64px !important;
   }
   
   @keyframes rocketLaunch {

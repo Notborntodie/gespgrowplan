@@ -19,9 +19,6 @@
         <div class="empty-icon"><Icon name="file-text" :size="64" /></div>
         <h3>暂无提交记录</h3>
         <p>您还没有提交过这道题目</p>
-        <button v-if="problemId" @click="goToProblem" class="btn btn-primary">
-          去提交
-        </button>
       </div>
       
       <div v-else class="submissions-by-month">
@@ -393,7 +390,18 @@ function formatDateTime(dateStr: string) {
 
 // 返回上一页
 function goBack() {
-  router.back()
+  // 检查是否从任务页面跳转过来
+  const from = route.query.from as string
+  const planId = route.query.planId as string
+  const taskId = route.query.taskId as string
+  
+  if (from === 'taskview' && planId && taskId) {
+    // 从任务页面跳转过来的，返回到任务页面的编程题标签
+    router.push(`/plan/${planId}/tasks/${taskId}?tab=programming`)
+  } else {
+    // 默认使用浏览器返回
+    router.back()
+  }
 }
 
 // 跳转到题目

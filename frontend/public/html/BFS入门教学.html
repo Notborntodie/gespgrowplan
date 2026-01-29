@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>广度优先搜索 (BFS) 入门教程</title>
+    <!-- Tailwind CSS -->
+    <script src="https://metis-online.fbcontent.cn/metis-misc/zgLDUdmazTYc0B4K6Cor.js"></script>
+    <!-- p5.js -->
+    <script src="https://metis-online.fbcontent.cn/metis-misc/cnObWiSohGePYbyhB6LlQ.js"></script>
+    <!-- Anime.js -->
+    <script src="https://metis-online.fbcontent.cn/metis-misc/zZZY40t7WJC7UdQCPACm.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6', // 蓝色
+                        secondary: '#10B981', // 绿色
+                        accent: '#F59E0B', // 橙色
+                        dark: '#1F2937',
+                        light: '#F3F4F6'
+                    }
+                }
+            }
+        }
+    </script>
+  <style>
+        body {
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            overflow: hidden; /* 防止滚动 */
+        }
+        .slide-container {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        .slide-container.active {
+            display: flex;
+            opacity: 1;
+        }
+        /* 自定义滚动条 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+        
+        /* 队列动画样式 */
+        .queue-item {
+            transition: all 0.3s ease;
+        }
+        .queue-enter {
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+    }
+  </style>
+</head>
+<body class="bg-light h-screen flex flex-col text-dark">
+
+  
+    <!-- 主内容区 -->
+    <main class="flex-1 relative overflow-hidden">
+        
+        <!-- Slide 1: 封面 -->
+        <div id="slide-1" class="slide-container active w-full h-full flex-col items-center justify-center text-center p-8">
+            <div class="max-w-3xl">
+                <h2 class="text-5xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">
+                    广度优先搜索
+                </h2>
+                <h3 class="text-2xl text-gray-600 mb-12">Breadth-First Search (BFS)</h3>
+                <p class="text-xl text-gray-500 mb-12 leading-relaxed">
+                    一种用于遍历或搜索树或图数据结构的算法。<br>
+                    它从根节点开始，先访问所有相邻节点，再深入下一层。
+                </p>
+                <button onclick="nextSlide()" class="bg-primary hover:bg-blue-600 text-white px-8 py-3 rounded-full text-lg font-medium shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1">
+                    开始学习
+                </button>
+            </div>
+            <!-- 装饰性背景元素 -->
+            <div class="absolute top-20 left-20 w-32 h-32 bg-blue-100 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+            <div class="absolute top-40 right-20 w-32 h-32 bg-green-100 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+        </div>
+
+        <!-- Slide 2: 核心概念 -->
+        <div id="slide-2" class="slide-container w-full h-full flex-col md:flex-row p-8 gap-8">
+            <div class="flex-1 flex flex-col justify-center space-y-6">
+                <h2 class="text-3xl font-bold text-primary">像水波纹一样扩散</h2>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <p class="text-lg leading-relaxed text-gray-700">
+                        想象你在平静的湖面上扔了一颗石子。
+                    </p>
+                    <ul class="mt-4 space-y-3 text-gray-600">
+                        <li class="flex items-start">
+                            <span class="mr-2 text-primary">●</span>
+                            波纹会一圈一圈地向外扩散。
+                        </li>
+                        <li class="flex items-start">
+                            <span class="mr-2 text-primary">●</span>
+                            先覆盖离中心最近的地方（第1层）。
+                        </li>
+                        <li class="flex items-start">
+                            <span class="mr-2 text-primary">●</span>
+                            然后是稍远一点的地方（第2层）。
+                        </li>
+                        <li class="flex items-start">
+                            <span class="mr-2 text-primary">●</span>
+                            这就是 <span class="font-bold text-primary">层序遍历</span> 的思想。
+                        </li>
+                    </ul>
+                </div>
+          </div>
+            <div class="flex-1 bg-white rounded-2xl shadow-inner flex items-center justify-center relative overflow-hidden" id="ripple-canvas">
+                <!-- p5.js ripple effect will be here -->
+                <div class="absolute bottom-4 text-gray-400 text-sm">点击区域产生波纹</div>
+          </div>
+        </div>
+
+        <!-- Slide 3: 数据结构 - 队列 -->
+        <div id="slide-3" class="slide-container w-full h-full flex-col md:flex-row p-8 gap-8">
+            <div class="flex-1 flex flex-col justify-center space-y-6">
+                <h2 class="text-3xl font-bold text-accent">核心道具：队列 (Queue)</h2>
+                <p class="text-lg text-gray-700">
+                    BFS 需要一个“小本子”来记录接下来要访问谁。这个小本子必须遵守 <span class="font-bold text-accent">先进先出 (FIFO)</span> 的规则。
+                </p>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <h4 class="font-bold mb-4">操作规则：</h4>
+                    <div class="flex flex-col gap-4">
+                        <div class="flex items-center gap-4">
+                            <span class="bg-green-100 text-green-700 px-3 py-1 rounded text-sm font-bold">入队 (Enqueue)</span>
+                            <span class="text-gray-600">发现新节点时，排到队尾。</span>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <span class="bg-red-100 text-red-700 px-3 py-1 rounded text-sm font-bold">出队 (Dequeue)</span>
+                            <span class="text-gray-600">处理完当前节点，从队头移出。</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex gap-4 mt-4">
+                    <button onclick="demoQueue.enqueue()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition">模拟入队</button>
+                    <button onclick="demoQueue.dequeue()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition">模拟出队</button>
+                </div>
+            </div>
+            <div class="flex-1 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-300 flex items-center justify-center p-8">
+                <div class="relative w-full max-w-md h-32 bg-white rounded-xl shadow-lg flex items-center px-4 overflow-hidden border border-gray-200">
+                    <div class="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-white to-transparent z-10"></div>
+                    <div class="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-white to-transparent z-10"></div>
+                    <div class="text-xs text-gray-400 absolute top-2 left-4">队头 (Front)</div>
+                    <div class="text-xs text-gray-400 absolute top-2 right-4">队尾 (Rear)</div>
+                    
+                    <div id="queue-visual-container" class="flex gap-2 items-center w-full overflow-x-auto p-2 no-scrollbar">
+                        <!-- Queue items will be injected here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: 算法演示 (核心) -->
+        <div id="slide-4" class="slide-container w-full h-full flex-col p-4 gap-4">
+            <div class="flex justify-between items-end mb-2">
+                <div>
+                    <h2 class="text-2xl font-bold text-primary">BFS 算法可视化</h2>
+                    <p class="text-sm text-gray-500">观察节点颜色变化和队列状态</p>
+                </div>
+                <div class="flex gap-2">
+                    <div class="flex items-center gap-1"><div class="w-3 h-3 rounded-full bg-white border-2 border-gray-400"></div><span class="text-xs">未访问</span></div>
+                    <div class="flex items-center gap-1"><div class="w-3 h-3 rounded-full bg-accent"></div><span class="text-xs">队列中</span></div>
+                    <div class="flex items-center gap-1"><div class="w-3 h-3 rounded-full bg-primary"></div><span class="text-xs">处理中</span></div>
+                    <div class="flex items-center gap-1"><div class="w-3 h-3 rounded-full bg-secondary"></div><span class="text-xs">已完成</span></div>
+      </div>
+    </div>
+            
+            <div class="flex flex-1 gap-4 min-h-0">
+                <!-- Canvas 区域 -->
+                <div class="flex-[2] bg-white rounded-2xl shadow-lg border border-gray-200 relative overflow-hidden" id="bfs-canvas-container">
+                    <!-- p5.js instance here -->
+    </div>
+
+                <!-- 控制面板 & 状态 -->
+                <div class="flex-1 flex flex-col gap-4 min-w-[250px]">
+                    <!-- 队列展示 -->
+                    <div class="bg-white p-4 rounded-xl shadow border border-gray-100 flex-1 flex flex-col">
+                        <h3 class="font-bold text-gray-700 mb-2 border-b pb-2">当前队列 (Queue)</h3>
+                        <div id="bfs-queue-display" class="flex flex-wrap gap-2 content-start overflow-y-auto flex-1">
+                            <span class="text-gray-400 text-sm italic">空</span>
+                        </div>
+  </div>
+                    
+                    <!-- 步骤说明 -->
+                    <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 h-32 overflow-y-auto">
+                        <h3 class="font-bold text-blue-800 text-sm mb-1">当前步骤:</h3>
+                        <p id="bfs-step-desc" class="text-sm text-blue-900">点击"开始"启动算法演示。</p>
+                    </div>
+
+                    <!-- 控制按钮 -->
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="bfsController.reset()" class="col-span-2 bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 rounded-lg transition font-medium">重置 (Reset)</button>
+                        <button onclick="bfsController.prev()" class="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 py-2 rounded-lg transition">上一步</button>
+                        <button onclick="bfsController.next()" class="bg-primary hover:bg-blue-600 text-white py-2 rounded-lg transition font-medium shadow-md">下一步</button>
+                        <button onclick="bfsController.autoPlay()" id="btn-autoplay" class="col-span-2 bg-accent hover:bg-yellow-600 text-white py-2 rounded-lg transition font-medium shadow-md">自动播放</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: 总结 -->
+        <div id="slide-5" class="slide-container w-full h-full flex-col items-center justify-center text-center p-8">
+            <div class="max-w-2xl bg-white p-10 rounded-3xl shadow-xl border border-gray-100">
+                <h2 class="text-3xl font-bold mb-8 text-primary">课程总结</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+                    <div class="p-4 bg-blue-50 rounded-xl">
+                        <h4 class="font-bold text-blue-800 mb-2">核心思想</h4>
+                        <p class="text-sm text-blue-700">层层递进，地毯式搜索。保证在访问第 k+1 层节点前，所有第 k 层节点都已被访问。</p>
+                    </div>
+                    <div class="p-4 bg-green-50 rounded-xl">
+                        <h4 class="font-bold text-green-800 mb-2">应用场景</h4>
+                        <p class="text-sm text-green-700">最短路径问题（无权图）、社交网络好友推荐、网络爬虫、迷宫寻路。</p>
+                    </div>
+                    <div class="p-4 bg-yellow-50 rounded-xl">
+                        <h4 class="font-bold text-yellow-800 mb-2">时间复杂度</h4>
+                        <p class="text-sm text-yellow-700">O(V + E)，其中 V 是节点数，E 是边数。</p>
+                    </div>
+                    <div class="p-4 bg-purple-50 rounded-xl">
+                        <h4 class="font-bold text-purple-800 mb-2">空间复杂度</h4>
+                        <p class="text-sm text-purple-700">O(V)，最坏情况下需要存储所有节点（在队列中）。</p>
+                    </div>
+                </div>
+                <button onclick="location.reload()" class="mt-8 text-gray-500 hover:text-primary underline">重新开始</button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- 底部导航控制 -->
+    <footer class="bg-white border-t border-gray-200 p-4 flex justify-between items-center">
+        <button onclick="prevSlide()" id="btn-prev-slide" class="bg-primary hover:bg-blue-600 disabled:bg-gray-300 disabled:hover:bg-gray-300 text-white disabled:text-gray-500 disabled:cursor-not-allowed px-6 py-3 rounded-lg font-semibold text-lg shadow-lg hover:shadow-xl transition-all transform hover:scale-105 disabled:hover:scale-100 disabled:hover:shadow-lg flex items-center gap-2 min-w-[120px] justify-center">
+            <span class="text-2xl">←</span>
+            <span>上一页</span>
+        </button>
+        <div class="flex gap-2">
+            <span class="w-2 h-2 rounded-full bg-primary cursor-pointer" onclick="goToSlide(1)"></span>
+            <span class="w-2 h-2 rounded-full bg-gray-300 cursor-pointer hover:bg-primary" onclick="goToSlide(2)"></span>
+            <span class="w-2 h-2 rounded-full bg-gray-300 cursor-pointer hover:bg-primary" onclick="goToSlide(3)"></span>
+            <span class="w-2 h-2 rounded-full bg-gray-300 cursor-pointer hover:bg-primary" onclick="goToSlide(4)"></span>
+            <span class="w-2 h-2 rounded-full bg-gray-300 cursor-pointer hover:bg-primary" onclick="goToSlide(5)"></span>
+        </div>
+        <button onclick="nextSlide()" id="btn-next-slide" class="bg-primary hover:bg-blue-600 disabled:bg-gray-300 disabled:hover:bg-gray-300 text-white disabled:text-gray-500 disabled:cursor-not-allowed px-6 py-3 rounded-lg font-semibold text-lg shadow-lg hover:shadow-xl transition-all transform hover:scale-105 disabled:hover:scale-100 disabled:hover:shadow-lg flex items-center gap-2 min-w-[120px] justify-center">
+            <span>下一页</span>
+            <span class="text-2xl">→</span>
+        </button>
+    </footer>
+
+  <script>
+        // --- 幻灯片逻辑 ---
+        let currentSlide = 1;
+        const totalSlides = 5;
+
+        function updateSlideUI() {
+            // 隐藏所有
+            document.querySelectorAll('.slide-container').forEach(el => {
+                el.classList.remove('active');
+                // 简单的淡出效果
+                setTimeout(() => {
+                    if(!el.classList.contains('active')) el.style.display = 'none';
+                }, 500);
+            });
+
+            // 显示当前
+            const activeSlide = document.getElementById(`slide-${currentSlide}`);
+            activeSlide.style.display = currentSlide === 1 || currentSlide === 5 ? 'flex' : (window.innerWidth >= 768 ? 'flex' : 'flex'); // 保持flex布局
+            // 强制重绘以触发transition
+            void activeSlide.offsetWidth; 
+            activeSlide.classList.add('active');
+
+            // 更新指示器（如果存在）
+            const pageIndicator = document.getElementById('page-indicator');
+            if (pageIndicator) {
+                pageIndicator.innerText = `${currentSlide} / ${totalSlides}`;
+            }
+            
+            // 更新底部圆点
+            const dots = document.querySelectorAll('footer span.w-2');
+            dots.forEach((dot, idx) => {
+                if (idx + 1 === currentSlide) {
+                    dot.classList.remove('bg-gray-300');
+                    dot.classList.add('bg-primary');
+                } else {
+                    dot.classList.add('bg-gray-300');
+                    dot.classList.remove('bg-primary');
+                }
+            });
+
+            // 按钮状态
+            document.getElementById('btn-prev-slide').disabled = currentSlide === 1;
+            document.getElementById('btn-next-slide').disabled = currentSlide === totalSlides;
+
+            // 触发特定页面的初始化
+            if (currentSlide === 2) initRippleP5();
+            if (currentSlide === 4) initBFSP5();
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides) {
+                currentSlide++;
+                updateSlideUI();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 1) {
+                currentSlide--;
+                updateSlideUI();
+            }
+        }
+
+        function goToSlide(n) {
+            currentSlide = n;
+            updateSlideUI();
+        }
+
+        // --- Slide 2: 波纹效果 (p5.js) ---
+        let rippleP5 = null;
+        function initRippleP5() {
+            if (rippleP5) return;
+            const container = document.getElementById('ripple-canvas');
+            
+            const sketch = (p) => {
+                let ripples = [];
+
+                p.setup = () => {
+                    const canvas = p.createCanvas(container.clientWidth, container.clientHeight);
+                    canvas.parent('ripple-canvas');
+                    p.noFill();
+                    p.strokeWeight(2);
+                };
+
+                p.draw = () => {
+                    p.background(255);
+                    
+                    // 绘制中心点提示
+                    if (ripples.length === 0) {
+                        p.noStroke();
+                        p.fill(200);
+                        p.textAlign(p.CENTER);
+                        p.text("点击任意位置", p.width/2, p.height/2);
+                    }
+
+                    for (let i = ripples.length - 1; i >= 0; i--) {
+                        let r = ripples[i];
+                        r.radius += 2;
+                        r.alpha -= 2;
+                        
+                        if (r.alpha <= 0) {
+                            ripples.splice(i, 1);
+        } else {
+                            p.stroke(59, 130, 246, r.alpha); // Primary color
+                            p.circle(r.x, r.y, r.radius);
+                            // 绘制第二圈
+                            if (r.radius > 20) {
+                                p.stroke(59, 130, 246, r.alpha * 0.8);
+                                p.circle(r.x, r.y, r.radius - 20);
+                            }
+                        }
+                    }
+                };
+
+                p.mousePressed = () => {
+                    if (p.mouseX > 0 && p.mouseX < p.width && p.mouseY > 0 && p.mouseY < p.height) {
+                        ripples.push({x: p.mouseX, y: p.mouseY, radius: 0, alpha: 255});
+                    }
+                };
+
+                p.windowResized = () => {
+                    p.resizeCanvas(container.clientWidth, container.clientHeight);
+                };
+            };
+            rippleP5 = new p5(sketch);
+        }
+
+        // --- Slide 3: 队列演示 ---
+        const demoQueue = {
+            items: [],
+            count: 0,
+            enqueue: () => {
+                const container = document.getElementById('queue-visual-container');
+                const val = ++demoQueue.count;
+                const el = document.createElement('div');
+                el.className = 'queue-item queue-enter min-w-[40px] h-[40px] bg-accent text-white rounded-lg flex items-center justify-center font-bold shadow-md';
+                el.innerText = val;
+                container.appendChild(el);
+                demoQueue.items.push(el);
+                // 滚动到最右边
+                container.scrollLeft = container.scrollWidth;
+            },
+            dequeue: () => {
+                if (demoQueue.items.length === 0) return;
+                const el = demoQueue.items.shift();
+                el.style.transform = 'translateY(50px) scale(0.5)';
+                el.style.opacity = '0';
+                setTimeout(() => el.remove(), 300);
+            }
+        };
+
+        // --- Slide 4: BFS 算法可视化 (核心) ---
+        let bfsP5 = null;
+        const bfsController = {
+            reset: () => {},
+            next: () => {},
+            prev: () => {},
+            autoPlay: () => {}
+        };
+
+        function initBFSP5() {
+            if (bfsP5) return;
+            const container = document.getElementById('bfs-canvas-container');
+
+            const sketch = (p) => {
+                // 图结构
+                let nodes = [];
+                let edges = [];
+                // 算法状态
+                let queue = [];
+                let visited = new Set();
+                let history = []; // 记录每一步的状态快照
+                let currentStepIndex = -1;
+                let isAutoPlaying = false;
+                let autoPlayTimer = null;
+                
+                // 节点状态常量
+                const ST_UNVISITED = 0;
+                const ST_IN_QUEUE = 1;
+                const ST_PROCESSING = 2;
+                const ST_VISITED = 3;
+
+                // 初始化图数据
+                function initGraph() {
+                    // 创建一个简单的树/图结构
+                    // 0 -> 1, 2
+                    // 1 -> 3, 4
+                    // 2 -> 5, 6
+                    // 4 -> 7
+                    // 增加一些回环让它变成图而不是树
+                    // 5 -> 4
+                    
+                    const positions = [
+                        {x: 0.5, y: 0.15}, // 0
+                        {x: 0.3, y: 0.35}, // 1
+                        {x: 0.7, y: 0.35}, // 2
+                        {x: 0.15, y: 0.55}, // 3
+                        {x: 0.45, y: 0.55}, // 4
+                        {x: 0.65, y: 0.55}, // 5
+                        {x: 0.85, y: 0.55}, // 6
+                        {x: 0.35, y: 0.8},  // 7
+                    ];
+
+                    nodes = positions.map((pos, idx) => ({
+                        id: idx,
+                        x: pos.x * p.width,
+                        y: pos.y * p.height,
+                        state: ST_UNVISITED,
+                        label: String.fromCharCode(65 + idx) // A, B, C...
+                    }));
+
+                    const connections = [
+                        [0, 1], [0, 2],
+                        [1, 3], [1, 4],
+                        [2, 5], [2, 6],
+                        [4, 7],
+                        [5, 4] // 跨层连接
+                    ];
+
+                    edges = connections.map(c => ({from: c[0], to: c[1]}));
+                    
+                    // 重置算法状态
+                    queue = [];
+                    visited = new Set();
+                    history = [];
+                    currentStepIndex = -1;
+                    
+                    // 记录初始状态 (Step 0)
+                    saveState("初始状态：准备从节点 A 开始搜索");
+                    
+                    // 准备第一步：将起点加入队列
+                    queue.push(0);
+                    visited.add(0);
+                    nodes[0].state = ST_IN_QUEUE;
+                    saveState("将起点 A 加入队列，标记为待访问");
+                    
+                    currentStepIndex = 0; // 指向初始状态
+                    restoreState(0);
+                    updateUI();
+                }
+
+                // 保存当前状态快照
+                function saveState(desc) {
+                    history.push({
+                        nodes: JSON.parse(JSON.stringify(nodes)),
+                        queue: [...queue],
+                        visited: new Set(visited),
+                        desc: desc
+                    });
+                }
+
+                // 恢复状态
+                function restoreState(index) {
+                    if (index < 0 || index >= history.length) return;
+                    const state = history[index];
+                    nodes = JSON.parse(JSON.stringify(state.nodes));
+                    queue = [...state.queue];
+                    visited = new Set(state.visited);
+                    
+                    // 更新UI描述
+                    document.getElementById('bfs-step-desc').innerText = state.desc;
+                    updateQueueUI(queue);
+                }
+
+                // 计算所有步骤（预计算）
+                function calculateAllSteps() {
+                    // 重新模拟一遍BFS过程并记录所有步骤
+                    // 注意：这里我们不直接修改当前的nodes/queue，而是使用临时变量模拟
+                    // 但为了简单，我们可以在initGraph后直接运行一遍生成history，然后重置回step 0
+                    
+                    // 这里的逻辑是：用户点击"下一步"时，如果history里有下一步，直接恢复；
+                    // 如果没有（通常是一次性生成所有步骤比较好管理），则生成。
+                    // 让我们采用"按需计算"或"预计算"模式。这里采用预计算模式最稳健。
+                    
+                    // 1. 重置到仅包含起点的状态
+                    // (initGraph中已经做了Step 0 和 Step 1)
+                    // 现在的 history[0] 是全白，history[1] 是A在队列
+                    
+                    let tempQueue = [0];
+                    let tempVisited = new Set([0]);
+                    // 此时 nodes 状态应该是 A: IN_QUEUE
+                    // 我们需要一个临时的 nodes 数组来追踪状态变化
+                    let tempNodes = JSON.parse(JSON.stringify(history[1].nodes)); 
+                    
+                    // 开始模拟循环
+                    while (tempQueue.length > 0) {
+                        // 步骤 A: 取出队头
+                        const currentId = tempQueue[0]; // 只是查看，还没移出
+                        // 状态：队头节点变为 PROCESSING
+                        tempNodes[currentId].state = ST_PROCESSING;
+                        
+                        history.push({
+                            nodes: JSON.parse(JSON.stringify(tempNodes)),
+                            queue: [...tempQueue],
+                            visited: new Set(tempVisited),
+                            desc: `从队列取出节点 ${tempNodes[currentId].label}，准备检查其邻居`
+                        });
+
+                        // 真正的出队
+                        tempQueue.shift(); 
+                        
+                        // 步骤 B: 检查邻居
+                        // 找到所有邻居
+                        const neighbors = edges.filter(e => e.from === currentId).map(e => e.to)
+                                         .concat(edges.filter(e => e.to === currentId).map(e => e.from)); // 无向图逻辑? 
+                                         // 题目通常是有向或无向。这里画的是有向箭头吗？
+                                         // 假设是无向图更符合入门直觉，或者有向图。
+                                         // 代码里的 edges 定义是有向的 [0,1]。
+                                         // 为了演示效果，我们按有向图处理，或者无向。
+                                         // 让我们按有向图处理（更严谨），但上面的连接看起来像树。
+                                         // 修正：按有向图处理。
+                        
+                        const outNeighbors = edges.filter(e => e.from === currentId).map(e => e.to);
+                        
+                        // 对邻居排序以保证确定性（比如按ID）
+                        outNeighbors.sort((a,b) => a - b);
+
+                        let hasNew = false;
+                        for (let neighborId of outNeighbors) {
+                            if (!tempVisited.has(neighborId)) {
+                                tempVisited.add(neighborId);
+                                tempQueue.push(neighborId);
+                                tempNodes[neighborId].state = ST_IN_QUEUE;
+                                hasNew = true;
+                                // 记录发现新邻居的步骤
+                                history.push({
+                                    nodes: JSON.parse(JSON.stringify(tempNodes)),
+                                    queue: [...tempQueue],
+                                    visited: new Set(tempVisited),
+                                    desc: `发现邻居 ${tempNodes[neighborId].label}，将其加入队列`
+                                });
+                            }
+                        }
+
+                        // 步骤 C: 当前节点处理完毕
+                        tempNodes[currentId].state = ST_VISITED;
+                        history.push({
+                            nodes: JSON.parse(JSON.stringify(tempNodes)),
+                            queue: [...tempQueue],
+                            visited: new Set(tempVisited),
+                            desc: `节点 ${tempNodes[currentId].label} 的所有邻居检查完毕，标记为已完成`
+                        });
+                    }
+                    
+                    history.push({
+                        nodes: JSON.parse(JSON.stringify(tempNodes)),
+                        queue: [],
+                        visited: new Set(tempVisited),
+                        desc: "队列为空，搜索结束！"
+                    });
+                }
+
+                function updateQueueUI(q) {
+                    const qContainer = document.getElementById('bfs-queue-display');
+                    qContainer.innerHTML = '';
+                    if (q.length === 0) {
+                        qContainer.innerHTML = '<span class="text-gray-400 text-sm italic">空</span>';
+                        return;
+                    }
+                    q.forEach(nodeId => {
+                        const el = document.createElement('div');
+                        el.className = 'w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center font-bold text-sm shadow-sm animate-bounce-short';
+                        el.innerText = nodes[nodeId].label;
+                        qContainer.appendChild(el);
+                    });
+                }
+
+                // 暴露给外部的控制函数
+                bfsController.reset = () => {
+                    stopAutoPlay();
+                    currentStepIndex = 0; // 回到初始状态（未开始）
+                    // 实际上我们希望回到 Step 1 (A在队列中) 还是 Step 0?
+                    // Step 0 是全白。Step 1 是 A 入队。
+                    // 让我们回到 Step 1 作为"准备好"的状态
+                    currentStepIndex = 1;
+                    restoreState(currentStepIndex);
+                    updateUI();
+                };
+
+                bfsController.next = () => {
+                    stopAutoPlay();
+                    if (currentStepIndex < history.length - 1) {
+                        currentStepIndex++;
+                        restoreState(currentStepIndex);
+                        updateUI();
+                    }
+                };
+
+                bfsController.prev = () => {
+                    stopAutoPlay();
+                    if (currentStepIndex > 0) {
+                        currentStepIndex--;
+                        restoreState(currentStepIndex);
+                        updateUI();
+                    }
+                };
+                
+                bfsController.autoPlay = () => {
+                    if (isAutoPlaying) {
+                        stopAutoPlay();
+                        return;
+                    }
+                    isAutoPlaying = true;
+                    document.getElementById('btn-autoplay').innerText = "暂停";
+                    document.getElementById('btn-autoplay').classList.replace('bg-accent', 'bg-red-500');
+                    document.getElementById('btn-autoplay').classList.replace('hover:bg-yellow-600', 'hover:bg-red-600');
+                    
+                    autoPlayTimer = setInterval(() => {
+                        if (currentStepIndex < history.length - 1) {
+                            currentStepIndex++;
+                            restoreState(currentStepIndex);
+                            updateUI();
+        } else {
+                            stopAutoPlay();
+                        }
+                    }, 1000);
+                };
+
+                function stopAutoPlay() {
+                    isAutoPlaying = false;
+                    clearInterval(autoPlayTimer);
+                    document.getElementById('btn-autoplay').innerText = "自动播放";
+                    document.getElementById('btn-autoplay').classList.replace('bg-red-500', 'bg-accent');
+                    document.getElementById('btn-autoplay').classList.replace('hover:bg-red-600', 'hover:bg-yellow-600');
+                }
+
+                function updateUI() {
+                    // 可以在这里触发一些额外的DOM更新
+                }
+
+                p.setup = () => {
+                    const canvas = p.createCanvas(container.clientWidth, container.clientHeight);
+                    canvas.parent('bfs-canvas-container');
+                    p.textAlign(p.CENTER, p.CENTER);
+                    initGraph();
+                    calculateAllSteps(); // 预计算所有步骤
+                    // 初始展示 Step 1
+                    currentStepIndex = 1;
+                    restoreState(1);
+                };
+
+                p.draw = () => {
+                    p.background(255);
+                    
+                    // 绘制边
+                    p.stroke(200);
+                    p.strokeWeight(2);
+                    edges.forEach(e => {
+                        const n1 = nodes[e.from];
+                        const n2 = nodes[e.to];
+                        drawArrow(p, n1.x, n1.y, n2.x, n2.y);
+                    });
+
+                    // 绘制节点
+                    nodes.forEach(n => {
+                        p.strokeWeight(2);
+                        p.stroke(255);
+                        
+                        // 根据状态填充颜色
+                        if (n.state === ST_UNVISITED) {
+                            p.fill(255);
+                            p.stroke(156, 163, 175); // gray-400
+                        } else if (n.state === ST_IN_QUEUE) {
+                            p.fill(245, 158, 11); // accent (orange)
+                            p.stroke(245, 158, 11);
+                        } else if (n.state === ST_PROCESSING) {
+                            p.fill(59, 130, 246); // primary (blue)
+                            p.stroke(59, 130, 246);
+                        } else if (n.state === ST_VISITED) {
+                            p.fill(16, 185, 129); // secondary (green)
+                            p.stroke(16, 185, 129);
+                        }
+
+                        // 节点圆圈
+                        p.circle(n.x, n.y, 40);
+                        
+                        // 文字
+                        p.noStroke();
+                        p.fill(n.state === ST_UNVISITED ? 50 : 255);
+                        p.textSize(16);
+                        p.textStyle(p.BOLD);
+                        p.text(n.label, n.x, n.y);
+                    });
+                };
+
+                p.windowResized = () => {
+                    p.resizeCanvas(container.clientWidth, container.clientHeight);
+                    // 重新计算节点位置比例
+                    initGraph();
+                    calculateAllSteps();
+                    restoreState(currentStepIndex);
+                };
+
+                // 辅助函数：画箭头
+                function drawArrow(p, x1, y1, x2, y2) {
+                    p.push();
+                    const angle = Math.atan2(y2 - y1, x2 - x1);
+                    const dist = Math.hypot(x2 - x1, y2 - y1);
+                    const r = 20; // 节点半径
+                    
+                    p.translate(x1, y1);
+                    p.rotate(angle);
+                    
+                    // 线
+                    p.line(r, 0, dist - r, 0);
+                    
+                    // 箭头头
+                    p.translate(dist - r, 0);
+                    p.triangle(0, 0, -6, -3, -6, 3);
+                    p.pop();
+                }
+            };
+            bfsP5 = new p5(sketch);
+        }
+
+        // 初始化第一页
+        updateSlideUI();
+
+  </script>
+</body>
+</html>

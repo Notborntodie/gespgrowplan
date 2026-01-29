@@ -20,13 +20,13 @@ DOMAIN_NAME=106.14.143.27
 #SSL_KEY_PATH=/etc/ssl/gesp-self-signed/server.key
 #
 # 使用Let's Encrypt证书（需要域名）：
-# SSL_CERT_PATH=/etc/letsencrypt/live/your-domain.com/fullchain.pem
-# SSL_KEY_PATH=/etc/letsencrypt/live/your-domain.com/privkey.pem
+# SSL_CERT_PATH=/etc/letsencrypt/live/zhengyanchen.cn/fullchain.pem
+# SSL_KEY_PATH=/etc/letsencrypt/live/zhengyanchen.cn/privkey.pem
 #
 # 如果不启用HTTPS，保持以下两行为空：
-# SSL_CERT_PATH=
-# SSL_KEY_PATH=
-# ENABLE_HTTPS=false
+SSL_CERT_PATH=
+SSL_KEY_PATH=
+ENABLE_HTTPS=false
 
 # API配置（用于构建时注入环境变量）
 # 注意：如果启用了HTTPS，建议API地址也使用HTTPS或配置Nginx反向代理
@@ -41,11 +41,10 @@ AI_API_BASE_URL=http://106.14.143.27:8000/api
 # - enabled: 是否启用（可选，默认：true）
 #
 # 示例1：单个判题机
-# OJ_API_CONFIGS='[{"url":"http://106.14.143.27:3000","name":"主判题机","priority":1,"enabled":true}]'
+# OJ_API_CONFIGS='[{"url":"http://localhost:3000","name":"本地判题机","priority":1,"enabled":true}]'
 #
 # 示例2：多个判题机（负载均衡）
-OJ_API_CONFIGS='[{"url":"http://121.4.103.140:8000","name":"主服务器","priority":1,"enabled":true},{"url":"http://106.14.143.27:3000","name":"备用服务器","priority":2,"enabled":true}]'
+# OJ_API_CONFIGS='[{"url":"http://localhost:3000","name":"主判题机","priority":1,"enabled":true},{"url":"http://localhost:8000","name":"备用判题机","priority":2,"enabled":true}]'
 #
 # 如果不配置，将使用 API_BASE_URL 作为默认判题机
-#OJ_API_CONFIGS=
-
+OJ_API_CONFIGS='[{"url":"http://106.14.143.27:3000","name":"主服务器","priority":1,"enabled":true}]'

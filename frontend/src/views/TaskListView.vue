@@ -51,141 +51,116 @@
                   </div>
                 </div>
 
-                <!-- 时间轴任务列表 -->
-                <div class="timeline-wrapper">
-                  <!-- 连续的时间轴线 -->
-                  <div class="timeline-axis">
-                    <div class="timeline-axis-line"></div>
-                  </div>
-                  
+                <!-- 任务列表 - 使用侧边栏风格 -->
+                <div class="task-list-main">
                   <!-- 任务列表 -->
-                  <div class="timeline-items">
+                  <div class="task-list-container">
                     <div
                       v-for="(task, index) in selectedPlan?.tasks || []"
                       :key="task.id"
-                      class="timeline-item"
-                    >
-                      <!-- 时间轴节点 -->
-                      <div class="timeline-node-wrapper">
-                        <div class="timeline-node" :class="getTimelineNodeClass(task)">
-                          <div class="timeline-node-inner"></div>
-                          <div class="timeline-node-glow"></div>
-                        </div>
-                        <div class="timeline-node-label">
-                          <span class="node-number">{{ index + 1 }}</span>
-                        </div>
-                      </div>
-                      
-                      <!-- 任务卡片 -->
-                      <div class="timeline-card-wrapper">
-                        <div
-                          class="content-section task-card-compact"
-                      :class="{ completed: task.is_completed, active: isTaskActive(task), locked: !isTaskActive(task) }"
+                      :ref="(el) => setTaskRef(el, task.id)"
+                      class="task-progress-item-main"
+                      :class="{ 
+                        'completed': task.is_completed, 
+                        'active': isTaskActive(task),
+                        'locked': !isTaskActive(task),
+                        'type-exam-card': task.is_exam_mode,
+                        'type-normal-card': !task.is_exam_mode
+                      }"
                       @click="isTaskActive(task) && enterTask(task)"
+                      :title="task.name"
                     >
-                          <div class="section-content-compact">
-                            <!-- 任务头部 -->
-                            <div class="task-header-compact">
-                              <div class="task-title-row">
-                                <span class="task-type-badge" :class="task.is_exam_mode ? 'type-exam' : 'type-normal'">
+                      <div class="task-progress-node-main" :class="getTimelineNodeClass(task)">
+                        <div class="task-progress-node-inner-main"></div>
+                      </div>
+                      <div class="task-progress-info-main">
+                        <div class="task-progress-number-main">{{ index + 1 }}</div>
+                        <div class="task-progress-name-main">{{ task.name }}</div>
+                        <div class="task-progress-meta-main">
+                          <span class="task-type-badge-main" :class="task.is_exam_mode ? 'type-exam' : 'type-normal'">
                                   {{ task.is_exam_mode ? '真题试炼' : '专项突破' }}
                                 </span>
-                                <h3 class="task-title-compact">{{ task.name }}</h3>
-                                <span class="task-status-badge-compact" :class="getTaskStatusClass(task)">
+                          <span class="task-progress-status-main" :class="getTaskStatusClass(task)">
                           {{ getTaskStatusText(task) }}
                         </span>
                       </div>
-                        </div>
-                            
-                            <!-- 任务描述 -->
-                            <p class="task-desc-compact">{{ task.description }}</p>
-                            
-                            <!-- 任务元信息 -->
-                            <div class="task-meta-compact">
-                              <div class="task-time-compact">
-                                <Icon name="calendar" :size="14" />
+                        <div class="task-progress-desc-main" v-if="task.description">{{ task.description }}</div>
+                        <div class="task-progress-time-main">
+                          <Icon name="calendar" :size="16" />
                                 <span>{{ formatDate(task.start_time) }} - {{ formatDate(task.end_time) }}</span>
                         </div>
-                              <div class="task-stats-compact">
-                                <span class="task-stat-item">
-                                  <Icon name="file-text" :size="14" />
-                                  <span>{{ task.exam_count || 0 }}套</span>
-                                </span>
-                                <span class="task-stat-item">
-                                  <Icon name="code" :size="14" />
-                                  <span>{{ task.oj_count || 0 }}道</span>
-                                </span>
                   </div>
                 </div>
-
-                            <!-- 操作按钮 -->
-                            <div class="task-action-compact">
-                              <button class="enter-task-btn-compact" @click.stop="enterTask(task)" :disabled="!isTaskActive(task)">
-                                <Icon name="arrow-right" :size="14" />
-                              </button>
                     </div>
                       </div>
+
                       </div>
                       </div>
                     </div>
                   </div>
-                </div>
-
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
       <div class="sidebar-placeholder-right"></div>
-    </div>
+                </div>
 
-    <!-- 底部固定：计划信息 + 计划完成进度 -->
-    <div class="plan-header-fixed" v-if="selectedPlan">
-      <div class="plan-header-inner">
-        <div class="plan-header-actions">
-          <button class="back-btn" @click="backToPlans">
-            <Icon name="arrow-left" :size="16" /> 返回
-          </button>
-        </div>
-        <!-- 计划基本信息 -->
-        <div class="plan-header-info">
-          <div class="plan-header-title-section">
-            <h2 class="plan-header-title">{{ selectedPlan.name }}</h2>
-            <div class="plan-level-badge-header">GESP {{ selectedPlan.level }}级</div>
-        </div>
-          <p class="plan-header-desc" v-if="selectedPlan.description">{{ selectedPlan.description }}</p>
-          <div class="plan-header-stats">
-            <div class="info-stat-header">
-              <span class="stat-value-header">{{ planProgress?.completed_tasks ?? selectedPlan.completed_tasks ?? 0 }}</span>
-              <span class="stat-label-header">已完成</span>
+    <!-- 右侧固定边栏：任务进度 + 计划信息 -->
+    <div v-if="selectedPlan" class="plan-sidebar-right-fixed">
+      <!-- 任务进度（顶部） -->
+      <div v-if="selectedPlan.tasks && selectedPlan.tasks.length > 0" class="task-progress-sidebar">
+        <div class="progress-title-sidebar">
+          <Icon name="list-checks" :size="28" />
+          <span>任务进度</span>
+              </div>
+        <div class="progress-bar-container-sidebar">
+          <div 
+            class="progress-bar-fill-sidebar" 
+            :style="{ width: getPlanProgressPercent() + '%' }"
+          ></div>
             </div>
-            <div class="info-stat-header">
-              <span class="stat-value-header">{{ planProgress?.total_tasks ?? selectedPlan.total_tasks ?? 0 }}</span>
-              <span class="stat-label-header">总任务</span>
+        <div class="progress-text-sidebar">
+          {{ planProgress?.completed_tasks ?? 0 }}/{{ planProgress?.total_tasks ?? 0 }}
+          </div>
+        
+        <!-- 任务统计信息 -->
+        <div class="task-stats-sidebar">
+          <div class="task-stat-item-sidebar completed-stat">
+            <div class="task-stat-icon">
+              <Icon name="check-circle" :size="24" />
+        </div>
+            <div class="task-stat-content">
+              <div class="task-stat-value">{{ getCompletedTasksCount() }}</div>
+              <div class="task-stat-label">已完成</div>
+      </div>
+    </div>
+          <div class="task-stat-item-sidebar overdue-stat">
+            <div class="task-stat-icon">
+              <Icon name="alert-circle" :size="24" />
+        </div>
+            <div class="task-stat-content">
+              <div class="task-stat-value">{{ getOverdueTasksCount() }}</div>
+              <div class="task-stat-label">已过期</div>
+        </div>
             </div>
-            <div class="info-stat-header">
-              <span class="stat-value-header">{{ planProgress?.progress_rate ?? selectedPlan.progress ?? 0 }}%</span>
-              <span class="stat-label-header">完成率</span>
+          <div class="task-stat-item-sidebar upcoming-stat">
+            <div class="task-stat-icon">
+              <Icon name="clock" :size="24" />
+            </div>
+            <div class="task-stat-content">
+              <div class="task-stat-value">{{ getUpcomingTasksCount() }}</div>
+              <div class="task-stat-label">未开始</div>
             </div>
           </div>
         </div>
       </div>
-      <!-- 计划完成进度 -->
-      <div v-if="planProgress" class="plan-progress-in-header">
-        <div class="progress-header-row">
-          <span class="progress-label">任务完成</span>
-          <span class="progress-text">
-            {{ planProgress.completed_tasks ?? 0 }}/{{ planProgress.total_tasks ?? 0 }}
-          </span>
+
+      <!-- 计划信息（底部） -->
+      <div class="plan-info-bottom">
+        <!-- 计划标题和描述 -->
+        <div class="plan-header-right">
+          <h2 class="plan-title-right">{{ selectedPlan.name }}</h2>
+          <div class="plan-level-badge-right">GESP {{ selectedPlan.level }}级</div>
+          <p v-if="selectedPlan.description" class="plan-desc-right">{{ selectedPlan.description }}</p>
         </div>
-        <div class="progress-bar-container-header">
-          <div 
-            class="progress-bar-fill-header" 
-            :style="{ width: getPlanProgressPercent() + '%' }"
-          ></div>
         </div>
-      </div>
-      <div class="plan-header-underline"></div>
     </div>
 
     <!-- 烟花效果 -->
@@ -196,7 +171,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import Icon from '@/components/Icon.vue'
 
@@ -214,6 +189,56 @@ const error = ref<string | null>(null)
 const showFireworks = ref(false)
 
 const userInfo = ref<any>(null)
+
+// 任务元素引用 Map
+const taskRefs = ref<Map<number, HTMLElement>>(new Map())
+
+// 设置任务引用
+const setTaskRef = (el: any, taskId: number) => {
+  if (el) {
+    taskRefs.value.set(taskId, el)
+  }
+}
+
+// 滚动到进行中的任务
+const scrollToActiveTask = async () => {
+  // 等待 DOM 更新
+  await nextTick()
+  
+  if (!selectedPlan.value?.tasks || selectedPlan.value.tasks.length === 0) return
+  
+  // 查找进行中的任务
+  const activeTask = selectedPlan.value.tasks.find((task: any) => isTaskInProgress(task))
+  
+  if (activeTask) {
+    // 等待一下，确保 ref 已经设置
+    await nextTick()
+    
+    const taskElement = taskRefs.value.get(activeTask.id)
+    if (taskElement) {
+      // 延迟一点时间，确保页面已经完全渲染完成
+      setTimeout(() => {
+        taskElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+          inline: 'nearest'
+        })
+      }, 500)
+    } else {
+      // 如果第一次没找到，再等一会儿重试
+      setTimeout(() => {
+        const retryElement = taskRefs.value.get(activeTask.id)
+        if (retryElement) {
+          retryElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+            inline: 'nearest'
+          })
+        }
+      }, 1000)
+    }
+  }
+}
 
 const fetchPlanTasks = async (planId: number) => {
   if (!userInfo.value?.id) return null
@@ -277,7 +302,7 @@ const getTaskStatusText = (task: any) => {
   const start = new Date(task.start_time)
   const end = new Date(task.end_time)
   if (now < start) return '未开始'
-  if (now > end) return '已过期'
+  if (now > end) return '已过期，开始补做'
   return '进行中'
 }
 
@@ -297,6 +322,34 @@ const getPlanProgressPercent = () => {
   const completed = planProgress.value.completed_tasks ?? 0
   if (total === 0) return 0
   return Math.round((completed / total) * 100)
+}
+
+// 计算已完成任务数量
+const getCompletedTasksCount = () => {
+  if (!selectedPlan.value?.tasks) return 0
+  return selectedPlan.value.tasks.filter((task: any) => task.is_completed).length
+}
+
+// 计算已过期任务数量
+const getOverdueTasksCount = () => {
+  if (!selectedPlan.value?.tasks) return 0
+  const now = new Date()
+  return selectedPlan.value.tasks.filter((task: any) => {
+    if (task.is_completed) return false
+    const end = new Date(task.end_time)
+    return now > end
+  }).length
+}
+
+// 计算未开始任务数量
+const getUpcomingTasksCount = () => {
+  if (!selectedPlan.value?.tasks) return 0
+  const now = new Date()
+  return selectedPlan.value.tasks.filter((task: any) => {
+    if (task.is_completed) return false
+    const start = new Date(task.start_time)
+    return now < start
+  }).length
 }
 
 // 检查计划是否完成（通过is_completed标志或完成率100%）
@@ -349,6 +402,15 @@ const isTaskActive = (task: any) => {
   return true
 }
 
+// 判断任务是否进行中
+const isTaskInProgress = (task: any) => {
+  if (task.is_completed) return false
+  const now = new Date()
+  const start = new Date(task.start_time)
+  const end = new Date(task.end_time)
+  return now >= start && now <= end
+}
+
 const backToPlans = () => {
   router.push('/plan')
 }
@@ -371,9 +433,6 @@ const testAPIConnection = async () => {
 }
 
 onMounted(async () => {
-  // 滚动到顶部
-  window.scrollTo({ top: 0, behavior: 'smooth' })
-  
   const userInfoStr = localStorage.getItem('userInfo')
   if (!userInfoStr) {
     error.value = '请先登录'
@@ -426,6 +485,10 @@ onMounted(async () => {
       triggerFireworks()
     }
   }
+  
+  // 数据加载完成后，滚动到进行中的任务
+  await nextTick()
+  scrollToActiveTask()
 })
 
 // 监听计划完成状态，当从未完成变为完成时触发烟花
@@ -458,7 +521,7 @@ watch(() => {
   gap: 32px;
   width: 100%;
   margin: 0 auto;
-  padding: 0 20px 100px 20px; /* 底部 padding 为底部 header 留出空间 */
+  padding: 0 20px 20px 20px; /* 移除底部 padding，因为不再有底部固定栏 */
   box-sizing: border-box;
   flex-shrink: 0;
   align-items: flex-start;
@@ -466,253 +529,552 @@ watch(() => {
   margin-top: 0;
 }
 
-/* 底部固定计划头部 */
-.plan-header-fixed {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 5px 24px;
-  border-top: 2px solid rgba(255, 255, 255, 0.2);
+/* 右侧固定边栏 - 低幼化风格，更宽更大 */
+.plan-sidebar-right-fixed {
   position: fixed;
-  bottom: 0; /* 固定在底部 */
-  left: 0;
+  top: 48px; /* 从导航栏下方开始 */
   right: 0;
+  bottom: 0;
+  width: 420px; /* 从280px增加到420px，更宽 */
   z-index: 999;
+  background: linear-gradient(135deg, #1e90ff 0%, #38bdf8 100%);
+  border-left: 8px solid #0c7cd5; /* 更粗的边框 */
+  box-shadow: -12px 0 40px rgba(30, 144, 255, 0.4);
+  padding: 28px 20px; /* 更大的内边距 */
   backdrop-filter: blur(10px);
-  background: linear-gradient(135deg, rgba(135, 206, 235, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
-  width: 100%;
-  gap: 4px;
-  box-sizing: border-box;
-  max-height: 40vh;
-  overflow-y: auto;
+  animation: slideRight 0.4s ease-out;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto; /* 允许滚动 */
 }
 
-.plan-header-inner {
-  width: 100%;
-  max-width: 1600px;
+@keyframes slideRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* 计划标题和描述 - 低幼化，更大更可爱 */
+.plan-header-right {
+  text-align: center;
+  margin-bottom: 0; /* 底部不需要间距 */
+  padding-bottom: 0; /* 底部不需要内边距 */
+}
+
+.plan-title-right {
+  margin: 0 0 12px 0; /* 更大的间距 */
+  font-size: 2.2rem; /* 从1.6rem增加到2.2rem */
+  font-weight: 900;
+  color: white;
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), 0 0 20px rgba(255, 255, 255, 0.3); /* 更强的阴影效果 */
+  letter-spacing: 2px; /* 更大的字间距 */
+  line-height: 1.3;
+  word-break: break-word;
+}
+
+.plan-level-badge-right {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.25); /* 更亮的背景 */
+  color: white;
+  padding: 10px 18px; /* 更大的内边距 */
+  border-radius: 20px; /* 更大的圆角 */
+  font-size: 1.1rem; /* 从0.85rem增加到1.1rem */
+  font-weight: 800; /* 更粗的字体 */
+  margin-bottom: 12px; /* 更大的间距 */
+  backdrop-filter: blur(10px);
+  border: 3px solid rgba(255, 255, 255, 0.4); /* 更粗的边框 */
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2); /* 添加阴影 */
+}
+
+.plan-desc-right {
+  margin: 12px 0 0 0; /* 更大的间距 */
+  font-size: 1.2rem; /* 从0.95rem增加到1.2rem */
+  font-weight: 600; /* 更粗的字体 */
+  color: rgba(255, 255, 255, 0.95); /* 更亮的颜色 */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  line-height: 1.6; /* 更大的行高 */
+  word-break: break-word;
+}
+
+/* 计划统计信息 - 低幼化，更大更可爱 */
+.plan-stats-right {
+  display: flex;
+  gap: 16px; /* 更大的间距 */
+  margin-bottom: 0;
+}
+
+.plan-stat-item {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  position: relative;
-  gap: 4px;
-  padding: 4px 24px;
-  min-height: auto;
-}
-
-.plan-header-actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  position: absolute;
-  left: 24px;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 3;
-}
-
-/* 计划信息区域 - 一行显示 */
-.plan-header-info {
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: nowrap;
-  position: relative;
-  padding: 0 100px;
-  box-sizing: border-box;
-}
-
-.plan-header-title-section {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-shrink: 0;
-  min-width: 0;
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 2;
-}
-
-.plan-header-title {
-  font-size: 1.1rem;
-  font-weight: 800;
-  letter-spacing: 0.02em;
-  color: #1e293b;
-  padding: 2px 10px;
-  border-radius: 10px;
-  border: 1.5px solid rgba(30, 144, 255, 0.3);
+  gap: 8px; /* 更大的间距 */
+  padding: 18px 12px; /* 更大的内边距 */
+  background: rgba(255, 255, 255, 0.2); /* 更亮的背景 */
+  border-radius: 20px; /* 更大的圆角 */
   backdrop-filter: blur(10px);
-  background-color: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 4px 16px rgba(30, 144, 255, 0.15), inset 0 1px 0 rgba(255,255,255,0.8);
-  margin: 0;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  max-width: 300px;
-  z-index: 2;
+  border: 3px solid rgba(255, 255, 255, 0.3); /* 更粗的边框 */
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15); /* 添加阴影 */
+  transition: all 0.3s ease;
 }
 
-.plan-level-badge-header {
-  background: linear-gradient(135deg, #1e90ff 0%, #38bdf8 100%);
+.plan-stat-item:hover {
+  transform: scale(1.05); /* 悬停放大效果 */
+  background: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 6px 16px rgba(255, 255, 255, 0.25);
+}
+
+.stat-value-right {
+  font-size: 2rem; /* 从1.4rem增加到2rem */
+  font-weight: 900; /* 更粗的字体 */
   color: white;
-  padding: 2px 10px;
-  border-radius: 8px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  white-space: nowrap;
-  box-shadow: 0 2px 8px rgba(30, 144, 255, 0.3);
+  line-height: 1;
+  text-shadow: 0 3px 6px rgba(0, 0, 0, 0.3), 0 0 15px rgba(255, 255, 255, 0.2); /* 更强的阴影 */
+}
+
+.stat-label-right {
+  font-size: 0.95rem; /* 从0.75rem增加到0.95rem */
+  font-weight: 700; /* 更粗的字体 */
+  color: rgba(255, 255, 255, 0.95);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* 任务进度区域（顶部，占据主要空间） */
+.plan-progress-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0; /* 允许 flex 子元素缩小 */
+  overflow: hidden; /* 防止溢出 */
+}
+
+.progress-title-right {
+  display: flex;
+  align-items: center;
+  gap: 12px; /* 更大的间距 */
+  color: white;
+  font-size: 1.4rem; /* 从1rem增加到1.4rem */
+  font-weight: 800; /* 更粗的字体 */
+  margin-bottom: 12px; /* 更大的间距 */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.progress-title-right :deep(.lucide-icon) {
+  color: white;
+  flex-shrink: 0;
+  width: 28px; /* 更大的图标 */
+  height: 28px;
+}
+
+.progress-bar-container-right {
+  width: 100%;
+  height: 16px; /* 从10px增加到16px，更粗的进度条 */
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 20px; /* 更大的圆角 */
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 12px; /* 更大的间距 */
+  border: 2px solid rgba(255, 255, 255, 0.2); /* 添加边框 */
+}
+
+.progress-bar-fill-right {
+  height: 100%;
+  background: linear-gradient(90deg, #fff 0%, #e0f2fe 100%);
+  border-radius: 20px;
+  transition: width 0.5s ease-in-out;
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.5); /* 更强的阴影 */
+}
+
+.progress-text-right {
+  text-align: center;
+  color: white;
+  font-size: 1.1rem; /* 从0.85rem增加到1.1rem */
+  font-weight: 700; /* 更粗的字体 */
+  margin-bottom: 16px; /* 更大的间距 */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* 可点击的任务进度列表 - 低幼化 */
+.task-progress-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px; /* 从8px增加到12px，更大的间距 */
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0; /* 允许 flex 子元素缩小 */
+  padding-right: 4px; /* 为滚动条留出空间 */
+}
+
+/* 右侧边栏任务进度区域 */
+.task-progress-sidebar {
+  margin-bottom: 24px;
+  padding-bottom: 24px;
+  border-bottom: 4px solid rgba(255, 255, 255, 0.4);
   flex-shrink: 0;
 }
 
-.plan-header-desc {
-  color: #1e293b;
-  font-size: 0.8rem;
-  margin: 0;
-  line-height: 1.4;
+.progress-title-sidebar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: white;
+  font-size: 1.6rem; /* 更大的字体 */
+  font-weight: 800;
+  margin-bottom: 16px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.progress-title-sidebar :deep(.lucide-icon) {
+  color: white;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+}
+
+.progress-bar-container-sidebar {
+  width: 100%;
+  height: 20px; /* 更粗的进度条 */
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 24px;
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 12px;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+}
+
+.progress-bar-fill-sidebar {
+  height: 100%;
+  background: linear-gradient(90deg, #fff 0%, #e0f2fe 100%);
+  border-radius: 24px;
+  transition: width 0.5s ease-in-out;
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.5);
+}
+
+.progress-text-sidebar {
+  text-align: center;
+  color: white;
+  font-size: 1.2rem; /* 更大的字体 */
+  font-weight: 700;
+  margin-bottom: 20px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* 任务统计信息 */
+.task-stats-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.task-stat-item-sidebar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  border: 3px solid transparent;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.task-stat-item-sidebar:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.02);
+}
+
+.task-stat-item-sidebar.completed-stat {
+  border-color: rgba(34, 197, 94, 0.4);
+  background: rgba(34, 197, 94, 0.15);
+}
+
+.task-stat-item-sidebar.overdue-stat {
+  border-color: rgba(239, 68, 68, 0.4);
+  background: rgba(239, 68, 68, 0.15);
+}
+
+.task-stat-item-sidebar.upcoming-stat {
+  border-color: rgba(251, 191, 36, 0.4);
+  background: rgba(251, 191, 36, 0.15);
+}
+
+.task-stat-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
+}
+
+.task-stat-item-sidebar.completed-stat .task-stat-icon {
+  background: rgba(34, 197, 94, 0.3);
+  color: #22c55e;
+}
+
+.task-stat-item-sidebar.overdue-stat .task-stat-icon {
+  background: rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+}
+
+.task-stat-item-sidebar.upcoming-stat .task-stat-icon {
+  background: rgba(251, 191, 36, 0.3);
+  color: #fbbf24;
+}
+
+.task-stat-item-sidebar :deep(.lucide-icon) {
+  color: white;
+  flex-shrink: 0;
+}
+
+.task-stat-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.task-stat-value {
+  font-size: 2rem; /* 更大的字体 */
+  font-weight: 900;
+  color: white;
+  line-height: 1;
+  text-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+}
+
+.task-stat-label {
+  font-size: 1rem; /* 更大的字体 */
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.95);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* 计划信息底部区域 - 低幼化 */
+.plan-info-bottom {
+  margin-top: auto; /* 推到底部 */
+  padding-top: 20px; /* 顶部内边距 */
+  flex-shrink: 0; /* 防止被压缩 */
+}
+
+.task-progress-item {
+  display: flex;
+  align-items: center;
+  gap: 14px; /* 从10px增加到14px */
+  padding: 16px 18px; /* 从10px 12px增加到16px 18px，更大的内边距 */
+  background: rgba(255, 255, 255, 0.2); /* 更亮的背景 */
+  border-radius: 20px; /* 从12px增加到20px，更大的圆角 */
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* 更流畅的动画 */
+  border: 3px solid transparent; /* 从2px增加到3px */
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* 添加阴影 */
+}
+
+.task-progress-item:hover:not(.locked) {
+  background: rgba(255, 255, 255, 0.3); /* 更亮的悬停背景 */
+  border-color: rgba(255, 255, 255, 0.5); /* 更明显的边框 */
+  transform: translateX(-6px) scale(1.02); /* 更大的移动和缩放效果 */
+  box-shadow: 0 6px 16px rgba(255, 255, 255, 0.3); /* 更强的阴影 */
+}
+
+.task-progress-item.completed {
+  background: rgba(34, 197, 94, 0.25); /* 更亮的背景 */
+  border-color: rgba(34, 197, 94, 0.5); /* 更明显的边框 */
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2); /* 添加阴影 */
+}
+
+.task-progress-item.active {
+  background: rgba(255, 255, 255, 0.3); /* 更亮的背景 */
+  border-color: rgba(255, 255, 255, 0.6); /* 更明显的边框 */
+  box-shadow: 0 6px 16px rgba(255, 255, 255, 0.3); /* 更强的阴影 */
+  animation: activePulse 2s ease-in-out infinite; /* 添加脉冲动画 */
+}
+
+@keyframes activePulse {
+  0%, 100% {
+    box-shadow: 0 6px 16px rgba(255, 255, 255, 0.3);
+  }
+  50% {
+    box-shadow: 0 8px 20px rgba(255, 255, 255, 0.5);
+  }
+}
+
+.task-progress-item.locked {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.task-progress-item.locked:hover {
+  transform: none;
+  background: rgba(255, 255, 255, 0.2);
+  border-color: transparent;
+}
+
+.task-progress-node {
+  width: 32px; /* 从24px增加到32px */
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  border: 3px solid rgba(255, 255, 255, 0.5); /* 从2px增加到3px */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.2); /* 添加阴影 */
+}
+
+.task-progress-node-inner {
+  width: 16px; /* 从12px增加到16px */
+  height: 16px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.7); /* 更亮的内部 */
+  transition: all 0.3s ease;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.4); /* 添加发光效果 */
+}
+
+.task-progress-item.completed .task-progress-node {
+  background: rgba(34, 197, 94, 0.4); /* 更亮的背景 */
+  border-color: rgba(34, 197, 94, 0.9); /* 更明显的边框 */
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4); /* 更强的阴影 */
+}
+
+.task-progress-item.completed .task-progress-node-inner {
+  background: #22c55e;
+  box-shadow: 0 0 12px rgba(34, 197, 94, 0.8); /* 更强的发光效果 */
+  width: 18px; /* 稍微大一点 */
+  height: 18px;
+}
+
+.task-progress-item.active .task-progress-node {
+  background: rgba(255, 255, 255, 0.5); /* 更亮的背景 */
+  border-color: rgba(255, 255, 255, 0.9); /* 更明显的边框 */
+  animation: nodePulse 2s ease-in-out infinite;
+  box-shadow: 0 4px 16px rgba(255, 255, 255, 0.4); /* 更强的阴影 */
+}
+
+.task-progress-item.active .task-progress-node-inner {
+  background: white;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.9); /* 更强的发光效果 */
+  width: 18px; /* 稍微大一点 */
+  height: 18px;
+}
+
+.task-progress-item.locked .task-progress-node {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.task-progress-item.locked .task-progress-node-inner {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+@keyframes nodePulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.task-progress-info {
   flex: 1;
   min-width: 0;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  max-width: 300px;
-  font-weight: 500;
-  margin-right: auto;
-}
-
-.plan-header-stats {
-  display: flex;
-  gap: 12px;
-  flex-wrap: nowrap;
-  flex-shrink: 0;
-}
-
-.info-stat-header {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 1px;
-  padding: 3px 10px;
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 8px;
-  border: 1px solid rgba(30, 144, 255, 0.2);
-  backdrop-filter: blur(10px);
-  min-width: 65px;
-  box-shadow: 0 2px 6px rgba(30, 144, 255, 0.1);
+  gap: 6px; /* 从4px增加到6px */
 }
 
-.stat-value-header {
-  display: block;
-  font-size: 1.2rem;
-  font-weight: 800;
-  color: #1e90ff;
-  line-height: 1;
+.task-progress-number {
+  font-size: 0.9rem; /* 从0.7rem增加到0.9rem */
+  font-weight: 800; /* 从700增加到800 */
+  color: rgba(255, 255, 255, 0.9); /* 更亮的颜色 */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* 更强的阴影 */
 }
 
-.stat-label-header {
-  color: #64748b;
-  font-size: 0.75rem;
-  font-weight: 600;
-}
-
-/* 计划完成进度在 header 中的样式 */
-.plan-progress-in-header {
-  width: 100%;
-  max-width: 1600px;
-  padding: 4px 24px;
-  margin-top: 3px;
-}
-
-.progress-header-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 3px;
-}
-
-.progress-label {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #1e293b;
-}
-
-.progress-text {
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: #1e90ff;
-}
-
-.progress-bar-container-header {
-  width: 100%;
-  height: 8px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 10px;
+.task-progress-name {
+  font-size: 1.05rem; /* 从0.85rem增加到1.05rem */
+  font-weight: 700; /* 从600增加到700 */
+  color: white;
+  line-height: 1.4; /* 从1.3增加到1.4 */
   overflow: hidden;
-  position: relative;
-}
-
-.progress-bar-fill-header {
-  height: 100%;
-  background: linear-gradient(90deg, #1e90ff 0%, #38bdf8 100%);
-  border-radius: 10px;
-  transition: width 0.5s ease-in-out;
-  box-shadow: 0 2px 8px rgba(30, 144, 255, 0.4);
-}
-
-.plan-header-title {
-  text-align: center;
-  font-size: 1.6rem;
-  font-weight: 800;
-  letter-spacing: 0.02em;
-  background: linear-gradient(135deg, #0ea5e9 0%, #1e90ff 40%, #60a5fa 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  padding: 4px 12px;
-  border-radius: 12px;
-  border: 1.5px solid rgba(255, 255, 255, 0.35);
-  backdrop-filter: blur(10px);
-  background-color: rgba(255, 255, 255, 0.3);
-  box-shadow: 0 6px 24px rgba(30, 144, 255, 0.18), inset 0 1px 0 rgba(255,255,255,0.6);
-  max-width: 80%;
-  overflow: hidden;
-  white-space: nowrap;
   text-overflow: ellipsis;
-  z-index: 2;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* 更强的阴影 */
 }
 
+.task-progress-status {
+  font-size: 0.85rem; /* 从0.7rem增加到0.85rem */
+  font-weight: 700; /* 从600增加到700 */
+  padding: 4px 10px; /* 从2px 6px增加到4px 10px */
+  border-radius: 12px; /* 从6px增加到12px，更大的圆角 */
+  display: inline-block;
+  width: fit-content;
+  border: 2px solid transparent; /* 添加边框 */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); /* 添加阴影 */
+}
 
-.plan-header-underline {
-  height: 2px;
-  background: linear-gradient(90deg, transparent 0%, #1e90ff 40%, #38bdf8 60%, transparent 100%);
-  margin-top: 4px;
-  border-radius: 2px;
-  opacity: 0.6;
-  width: 100%;
-  max-width: 1600px;
+.task-progress-status.status-completed {
+  background: rgba(34, 197, 94, 0.4); /* 更亮的背景 */
+  color: #ffffff; /* 更亮的文字 */
+  border-color: rgba(34, 197, 94, 0.6); /* 添加边框 */
+  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3); /* 更强的阴影 */
+}
+
+.task-progress-status.status-active {
+  background: rgba(30, 144, 255, 0.4); /* 更亮的背景 */
+  color: #ffffff; /* 更亮的文字 */
+  border-color: rgba(30, 144, 255, 0.6); /* 添加边框 */
+  box-shadow: 0 2px 8px rgba(30, 144, 255, 0.3); /* 更强的阴影 */
+  animation: statusPulse 2s ease-in-out infinite; /* 添加脉冲动画 */
+}
+
+@keyframes statusPulse {
+  0%, 100% {
+    box-shadow: 0 2px 8px rgba(30, 144, 255, 0.3);
+  }
+  50% {
+    box-shadow: 0 4px 12px rgba(30, 144, 255, 0.5);
+  }
+}
+
+.task-progress-status.status-upcoming {
+  background: rgba(251, 191, 36, 0.4); /* 更亮的背景 */
+  color: #ffffff; /* 更亮的文字 */
+  border-color: rgba(251, 191, 36, 0.6); /* 添加边框 */
+  box-shadow: 0 2px 8px rgba(251, 191, 36, 0.3); /* 更强的阴影 */
+}
+
+.task-progress-status.status-overdue {
+  background: rgba(239, 68, 68, 0.4); /* 更亮的背景 */
+  color: #ffffff; /* 更亮的文字 */
+  border-color: rgba(239, 68, 68, 0.6); /* 添加边框 */
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3); /* 更强的阴影 */
 }
 
 .sidebar-placeholder-left { 
   width: 50px; 
   flex-shrink: 0; 
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding-top: 20px;
-  position: sticky;
-  top: 20px;
-  height: fit-content;
-  z-index: 10;
 }
 .sidebar-placeholder-right { width: 50px; flex-shrink: 0; }
 
-/* 左侧返回按钮样式 */
+/* 左侧返回按钮样式 - 固定定位 */
 .back-nav-arrow {
-  background: rgba(30, 144, 255, 0.1);
+  position: fixed;
+  left: 20px;
+  top: 80px;
+  background: rgba(30, 144, 255, 0.15);
   backdrop-filter: blur(10px);
   color: #1e90ff;
   border: 2px solid rgba(30, 144, 255, 0.3);
@@ -725,9 +1087,7 @@ watch(() => {
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(30, 144, 255, 0.2);
-  flex-shrink: 0;
-  z-index: 10;
-  position: relative;
+  z-index: 100;
 }
 
 .back-nav-arrow:hover {
@@ -788,7 +1148,16 @@ watch(() => {
 .number-badge { background: rgba(255, 255, 255, 0.2); color: white; padding: 10px 20px; border-radius: 24px; font-weight: 700; font-size: 1.1rem; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3); box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2); }
 .level-badge { background: rgba(255, 255, 255, 0.15); color: white; padding: 8px 14px; border-radius: 18px; font-weight: 600; font-size: 0.95rem; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); }
 .question-content-unified { flex: 1; display: flex; flex-direction: row; overflow: visible; background: transparent; /* 透明背景，融入页面背景 */ }
-.question-left-panel { flex: 1; overflow: visible; padding: 24px; display: flex; flex-direction: column; gap: 24px; background: transparent; /* 透明背景，融入页面背景 */ }
+.question-left-panel { 
+  flex: 1; 
+  overflow: visible; 
+  padding: 24px; 
+  padding-right: 440px; /* 为右侧边栏预留空间，从300px增加到440px */
+  display: flex; 
+  flex-direction: column; 
+  gap: 24px; 
+  background: transparent; /* 透明背景，融入页面背景 */ 
+}
 .question-left-panel-centered { max-width: 1600px; margin: 0 auto; width: 100%; }
 .content-section { 
   background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); 
@@ -921,7 +1290,451 @@ watch(() => {
   font-weight: 500;
 }
 
-/* 时间轴包装器 */
+/* 左侧任务列表 - 低幼化风格 */
+.task-list-main {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin: 24px 0;
+}
+
+/* 任务列表容器 */
+.task-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px; /* 更大的间距 */
+}
+
+/* 任务项 - 低幼化风格 */
+.task-progress-item-main {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px; /* 更大的间距 */
+  padding: 20px 24px; /* 更大的内边距 */
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border-radius: 24px; /* 更大的圆角 */
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 4px solid #e0f2fe; /* 更粗的边框 */
+  box-shadow: 0 4px 16px rgba(30, 144, 255, 0.1);
+}
+
+.task-progress-item-main:hover:not(.locked) {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border-color: #1e90ff;
+  transform: translateX(8px) scale(1.02); /* 更大的移动和缩放效果 */
+  box-shadow: 0 8px 24px rgba(30, 144, 255, 0.2);
+}
+
+/* 通用的完成状态已被类型特定的样式覆盖，保留节点和状态的完成样式 */
+
+.task-progress-item-main.active {
+  background: linear-gradient(135deg, #f0f9ff 0%, #dbeafe 100%);
+  border-color: #3b82f6;
+  box-shadow: 0 6px 20px rgba(30, 144, 255, 0.25);
+  animation: activePulseMain 2s ease-in-out infinite;
+}
+
+@keyframes activePulseMain {
+  0%, 100% {
+    box-shadow: 0 6px 20px rgba(30, 144, 255, 0.25);
+  }
+  50% {
+    box-shadow: 0 8px 24px rgba(30, 144, 255, 0.35);
+  }
+}
+
+.task-progress-item-main.locked {
+  opacity: 0.6;
+  cursor: not-allowed;
+  filter: grayscale(20%);
+}
+
+.task-progress-item-main.locked:hover {
+  transform: none;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border-color: #e0f2fe;
+}
+
+/* 专项突破卡片 - 蓝色主题 */
+.task-progress-item-main.type-normal-card {
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  border-color: #1e90ff;
+  box-shadow: 0 4px 16px rgba(30, 144, 255, 0.15);
+}
+
+.task-progress-item-main.type-normal-card:hover:not(.locked) {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  border-color: #0c7cd5;
+  box-shadow: 0 8px 24px rgba(30, 144, 255, 0.3);
+}
+
+.task-progress-item-main.type-normal-card.active {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  border-color: #1e90ff;
+  box-shadow: 0 6px 20px rgba(30, 144, 255, 0.3);
+}
+
+/* 专项突破完成状态 - 保持蓝色主题，只是边框稍微深一点表示完成 */
+.task-progress-item-main.type-normal-card.completed {
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  border-color: #0c7cd5;
+  box-shadow: 0 4px 16px rgba(30, 144, 255, 0.2);
+}
+
+.task-progress-item-main.type-normal-card.locked {
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  border-color: #94a3b8;
+}
+
+.task-progress-item-main.type-normal-card.locked:hover {
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  border-color: #94a3b8;
+}
+
+/* 真题试炼卡片 - 金色主题 */
+.task-progress-item-main.type-exam-card {
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  border-color: #f59e0b;
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.15);
+}
+
+.task-progress-item-main.type-exam-card:hover:not(.locked) {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-color: #d97706;
+  box-shadow: 0 8px 24px rgba(245, 158, 11, 0.3);
+}
+
+.task-progress-item-main.type-exam-card.active {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-color: #f59e0b;
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.3);
+  animation: activePulseExam 2s ease-in-out infinite;
+}
+
+@keyframes activePulseExam {
+  0%, 100% {
+    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.3);
+  }
+  50% {
+    box-shadow: 0 8px 24px rgba(245, 158, 11, 0.4);
+  }
+}
+
+/* 真题试炼完成状态 - 保持金色主题，只是边框稍微深一点表示完成 */
+.task-progress-item-main.type-exam-card.completed {
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  border-color: #d97706;
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.2);
+}
+
+.task-progress-item-main.type-exam-card.locked {
+  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+  border-color: #d1d5db;
+}
+
+.task-progress-item-main.type-exam-card.locked:hover {
+  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+  border-color: #d1d5db;
+}
+
+/* 任务节点 */
+.task-progress-node-main {
+  width: 40px; /* 更大的节点 */
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(30, 144, 255, 0.1);
+  border: 4px solid rgba(30, 144, 255, 0.3); /* 更粗的边框 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(30, 144, 255, 0.2);
+}
+
+/* 专项突破节点 - 蓝色 */
+.type-normal-card .task-progress-node-main {
+  background: rgba(30, 144, 255, 0.15);
+  border-color: rgba(30, 144, 255, 0.4);
+  box-shadow: 0 4px 12px rgba(30, 144, 255, 0.25);
+}
+
+.type-normal-card .task-progress-node-inner-main {
+  background: rgba(30, 144, 255, 0.6);
+  box-shadow: 0 0 10px rgba(30, 144, 255, 0.5);
+}
+
+/* 真题试炼节点 - 金色 */
+.type-exam-card .task-progress-node-main {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: rgba(245, 158, 11, 0.4);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25);
+}
+
+.type-exam-card .task-progress-node-inner-main {
+  background: rgba(245, 158, 11, 0.6);
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+}
+
+.task-progress-node-inner-main {
+  width: 20px; /* 更大的内部节点 */
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(30, 144, 255, 0.5);
+  transition: all 0.3s ease;
+  box-shadow: 0 0 10px rgba(30, 144, 255, 0.4);
+}
+
+.task-progress-item-main.completed .task-progress-node-main {
+  background: rgba(34, 197, 94, 0.2);
+  border-color: rgba(34, 197, 94, 0.6);
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+}
+
+.task-progress-item-main.completed .task-progress-node-inner-main {
+  background: #22c55e;
+  box-shadow: 0 0 15px rgba(34, 197, 94, 0.7);
+  width: 22px;
+  height: 22px;
+}
+
+.task-progress-item-main.active .task-progress-node-main {
+  background: rgba(30, 144, 255, 0.2);
+  border-color: rgba(30, 144, 255, 0.6);
+  animation: nodePulseMain 2s ease-in-out infinite;
+  box-shadow: 0 4px 16px rgba(30, 144, 255, 0.4);
+}
+
+/* 专项突破进行中节点 - 蓝色 */
+.type-normal-card.active .task-progress-node-main {
+  background: rgba(30, 144, 255, 0.25);
+  border-color: rgba(30, 144, 255, 0.7);
+  animation: nodePulseBlue 2s ease-in-out infinite;
+  box-shadow: 0 4px 16px rgba(30, 144, 255, 0.5);
+}
+
+.type-normal-card.active .task-progress-node-inner-main {
+  background: #1e90ff;
+  box-shadow: 0 0 18px rgba(30, 144, 255, 0.9);
+  width: 22px;
+  height: 22px;
+}
+
+/* 真题试炼进行中节点 - 金色 */
+.type-exam-card.active .task-progress-node-main {
+  background: rgba(245, 158, 11, 0.25);
+  border-color: rgba(245, 158, 11, 0.7);
+  animation: nodePulseGold 2s ease-in-out infinite;
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.5);
+}
+
+.type-exam-card.active .task-progress-node-inner-main {
+  background: #f59e0b;
+  box-shadow: 0 0 18px rgba(245, 158, 11, 0.9);
+  width: 22px;
+  height: 22px;
+}
+
+.task-progress-item-main.active .task-progress-node-inner-main {
+  background: #1e90ff;
+  box-shadow: 0 0 18px rgba(30, 144, 255, 0.8);
+  width: 22px;
+  height: 22px;
+}
+
+@keyframes nodePulseMain {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+@keyframes nodePulseBlue {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 4px 16px rgba(30, 144, 255, 0.5);
+  }
+  50% {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(30, 144, 255, 0.7);
+  }
+}
+
+@keyframes nodePulseGold {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 4px 16px rgba(245, 158, 11, 0.5);
+  }
+  50% {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.7);
+  }
+}
+
+.task-progress-item-main.locked .task-progress-node-main {
+  background: rgba(148, 163, 184, 0.1);
+  border-color: rgba(148, 163, 184, 0.3);
+}
+
+.task-progress-item-main.locked .task-progress-node-inner-main {
+  background: rgba(148, 163, 184, 0.4);
+}
+
+/* 任务信息 */
+.task-progress-info-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* 更大的间距 */
+}
+
+.task-progress-number-main {
+  font-size: 1.1rem; /* 更大的字体 */
+  font-weight: 800;
+  color: #1e90ff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* 专项突破编号 - 蓝色 */
+.type-normal-card .task-progress-number-main {
+  color: #1e90ff;
+  text-shadow: 0 2px 4px rgba(30, 144, 255, 0.3);
+}
+
+/* 真题试炼编号 - 金色 */
+.type-exam-card .task-progress-number-main {
+  color: #d97706;
+  text-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
+}
+
+.task-progress-name-main {
+  font-size: 1.3rem; /* 更大的字体 */
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+/* 专项突破名称颜色保持深色 */
+.type-normal-card .task-progress-name-main {
+  color: #1e293b;
+}
+
+/* 真题试炼名称颜色稍微深一点以适应金色背景 */
+.type-exam-card .task-progress-name-main {
+  color: #78350f;
+}
+
+.task-progress-meta-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.task-type-badge-main {
+  padding: 6px 14px;
+  border-radius: 16px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  white-space: nowrap;
+  border: 2px solid transparent;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.task-type-badge-main.type-exam {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+  border-color: #d97706;
+}
+
+.task-type-badge-main.type-normal {
+  background: linear-gradient(135deg, #1e90ff 0%, #38bdf8 100%);
+  color: white;
+  border-color: #1e90ff;
+}
+
+.task-progress-status-main {
+  font-size: 0.95rem; /* 更大的字体 */
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 16px;
+  display: inline-block;
+  width: fit-content;
+  border: 2px solid transparent;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.task-progress-status-main.status-completed {
+  background: rgba(34, 197, 94, 0.2);
+  color: #059669;
+  border-color: rgba(34, 197, 94, 0.4);
+}
+
+.task-progress-status-main.status-active {
+  background: rgba(30, 144, 255, 0.2);
+  color: #1e40af;
+  border-color: rgba(30, 144, 255, 0.4);
+  animation: statusPulseMain 2s ease-in-out infinite;
+}
+
+@keyframes statusPulseMain {
+  0%, 100% {
+    box-shadow: 0 2px 6px rgba(30, 144, 255, 0.2);
+  }
+  50% {
+    box-shadow: 0 4px 10px rgba(30, 144, 255, 0.4);
+  }
+}
+
+.task-progress-status-main.status-upcoming {
+  background: rgba(251, 191, 36, 0.2);
+  color: #d97706;
+  border-color: rgba(251, 191, 36, 0.4);
+}
+
+.task-progress-status-main.status-overdue {
+  background: rgba(239, 68, 68, 0.2);
+  color: #dc2626;
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+.task-progress-desc-main {
+  font-size: 1rem;
+  color: #64748b;
+  line-height: 1.6;
+  margin-top: 4px;
+}
+
+.task-progress-time-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.task-progress-time-main :deep(.lucide-icon) {
+  color: #1e90ff;
+  flex-shrink: 0;
+}
+
+/* 专项突破时间图标 - 蓝色 */
+.type-normal-card .task-progress-time-main :deep(.lucide-icon) {
+  color: #1e90ff;
+}
+
+/* 真题试炼时间图标 - 金色 */
+.type-exam-card .task-progress-time-main :deep(.lucide-icon) {
+  color: #d97706;
+}
+
+/* 时间轴包装器（保留原有样式，但可能不再使用） */
 .timeline-wrapper {
   position: relative;
   padding: 20px 0 20px 60px;
@@ -1406,7 +2219,16 @@ watch(() => {
     height: auto; 
     min-height: calc(100vh - 20px); 
   }
-  .question-left-panel { padding: 16px; gap: 16px; }
+  .question-left-panel { 
+    padding: 16px; 
+    padding-right: 16px; /* 移动端移除右侧 padding */
+    gap: 16px; 
+  }
+  
+  /* 隐藏右侧边栏 */
+  .plan-sidebar-right-fixed {
+    display: none;
+  }
   
   /* 时间轴响应式 */
   .timeline-wrapper {
@@ -1452,72 +2274,6 @@ watch(() => {
     width: 100%;
     justify-content: flex-start;
   }
-  
-  /* Header响应式 */
-  .plan-header-fixed {
-    padding: 10px 12px;
-    max-height: 50vh;
-  }
-  
-  .plan-header-inner {
-    padding: 10px 12px;
-    gap: 6px;
-  }
-  
-  .plan-header-info {
-    flex-wrap: wrap;
-    gap: 8px;
-    padding: 0 80px;
-  }
-  
-  .plan-header-title-section {
-    position: static;
-    transform: none;
-    order: 1;
-    width: 100%;
-    justify-content: center;
-  }
-  
-  .plan-header-title {
-    font-size: 1rem;
-    max-width: 200px;
-    padding: 3px 8px;
-  }
-  
-  .plan-level-badge-header {
-    font-size: 0.75rem;
-    padding: 3px 8px;
-  }
-  
-  .plan-header-desc {
-    font-size: 0.75rem;
-    max-width: 100%;
-    order: 3;
-    width: 100%;
-    white-space: normal;
-    -webkit-line-clamp: 1;
-    margin-right: 0;
-  }
-  
-  .plan-header-stats {
-    gap: 8px;
-    order: 2;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  
-  .info-stat-header {
-    padding: 4px 8px;
-    min-width: 60px;
-  }
-  
-  .stat-value-header {
-    font-size: 1rem;
-  }
-  
-  .stat-label-header {
-    font-size: 0.7rem;
-  }
 }
 
 @media (max-width: 480px) {
@@ -1537,6 +2293,15 @@ watch(() => {
   }
   .task-item { padding: 16px; }
   .task-main-content h4 { font-size: 1.1rem; }
+  
+  /* 隐藏右侧边栏 */
+  .plan-sidebar-right-fixed {
+    display: none;
+  }
+  
+  .question-left-panel {
+    padding-right: 16px;
+  }
 }
 
 /* 计划进度卡片 */

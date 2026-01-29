@@ -25,6 +25,11 @@
             <div class="exam-title-section">
               <h2 class="exam-title">{{ examInfo.name || 'GESP 考试' }}</h2>
               <span class="exam-level-badge">GESP {{ examInfo.level || 1 }}级</span>
+              <!-- 自由练习状态标识 -->
+              <span class="submission-mode-badge free-practice-badge" title="自由练习模式，可以随时练习">
+                <Icon name="zap" :size="14" />
+                <span>自由练习</span>
+              </span>
             </div>
             
             <!-- 进度信息 - 可点击图标 -->
@@ -615,14 +620,24 @@ export default defineComponent({
     // 检查是否从计划页面进入
     const fromPlan = urlParams.get('from') === 'plan';
     const fromTaskView = urlParams.get('from') === 'taskview';
-    const planId = urlParams.get('planId');
-    const taskId = urlParams.get('taskId');
+    const planId = urlParams.get('planId') || null;
+    const taskId = urlParams.get('taskId') || null;
     
-    // 保存来源信息到组件数据中
+    // 保存来源信息到组件数据中（空字符串转换为 null）
     this.fromPlan = fromPlan;
-    this.planId = planId || null;
-    this.taskId = taskId || null;
+    this.planId = (planId && planId.trim() !== '') ? planId : null;
+    this.taskId = (taskId && taskId.trim() !== '') ? taskId : null;
     this.fromTaskView = fromTaskView;
+    
+    // 调试日志
+    console.log('🔍 [GESPEaxmView] URL参数检查:', {
+      from: urlParams.get('from'),
+      fromPlan,
+      fromTaskView,
+      planId: this.planId,
+      taskId: this.taskId,
+      fullUrl: window.location.href
+    });
     
     this.loadExamData();
     
@@ -782,9 +797,23 @@ export default defineComponent({
         
         // 判断是否使用任务内提交接口
         let submitUrl = `${this.BASE_URL}/submit-exam`;
-        if (this.fromTaskView && this.taskId) {
+        // 检查是否是任务内提交：fromTaskView 且 taskId 存在且不为空
+        const isTaskSubmission = this.fromTaskView && this.taskId && this.taskId.trim() !== '';
+        
+        if (isTaskSubmission) {
           submitUrl = `${this.BASE_URL}/learning-tasks/${this.taskId}/submit-exam`;
-          console.log('使用任务内提交接口:', submitUrl);
+          console.log('✅ [GESPEaxmView] 使用任务内提交接口:', submitUrl, {
+            fromTaskView: this.fromTaskView,
+            taskId: this.taskId,
+            planId: this.planId
+          });
+        } else {
+          console.log('⚠️ [GESPEaxmView] 使用普通提交接口', {
+            fromTaskView: this.fromTaskView,
+            taskId: this.taskId,
+            planId: this.planId,
+            reason: !this.fromTaskView ? '不是从任务页面进入' : !this.taskId ? '缺少taskId参数' : 'taskId为空'
+          });
         }
         
         const response = await fetch(submitUrl, {
@@ -904,16 +933,25 @@ export default defineComponent({
     // 返回对应等级的考试列表
     goBackToLevelExams() {
       this.showSubmitResult = false;
-          // 新增逻辑：
+      // 新增逻辑：
       const urlParams = new URLSearchParams(window.location.search);
       const from = urlParams.get('from');
-      const planId = urlParams.get('planId');
-      const taskId = urlParams.get('taskId');
-      if (from === 'taskview' && planId && taskId) {
+      const planId = urlParams.get('planId') || null;
+      const taskId = urlParams.get('taskId') || null;
+      
+      // 检查是否有有效的任务参数（不为空字符串）
+      const hasValidTaskParams = from === 'taskview' && 
+                                  planId && planId.trim() !== '' && 
+                                  taskId && taskId.trim() !== '';
+      
+      if (hasValidTaskParams) {
+        console.log('✅ [GESPEaxmView] 从任务页面进入，返回到任务页面', { planId, taskId });
         this.router.push(`/plan/${planId}/tasks/${taskId}?tab=exercises`);
       } else if (this.fromPlan) {
+        console.log('✅ [GESPEaxmView] 从计划页面进入，返回到计划页面');
         this.router.push('/plan');
       } else {
+        console.log('⚠️ [GESPEaxmView] 返回到级别考试列表', { from, planId, taskId });
         this.router.push(`/level-exams/${this.examInfo.level}`);
       }
     },
@@ -931,11 +969,19 @@ export default defineComponent({
       localStorage.removeItem('currentExamInfo');
       const urlParams = new URLSearchParams(window.location.search);
       const from = urlParams.get('from');
-      const planId = urlParams.get('planId');
-      const taskId = urlParams.get('taskId');
-      if (from === 'taskview' && planId && taskId) {
+      const planId = urlParams.get('planId') || null;
+      const taskId = urlParams.get('taskId') || null;
+      
+      // 检查是否有有效的任务参数（不为空字符串）
+      const hasValidTaskParams = from === 'taskview' && 
+                                  planId && planId.trim() !== '' && 
+                                  taskId && taskId.trim() !== '';
+      
+      if (hasValidTaskParams) {
+        console.log('✅ [GESPEaxmView] 从任务页面退出，返回到任务页面', { planId, taskId });
         this.router.push(`/plan/${planId}/tasks/${taskId}?tab=exercises`);
       } else if (this.fromPlan) {
+        console.log('✅ [GESPEaxmView] 从计划页面退出，返回到计划页面');
         this.router.push('/plan');
       } else {
         this.router.push(`/level-exams/${this.examInfo.level}`);
@@ -1470,6 +1516,44 @@ export default defineComponent({
   box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.3);
   backdrop-filter: blur(10px);
+}
+
+/* 提交模式状态徽章样式 */
+.submission-mode-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 18px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  box-shadow: 0 4px 12px rgba(255,255,255,0.2);
+  border: 1px solid rgba(255,255,255,0.3);
+  backdrop-filter: blur(10px);
+  position: relative;
+  z-index: 1;
+  transition: all 0.3s ease;
+}
+
+.submission-mode-badge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(255,255,255,0.3);
+}
+
+/* 自由练习徽章 - 紫色主题（更醒目） */
+.free-practice-badge {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: white;
+  border-color: rgba(139, 92, 246, 0.6);
+  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.4);
+}
+
+.free-practice-badge:hover {
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6);
+}
+
+.free-practice-badge :deep(.lucide-icon) {
+  color: white;
 }
 
 .exam-progress-section {

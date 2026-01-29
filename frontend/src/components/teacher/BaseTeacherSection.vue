@@ -24,37 +24,50 @@ defineProps<{
 
 <style scoped>
 .content-section {
-  background: #f8fafc;
-  padding: 32px 24px;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  background: linear-gradient(135deg, #87ceeb 0%, #b3d9ff 50%, #cce5ff 100%);
+  padding: 0;
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(30, 144, 255, 0.2);
   width: 100%;
   margin: 0 auto 32px auto;
-  border: 1px solid #e2e8f0;
+  border: 4px solid #87ceeb;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
 }
 
 .section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  padding: 6px 28px;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 12px;
+  background: linear-gradient(135deg, #87ceeb 0%, #b3d9ff 50%, #cce5ff 100%);
+  border-bottom: none;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  flex-shrink: 0;
+  box-shadow: none;
+  margin-bottom: 0;
 }
 
 .section-header .header-left {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 24px;
   flex-wrap: wrap;
 }
 
 .section-header h2 {
   margin: 0;
-  color: #1e293b;
-  font-size: 1.8rem;
-  font-weight: 700;
+  color: #0c4a6e;
+  font-size: 2rem;
+  font-weight: 900;
+  text-shadow: 0 2px 4px rgba(255, 255, 255, 0.5);
 }
 
 .section-header .header-right {
@@ -65,6 +78,32 @@ defineProps<{
 
 .table-container {
   width: 100%;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0;
+  min-height: 0;
+  background: transparent;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(30, 144, 255, 0.3) transparent;
+}
+
+.table-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.table-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+  background: rgba(30, 144, 255, 0.3);
+  border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(30, 144, 255, 0.5);
 }
 </style>
 

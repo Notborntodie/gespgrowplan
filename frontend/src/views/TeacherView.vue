@@ -1,69 +1,56 @@
 
 <template>
   <div class="profile-layout">
-    <!-- 侧边栏 -->
-    <aside class="sidebar">
-      <div class="sidebar-header">
-        <h2>教师管理</h2>
-      </div>
-      <nav class="sidebar-nav">
-        <button 
-          v-for="item in menuItems" 
-          :key="item.key"
-          :class="['nav-item', { active: currentActiveSection === item.key }]"
-          @click="openSection(item.key)"
-        >
-          {{ item.label }}
-        </button>
-      </nav>
-    </aside>
-    
     <!-- 主内容区域 -->
-    <main class="main-content" :class="{ 'has-tabs': openedSections.length > 0 }">
-      <!-- 次级页面标签栏 -->
-      <div v-if="openedSections.length > 0" class="tabs-header">
-        <div class="tabs-container">
-          <div 
-            v-for="section in openedSections" 
-            :key="section"
-            class="tab-item"
-            :class="{ active: currentActiveSection === section }"
-            @click="switchToSection(section)"
-          >
-            <span class="tab-label">{{ getMenuLabel(section) }}</span>
-            <button 
-              class="tab-close"
-              @click.stop="closeSection(section)"
-              title="关闭"
-            >
-              ×
-            </button>
-          </div>
-        </div>
-      </div>
-
+    <main class="main-content">
       <!-- 客观题提交 -->
-      <ObjectiveSubmissionsSection v-if="currentActiveSection === 'objective-submissions'" />
+      <div v-if="currentActiveSection === 'objective-submissions'" class="section-wrapper">
+        <ObjectiveSubmissionsSection />
+      </div>
       
       <!-- OJ提交 -->
-      <OJSubmissionsSection v-if="currentActiveSection === 'oj-submissions'" />
+      <div v-if="currentActiveSection === 'oj-submissions'" class="section-wrapper">
+        <OJSubmissionsSection />
+      </div>
       
       <!-- 学生管理 -->
-      <StudentManagementSection 
-        v-if="currentActiveSection === 'student-management'"
-        :students="students"
-        :loading="studentsLoading"
-        @bind-student="handleBindStudent"
-        @create-student="showCreateStudentDialog = true"
-        @batch-create-student="showBatchCreateDialog = true"
-        @view-student="showStudentDetail"
-      />
-      
-      <!-- 学习计划管理 -->
-      <LearningPlanManagementSection v-if="currentActiveSection === 'learning-plan-management'" />
+      <div v-if="currentActiveSection === 'student-management'" class="student-management-wrapper" :class="{ 'has-panel': selectedStudentForPlanProgress || selectedStudentForPlanManagement }">
+        <div class="student-management-main">
+          <StudentManagementSection 
+            :students="students"
+            :loading="studentsLoading"
+            :has-panel="!!(selectedStudentForPlanProgress || selectedStudentForPlanManagement)"
+            @bind-student="handleBindStudent"
+            @create-student="showCreateStudentDialog = true"
+            @batch-create-student="showBatchCreateDialog = true"
+            @view-plan-progress="showStudentPlanProgress"
+            @manage-plans="showStudentPlanManagement"
+            @unbind-student="handleUnbindStudent"
+          />
+        </div>
+        <!-- 学生计划完成面板 -->
+        <StudentPlanProgressPanel
+          v-if="selectedStudentForPlanProgress"
+          :student-id="selectedStudentForPlanProgress.id"
+          :student-info="selectedStudentForPlanProgress"
+          :teacher-id="userInfo?.id || 0"
+          @close="closeStudentPlanProgress"
+        />
+        <!-- 学生计划管理面板 -->
+        <StudentPlanManagementPanel
+          v-if="selectedStudentForPlanManagement"
+          :student-id="selectedStudentForPlanManagement.id"
+          :student-info="selectedStudentForPlanManagement"
+          :teacher-id="userInfo?.id || 0"
+          @close="closeStudentPlanManagement"
+          @plan-updated="handlePlanUpdated"
+        />
+      </div>
       
       <!-- 计划完成 -->
-      <PlanProgressSection v-if="currentActiveSection === 'plan-progress'" />
+      <div v-if="currentActiveSection === 'plan-progress'" class="section-wrapper">
+        <PlanProgressSection />
+      </div>
       
     </main>
       
@@ -230,11 +217,11 @@
             </div>
           </div>
 
-    <!-- 批量导入学生对话框 -->
+    <!-- 批量创建学生对话框 -->
     <div v-if="showBatchCreateDialog" class="dialog-overlay" @click="closeBatchCreateDialog">
       <div class="dialog dialog-large" @click.stop>
         <div class="dialog-header">
-          <h3>批量导入学生</h3>
+          <h3>批量创建学生</h3>
           <button @click="closeBatchCreateDialog" class="btn-close">&times;</button>
         </div>
         <div class="dialog-body">
@@ -569,12 +556,26 @@
         </div>
       </div>
     </div>
+    
+    <!-- 侧边栏 - 右侧 -->
+    <aside class="sidebar">
+      <nav class="sidebar-nav">
+        <button 
+          v-for="item in menuItems" 
+          :key="item.key"
+          :class="['nav-item', { active: currentActiveSection === item.key }]"
+          @click="openSection(item.key)"
+        >
+          {{ item.label }}
+        </button>
+      </nav>
+    </aside>
   </template>
   
   <script setup lang="ts">import { BASE_URL } from '@/config/api'
 import { pinyin } from 'pinyin-pro'
 
-import { ref, onMounted, watch, reactive, computed } from 'vue'
+import { ref, onMounted, onUnmounted, watch, reactive, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
   import axios from 'axios'
 import SuccessMessageDialog from '@/components/admin/Dialog/SuccessMessageDialog.vue'
@@ -582,8 +583,9 @@ import ConfirmDialog from '@/components/admin/Dialog/ConfirmDialog.vue'
 import ObjectiveSubmissionsSection from '@/components/teacher/ObjectiveSubmissionsSection.vue'
 import OJSubmissionsSection from '@/components/teacher/OJSubmissionsSection.vue'
 import StudentManagementSection from '@/components/teacher/StudentManagementSection.vue'
-import LearningPlanManagementSection from '@/components/teacher/LearningPlanManagementSection.vue'
 import PlanProgressSection from '@/components/teacher/PlanProgressSection.vue'
+import StudentPlanProgressPanel from '@/components/teacher/StudentPlanProgressPanel.vue'
+import StudentPlanManagementPanel from '@/components/teacher/StudentPlanManagementPanel.vue'
 import Icon from '@/components/Icon.vue'
   
   // 路由
@@ -621,8 +623,13 @@ import Icon from '@/components/Icon.vue'
   const showStudentDetailDialog = ref(false)
   const selectedStudent = ref<any>(null)
   
-  // 管理打开的页面（标签栏功能）
-  const openedSections = ref<string[]>([])
+  // 学生计划完成面板
+  const selectedStudentForPlanProgress = ref<any>(null)
+  
+  // 学生计划管理面板
+  const selectedStudentForPlanManagement = ref<any>(null)
+  
+  // 当前激活的页面
   const currentActiveSection = ref<string>('')
   
   // 学生提交相关数据
@@ -667,20 +674,14 @@ import Icon from '@/components/Icon.vue'
   
   // 侧边栏菜单项
   const menuItems = [
+    { key: 'student-management', label: '学生管理' },
     { key: 'objective-submissions', label: '客观题提交' },
     { key: 'oj-submissions', label: 'OJ提交' },
-    { key: 'student-management', label: '学生管理' },
-    { key: 'learning-plan-management', label: '学习计划管理' },
     { key: 'plan-progress', label: '计划完成' }
   ]
 
   // 从侧边栏打开页面
   function openSection(sectionKey: string) {
-    // 如果页面还没有打开，添加到打开列表
-    if (!openedSections.value.includes(sectionKey)) {
-      openedSections.value.push(sectionKey)
-    }
-    
     // 切换到该页面
     currentActiveSection.value = sectionKey
     
@@ -692,41 +693,6 @@ import Icon from '@/components/Icon.vue'
       fetchStudents()
     }
     // 注意：objective-submissions 和 oj-submissions 的数据加载已移到各自的组件中
-  }
-
-  // 从标签栏切换页面
-  function switchToSection(sectionKey: string) {
-    currentActiveSection.value = sectionKey
-    // 保存状态
-    saveCurrentState()
-  }
-
-  // 关闭页面
-  function closeSection(sectionKey: string) {
-    const index = openedSections.value.indexOf(sectionKey)
-    if (index > -1) {
-      openedSections.value.splice(index, 1)
-      
-      // 如果关闭的是当前活跃的页面，需要切换到其他页面
-      if (currentActiveSection.value === sectionKey) {
-        if (openedSections.value.length > 0) {
-          // 如果还有其他打开的页面，切换到最后一个
-          currentActiveSection.value = openedSections.value[openedSections.value.length - 1]
-        } else {
-          // 如果没有其他页面了，清空当前活跃页面
-          currentActiveSection.value = ''
-        }
-      }
-      
-      // 保存状态
-      saveCurrentState()
-    }
-  }
-
-  // 根据key获取菜单项的标签
-  function getMenuLabel(key: string): string {
-    const menuItem = menuItems.find(item => item.key === key)
-    return menuItem ? menuItem.label : key
   }
   
   // 过滤后的可绑定学生列表
@@ -814,7 +780,56 @@ import Icon from '@/components/Icon.vue'
     confirmAction.value = null
   }
   
-  // 显示学生详情
+  // 显示学生计划完成面板
+  const showStudentPlanProgress = (student: any) => {
+    // 如果已经打开了计划管理面板，先关闭它
+    if (selectedStudentForPlanManagement.value) {
+      selectedStudentForPlanManagement.value = null
+    }
+    selectedStudentForPlanProgress.value = student
+  }
+  
+  // 关闭学生计划完成面板
+  const closeStudentPlanProgress = () => {
+    selectedStudentForPlanProgress.value = null
+  }
+  
+  // 显示学生计划管理面板
+  const showStudentPlanManagement = (student: any) => {
+    // 如果已经打开了计划完成面板，先关闭它
+    if (selectedStudentForPlanProgress.value) {
+      selectedStudentForPlanProgress.value = null
+    }
+    selectedStudentForPlanManagement.value = student
+  }
+  
+  // 关闭学生计划管理面板
+  const closeStudentPlanManagement = () => {
+    selectedStudentForPlanManagement.value = null
+  }
+  
+  // 处理计划更新
+  const handlePlanUpdated = () => {
+    // 可以在这里刷新学生列表或其他相关数据
+    if (currentActiveSection.value === 'student-management' && userInfo.value) {
+      fetchStudents()
+    }
+  }
+  
+  // 处理解除绑定学生
+  const handleUnbindStudent = (student: any) => {
+    if (!userInfo.value) return
+    
+    showConfirm(
+      '解除绑定',
+      `确定要解除与学生 "${student.real_name || student.username}" 的绑定关系吗？`,
+      () => {
+        performUnbindStudent(student.id)
+      }
+    )
+  }
+  
+  // 显示学生详情（保留原有功能，用于其他场景）
   const showStudentDetail = (student: any) => {
     selectedStudent.value = student
     showStudentDetailDialog.value = true
@@ -1448,15 +1463,12 @@ import Icon from '@/components/Icon.vue'
     if (currentActiveSection.value) {
       localStorage.setItem('teacherView_activeSection', currentActiveSection.value)
     }
-    if (openedSections.value.length > 0) {
-      localStorage.setItem('teacherView_openedSections', JSON.stringify(openedSections.value))
-    }
   }
   
   // 恢复状态
   function restoreState() {
     // 如果已经有打开的页面，不重复恢复
-    if (openedSections.value.length > 0 && currentActiveSection.value) {
+    if (currentActiveSection.value) {
       console.log('已有打开的页面，跳过状态恢复')
       return
     }
@@ -1465,42 +1477,19 @@ import Icon from '@/components/Icon.vue'
     const fromSection = route.query.fromSection as string
     if (fromSection) {
       console.log('从路由查询参数恢复状态:', fromSection)
-      // 先恢复打开的页面列表
-      const savedOpenedSections = localStorage.getItem('teacherView_openedSections')
-      if (savedOpenedSections) {
-        try {
-          const parsed = JSON.parse(savedOpenedSections)
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            openedSections.value = parsed
-          }
-        } catch (e) {
-          console.error('解析保存的打开页面列表失败:', e)
-        }
-      }
       openSection(fromSection)
       return
     }
     
     // 从 localStorage 恢复
     const savedSection = localStorage.getItem('teacherView_activeSection')
-    const savedOpenedSections = localStorage.getItem('teacherView_openedSections')
     
     if (savedSection) {
       console.log('从 localStorage 恢复状态:', savedSection)
-      if (savedOpenedSections) {
-        try {
-          const parsed = JSON.parse(savedOpenedSections)
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            openedSections.value = parsed
-          }
-        } catch (e) {
-          console.error('解析保存的打开页面列表失败:', e)
-        }
-      }
       openSection(savedSection)
     } else {
-      // 默认打开客观题提交页面
-      openSection('objective-submissions')
+      // 默认打开学生管理页面
+      openSection('student-management')
     }
   }
   
@@ -1595,11 +1584,20 @@ import Icon from '@/components/Icon.vue'
     if (userInfo.value) {
       restoreState()
     }
+    // 禁用整体页面滚动
+    document.body.style.overflow = 'hidden'
+    document.documentElement.style.overflow = 'hidden'
+  })
+  
+  // 组件卸载时恢复页面滚动
+  onUnmounted(() => {
+    document.body.style.overflow = ''
+    document.documentElement.style.overflow = ''
   })
   
   // 监听用户信息变化，当用户信息加载完成后恢复状态
   watch(userInfo, (newUserInfo) => {
-    if (newUserInfo && openedSections.value.length === 0) {
+    if (newUserInfo && !currentActiveSection.value) {
       restoreState()
     }
   })
@@ -1607,7 +1605,7 @@ import Icon from '@/components/Icon.vue'
   // 监听路由变化，当从子页面返回时恢复状态
   watch(() => route.path, (newPath) => {
     // 如果返回到 /teacher 页面，且当前没有打开的子页面，则恢复状态
-    if (newPath === '/teacher' && openedSections.value.length === 0 && userInfo.value) {
+    if (newPath === '/teacher' && !currentActiveSection.value && userInfo.value) {
       restoreState()
     }
   })
@@ -1654,215 +1652,246 @@ import Icon from '@/components/Icon.vue'
     --transition-normal: 250ms ease;
   }
 
-  /* 统一背景为渐变，与AdminView一致 */
+  /* 统一背景为渐变，与PlanView一致 */
   .profile-layout {
     display: flex;
-    min-height: 100vh;
+    flex-direction: row;
+    height: 100vh;
     width: 100vw;
-    background: linear-gradient(135deg, var(--primary-light, #87ceeb) 0%, var(--bg-secondary, #f8fafc) 100%);
+    overflow: hidden;
+    background: linear-gradient(135deg, #87ceeb 0%, #f8fafc 100%);
     box-sizing: border-box;
+    font-family: 'HarmonyOS Sans', 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif;
   }
 
-  /* 侧边栏样式 - 与AdminView保持一致 */
+  /* 侧边栏样式 - 右侧纵向布局 */
   .sidebar {
-    width: 200px;
-    background: linear-gradient(180deg, rgba(30, 144, 255, 0.08) 0%, rgba(135, 206, 235, 0.05) 100%);
+    width: 160px;
+    height: calc(100% - 48px);
+    background: linear-gradient(135deg, #1e90ff 0%, #38bdf8 100%);
     backdrop-filter: blur(10px);
-    color: #374151;
-    padding: 24px 0;
+    color: white;
+    padding: 0;
     position: fixed;
-    left: 0;
-    top: 48px; /* NavBar 的高度 */
-    height: calc(100vh - 48px);
-    overflow-y: auto;
+    top: 48px;
+    right: 0;
+    bottom: 0;
     z-index: 10;
-    box-shadow: 0 0 20px rgba(30, 144, 255, 0.1);
-    border-right: 1px solid rgba(30, 144, 255, 0.1);
+    box-shadow: -12px 0 40px rgba(30, 144, 255, 0.4);
+    border-left: 6px solid #0c7cd5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 0;
   }
 
   .sidebar-header {
-    padding: 0 24px 24px;
-    border-bottom: 1px solid rgba(30, 144, 255, 0.1);
-    margin-bottom: 16px;
+    padding: 0;
+    margin: 0;
+    border: none;
+    display: flex;
+    align-items: center;
   }
 
   .sidebar-header h2 {
     margin: 0;
-    color: #1e293b;
-    font-size: 20px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
+    color: white;
+    font-size: 16px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   }
 
   .sidebar-nav {
-    padding: 8px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    justify-content: flex-start;
+    padding: 0;
+    width: 100%;
   }
 
   .nav-item {
-    width: 100%;
-    padding: 12px 24px;
-    background: transparent;
-    border: none;
-    color: #475569;
-    text-align: left;
+    padding: 16px 20px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    text-align: center;
     cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 16px;
-    font-weight: 500;
-    letter-spacing: 0.3px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
     position: relative;
-    margin: 4px 0;
+    margin: 0;
+    border-radius: 12px;
+    white-space: nowrap;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .nav-item:hover {
-    background: rgba(30, 144, 255, 0.12);
-    color: #1e293b;
-    transform: translateX(4px);
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateX(-2px) scale(1.05);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    border-width: 4px;
   }
 
   .nav-item.active {
-    background: linear-gradient(90deg, rgba(30, 144, 255, 0.2) 0%, rgba(135, 206, 235, 0.15) 100%);
+    background: rgba(255, 255, 255, 0.95);
     color: #1e90ff;
-    font-weight: 600;
-    box-shadow: 0 2px 8px rgba(30, 144, 255, 0.2);
+    font-weight: 900;
+    box-shadow: 0 8px 24px rgba(255, 255, 255, 0.4);
+    border-color: white;
+    border-width: 4px;
+    transform: translateX(-2px) scale(1.05);
   }
 
   .nav-item.active::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 3px;
-    background: linear-gradient(180deg, #1e90ff 0%, #87ceeb 100%);
-    border-radius: 0 2px 2px 0;
+    display: none;
   }
 
   .main-content {
     flex: 1;
-    margin-left: 200px;
-    padding: 40px 3vw 0 3vw;
+    margin-left: 0;
+    margin-right: 160px; /* 为右侧侧边栏留出空间 */
+    padding: 0;
     background: transparent;
-    min-height: 100vh;
+    min-height: 0;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* 通用章节包装器 - 支持滚动 */
+  .section-wrapper {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 40px 3vw;
+    box-sizing: border-box;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(30, 144, 255, 0.3) transparent;
+  }
+
+  .section-wrapper::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .section-wrapper::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .section-wrapper::-webkit-scrollbar-thumb {
+    background: rgba(30, 144, 255, 0.3);
+    border-radius: 4px;
+  }
+
+  .section-wrapper::-webkit-scrollbar-thumb:hover {
+    background: rgba(30, 144, 255, 0.5);
+  }
+
+  /* 学生管理包装器 - 支持展开面板 */
+  .student-management-wrapper {
+    display: flex;
+    gap: 0;
+    width: 100%;
+    flex: 1;
+    min-height: 0;
+    transition: all 0.3s ease;
+    overflow: hidden;
+  }
+
+  .student-management-wrapper.has-panel {
+    gap: 0;
+  }
+
+  .student-management-main {
+    flex: 1;
+    transition: all 0.3s ease;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    padding: 20px 3vw;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
   }
 
-  /* 标签栏样式 */
-  .tabs-header {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border-bottom: none;
-    padding: 0 24px;
-    position: fixed;
-    top: 48px; /* NavBar 的高度 */
-    left: 200px; /* 侧边栏的宽度 */
-    right: 0;
-    z-index: 30;
-    box-shadow: none;
-  }
-
-  .tabs-container {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    overflow-x: auto;
-    padding: 4px 0;
-  }
-
-  .tab-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 16px;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px 8px 0 0;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    white-space: nowrap;
-    font-size: 14px;
-    font-weight: 500;
-    color: #64748b;
-    min-width: fit-content;
-    position: relative;
-  }
-
-  .tab-item:hover {
-    background: #f1f5f9;
-    border-color: #cbd5e1;
-    color: #475569;
-  }
-
-  .tab-item.active {
-    background: linear-gradient(135deg, rgba(30, 144, 255, 0.1) 0%, rgba(135, 206, 235, 0.05) 100%);
-    border-color: #1e90ff;
-    color: #1e90ff;
-    font-weight: 600;
-    box-shadow: 0 2px 8px rgba(30, 144, 255, 0.15);
-  }
-
-  .tab-item.active::after {
-    content: '';
-    position: absolute;
-    bottom: -1px;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, #1e90ff 0%, #38bdf8 100%);
-    border-radius: 2px 2px 0 0;
-  }
-
-  .tab-label {
+  /* 学生管理区域内的 content-section 移除底部 margin，并填充空间 */
+  .student-management-main .content-section {
+    margin-bottom: 0;
     flex: 1;
-  }
-
-  .tab-close {
-    background: none;
-    border: none;
-    color: #9ca3af;
-    cursor: pointer;
-    padding: 0;
-    border-radius: 4px;
-    transition: all 0.2s ease;
-    font-size: 16px;
-    font-weight: 400;
-    line-height: 1;
-    width: 18px;
-    height: 18px;
+    min-height: 0;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: Arial, sans-serif;
+    flex-direction: column;
   }
 
-  .tab-close:hover {
-    background: rgba(239, 68, 68, 0.1);
-    color: #ef4444;
+  .student-management-main::-webkit-scrollbar {
+    width: 8px;
   }
 
-  .tab-item.active .tab-close {
-    color: #64748b;
+  .student-management-main::-webkit-scrollbar-track {
+    background: transparent;
   }
 
-  .tab-item.active .tab-close:hover {
-    background: rgba(239, 68, 68, 0.1);
-    color: #ef4444;
+  .student-management-main::-webkit-scrollbar-thumb {
+    background: rgba(30, 144, 255, 0.3);
+    border-radius: 4px;
   }
 
-  /* 标签栏不影响内容布局，内容正常平铺显示 */
-  /* 标签栏是固定定位，覆盖在内容上方，但不影响内容流 */
+  .student-management-main::-webkit-scrollbar-thumb:hover {
+    background: rgba(30, 144, 255, 0.5);
+  }
+
+  .student-management-wrapper.has-panel .student-management-main {
+    flex: 0 0 50%;
+    max-width: 50%;
+  }
+  
+  /* 确保两个面板可以同时存在时，主内容区域进一步缩小 */
+  .student-management-wrapper.has-panel:has(.student-plan-progress-panel):has(.student-plan-management-panel) .student-management-main {
+    flex: 0 0 33.33%;
+    max-width: 33.33%;
+  }
+
 
   .content-section {
-    background: #f8fafc;
+    background: linear-gradient(135deg, #ffffff 0%, #e0f2fe 100%);
     padding: 32px 24px;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    border-radius: 24px;
+    box-shadow: 0 12px 40px rgba(30, 144, 255, 0.3);
     width: 100%;
     margin: 0 auto 32px auto;
-    border: 1px solid #e2e8f0;
+    border: 6px solid #1e90ff;
     box-sizing: border-box;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .content-section:hover {
+    box-shadow: 0 16px 48px rgba(30, 144, 255, 0.4);
+    transform: translateY(-2px);
+  }
+
+  /* 学生管理区域内的 content-section 移除底部 margin */
+  .student-management-main .content-section {
+    margin-bottom: 0;
+  }
+
+  /* section-wrapper 内的 content-section 保持正常 margin */
+  .section-wrapper .content-section {
+    margin-bottom: 32px;
   }
 
   .content-section.learning-plan-section {
@@ -1872,7 +1901,7 @@ import Icon from '@/components/Icon.vue'
     box-shadow: none;
   }
 
-  /* 表格列表样式 - 参考 StudentSubmissionsView */
+  /* 表格列表样式 - 参考 PlanView */
   .section-header {
     display: flex;
     justify-content: space-between;
@@ -1880,6 +1909,12 @@ import Icon from '@/components/Icon.vue'
     margin-bottom: 24px;
     flex-wrap: wrap;
     gap: 16px;
+    padding: 24px 32px;
+    background: linear-gradient(135deg, #1e90ff 0%, #38bdf8 100%);
+    border-radius: 20px 20px 0 0;
+    border-bottom: 4px solid #0c7cd5;
+    margin: -32px -24px 24px -24px;
+    position: relative;
   }
 
   .section-header .header-left {
@@ -1891,9 +1926,11 @@ import Icon from '@/components/Icon.vue'
 
   .section-header h2 {
     margin: 0;
-    color: #1e293b;
+    color: white;
     font-size: 1.8rem;
-    font-weight: 700;
+    font-weight: 900;
+    text-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+    letter-spacing: 1px;
   }
 
   .section-header .header-right {
@@ -1903,9 +1940,10 @@ import Icon from '@/components/Icon.vue'
   }
 
   .count-info {
-    color: #64748b;
+    color: rgba(255, 255, 255, 0.9);
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 600;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   }
 
   .table-container {
@@ -1966,10 +2004,11 @@ import Icon from '@/components/Icon.vue'
   /* 表格容器 */
   .data-table-container {
     background: white;
-    border-radius: 12px;
-    border: 1.5px solid #e2e8f0;
+    border-radius: 20px;
+    border: 5px solid #1e90ff;
     overflow: hidden;
     width: 100%;
+    box-shadow: 0 8px 24px rgba(30, 144, 255, 0.2);
   }
 
   .data-table {
@@ -2177,11 +2216,11 @@ import Icon from '@/components/Icon.vue'
 
   @media (max-width: 768px) {
     .sidebar {
-      width: 200px;
+      width: 320px;
     }
     
     .main-content {
-      margin-left: 200px;
+      margin-right: 320px;
       padding: 20px;
     }
   }
@@ -2216,18 +2255,21 @@ import Icon from '@/components/Icon.vue'
   }
 
   .search-input {
-    padding: 12px 16px 12px 40px;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
+    padding: 14px 20px 14px 44px;
+    border: 3px solid #e2e8f0;
+    border-radius: 16px;
     font-size: 14px;
     width: 300px;
     transition: all 0.3s ease;
+    font-weight: 500;
+    background: white;
   }
 
   .search-input:focus {
     outline: none;
     border-color: #1e90ff;
-    box-shadow: 0 0 0 3px rgba(30, 144, 255, 0.1);
+    border-width: 4px;
+    box-shadow: 0 0 0 4px rgba(30, 144, 255, 0.15);
   }
 
   .search-icon {
@@ -2244,22 +2286,27 @@ import Icon from '@/components/Icon.vue'
   }
 
   .btn-primary {
-    background: linear-gradient(135deg, #1e90ff 0%, #87ceeb 100%);
+    background: linear-gradient(135deg, #1e90ff 0%, #38bdf8 100%);
     color: white;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-weight: 600;
+    border: 5px solid #0c7cd5;
+    padding: 14px 24px;
+    border-radius: 16px;
+    font-weight: 900;
     cursor: pointer;
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
     gap: 8px;
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 16px rgba(30, 144, 255, 0.3);
   }
 
-  .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(30, 144, 255, 0.3);
+  .btn-primary:hover:not(:disabled) {
+    background: linear-gradient(135deg, #0c7cd5 0%, #1e90ff 100%);
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 20px rgba(30, 144, 255, 0.4);
+    border-width: 6px;
   }
 
   .btn-primary:disabled {
@@ -2269,24 +2316,28 @@ import Icon from '@/components/Icon.vue'
   }
 
   .btn-secondary {
-    background: #f8fafc;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
     color: #64748b;
-    border: 1px solid #e2e8f0;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-weight: 600;
+    border: 3px solid #e2e8f0;
+    padding: 14px 24px;
+    border-radius: 16px;
+    font-weight: 700;
     cursor: pointer;
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
     gap: 8px;
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
 
   .btn-secondary:hover {
-    background: #e2e8f0;
+    background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
     color: #475569;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(100, 116, 139, 0.2);
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 4px 12px rgba(100, 116, 139, 0.3);
+    border-width: 4px;
   }
 
   .btn-icon {
@@ -2321,17 +2372,19 @@ import Icon from '@/components/Icon.vue'
   }
 
   .student-card {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
+    background: linear-gradient(135deg, #ffffff 0%, #e0f2fe 100%);
+    border: 5px solid #1e90ff;
+    border-radius: 20px;
     overflow: hidden;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 24px rgba(30, 144, 255, 0.2);
     transition: all 0.3s ease;
   }
 
   .student-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 0 16px 40px rgba(30, 144, 255, 0.4);
+    border-color: #0c7cd5;
+    border-width: 6px;
   }
 
   .student-card-header {
@@ -2339,8 +2392,8 @@ import Icon from '@/components/Icon.vue'
     justify-content: space-between;
     align-items: center;
     padding: 20px;
-    background: linear-gradient(135deg, rgba(30, 144, 255, 0.05) 0%, rgba(135, 206, 235, 0.02) 100%);
-    border-bottom: 1px solid #e2e8f0;
+    background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+    border-bottom: 3px solid #1e90ff;
   }
 
   .student-info {
@@ -2353,13 +2406,15 @@ import Icon from '@/components/Icon.vue'
     width: 48px;
     height: 48px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #1e90ff 0%, #87ceeb 100%);
+    background: linear-gradient(135deg, #1e90ff 0%, #38bdf8 100%);
     color: white;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 600;
+    font-weight: 900;
     font-size: 18px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 12px rgba(30, 144, 255, 0.3);
   }
 
   .student-details h3 {
@@ -2412,21 +2467,34 @@ import Icon from '@/components/Icon.vue'
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.6);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 1000;
+    backdrop-filter: blur(4px);
   }
 
   .dialog {
     background: white;
-    border-radius: 12px;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     max-width: 500px;
     width: 90%;
     max-height: 90vh;
     overflow-y: auto;
+    animation: modalSlideIn 0.3s ease;
+  }
+
+  @keyframes modalSlideIn {
+    from {
+      opacity: 0;
+      transform: translateY(30px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
   }
 
   .dialog-large {
@@ -2437,36 +2505,42 @@ import Icon from '@/components/Icon.vue'
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 24px;
-    border-bottom: 1px solid #e2e8f0;
+    padding: 24px 28px;
+    border-bottom: 2px solid #e0f2fe;
+    background: linear-gradient(135deg, #1e90ff 0%, #38bdf8 100%);
+    border-radius: 20px 20px 0 0;
   }
 
   .dialog-header h3 {
     margin: 0;
-    color: #1e293b;
-    font-size: 18px;
-    font-weight: 600;
+    color: white;
+    font-size: 1.8rem;
+    font-weight: 900;
+    text-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+    letter-spacing: 1px;
   }
 
   .btn-close {
-    background: none;
-    border: none;
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
     font-size: 24px;
-    color: #64748b;
+    color: white;
     cursor: pointer;
     padding: 0;
-    width: 32px;
-    height: 32px;
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 6px;
+    border-radius: 12px;
     transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
   }
 
   .btn-close:hover {
-    background: #f1f5f9;
-    color: #475569;
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.05);
+    border-width: 3px;
   }
 
   .dialog-body {
@@ -2499,18 +2573,21 @@ import Icon from '@/components/Icon.vue'
 
   .form-group input,
   .form-group select {
-    padding: 12px;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
+    padding: 14px 16px;
+    border: 3px solid #e2e8f0;
+    border-radius: 12px;
     font-size: 14px;
     transition: all 0.3s ease;
+    font-weight: 500;
+    background: white;
   }
 
   .form-group input:focus,
   .form-group select:focus {
     outline: none;
     border-color: #1e90ff;
-    box-shadow: 0 0 0 3px rgba(30, 144, 255, 0.1);
+    border-width: 4px;
+    box-shadow: 0 0 0 4px rgba(30, 144, 255, 0.15);
   }
 
   .dialog-actions {
@@ -2621,11 +2698,12 @@ import Icon from '@/components/Icon.vue'
   .student-detail-header {
     display: flex;
     align-items: center;
-      gap: 20px;
-      padding: 20px;
-    background: linear-gradient(135deg, rgba(30, 144, 255, 0.05) 0%, rgba(135, 206, 235, 0.02) 100%);
-    border-radius: 12px;
-    border: 1px solid #e2e8f0;
+    gap: 20px;
+    padding: 24px;
+    background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+    border-radius: 20px;
+    border: 5px solid #1e90ff;
+    box-shadow: 0 4px 16px rgba(30, 144, 255, 0.2);
   }
 
   .student-avatar-large {
@@ -2665,30 +2743,34 @@ import Icon from '@/components/Icon.vue'
     display: flex;
     align-items: center;
     gap: 16px;
-    padding: 20px;
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    padding: 24px;
+    background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+    border: 3px solid #bae6fd;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(30, 144, 255, 0.15);
     transition: all 0.3s ease;
   }
 
   .stat-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 8px 20px rgba(30, 144, 255, 0.25);
+    border-color: #1e90ff;
+    border-width: 4px;
   }
 
   .stat-icon {
-    font-size: 24px;
-    width: 48px;
-    height: 48px;
+    font-size: 32px;
+    width: 56px;
+    height: 56px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #0ea5e9;
+    color: #1e90ff;
     flex-shrink: 0;
-    background: linear-gradient(135deg, rgba(30, 144, 255, 0.1) 0%, rgba(135, 206, 235, 0.05) 100%);
-    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(30, 144, 255, 0.15) 0%, rgba(56, 189, 248, 0.1) 100%);
+    border-radius: 16px;
+    border: 2px solid rgba(30, 144, 255, 0.2);
+    box-shadow: 0 2px 8px rgba(30, 144, 255, 0.15);
   }
 
   .stat-content {
@@ -2696,10 +2778,11 @@ import Icon from '@/components/Icon.vue'
   }
 
   .stat-number {
-    font-size: 24px;
-    font-weight: 700;
+    font-size: 28px;
+    font-weight: 900;
     color: #1e90ff;
     margin-bottom: 4px;
+    text-shadow: 0 2px 4px rgba(30, 144, 255, 0.2);
   }
 
   .stat-label {
@@ -2717,43 +2800,51 @@ import Icon from '@/components/Icon.vue'
   }
 
   .btn-warning {
-    background: #f59e0b;
+    background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
     color: white;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-weight: 600;
+    border: 5px solid #d97706;
+    padding: 14px 24px;
+    border-radius: 16px;
+    font-weight: 900;
     cursor: pointer;
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
     gap: 8px;
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3);
   }
 
   .btn-warning:hover {
-    background: #d97706;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+    background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+    border-width: 6px;
   }
 
   .btn-danger {
-    background: #ef4444;
+    background: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
     color: white;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-weight: 600;
+    border: 5px solid #dc2626;
+    padding: 14px 24px;
+    border-radius: 16px;
+    font-weight: 900;
     cursor: pointer;
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
     gap: 8px;
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3);
   }
 
   .btn-danger:hover {
-    background: #dc2626;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+    border-width: 6px;
   }
 
   .icon-arrow {
@@ -2947,18 +3038,20 @@ import Icon from '@/components/Icon.vue'
   }
 
   .exam-card {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
+    background: linear-gradient(135deg, #ffffff 0%, #e0f2fe 100%);
+    border: 5px solid #1e90ff;
+    border-radius: 20px;
     overflow: hidden;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 24px rgba(30, 144, 255, 0.2);
     transition: all 0.3s ease;
     cursor: pointer;
   }
 
   .exam-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 0 16px 40px rgba(30, 144, 255, 0.4);
+    border-color: #0c7cd5;
+    border-width: 6px;
   }
 
   .exam-card-header {
@@ -2966,8 +3059,8 @@ import Icon from '@/components/Icon.vue'
     justify-content: space-between;
     align-items: center;
     padding: 20px;
-    background: linear-gradient(135deg, rgba(30, 144, 255, 0.05) 0%, rgba(135, 206, 235, 0.02) 100%);
-    border-bottom: 1px solid #e2e8f0;
+    background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+    border-bottom: 3px solid #1e90ff;
   }
 
   .exam-info h3 {
@@ -3503,7 +3596,7 @@ import Icon from '@/components/Icon.vue'
     color: #0c4a6e;
   }
 
-  /* 批量导入学生样式 */
+  /* 批量创建学生样式 */
   .batch-info {
     background: #f0f9ff;
     border: 1px solid #bae6fd;

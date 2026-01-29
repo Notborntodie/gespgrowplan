@@ -19,15 +19,29 @@
         </div>
         <!-- 普通页面显示横向菜单 -->
         <nav v-else class="main-nav">
-          <button 
+          <div 
             v-for="item in visibleMenuItems" 
             :key="item.key"
-            @click="handleMainMenuClick(item)"
-            :class="['nav-menu-item', { active: activeMainMenu === item.key }]"
+            class="nav-menu-item-wrapper"
           >
-            {{ item.label }}
-            <Icon v-if="(item as any).comingSoon" name="rocket" :size="14" class="coming-soon-icon" />
-          </button>
+            <button 
+              @click="handleMainMenuClick(item)"
+              :class="['nav-menu-item', { active: activeMainMenu === item.key }]"
+            >
+              {{ item.label }}
+              <Icon v-if="(item as any).comingSoon" name="rocket" :size="14" class="coming-soon-icon" />
+            </button>
+            <!-- GESP编程旁边的动画演示按钮 -->
+            <button 
+              v-if="item.key === 'smartoj'"
+              @click.stop="goToAnimationDemo"
+              :class="['animation-demo-btn', { active: isAnimationDemoPage }]"
+              title="动画演示"
+            >
+              <Icon name="play-circle" :size="16" />
+              <span class="animation-demo-text">动画演示</span>
+            </button>
+          </div>
         </nav>
       </div>
       
@@ -89,6 +103,7 @@
         </div>
       </div>
     </transition>
+    
   </div>
 </template>
 
@@ -199,14 +214,17 @@ const handleGespLevelChanged = (event: CustomEvent) => {
 // 检查是否为考试页面或OJ页面
 const checkExamPage = () => {
   const currentPath = route.path
-  isExamPage.value = currentPath.includes('/exam/')
-  // 检测OJ做题页：路径以/smartoj/开头且不是/smartoj本身（题目列表页）
-  isOJPage.value = currentPath.startsWith('/smartoj/') && currentPath !== '/smartoj'
+  // 检测考试页面：包括 /exam/ 和 /plan-exam/
+  isExamPage.value = currentPath.includes('/exam/') || currentPath.includes('/plan-exam/')
+  // 检测OJ做题页：路径以/smartoj/或/plan-smartoj/开头且不是列表页
+  isOJPage.value = (currentPath.startsWith('/smartoj/') && currentPath !== '/smartoj') ||
+                    (currentPath.startsWith('/plan-smartoj/') && currentPath !== '/plan-smartoj')
   
   console.log('NavBar检测路径:', currentPath, '| isExamPage:', isExamPage.value, '| isOJPage:', isOJPage.value)
   console.log('路径检查详情:', {
     currentPath,
     startsWithSmartoj: currentPath.startsWith('/smartoj/'),
+    startsWithPlanSmartoj: currentPath.startsWith('/plan-smartoj/'),
     notEqualSmartoj: currentPath !== '/smartoj',
     isOJPageResult: isOJPage.value
   })
@@ -256,7 +274,11 @@ const exitOJ = () => {
   console.log('当前路径:', currentPath, '问题ID:', problemId)
   console.log('来源信息:', { from, planId, taskId })
   
-  if (from === 'taskview' && planId && taskId) {
+  // 如果是任务内OJ页面（/plan-smartoj/），触发退出确认弹窗
+  if (currentPath.includes('/plan-smartoj/')) {
+    // 触发 PlanSmartOJView 中的退出确认弹窗
+    window.dispatchEvent(new CustomEvent('exitOJRequest'))
+  } else if (from === 'taskview' && planId && taskId) {
     router.push(`/plan/${planId}/tasks/${taskId}?tab=programming`);
   } else if (from) {
     router.push('/plan');
@@ -268,7 +290,7 @@ const exitOJ = () => {
 // 退出考试页面
 const exitExam = () => {
   console.log('退出考试按钮被点击')
-  // 触发 GESPEaxmView 中的退出确认弹窗
+  // 触发考试页面中的退出确认弹窗（包括 GESPEaxmView 和 PlanExamView）
   // 通过 window 事件来触发
   window.dispatchEvent(new CustomEvent('exitExamRequest'))
 }
@@ -283,12 +305,20 @@ const logout = () => {
   router.push('/login')
 }
 
+// 检查是否为动画演示页面
+const isAnimationDemoPage = computed(() => {
+  return route.path === '/animation-demo'
+})
+
 // 检查当前是否在管理页面并设置活动菜单
 const checkAdminView = () => {
   isAdminView.value = route.path === '/select'
   
   // 根据当前路由设置活动菜单
-  if (route.path === '/') {
+  // 注意：动画演示页面不激活任何主菜单项
+  if (route.path === '/animation-demo') {
+    activeMainMenu.value = ''
+  } else if (route.path === '/') {
     activeMainMenu.value = 'home'
   } else if (route.path === '/plan') {
     activeMainMenu.value = 'plan'
@@ -348,6 +378,11 @@ const goToAdmin = () => {
 const goToTeacher = () => {
   closeDropdown()
   router.push('/teacher')
+}
+
+// 跳转到动画演示页面
+const goToAnimationDemo = () => {
+  router.push('/animation-demo')
 }
 
 // 处理主菜单点击
@@ -479,12 +514,12 @@ onUnmounted(() => {
 
 .logo-text {
   color: #ffffff;
-  font-size: 1.2rem;
-  font-weight: 600;
+  font-size: 1.3rem;
+  font-weight: 900;
   font-family: 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
   white-space: nowrap;
-  letter-spacing: 1px;
+  letter-spacing: 2px;
   margin-bottom: 0px;
   padding-bottom: 2px;
 }
@@ -518,12 +553,12 @@ onUnmounted(() => {
 }
 
 .exam-title-container {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 3px solid rgba(255, 255, 255, 0.3);
   border-radius: 12px;
-  padding: 8px 20px;
-  box-shadow: 0 4px 16px rgba(30, 144, 255, 0.1);
+  padding: 8px 24px;
+  box-shadow: 0 6px 24px rgba(30, 144, 255, 0.2);
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
@@ -545,17 +580,18 @@ onUnmounted(() => {
 }
 
 .exam-title-container:hover {
-  background: rgba(255, 255, 255, 0.2);
-  border-color: rgba(255, 255, 255, 0.3);
-  box-shadow: 0 6px 20px rgba(30, 144, 255, 0.15);
-  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 8px 28px rgba(30, 144, 255, 0.25);
+  transform: translateY(-2px) scale(1.02);
+  border-width: 5px;
 }
 
 .exam-title-text {
   margin: 0;
   color: #2c5282;
-  font-weight: 600;
-  font-size: 1.05rem;
+  font-weight: 900;
+  font-size: 1.15rem;
   text-align: center;
   white-space: nowrap;
   overflow: hidden;
@@ -563,6 +599,8 @@ onUnmounted(() => {
   max-width: 100%;
   position: relative;
   z-index: 1;
+  letter-spacing: 1px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .main-nav {
@@ -575,13 +613,14 @@ onUnmounted(() => {
   background: transparent;
   border: none;
   color: #374151;
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-size: 1rem;
-  font-weight: 500;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-size: 1.2rem;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   position: relative;
+  letter-spacing: 0.5px;
 }
 
 .nav-menu-item:hover {
@@ -590,9 +629,10 @@ onUnmounted(() => {
 }
 
 .nav-menu-item.active {
-  background: rgba(30, 144, 255, 0.15);
+  background: rgba(30, 144, 255, 0.2);
   color: #1e90ff;
-  font-weight: 600;
+  font-weight: 900;
+  border: 3px solid rgba(30, 144, 255, 0.3);
 }
 
 .nav-menu-item.active::after {
@@ -601,10 +641,10 @@ onUnmounted(() => {
   bottom: -2px;
   left: 50%;
   transform: translateX(-50%);
-  width: 20px;
-  height: 2px;
+  width: 30px;
+  height: 4px;
   background: #1e90ff;
-  border-radius: 1px;
+  border-radius: 2px;
 }
 
 .nav-menu-item:disabled {
@@ -622,6 +662,65 @@ onUnmounted(() => {
   margin-left: 4px;
   opacity: 0.7;
 }
+
+.nav-menu-item-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 动画演示按钮样式 */
+.animation-demo-btn {
+  background: transparent;
+  border: none;
+  color: #374151;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.animation-demo-btn:hover {
+  background: rgba(30, 144, 255, 0.1);
+  color: #1e90ff;
+}
+
+.animation-demo-btn.active {
+  background: rgba(30, 144, 255, 0.2);
+  color: #1e90ff;
+  font-weight: 900;
+  border: 3px solid rgba(30, 144, 255, 0.3);
+}
+
+.animation-demo-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 4px;
+  background: #1e90ff;
+  border-radius: 2px;
+}
+
+.animation-demo-btn:active {
+  transform: translateY(0);
+}
+
+.animation-demo-text {
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
 
 
 .nav-right {
@@ -641,41 +740,44 @@ onUnmounted(() => {
 .user-btn {
   background: linear-gradient(135deg, #87ceeb, #b0e0e6);
   color: #2c5282 !important;
-  border: none;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  font-weight: 600;
+  border: 2px solid rgba(44, 82, 130, 0.3);
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 800;
   cursor: pointer;
   padding: 8px 16px;
   margin: 0;
-  transition: all 250ms ease;
-  box-shadow: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(30, 144, 255, 0.2);
   position: relative;
   overflow: hidden;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  min-width: 140px;
+  min-width: 150px;
+  letter-spacing: 0.5px;
 }
 
 .user-btn:hover {
-  box-shadow: none;
-  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(30, 144, 255, 0.3);
+  transform: translateY(-2px) scale(1.05);
+  border-width: 4px;
 }
 
 .user-avatar {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  background: rgba(44, 82, 130, 0.15);
+  background: rgba(44, 82, 130, 0.2);
   color: #2c5282;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 600;
-  font-size: 13px;
+  font-weight: 800;
+  font-size: 14px;
   flex-shrink: 0;
+  border: 2px solid rgba(44, 82, 130, 0.3);
 }
 
 .user-info {
@@ -687,16 +789,17 @@ onUnmounted(() => {
 }
 
 .user-name {
-  font-weight: 600;
-  font-size: 14px;
+  font-weight: 800;
+  font-size: 1.1rem;
   line-height: 1.2;
 }
 
 
 .dropdown-arrow {
-  font-size: 0.8rem;
+  font-size: 1rem;
   transition: transform 250ms ease;
-  margin-left: 4px;
+  margin-left: 6px;
+  font-weight: 700;
 }
 
 .dropdown-arrow.open {
@@ -708,13 +811,13 @@ onUnmounted(() => {
   top: 100%;
   left: 0;
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-  border: 1px solid #e2e8f0;
-  min-width: 180px;
+  border-radius: 16px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+  border: 4px solid #e2e8f0;
+  min-width: 200px;
   z-index: 1000;
   overflow: hidden;
-  margin-top: 8px;
+  margin-top: 10px;
   animation: dropdownFadeIn 200ms ease-out;
 }
 
@@ -731,17 +834,19 @@ onUnmounted(() => {
 
 .dropdown-item {
   width: 100%;
-  padding: 12px 16px;
+  padding: 16px 20px;
   border: none;
   background: none;
   text-align: left;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 12px;
-  font-size: 1rem;
+  gap: 14px;
+  font-size: 1.1rem;
+  font-weight: 700;
   color: #374151;
-  transition: background-color 150ms ease;
+  transition: all 0.3s ease;
+  letter-spacing: 0.3px;
 }
 
 .dropdown-item:hover {
@@ -761,26 +866,28 @@ onUnmounted(() => {
 .exit-oj-btn {
   background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
   color: white;
-  border: none;
-  border-radius: 8px;
+  border: 3px solid #b91c1c;
+  border-radius: 10px;
   padding: 8px 16px;
-  font-size: 0.9rem;
-  font-weight: 600;
+  font-size: 1rem;
+  font-weight: 900;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.2);
+  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3);
   display: flex;
   align-items: center;
   gap: 6px;
   position: relative;
   z-index: 1000;
   pointer-events: auto;
+  letter-spacing: 0.5px;
 }
 
 .exit-oj-btn:hover {
   background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+  border-width: 5px;
 }
 
 .dropdown-item.logout-item:hover {
@@ -788,8 +895,8 @@ onUnmounted(() => {
 }
 
 .item-icon {
-  width: 18px;
-  height: 18px;
+  width: 22px;
+  height: 22px;
   flex-shrink: 0;
 }
 
@@ -812,17 +919,17 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 12px 20px;
-  background: rgba(135, 206, 235, 0.1);
-  border: 2px dashed rgba(30, 144, 255, 0.3);
-  border-radius: 8px;
+  padding: 14px 24px;
+  background: rgba(135, 206, 235, 0.15);
+  border: 4px dashed rgba(30, 144, 255, 0.4);
+  border-radius: 12px;
   transition: all 0.3s ease;
 }
 
 .placeholder-text {
   color: #64748b;
-  font-size: 0.9rem;
-  font-weight: 500;
+  font-size: 1.1rem;
+  font-weight: 700;
   font-style: italic;
 }
 
@@ -887,11 +994,11 @@ onUnmounted(() => {
 
 @media (max-width: 768px) {
   .logo-image {
-    height: 35px;
+    height: 42px;
   }
   
   .logo-text {
-    font-size: 1rem;
+    font-size: 1.3rem;
   }
   .nav-content {
     padding: 0 var(--space-4);
@@ -906,25 +1013,30 @@ onUnmounted(() => {
   }
   
   .nav-menu-item {
-    padding: 6px 12px;
-    font-size: 0.9rem;
+    padding: 10px 16px;
+    font-size: 1.1rem;
+  }
+  
+  .animation-demo-btn {
+    padding: 10px 16px;
+    font-size: 1.1rem;
   }
   
   .user-btn {
-    padding: 10px 16px;
-    font-size: 1rem;
-    min-width: 140px;
+    padding: 10px 18px;
+    font-size: 1.1rem;
+    min-width: 150px;
     gap: 10px;
   }
 
   .user-avatar {
-    width: 28px;
-    height: 28px;
-    font-size: 12px;
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
   }
 
   .user-name {
-    font-size: 13px;
+    font-size: 1rem;
   }
 
   .nav-placeholder {
@@ -952,7 +1064,7 @@ onUnmounted(() => {
 
 @media (max-width: 480px) {
   .nav-bar {
-    height: 50px;
+    height: 46px;
     padding: var(--space-2) 0;
   }
   
@@ -965,11 +1077,11 @@ onUnmounted(() => {
   }
   
   .logo-image {
-    height: 30px;
+    height: 38px;
   }
   
   .logo-text {
-    font-size: 0.9rem;
+    font-size: 1.2rem;
   }
   
   .nav-center {
@@ -981,8 +1093,13 @@ onUnmounted(() => {
   }
   
   .nav-menu-item {
-    padding: 4px 8px;
-    font-size: 0.8rem;
+    padding: 8px 12px;
+    font-size: 1rem;
+  }
+
+  .animation-demo-btn {
+    padding: 8px 12px;
+    font-size: 1rem;
   }
 
   .nav-right {
@@ -990,20 +1107,20 @@ onUnmounted(() => {
   }
   
   .user-btn {
-    padding: 8px 12px;
-    font-size: 0.9rem;
-    min-width: 120px;
+    padding: 8px 14px;
+    font-size: 1rem;
+    min-width: 130px;
     gap: 8px;
   }
 
   .user-avatar {
-    width: 24px;
-    height: 24px;
-    font-size: 11px;
+    width: 30px;
+    height: 30px;
+    font-size: 13px;
   }
 
   .user-name {
-    font-size: 12px;
+    font-size: 0.95rem;
   }
 
   .nav-placeholder {
@@ -1045,7 +1162,7 @@ onUnmounted(() => {
 /* 等级切换提示弹窗样式 */
 .level-toast {
   position: fixed;
-  top: 80px;
+  top: 70px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 2000;
@@ -1055,28 +1172,31 @@ onUnmounted(() => {
 .toast-content {
   background: linear-gradient(135deg, #1e90ff 0%, #38bdf8 100%);
   color: white;
-  padding: 12px 24px;
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(30, 144, 255, 0.4);
+  padding: 16px 28px;
+  border-radius: 16px;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 12px 32px rgba(30, 144, 255, 0.5);
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 0.95rem;
-  font-weight: 600;
+  gap: 12px;
+  font-size: 1.2rem;
+  font-weight: 900;
   white-space: nowrap;
+  letter-spacing: 0.5px;
 }
 
 .toast-icon {
-  font-size: 1.2rem;
-  font-weight: 700;
+  font-size: 1.4rem;
+  font-weight: 900;
   color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
-  background: rgba(255, 255, 255, 0.2);
+  width: 32px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.25);
   border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.3);
   flex-shrink: 0;
 }
 
@@ -1116,36 +1236,36 @@ onUnmounted(() => {
 
 @media (max-width: 768px) {
   .level-toast {
-    top: 70px;
+    top: 80px;
   }
   
   .toast-content {
-    padding: 10px 20px;
-    font-size: 0.9rem;
+    padding: 14px 24px;
+    font-size: 1.1rem;
   }
   
   .toast-icon {
-    width: 20px;
-    height: 20px;
-    font-size: 1rem;
+    width: 28px;
+    height: 28px;
+    font-size: 1.2rem;
   }
 }
 
 @media (max-width: 480px) {
   .level-toast {
-    top: 60px;
+    top: 70px;
   }
   
   .toast-content {
-    padding: 8px 16px;
-    font-size: 0.85rem;
-    gap: 8px;
+    padding: 12px 20px;
+    font-size: 1rem;
+    gap: 10px;
   }
   
   .toast-icon {
-    width: 18px;
-    height: 18px;
-    font-size: 0.9rem;
+    width: 26px;
+    height: 26px;
+    font-size: 1.1rem;
   }
 }
 </style>

@@ -57,8 +57,6 @@
     </div>
 
     <!-- 原有内容 -->
-    <div class="login-header">
-    </div>
     <div class="login-content">
       <div class="login-card">
         <div class="login-card-header">
@@ -240,7 +238,7 @@ const handleLogin = async () => {
       localStorage.setItem('userInfo', JSON.stringify(data.user))
       console.log(data.user)
       window.dispatchEvent(new Event('storage'))
-      router.push('/select')
+      router.push('/plan')
 
     } else {
       error.value = data.message || '登录失败'
@@ -295,17 +293,6 @@ const handleLogin = async () => {
 }
 
 /* 其余原有样式保持不变 */
-.login-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 0;
-  padding: 40px 3vw 20px 3vw;
-  border-bottom: 2px solid #e2e8f0;
-  width: 100%;
-  box-sizing: border-box;
-}
-
 .login-content {
   width: 100%;
   display: flex;

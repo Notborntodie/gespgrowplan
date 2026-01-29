@@ -531,22 +531,44 @@ const renderMarkdown = (text: string): string => {
     })
 
     // Step 3: 基础 Markdown 处理
+    // 先处理代码块（必须在换行符替换之前）
+    const codeBlockStore: Array<{ placeholder: string; html: string }> = []
+    let codeBlockIndex = 0
+    
+    // 匹配代码块：```可选语言\n代码内容\n```
+    processed = processed.replace(/```(\w+)?\r?\n([\s\S]*?)```/g, (match, lang, code) => {
+      const placeholder = `__CODE_BLOCK_${codeBlockIndex}__`
+      let html = ''
+      
+      if (lang && hljs.getLanguage(lang)) {
+        try {
+          const highlighted = hljs.highlight(code.trim(), { language: lang, ignoreIllegals: true }).value
+          html = `<pre class="hljs"><code class="language-${lang}">${highlighted}</code></pre>`
+        } catch (err) {
+          console.warn('代码高亮失败:', err)
+          html = `<pre><code>${code.trim()}</code></pre>`
+        }
+      } else {
+        html = `<pre><code>${code.trim()}</code></pre>`
+      }
+      
+      codeBlockStore.push({ placeholder, html })
+      codeBlockIndex++
+      return placeholder
+    })
+    
+    // 然后处理其他 Markdown 语法
     let result = processed
       .replace(/\n/g, '<br>')
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*(.*?)\*/g, '<em>$1</em>')
       .replace(/`([^`]+)`/g, '<code>$1</code>')
-      .replace(/```(\w+)?\n([\s\S]*?)```/g, (match, lang, code) => {
-        if (lang && hljs.getLanguage(lang)) {
-          try {
-            const highlighted = hljs.highlight(code, { language: lang, ignoreIllegals: true }).value
-            return `<pre class="hljs"><code class="language-${lang}">${highlighted}</code></pre>`
-          } catch (err) {
-            console.warn('代码高亮失败:', err)
-          }
-        }
-        return `<pre><code>${code}</code></pre>`
-      })
+    
+    // 还原代码块
+    codeBlockStore.forEach(({ placeholder, html }) => {
+      const regex = new RegExp(placeholder.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')
+      result = result.replace(regex, html)
+    })
 
     // Step 4: 还原数学公式
     mathStore.forEach(({ placeholder, html, original }) => {

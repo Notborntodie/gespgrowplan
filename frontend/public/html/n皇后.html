@@ -1,0 +1,1396 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N皇后问题可视化</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#f8fafc', // 浅灰背景（成长计划风格）
+                        secondary: '#e6f7ff', // 浅蓝背景
+                        accent: '#1e90ff', // 蓝色（皇后，成长计划主色）
+                        highlight: '#38bdf8', // 浅蓝色高亮
+                        danger: '#ef4444', // 红色冲突
+                        boardLight: '#e0f2fe', // 棋盘浅色（成长计划风格）
+                        boardDark: '#bae6fd', // 棋盘深色（成长计划风格）
+                    },
+                    fontFamily: {
+                        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* 自定义样式 */
+        body {
+            background-color: #f8fafc;
+            color: #2c5282;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+        
+        .chessboard {
+            display: grid;
+            gap: 1px;
+            background-color: #87ceeb;
+            border: 4px solid #87ceeb;
+            border-radius: 4px;
+            box-shadow: 0 20px 25px -5px rgba(30, 144, 255, 0.2), 0 10px 10px -5px rgba(30, 144, 255, 0.15);
+        }
+
+        .cell {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .cell.dark {
+            background-color: #bae6fd;
+        }
+
+        .cell.light {
+            background-color: #e0f2fe;
+        }
+
+        .cell.active-row {
+            box-shadow: inset 0 0 0 2px #1e90ff;
+        }
+
+        .coord-label {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            font-size: 10px;
+            color: rgba(44, 82, 130, 0.5);
+            font-family: monospace;
+            pointer-events: none;
+        }
+
+        .queen-coord {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(248, 250, 252, 0.95);
+            color: #1e90ff;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-family: monospace;
+            white-space: nowrap;
+            z-index: 20;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            border: 1px solid rgba(30, 144, 255, 0.3);
+        }
+
+        .cell:hover .queen-coord {
+            opacity: 1;
+        }
+        
+        /* 代码高亮样式 */
+        .code-line {
+            padding: 0 8px;
+            padding-left: 36px; /* 为左侧固定按钮留出空间 */
+            border-left: 3px solid transparent;
+            color: #1e293b; /* 深灰色文字，在灰色背景上更易读 */
+            white-space: pre;
+            font-size: 1rem;
+            line-height: 1.75rem;
+            position: relative;
+        }
+        .code-line.active {
+            background-color: #dbeafe; /* 稍深的蓝色背景，在灰色背景上更明显 */
+            border-left-color: #1e90ff;
+        }
+        .fold-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            color: #1e90ff;
+            background-color: rgba(229, 231, 235, 0.95); /* 深灰色背景，与代码区背景协调 */
+            border: 1px solid rgba(30, 144, 255, 0.3);
+            border-radius: 4px;
+            margin-right: 8px;
+            user-select: none;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+            position: sticky;
+            left: 8px; /* 固定在左侧，距离容器边缘8px */
+            z-index: 10;
+            box-shadow: 0 0 4px rgba(30, 144, 255, 0.2); /* 添加阴影，增强可见性 */
+        }
+        .fold-btn:hover {
+            color: #0c4a6e;
+            background-color: rgba(30, 144, 255, 0.2);
+            border-color: rgba(30, 144, 255, 0.5);
+            transform: scale(1.1);
+            box-shadow: 0 0 6px rgba(30, 144, 255, 0.4);
+        }
+        .fold-btn svg {
+            width: 14px;
+            height: 14px;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+        }
+        .fold-placeholder {
+            color: #1e90ff;
+            font-style: normal;
+            display: none;
+            margin-left: 8px;
+            cursor: pointer;
+            padding: 2px 8px;
+            background-color: rgba(30, 144, 255, 0.1);
+            border-radius: 4px;
+            border: 1px dashed rgba(30, 144, 255, 0.3);
+            transition: all 0.2s ease;
+            white-space: nowrap; /* 防止换行 */
+        }
+        .fold-placeholder:hover {
+            background-color: rgba(30, 144, 255, 0.2);
+            border-color: rgba(30, 144, 255, 0.5);
+            color: #0c4a6e;
+        }
+        .keyword { color: #1e90ff; }
+        .function { color: #38bdf8; }
+        .number { color: #64748b; }
+        .comment { color: #87ceeb; }
+
+        .cell.conflict {
+            background-color: rgba(239, 68, 68, 0.5) !important;
+        }
+        
+        .cell.check {
+            background-color: rgba(30, 144, 255, 0.3) !important;
+        }
+
+        .queen-img {
+            width: 80%;
+            height: 80%;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid #1e90ff;
+            box-shadow: 0 4px 6px -1px rgba(30, 144, 255, 0.4);
+            z-index: 10;
+            opacity: 0;
+            transform: scale(0.5);
+        }
+
+        /* 霓虹文字效果 */
+        .neon-text {
+            text-shadow: 0 0 10px rgba(30, 144, 255, 0.5);
+        }
+
+        /* 动漫文字效果 */
+        .anime-toast {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            font-size: 3rem;
+            font-weight: 900;
+            font-style: italic;
+            color: #fff;
+            -webkit-text-stroke: 2px #000;
+            text-shadow: 4px 4px 0px rgba(0,0,0,0.5);
+            pointer-events: none;
+            z-index: 100;
+            white-space: nowrap;
+            opacity: 0;
+        }
+        .anime-toast.blue { 
+            color: #1e90ff; 
+            -webkit-text-stroke: 2px #0c4a6e; 
+            text-shadow: 4px 4px 0px #0c4a6e; 
+        }
+        .anime-toast.red { 
+            color: #f87171; 
+            -webkit-text-stroke: 2px #7f1d1d; 
+            text-shadow: 4px 4px 0px #7f1d1d; 
+        }
+        .anime-toast.green { 
+            color: #4ade80; 
+            -webkit-text-stroke: 2px #14532d; 
+            text-shadow: 4px 4px 0px #14532d; 
+        }
+        .anime-toast.yellow { 
+            color: #f59e0b; 
+            -webkit-text-stroke: 2px #713f12; 
+            text-shadow: 4px 4px 0px #713f12; 
+        }
+
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #e6f7ff; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #87ceeb; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #38bdf8; 
+        }
+
+        input[type=range] {
+            -webkit-appearance: none; 
+            background: transparent; 
+        }
+        
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: #1e90ff;
+            cursor: pointer;
+            margin-top: -6px; 
+            box-shadow: 0 0 5px #1e90ff;
+        }
+        
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #87ceeb;
+            border-radius: 2px;
+        }
+
+        /* 布局保护：防止侧边栏与中间区域重叠 */
+        main {
+            min-width: 0;
+            width: 100%;
+        }
+
+        /* 左侧面板：固定最小宽度，不允许收缩 */
+        aside:first-of-type {
+            flex-shrink: 0 !important;
+            min-width: 192px;
+        }
+
+        /* 中间区域：可以收缩，但设置最小宽度 */
+        section.flex-1 {
+            min-width: 0;
+            flex: 1 1 0%;
+            overflow: hidden;
+        }
+
+        /* 右侧代码面板：固定最小宽度，不允许收缩 */
+        aside#code-panel {
+            flex-shrink: 0 !important;
+            min-width: 750px;
+        }
+
+
+        /* 分隔栏样式 */
+        .resizer {
+            width: 4px;
+            background-color: #e2e8f0;
+            cursor: col-resize;
+            position: relative;
+            flex-shrink: 0;
+            z-index: 100;
+            transition: background-color 0.2s;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .resizer:hover {
+            background-color: #87ceeb;
+        }
+
+        .resizer.active {
+            background-color: #1e90ff;
+        }
+
+        .resizer::before {
+            content: '';
+            position: absolute;
+            left: -4px;
+            right: -4px;
+            top: 0;
+            bottom: 0;
+            cursor: col-resize;
+            z-index: 1;
+        }
+
+
+        /* 响应式：小屏幕时调整布局 */
+        @media (max-width: 1024px) {
+            aside:first-of-type {
+                min-width: 150px;
+            }
+            aside#code-panel {
+                min-width: 300px;
+            }
+            .resizer {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            main {
+                flex-direction: column;
+            }
+            aside:first-of-type,
+            aside#code-panel {
+                min-width: 100%;
+                width: 100%;
+            }
+            .resizer {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden">
+
+    <!-- 主内容区 -->
+    <main class="flex-1 flex flex-col lg:flex-row overflow-hidden min-w-0">
+        
+        <!-- 左侧控制面板 -->
+        <aside id="left-panel" class="w-full lg:w-48 lg:min-w-[192px] bg-gradient-to-b from-blue-50 to-blue-100/50 border-r border-blue-200 p-3 flex flex-col gap-3 overflow-y-auto z-40 shrink-0" style="width: 192px;">
+            
+            <!-- 顶部空白占位，避免与返回键重叠 -->
+            <div style="height: 100px; flex-shrink: 0;"></div>
+            
+            <!-- 状态统计 -->
+            <div class="space-y-3 flex-1">
+                <h2 class="text-xs font-semibold text-blue-600 uppercase tracking-wider">实时状态</h2>
+                
+                <div class="grid grid-cols-2 gap-2">
+                    <div class="bg-white p-2 rounded-lg border border-blue-200 shadow-sm">
+                        <div class="text-xs text-blue-600 mb-1">找到解</div>
+                        <div id="solution-count" class="text-xl font-mono font-bold text-green-500">0</div>
+                    </div>
+                    <div class="bg-white p-2 rounded-lg border border-blue-200 shadow-sm">
+                        <div class="text-xs text-blue-600 mb-1">当前行</div>
+                        <div id="current-row" class="text-xl font-mono font-bold text-blue-500">-</div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-3 rounded-lg border border-blue-200 h-64 overflow-y-auto font-mono text-xs space-y-1 shadow-sm" id="log-container">
+                    <div class="text-blue-500 italic">等待开始...</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 左侧分隔栏 -->
+        <div class="resizer" id="left-resizer"></div>
+
+        <!-- 中间可视化区域 -->
+        <section id="center-panel" class="flex-1 bg-gradient-to-br from-blue-50 to-white relative flex flex-col items-center justify-center p-4 overflow-hidden min-w-0" style="flex: 1;">
+            <!-- 棋盘容器 -->
+            <div id="board-container" class="relative z-10 transition-all duration-500">
+                <!-- 棋盘将通过 JS 动态生成 -->
+            </div>
+
+            <!-- 底部说明 -->
+            <div class="mt-4 text-center max-w-2xl text-blue-600 bg-white/80 px-6 py-3 rounded-full backdrop-blur-sm border-2 border-blue-200 shadow-lg" style="font-family: 'Comic Sans MS', 'Microsoft YaHei', '微软雅黑', cursive; font-size: 1rem; font-weight: 700; letter-spacing: 1px;">
+                <span class="inline-block w-2.5 h-2.5 bg-blue-500 rounded-full mr-2" style="box-shadow: 0 0 6px rgba(30, 144, 255, 0.5);"></span><span>皇后</span>
+                <span class="inline-block w-2.5 h-2.5 bg-blue-300 rounded-full ml-4 mr-2" style="box-shadow: 0 0 6px rgba(56, 189, 248, 0.5);"></span><span>尝试</span>
+                <span class="inline-block w-2.5 h-2.5 bg-red-400 rounded-full ml-4 mr-2" style="box-shadow: 0 0 6px rgba(239, 68, 68, 0.5);"></span><span>冲突</span>
+            </div>
+        </section>
+
+        <!-- 右侧分隔栏 -->
+        <div class="resizer" id="right-resizer"></div>
+
+        <!-- 右侧代码面板 -->
+        <aside id="code-panel" class="w-full lg:w-[750px] lg:min-w-[750px] bg-gray-200 border-l border-blue-200 flex flex-col shrink-0 transition-all duration-300 ease-in-out overflow-hidden shadow-lg" style="width: 750px;">
+            <div class="p-3 border-b border-blue-200 bg-gradient-to-r from-blue-50 to-blue-100/50 flex justify-between items-center gap-3" id="code-header">
+                <div class="flex items-center gap-2 flex-1">
+                    <span class="text-xs text-blue-600 whitespace-nowrap">字体大小:</span>
+                    <input type="range" id="font-size-slider" min="12" max="24" value="13" step="1" 
+                           class="flex-1 h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                           style="min-width: 120px;">
+                    <span class="text-xs text-blue-700 font-mono whitespace-nowrap" id="font-size-value">13px</span>
+                </div>
+                <div class="flex gap-1.5" id="window-controls">
+                        <div class="w-3 h-3 rounded-full bg-red-400/30"></div>
+                        <div class="w-3 h-3 rounded-full bg-yellow-400/30"></div>
+                        <div class="w-3 h-3 rounded-full bg-green-400/30"></div>
+                    </div>
+                </div>
+            <div class="flex-1 overflow-y-auto overflow-x-auto p-4 font-mono text-base leading-7 bg-gray-200" id="code-container" style="color: #1e293b;">
+                <!-- 代码将通过 JS 生成 -->
+            </div>
+        </aside>
+    </main>
+
+    <!-- 底部设置区域 -->
+    <div class="bg-gradient-to-r from-blue-50 to-blue-100/80 backdrop-blur-md border-t border-blue-200 p-3 z-50 shadow-lg">
+        <div class="container mx-auto max-w-7xl">
+            <div class="flex flex-wrap gap-3 items-center justify-center">
+                <div class="bg-white/80 p-2 rounded-xl border border-blue-200 min-w-[180px] max-w-[220px] shadow-sm">
+                    <label class="block text-xs font-medium mb-1 text-blue-600">皇后数量 (N)</label>
+                    <div class="flex items-center gap-3">
+                        <input type="range" id="n-slider" min="4" max="12" value="4" class="flex-1">
+                        <span id="n-value" class="text-lg font-mono font-bold text-blue-500 w-6 text-center">4</span>
+                    </div>
+                </div>
+
+                <div class="bg-white/80 p-2 rounded-xl border border-blue-200 min-w-[180px] max-w-[220px] shadow-sm">
+                    <label class="block text-xs font-medium mb-1 text-blue-600">演示速度</label>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-blue-500">慢</span>
+                        <input type="range" id="speed-slider" min="1" max="100" value="1" class="flex-1">
+                        <span class="text-xs text-blue-500">快</span>
+                    </div>
+                </div>
+
+                <div class="flex gap-2">
+                    <button id="start-btn" class="bg-gradient-to-r from-blue-500 to-blue-400 hover:from-blue-400 hover:to-blue-300 text-white font-bold py-4 px-8 rounded-xl shadow-lg shadow-blue-500/30 transition-all transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3 text-xl" style="font-size: 1.5rem; font-weight: 900;">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+                        </svg>
+                        开始演示
+                    </button>
+                    <button id="pause-btn" class="bg-blue-200 hover:bg-blue-300 text-blue-700 font-semibold py-2 px-3 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm border border-blue-300" disabled>
+                        暂停
+                    </button>
+                    <button id="reset-btn" class="bg-blue-200 hover:bg-blue-300 text-blue-700 font-semibold py-2 px-3 rounded-xl transition-colors text-sm border border-blue-300">
+                        重置
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 常量与配置
+        const QUEEN_IMG_URL = 'https://musk-online.fbcontent.cn/pub-musk-ai-studio/workflow/file/picture/ArXCKkkRdCE4eswJsVp37f.jpg';
+        
+        // 状态管理
+        const state = {
+            n: 4,
+            speed: 1,
+            isRunning: false,
+            isPaused: false,
+            solutions: 0,
+            board: [], // 存储每行皇后的列索引，-1表示未放置
+            delay: 500,
+            abortController: null // 用于终止异步操作
+        };
+
+        // DOM 元素
+        const elements = {
+            nSlider: document.getElementById('n-slider'),
+            nValue: document.getElementById('n-value'),
+            speedSlider: document.getElementById('speed-slider'),
+            startBtn: document.getElementById('start-btn'),
+            pauseBtn: document.getElementById('pause-btn'),
+            resetBtn: document.getElementById('reset-btn'),
+            solutionCount: document.getElementById('solution-count'),
+            currentRow: document.getElementById('current-row'),
+            logContainer: document.getElementById('log-container'),
+            boardContainer: document.getElementById('board-container'),
+            codeContainer: document.getElementById('code-container'),
+            codePanel: document.getElementById('code-panel'),
+            codeHeader: document.getElementById('code-header'),
+            codeTitle: document.getElementById('code-title'),
+            windowControls: document.getElementById('window-controls'),
+            fontSizeSlider: document.getElementById('font-size-slider'),
+            fontSizeValue: document.getElementById('font-size-value'),
+            leftPanel: document.getElementById('left-panel'),
+            centerPanel: document.getElementById('center-panel'),
+            leftResizer: document.getElementById('left-resizer'),
+            rightResizer: document.getElementById('right-resizer'),
+        };
+
+        // 代码定义
+        const codeLines = [
+            { text: '#include<bits/stdc++.h>', indent: 0 },
+            { text: 'using namespace std;', indent: 0 },
+            { text: 'const int N = 15;  // n<13', indent: 0 },
+            { text: 'int n, ans = 0;', indent: 0 },
+            { text: 'bool col[N], dg[2 * N], udg[2 * N];', indent: 0 },
+            { text: '', indent: 0 },
+            { text: 'void dfs(int row) {  // 当前搜索到第 row 行', indent: 0 },
+            // 模块1：递归终止条件
+            { text: '    // 递归基（递归终止条件）', indent: 1, foldStart: 'term', foldTitle: '递归终止条件' },
+            { text: '    if (row == n + 1) {  // 放完 n 行', indent: 1, foldGroup: 'term' },
+            { text: '        ans++;', indent: 2, foldGroup: 'term' },
+            { text: '        return;', indent: 2, foldGroup: 'term' },
+            { text: '    }', indent: 1, foldGroup: 'term' },
+            
+            { text: '    for (int i = 1; i <= n; i++) {  // 尝试放在第 row 行第 i 列', indent: 1 },
+            // 模块2：判断与回溯
+            { text: '        // 1. 满足 n 皇后的条件', indent: 2, foldStart: 'condition', foldTitle: '满足 n 皇后的条件' },
+            { text: '        if (!col[i] && !dg[row - i + n] && !udg[row + i]) {', indent: 2, foldGroup: 'condition' },
+            { text: '            // 2. 在坐标 row i 放置皇后', indent: 3, foldStart: 'place', foldTitle: '在坐标 row i 放置皇后' },
+            { text: '            col[i] = dg[row - i + n] = udg[row + i] = true;', indent: 3, foldGroup: 'place' },
+            { text: '            // 3. 去递归搜索下一行', indent: 3, foldStart: 'recurse', foldTitle: '去递归搜索下一行' },
+            { text: '            dfs(row + 1);', indent: 3, foldGroup: 'recurse' },
+            { text: '            // 4. 回溯', indent: 3, foldStart: 'backtrack', foldTitle: '回溯' },
+            { text: '            col[i] = dg[row - i + n] = udg[row + i] = false;', indent: 3, foldGroup: 'backtrack' },
+            { text: '        }', indent: 2 },
+            
+            { text: '    }', indent: 1 },
+            { text: '}', indent: 0 },
+            { text: '', indent: 0 },
+            { text: 'int main() {', indent: 0 },
+            { text: '    cin >> n;', indent: 1 },
+            { text: '    dfs(1);  // 从第 1 行开始放', indent: 1 },
+            { text: '    cout << ans << endl;', indent: 1 },
+            { text: '    return 0;', indent: 1 },
+            { text: '}', indent: 0 }
+        ];
+
+        // 初始化分隔栏拖动功能
+        function initResizers() {
+            // 左侧分隔栏：调整左侧面板和中间区域
+            let isLeftResizing = false;
+            let startX = 0;
+            let startLeftWidth = 0;
+
+            elements.leftResizer.addEventListener('mousedown', (e) => {
+                isLeftResizing = true;
+                startX = e.clientX;
+                startLeftWidth = elements.leftPanel.offsetWidth;
+                elements.leftResizer.classList.add('active');
+                document.body.style.cursor = 'col-resize';
+                document.body.style.userSelect = 'none';
+                e.preventDefault();
+            });
+
+            // 右侧分隔栏：调整右侧代码面板和中间区域
+            let isRightResizing = false;
+            let startRightWidth = 0;
+
+            elements.rightResizer.addEventListener('mousedown', (e) => {
+                isRightResizing = true;
+                startX = e.clientX;
+                startRightWidth = elements.codePanel.offsetWidth;
+                elements.rightResizer.classList.add('active');
+                document.body.style.cursor = 'col-resize';
+                document.body.style.userSelect = 'none';
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            });
+
+            // 鼠标移动事件
+            document.addEventListener('mousemove', (e) => {
+                if (!isLeftResizing && !isRightResizing) return;
+                
+                // 如果目标是滑动条，不阻止默认行为
+                if (e.target.type === 'range' || e.target.closest('input[type="range"]')) {
+                    return;
+                }
+                
+                e.preventDefault();
+
+                const diffX = e.clientX - startX;
+
+                if (isLeftResizing) {
+                    const newWidth = startLeftWidth + diffX;
+                    const minWidth = 150;
+                    const maxWidth = window.innerWidth * 0.4; // 最多占40%宽度
+                    
+                    if (newWidth >= minWidth && newWidth <= maxWidth) {
+                        elements.leftPanel.style.width = `${newWidth}px`;
+                        elements.leftPanel.style.flexShrink = '0';
+                        // 重新计算棋盘
+                        if (!state.isRunning) {
+                            setTimeout(() => createBoard(), 50);
+                        }
+                    }
+                }
+
+                if (isRightResizing) {
+                    const newWidth = startRightWidth - diffX; // 注意这里是减，因为向右拖动是缩小代码面板
+                    const minWidth = 300;
+                    const maxWidth = window.innerWidth * 0.6; // 最多占60%宽度
+                    
+                    if (newWidth >= minWidth && newWidth <= maxWidth) {
+                        elements.codePanel.style.width = `${newWidth}px`;
+                        elements.codePanel.style.minWidth = `${newWidth}px`;
+                        elements.codePanel.style.flexShrink = '0';
+                        // 重新计算棋盘
+                        if (!state.isRunning) {
+                            setTimeout(() => createBoard(), 50);
+                        }
+                    }
+                }
+            });
+
+            // 鼠标释放事件
+            document.addEventListener('mouseup', (e) => {
+                // 如果目标是滑动条，不阻止默认行为
+                if (e.target.type === 'range' || e.target.closest('input[type="range"]')) {
+                    // 滑动条有自己的处理逻辑，不需要额外处理
+                    if (!isLeftResizing && !isRightResizing) {
+                        return;
+                    }
+                }
+                
+                if (isLeftResizing) {
+                    isLeftResizing = false;
+                    elements.leftResizer.classList.remove('active');
+                }
+                if (isRightResizing) {
+                    isRightResizing = false;
+                    elements.rightResizer.classList.remove('active');
+                }
+                document.body.style.cursor = '';
+                document.body.style.userSelect = '';
+                e.preventDefault();
+            });
+        }
+
+        // 应用字体大小
+        function applyFontSize(fontSize) {
+            elements.fontSizeValue.textContent = fontSize + 'px';
+            elements.codeContainer.style.fontSize = fontSize + 'px';
+            const lineHeight = Math.round(fontSize * 1.75);
+            document.querySelectorAll('.code-line').forEach(line => {
+                line.style.fontSize = fontSize + 'px';
+                line.style.lineHeight = lineHeight + 'px';
+            });
+            document.querySelectorAll('.fold-collapsed-text').forEach(text => {
+                text.style.fontSize = Math.round(fontSize * 0.875) + 'px';
+            });
+        }
+
+        // 初始化
+        function init() {
+            updateDelay();
+            createBoard();
+            renderCode();
+            bindEvents();
+            initResizers();
+            // 初始化字体大小
+            const initialFontSize = parseInt(elements.fontSizeSlider.value);
+            applyFontSize(initialFontSize);
+            
+            // 监听窗口大小变化，重新计算棋盘
+            let resizeTimer;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(() => {
+                    if (!state.isRunning) {
+                        createBoard();
+                    }
+                }, 250);
+            });
+        }
+
+        // 渲染代码
+        function renderCode() {
+            elements.codeContainer.innerHTML = codeLines.map((line, index) => {
+                let html = line.text
+                    .replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                    .replace(/\b(void|int|bool|if|for|return|using|namespace|const|cin|cout|endl)\b/g, '<span class="keyword">$1</span>')
+                    .replace(/\b(dfs|main)\b/g, '<span class="function">$1</span>')
+                    .replace(/(\/\/.*)/g, '<span class="comment">$1</span>');
+                
+                let prefix = '';
+                let suffix = '';
+                let classes = 'code-line';
+                
+                if (line.foldStart) {
+                    // 所有折叠块都默认折叠
+                    const isDefaultCollapsed = true;
+                    // 使用 SVG 箭头图标（基于 lucide ChevronRight 和 ChevronDown）
+                    const chevronRightSvg = '<svg viewBox="0 0 24 24" style="width: 14px; height: 14px; display: block;"><path d="m9 18 6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>';
+                    const chevronDownSvg = '<svg viewBox="0 0 24 24" style="width: 14px; height: 14px; display: block;"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>';
+                    const btnSvg = isDefaultCollapsed ? chevronRightSvg : chevronDownSvg;
+                    // Lucide Icons SVG（Lightbulb 和 ArrowUp）
+                    const lightbulbSvg = '<svg viewBox="0 0 24 24" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 4px;"><path d="M9 21h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M12 3a6 6 0 0 0 6 6c0 2.5-1.5 4.5-3 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M12 3a6 6 0 0 1-6 6c0 2.5 1.5 4.5 3 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M12 15v3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>';
+                    const arrowUpSvg = '<svg viewBox="0 0 24 24" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-left: 4px;"><path d="m18 15-6-6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M12 21V9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>';
+                    // 根据不同的折叠组设置不同的提示文字
+                    let placeholderText = '';
+                    const collapsedText = '点击左侧箭头收起代码';
+                    if (line.foldStart === 'term') {
+                        placeholderText = `${lightbulbSvg} 思考：递归基（递归终止条件）怎么写？点击查看 ${arrowUpSvg}`;
+                    } else if (line.foldStart === 'condition') {
+                        placeholderText = `${lightbulbSvg} 思考：1. 满足 n 皇后的条件怎么写？点击查看 ${arrowUpSvg}`;
+                    } else if (line.foldStart === 'place') {
+                        placeholderText = `${lightbulbSvg} 思考：2. 在坐标 row i 放置皇后怎么写？点击查看 ${arrowUpSvg}`;
+                    } else if (line.foldStart === 'recurse') {
+                        placeholderText = `${lightbulbSvg} 思考：3. 去递归搜索下一行怎么写？点击查看 ${arrowUpSvg}`;
+                    } else if (line.foldStart === 'backtrack') {
+                        placeholderText = `${lightbulbSvg} 思考：4. 回溯怎么写？点击查看 ${arrowUpSvg}`;
+                    } else {
+                        placeholderText = `// ... ${line.foldTitle}`;
+                    }
+                    const collapsedTextSpan = `<span class="fold-collapsed-text" data-fold-group="${line.foldStart}" style="display: ${isDefaultCollapsed ? 'none' : 'inline'}; color: #64748b; font-size: 0.875rem; margin-left: 8px;">${collapsedText}</span>`;
+                    prefix = `<span class="fold-btn" data-fold-group="${line.foldStart}" onclick="toggleCodeBlock('${line.foldStart}', this)" title="点击${isDefaultCollapsed ? '展开' : '折叠'}代码">${btnSvg}</span><span class="fold-placeholder" data-fold-group="${line.foldStart}" onclick="toggleCodeBlock('${line.foldStart}', this)" style="display: ${isDefaultCollapsed ? 'inline' : 'none'}">${placeholderText}</span>${collapsedTextSpan}`;
+                    suffix = '';
+                } else if (line.foldGroup) {
+                    classes += ` group-${line.foldGroup}`;
+                    // 所有折叠组都默认隐藏
+                    classes += ' hidden';
+                    prefix = `<span class="fold-btn" style="visibility:hidden; position: sticky; left: 8px; z-index: 10;"></span>`; // 占位对齐，保持相同定位
+                } else {
+                    prefix = `<span class="fold-btn" style="visibility:hidden; position: sticky; left: 8px; z-index: 10;"></span>`; // 占位对齐，保持相同定位
+                }
+
+                return `<div class="${classes}" id="code-line-${index}">${prefix}${html}${suffix}</div>`;
+            }).join('');
+        }
+
+        // 切换代码块折叠
+        window.toggleCodeBlock = function(groupId, clickedElement) {
+            const groupLines = document.querySelectorAll(`.group-${groupId}`);
+            if (groupLines.length === 0) return;
+            
+            const isHidden = groupLines[0].classList.contains('hidden');
+            const parent = clickedElement.parentElement;
+            const ph = parent.querySelector('.fold-placeholder');
+            const btn = parent.querySelector('.fold-btn[data-fold-group="' + groupId + '"]');
+            
+            if (!btn) {
+                console.warn('找不到折叠按钮');
+                return;
+            }
+
+            // 查找收起文字元素
+            const collapsedTextEl = parent.querySelector('.fold-collapsed-text[data-fold-group="' + groupId + '"]');
+
+            if (isHidden) {
+                // 展开
+                groupLines.forEach(el => el.classList.remove('hidden'));
+                // 更新为向下箭头（ChevronDown）
+                btn.innerHTML = '<svg viewBox="0 0 24 24" style="width: 14px; height: 14px; display: block;"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>';
+                if(ph) {
+                    ph.style.display = 'none';
+                }
+                if(collapsedTextEl) {
+                    collapsedTextEl.style.display = 'inline';
+                }
+            } else {
+                // 折叠
+                groupLines.forEach(el => el.classList.add('hidden'));
+                // 更新为向右箭头（ChevronRight）
+                btn.innerHTML = '<svg viewBox="0 0 24 24" style="width: 14px; height: 14px; display: block;"><path d="m9 18 6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>';
+                if(ph) {
+                    ph.style.display = 'inline';
+                    // Lucide Icons SVG（Lightbulb 和 ArrowUp）
+                    const lightbulbSvg = '<svg viewBox="0 0 24 24" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 4px;"><path d="M9 21h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M12 3a6 6 0 0 0 6 6c0 2.5-1.5 4.5-3 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M12 3a6 6 0 0 1-6 6c0 2.5 1.5 4.5 3 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M12 15v3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>';
+                    const arrowUpSvg = '<svg viewBox="0 0 24 24" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-left: 4px;"><path d="m18 15-6-6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M12 21V9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>';
+                    // 根据不同的折叠组显示不同的思考提示
+                    if (groupId === 'term') {
+                        ph.innerHTML = `${lightbulbSvg} 思考：递归基（递归终止条件）怎么写？点击查看 ${arrowUpSvg}`;
+                    } else if (groupId === 'condition') {
+                        ph.innerHTML = `${lightbulbSvg} 思考：1. 满足 n 皇后的条件怎么写？点击查看 ${arrowUpSvg}`;
+                    } else if (groupId === 'place') {
+                        ph.innerHTML = `${lightbulbSvg} 思考：2. 在坐标 row i 放置皇后怎么写？点击查看 ${arrowUpSvg}`;
+                    } else if (groupId === 'recurse') {
+                        ph.innerHTML = `${lightbulbSvg} 思考：3. 去递归搜索下一行怎么写？点击查看 ${arrowUpSvg}`;
+                    } else if (groupId === 'backtrack') {
+                        ph.innerHTML = `${lightbulbSvg} 思考：4. 回溯怎么写？点击查看 ${arrowUpSvg}`;
+                    }
+                }
+                if(collapsedTextEl) {
+                    collapsedTextEl.style.display = 'none';
+                }
+            }
+        };
+
+        // 高亮代码行
+        function highlightCode(lineIndex) {
+            document.querySelectorAll('.code-line').forEach(el => el.classList.remove('active'));
+            if (lineIndex >= 0 && lineIndex < codeLines.length) {
+                const el = document.getElementById(`code-line-${lineIndex}`);
+                el.classList.add('active');
+                
+                // 自动展开折叠块
+                const lineData = codeLines[lineIndex];
+                if (lineData.foldGroup) {
+                    const groupId = lineData.foldGroup;
+                    const groupLines = document.querySelectorAll(`.group-${groupId}`);
+                    if (groupLines[0].classList.contains('hidden')) {
+                        // 找到对应的 toggle 按钮并点击
+                        const startIndex = codeLines.findIndex(l => l.foldStart === groupId);
+                        if (startIndex !== -1) {
+                            const startEl = document.getElementById(`code-line-${startIndex}`);
+                            const btn = startEl.querySelector('.fold-btn');
+                            // 模拟点击
+                            if(btn) btn.click();
+                        }
+                    }
+                }
+
+                // 自动滚动到可见区域
+                el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+
+        // 绑定事件
+        function bindEvents() {
+            elements.nSlider.addEventListener('input', (e) => {
+                if (state.isRunning) return; // 运行时禁止修改
+                state.n = parseInt(e.target.value);
+                elements.nValue.textContent = state.n;
+                createBoard();
+                resetStats();
+            });
+
+            elements.speedSlider.addEventListener('input', (e) => {
+                state.speed = parseInt(e.target.value);
+                updateDelay();
+            });
+
+            elements.startBtn.addEventListener('click', async () => {
+                if (state.isRunning) return;
+                startVisualization();
+            });
+
+            elements.pauseBtn.addEventListener('click', () => {
+                state.isPaused = !state.isPaused;
+                elements.pauseBtn.textContent = state.isPaused ? '继续' : '暂停';
+                elements.pauseBtn.classList.toggle('bg-yellow-400', state.isPaused);
+                elements.pauseBtn.classList.toggle('bg-blue-200', !state.isPaused);
+                if (!state.isPaused) {
+                    log('继续演示');
+                } else {
+                    log('演示已暂停');
+                }
+            });
+
+            elements.resetBtn.addEventListener('click', () => {
+                resetVisualization();
+            });
+
+            // 字体大小调整
+            elements.fontSizeSlider.addEventListener('mousedown', (e) => {
+                e.stopPropagation(); // 阻止事件冒泡，避免被 resizer 事件处理
+            });
+            elements.fontSizeSlider.addEventListener('mouseup', (e) => {
+                e.stopPropagation();
+            });
+            elements.fontSizeSlider.addEventListener('input', (e) => {
+                const fontSize = parseInt(e.target.value);
+                applyFontSize(fontSize);
+            });
+        }
+
+        // 更新延迟时间
+        function updateDelay() {
+            // 速度 1-100，延迟 2500ms - 10ms
+            // 映射公式：delay = maxDelay - (speed - 1) * ((maxDelay - minDelay) / 99)
+            // 简化：越快 delay 越小
+            const minDelay = 10;
+            const maxDelay = 2500;
+            state.delay = maxDelay - ((state.speed - 1) / 99) * (maxDelay - minDelay);
+        }
+
+        // 创建棋盘
+        function createBoard() {
+            const n = state.n;
+            const container = elements.boardContainer;
+            container.innerHTML = '';
+            
+            // 动态计算单元格大小，确保适应屏幕
+            // 获取实际可用空间
+            const mainSection = elements.centerPanel;
+            const maxH = window.innerHeight - 250; // 减去底部设置等高度
+            const maxW = mainSection ? mainSection.clientWidth - 40 : (window.innerWidth < 768 ? window.innerWidth - 40 : window.innerWidth - 1000); // 减去左右侧边栏宽度和padding
+            const size = Math.min(maxH, maxW);
+            const cellSize = Math.max(20, Math.floor(size / n)); // 确保最小单元格大小
+            
+            container.style.width = `${cellSize * n}px`;
+            container.style.height = `${cellSize * n}px`;
+            container.className = `chessboard grid grid-cols-${n} grid-rows-${n}`;
+            
+            // 设置 grid-template-columns
+            container.style.gridTemplateColumns = `repeat(${n}, 1fr)`;
+            container.style.gridTemplateRows = `repeat(${n}, 1fr)`;
+
+            for (let r = 0; r < n; r++) {
+                for (let c = 0; c < n; c++) {
+                    const cell = document.createElement('div');
+                    cell.className = `cell ${(r + c) % 2 === 0 ? 'light' : 'dark'}`;
+                    cell.dataset.row = r;
+                    cell.dataset.col = c;
+                    cell.style.width = `${cellSize}px`;
+                    cell.style.height = `${cellSize}px`;
+                    
+                    // 添加坐标标签
+                    const coord = document.createElement('div');
+                    coord.className = 'coord-label';
+                    coord.textContent = `${r+1},${c+1}`; // 1-based index
+                    cell.appendChild(coord);
+                    
+                    container.appendChild(cell);
+                }
+            }
+        }
+
+        // 日志输出
+        function log(msg, type = 'info') {
+            const div = document.createElement('div');
+            const time = new Date().toLocaleTimeString();
+            div.innerHTML = `<span class="text-blue-500">[${time}]</span> <span class="${type === 'error' ? 'text-red-500' : type === 'success' ? 'text-green-500' : 'text-blue-700'}">${msg}</span>`;
+            elements.logContainer.prepend(div);
+            // 保持日志数量
+            if (elements.logContainer.children.length > 50) {
+                elements.logContainer.lastElementChild.remove();
+            }
+        }
+
+        // 重置统计
+        function resetStats() {
+            state.solutions = 0;
+            elements.solutionCount.textContent = '0';
+            elements.currentRow.textContent = '-';
+            elements.logContainer.innerHTML = '<div class="text-blue-500 italic">等待开始...</div>';
+        }
+
+        // 重置可视化
+        function resetVisualization() {
+            if (state.abortController) {
+                state.abortController.abort();
+            }
+            state.isRunning = false;
+            state.isPaused = false;
+            state.board = [];
+            
+            elements.startBtn.disabled = false;
+            elements.startBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            elements.pauseBtn.disabled = true;
+            elements.pauseBtn.textContent = '暂停';
+            elements.pauseBtn.classList.remove('bg-yellow-400');
+            elements.pauseBtn.classList.add('bg-blue-200');
+            elements.nSlider.disabled = false;
+            
+            createBoard();
+            resetStats();
+            log('已重置');
+        }
+
+        // 睡眠函数（支持暂停和中断）
+        async function sleep(ms) {
+            if (state.abortController && state.abortController.signal.aborted) {
+                throw new Error('Aborted');
+            }
+
+            // 如果暂停，等待直到恢复
+            while (state.isPaused) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                if (state.abortController && state.abortController.signal.aborted) {
+                    throw new Error('Aborted');
+                }
+            }
+
+            return new Promise((resolve, reject) => {
+                const timeout = setTimeout(resolve, ms);
+                if (state.abortController) {
+                    state.abortController.signal.addEventListener('abort', () => {
+                        clearTimeout(timeout);
+                        reject(new Error('Aborted'));
+                    });
+                }
+            });
+        }
+
+        // 开始演示
+        async function startVisualization() {
+            state.isRunning = true;
+            state.abortController = new AbortController();
+            state.board = new Array(state.n).fill(-1);
+            
+            elements.startBtn.disabled = true;
+            elements.startBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            elements.pauseBtn.disabled = false;
+            elements.nSlider.disabled = true;
+            
+            resetStats();
+            createBoard(); // 清空棋盘
+            log(`开始计算 ${state.n} 皇后问题...`);
+
+            try {
+                await solveNQueens(0);
+                log(`计算完成！共找到 ${state.solutions} 种解法。`, 'success');
+            } catch (e) {
+                if (e.message === 'Aborted') {
+                    log('演示已终止');
+                } else {
+                    console.error(e);
+                    log('发生错误', 'error');
+                }
+            } finally {
+                state.isRunning = false;
+                elements.startBtn.disabled = false;
+                elements.startBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                elements.pauseBtn.disabled = true;
+                elements.nSlider.disabled = false;
+            }
+        }
+
+        // 核心回溯算法
+        async function solveNQueens(row) {
+            highlightCode(6); // void dfs(int row)
+            await sleep(state.delay * 0.5);
+
+            // 自动展开递归终止条件代码块（如果折叠了）
+            const termGroupLines = document.querySelectorAll('.group-term');
+            if (termGroupLines.length > 0 && termGroupLines[0].classList.contains('hidden')) {
+                const startEl = document.getElementById('code-line-7');
+                if (startEl) {
+                    const btn = startEl.querySelector('.fold-btn');
+                    if (btn) btn.click();
+                    // 等待展开动画完成
+                    await sleep(100);
+                }
+            }
+
+            highlightCode(8); // if (row == n + 1)
+            if (row === state.n) {
+                highlightCode(9); // ans++
+                state.solutions++;
+                elements.solutionCount.textContent = state.solutions;
+                log(`找到第 ${state.solutions} 个解！`, 'success');
+                showToast('找到解！', 'yellow');
+                await highlightSolution();
+                await sleep(state.delay * 3);
+                clearHighlight();
+                highlightCode(10); // return
+                return;
+            }
+
+            elements.currentRow.textContent = row + 1;
+            highlightRow(row, true);
+            
+            highlightCode(12); // for (int i = 1...)
+            for (let col = 0; col < state.n; col++) {
+                // 1. 尝试放置
+                await showAttempt(row, col);
+                
+                // 自动展开相关代码块（如果折叠了）
+                // 展开条件判断
+                const conditionGroupLines = document.querySelectorAll('.group-condition');
+                if (conditionGroupLines.length > 0 && conditionGroupLines[0].classList.contains('hidden')) {
+                    const startEl = document.getElementById('code-line-13');
+                    if (startEl) {
+                        const btn = startEl.querySelector('.fold-btn[data-fold-group="condition"]');
+                        if (btn) {
+                            btn.click();
+                            await sleep(50);
+                        }
+                    }
+                }
+                
+                // 2. 检查冲突
+                highlightCode(14); // if (!col[i]...) (满足 n 皇后的条件)
+                const conflict = checkConflict(row, col);
+                
+                if (!conflict) {
+                    // 满足条件动画
+                    showToast('位置安全！', 'green');
+                    await showSuccess(row, col);
+
+                    // 自动展开放置皇后代码块
+                    const placeGroupLines = document.querySelectorAll('.group-place');
+                    if (placeGroupLines.length > 0 && placeGroupLines[0].classList.contains('hidden')) {
+                        const startEl = document.getElementById('code-line-15');
+                        if (startEl) {
+                            const btn = startEl.querySelector('.fold-btn[data-fold-group="place"]');
+                            if (btn) {
+                                btn.click();
+                                await sleep(50);
+                            }
+                        }
+                    }
+
+                    // 无冲突，放置皇后
+                    highlightCode(16); // col[i] = ... = true (在坐标 row i 放置皇后)
+                    placeQueen(row, col);
+                    state.board[row] = col;
+                    log(`在行 ${row+1}, 列 ${col+1} 放置皇后`);
+                    
+                    await sleep(state.delay);
+                    highlightRow(row, false); // 离开当前行
+                    
+                    // 自动展开递归搜索代码块
+                    const recurseGroupLines = document.querySelectorAll('.group-recurse');
+                    if (recurseGroupLines.length > 0 && recurseGroupLines[0].classList.contains('hidden')) {
+                        const startEl = document.getElementById('code-line-17');
+                        if (startEl) {
+                            const btn = startEl.querySelector('.fold-btn[data-fold-group="recurse"]');
+                            if (btn) {
+                                btn.click();
+                                await sleep(50);
+                            }
+                        }
+                    }
+                    
+                    // 递归下一行
+                    highlightCode(18); // dfs(row + 1) (去递归搜索下一行)
+                    // 在调用 dfs 之前显示"进入下一层递归"
+                    showToast('进入下一层递归！', 'blue');
+                    await animateRowEntry(row);
+                    await solveNQueens(row + 1);
+                    
+                    // 回溯 - dfs 返回后立即显示
+                    highlightRow(row, true); // 回到当前行
+                    showToast('回溯！', 'red');
+                    await animateBacktrack(row);
+                    
+                    // 自动展开回溯代码块
+                    const backtrackGroupLines = document.querySelectorAll('.group-backtrack');
+                    if (backtrackGroupLines.length > 0 && backtrackGroupLines[0].classList.contains('hidden')) {
+                        const startEl = document.getElementById('code-line-19');
+                        if (startEl) {
+                            const btn = startEl.querySelector('.fold-btn[data-fold-group="backtrack"]');
+                            if (btn) {
+                                btn.click();
+                                await sleep(50);
+                            }
+                        }
+                    }
+                    
+                    highlightCode(20); // col[i] = ... = false (回溯)
+                    removeQueen(row, col);
+                    state.board[row] = -1;
+                    log(`回溯：移除行 ${row+1}, 列 ${col+1} 的皇后`);
+                    await sleep(state.delay);
+                } else {
+                    // 有冲突，显示冲突
+                    await showConflict(row, col, conflict);
+                }
+                highlightCode(12); // for loop continue
+            }
+            
+            highlightRow(row, false);
+            highlightCode(22); // end function
+        }
+
+        // 检查冲突
+        function checkConflict(row, col) {
+            for (let r = 0; r < row; r++) {
+                const c = state.board[r];
+                if (c === col) return { type: 'col', r: r, c: c }; // 同列
+                if (Math.abs(row - r) === Math.abs(col - c)) return { type: 'diag', r: r, c: c }; // 同对角线
+            }
+            return null;
+        }
+
+        // UI 操作：高亮行
+        function highlightRow(row, active) {
+            const cells = document.querySelectorAll(`.cell[data-row="${row}"]`);
+            cells.forEach(cell => {
+                if (active) cell.classList.add('active-row');
+                else cell.classList.remove('active-row');
+            });
+        }
+
+        // UI 操作：显示尝试
+        async function showAttempt(row, col) {
+            const cell = getCell(row, col);
+            cell.classList.add('check');
+            
+            // 添加一个半透明的皇后作为尝试
+            const img = document.createElement('img');
+            img.src = QUEEN_IMG_URL;
+            img.className = 'queen-img opacity-50 scale-75 grayscale';
+            img.style.opacity = '0.4';
+            img.id = `attempt-${row}-${col}`;
+            cell.appendChild(img);
+            
+            await sleep(state.delay * 0.5);
+        }
+
+        // UI 操作：显示冲突
+        async function showConflict(row, col, conflict) {
+            const cell = getCell(row, col);
+            const conflictCell = getCell(conflict.r, conflict.c);
+            
+            cell.classList.remove('check');
+            cell.classList.add('conflict');
+            conflictCell.classList.add('conflict');
+            
+            // 移除尝试的皇后
+            const attemptImg = document.getElementById(`attempt-${row}-${col}`);
+            if (attemptImg) attemptImg.remove();
+
+            // 绘制连线或高亮路径（简化为高亮格子）
+            log(`冲突：与行 ${conflict.r+1}, 列 ${conflict.c+1} 冲突`, 'error');
+            
+            await sleep(state.delay);
+            
+            cell.classList.remove('conflict');
+            conflictCell.classList.remove('conflict');
+        }
+
+        // UI 操作：显示动漫文字
+        function showToast(text, type = 'blue') {
+            const toast = document.createElement('div');
+            toast.className = `anime-toast ${type}`;
+            toast.textContent = text;
+            document.body.appendChild(toast);
+
+            anime({
+                targets: toast,
+                scale: [0, 1.5, 1],
+                opacity: [0, 1, 0],
+                translateY: ['-50%', '-150%'],
+                rotate: [-10, 0, 10],
+                duration: 1500,
+                easing: 'easeOutElastic(1, .6)',
+                complete: () => toast.remove()
+            });
+        }
+
+        // UI 操作：显示满足条件
+        async function showSuccess(row, col) {
+            const cell = getCell(row, col);
+            const attemptImg = document.getElementById(`attempt-${row}-${col}`);
+            if (attemptImg) attemptImg.style.opacity = '0.2';
+
+            const overlay = document.createElement('div');
+            overlay.className = 'absolute inset-0 bg-green-500/40 z-20 rounded flex items-center justify-center';
+            overlay.innerHTML = '<svg class="w-8 h-8 text-white drop-shadow-md" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>';
+            cell.appendChild(overlay);
+
+            anime({
+                targets: overlay,
+                scale: [0.5, 1.2, 1],
+                opacity: [0, 1, 0],
+                duration: Math.min(state.delay * 1.5, 1000),
+                easing: 'easeOutElastic(1, .6)',
+                complete: () => overlay.remove()
+            });
+
+            await sleep(Math.min(state.delay, 800));
+        }
+
+        // UI 操作：行进入动画
+        async function animateRowEntry(row) {
+            const cells = document.querySelectorAll(`.cell[data-row="${row}"]`);
+            anime({
+                targets: cells,
+                backgroundColor: ['#e0f2fe', '#1e90ff', '#e0f2fe'], // 闪烁蓝色（成长计划风格）
+                duration: 600,
+                easing: 'easeOutQuad',
+                delay: anime.stagger(50) // 从左到右依次闪烁
+            });
+            await sleep(300);
+        }
+
+        // UI 操作：回溯动画
+        async function animateBacktrack(row) {
+            const cells = document.querySelectorAll(`.cell[data-row="${row}"]`);
+            anime({
+                targets: cells,
+                borderColor: ['#bae6fd', '#ef4444', '#bae6fd'], // 边框闪烁红色
+                borderWidth: [0, 2, 0],
+                duration: 600,
+                easing: 'easeOutQuad'
+            });
+            await sleep(300);
+        }
+
+        // UI 操作：放置皇后
+        function placeQueen(row, col) {
+            const cell = getCell(row, col);
+            cell.classList.remove('check');
+            
+            // 移除尝试的图片
+            const attemptImg = document.getElementById(`attempt-${row}-${col}`);
+            if (attemptImg) attemptImg.remove();
+
+            const img = document.createElement('img');
+            img.src = QUEEN_IMG_URL;
+            img.className = 'queen-img';
+            img.id = `queen-${row}-${col}`;
+            cell.appendChild(img);
+            
+            // 添加坐标浮层
+            const coordTip = document.createElement('div');
+            coordTip.className = 'queen-coord';
+            coordTip.textContent = `(${row+1}, ${col+1})`; // 1-based index
+            coordTip.id = `coord-${row}-${col}`;
+            // 默认显示一下，然后隐藏（通过CSS hover显示，或者这里控制）
+            // 为了演示清晰，我们让它入场时显示，之后hover显示
+            cell.appendChild(coordTip);
+            
+            // 坐标入场动画
+            anime({
+                targets: coordTip,
+                opacity: [0, 1],
+                translateY: [5, 0],
+                duration: 400,
+                delay: 200
+            });
+
+            // 入场动画
+            anime({
+                targets: img,
+                opacity: [0, 1],
+                scale: [0.5, 0.9],
+                duration: 400,
+                easing: 'easeOutBack'
+            });
+        }
+
+        // UI 操作：移除皇后
+        function removeQueen(row, col) {
+            const img = document.getElementById(`queen-${row}-${col}`);
+            const coord = document.getElementById(`coord-${row}-${col}`);
+            if (coord) coord.remove();
+            
+            if (img) {
+                anime({
+                    targets: img,
+                    opacity: 0,
+                    scale: 0.5,
+                    duration: 300,
+                    easing: 'easeInBack',
+                    complete: () => img.remove()
+                });
+            }
+        }
+
+        // UI 操作：高亮解
+        async function highlightSolution() {
+            const queens = document.querySelectorAll('.queen-img:not(.opacity-50)');
+            anime({
+                targets: queens,
+                scale: [0.9, 1.1, 0.9],
+                boxShadow: ['0 4px 6px -1px rgba(0, 0, 0, 0.5)', '0 0 20px 5px rgba(251, 191, 36, 0.6)', '0 4px 6px -1px rgba(0, 0, 0, 0.5)'],
+                duration: 1000,
+                loop: 2,
+                direction: 'alternate'
+            });
+        }
+        
+        function clearHighlight() {
+             const queens = document.querySelectorAll('.queen-img');
+             anime.remove(queens);
+             queens.forEach(q => {
+                 q.style.transform = 'scale(0.9)';
+                 q.style.boxShadow = '0 4px 6px -1px rgba(30, 144, 255, 0.4)';
+             });
+        }
+
+        function getCell(row, col) {
+            return document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+        }
+
+        // 启动
+        init();
+
+    </script>
+</body>
+</html>

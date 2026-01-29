@@ -56,51 +56,6 @@
                     </div>
                   </div>
 
-                  <!-- 考试模式总分面板 -->
-                  <div class="content-section exam-score-panel" v-if="selectedTask && getExamModeScore()">
-                    <div class="section-content">
-                      <div class="score-panel-header">
-                        <Icon name="trophy" :size="32" />
-                        <h3>考试成绩</h3>
-                      </div>
-                      <div class="score-panel-body">
-                        <div class="total-score-display">
-                          <span class="total-score-value">{{ getExamModeScore()?.total }}</span>
-                          <span class="total-score-label">总分</span>
-                        </div>
-                        <div class="score-breakdown">
-                          <div class="score-item">
-                            <div class="score-item-header">
-                              <Icon name="file-text" :size="18" />
-                              <span>客观题 (50%)</span>
-                            </div>
-                            <div class="score-item-value" :class="{ 'no-submission': !getExamModeScore()?.hasExamSubmission }">
-                              {{ getExamModeScore()?.hasExamSubmission ? getExamModeScore()?.examScore : '未提交' }}
-                            </div>
-                          </div>
-                          <div class="score-item">
-                            <div class="score-item-header">
-                              <Icon name="code" :size="18" />
-                              <span>编程题1 (25%)</span>
-                            </div>
-                            <div class="score-item-value" :class="{ 'no-submission': !getExamModeScore()?.hasOJ1Submission, 'score-perfect': getExamModeScore()?.oj1Score === 100, 'score-partial': getExamModeScore()?.oj1Score > 0 && getExamModeScore()?.oj1Score < 100 }">
-                              {{ getExamModeScore()?.hasOJ1Submission ? getExamModeScore()?.oj1Score + '分' : '未提交' }}
-                            </div>
-                          </div>
-                          <div class="score-item">
-                            <div class="score-item-header">
-                              <Icon name="code" :size="18" />
-                              <span>编程题2 (25%)</span>
-                            </div>
-                            <div class="score-item-value" :class="{ 'no-submission': !getExamModeScore()?.hasOJ2Submission, 'score-perfect': getExamModeScore()?.oj2Score === 100, 'score-partial': getExamModeScore()?.oj2Score > 0 && getExamModeScore()?.oj2Score < 100 }">
-                              {{ getExamModeScore()?.hasOJ2Submission ? getExamModeScore()?.oj2Score + '分' : '未提交' }}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
                   <!-- 考试模式主界面 -->
                   <div class="content-section exam-mode-card" v-if="selectedTask">
                     <div class="section-content">
@@ -121,7 +76,7 @@
                       <div v-if="isExamExpired()" class="exam-ended-notice">
                         <div class="ended-notice-content">
                           <Icon name="info" :size="20" />
-                          <p>考试已结束，无法再次提交。如需继续练习，请前往题库进行专项训练。</p>
+                          <p>考试时间已结束，您可以点击"开始补考"继续练习，或查看提交记录。</p>
                         </div>
                       </div>
 
@@ -140,7 +95,6 @@
                               :key="exam.id"
                               class="exam-item-card"
                               :class="{ 'exam-ended': isExamExpired() }"
-                              @click="startExam(exam)"
                             >
                               <div class="exam-item-number">{{ index + 1 }}</div>
                               <div class="exam-item-info">
@@ -150,17 +104,35 @@
                               <div class="exam-item-score" :class="{ 'has-score': exam.best_score !== undefined && exam.best_score !== null }">
                                 {{ exam.best_score !== undefined && exam.best_score !== null ? exam.best_score + '分' : '未作答' }}
                               </div>
-                              <!-- 考试结束后显示查看提交记录按钮 -->
+                              <!-- 考试未结束时显示开始考试按钮 -->
                               <button 
-                                v-if="isExamExpired()"
-                                @click.stop="viewExamSubmissions(exam)" 
-                                class="btn-exam-action"
-                                title="查看提交记录"
+                                v-if="!isExamExpired()"
+                                @click="startExam(exam)" 
+                                class="btn-exam-action btn-start-exam"
+                                title="开始考试"
                               >
-                                <Icon name="clipboard-list" :size="16" />
-                                <span>提交记录</span>
+                                <Icon name="play" :size="16" />
+                                <span>开始考试</span>
                               </button>
-                              <Icon v-else name="chevron-right" :size="20" class="exam-item-arrow" />
+                              <!-- 考试结束后显示开始补考和查看提交记录按钮 -->
+                              <div v-else class="exam-action-group">
+                                <button 
+                                  @click="startExam(exam)" 
+                                  class="btn-exam-action btn-start-exam"
+                                  title="开始补考"
+                                >
+                                  <Icon name="refresh-cw" :size="16" />
+                                  <span>开始补考</span>
+                                </button>
+                                <button 
+                                  @click="viewExamSubmissions(exam)" 
+                                  class="btn-exam-action"
+                                  title="查看提交记录"
+                                >
+                                  <Icon name="clipboard-list" :size="16" />
+                                  <span>提交记录</span>
+                                </button>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -170,7 +142,6 @@
                           <div class="exam-section-header">
                             <Icon name="code" :size="22" />
                             <h3>编程题</h3>
-                            <span class="exam-count">共 {{ selectedTask.oj_problems.length }} 道</span>
                           </div>
                           <div class="exam-items-grid">
                             <div 
@@ -178,29 +149,44 @@
                               :key="problem.id"
                               class="exam-item-card"
                               :class="{ 'exam-ended': isExamExpired() }"
-                              @click="startOJ(problem)"
                             >
                               <div class="exam-item-number">{{ index + 1 }}</div>
                               <div class="exam-item-info">
                                 <h4>{{ problem.title }}</h4>
-                                <span class="difficulty-badge" :class="'difficulty-' + problem.difficulty">
-                                  {{ getDifficultyText(problem.difficulty) }}
-                                </span>
+                               
                               </div>
                               <div class="exam-item-score" :class="{ 'has-score': problem.best_verdict, 'score-ac': problem.best_verdict === 'Accepted', 'score-pac': problem.best_verdict && problem.best_verdict.includes('PAC') }">
                                 {{ problem.best_verdict ? (problem.best_verdict === 'Accepted' ? 'AC' : (getOJScore(problem) > 0 ? getOJScore(problem) + '分' : problem.best_verdict)) : '未作答' }}
                               </div>
-                              <!-- 考试结束后显示讲解视频按钮 -->
+                              <!-- 考试未结束时显示开始答题按钮 -->
                               <button 
-                                v-if="isExamExpired()"
-                                @click.stop="openVideoDialog(problem)" 
-                                class="btn-exam-action btn-video"
-                                title="观看讲解视频"
+                                v-if="!isExamExpired()"
+                                @click="startOJ(problem)" 
+                                class="btn-exam-action btn-start-exam"
+                                title="开始答题"
                               >
-                                <Icon name="play-circle" :size="16" />
-                                <span>讲解视频</span>
+                                <Icon name="play" :size="16" />
+                                <span>开始答题</span>
                               </button>
-                              <Icon v-else name="chevron-right" :size="20" class="exam-item-arrow" />
+                              <!-- 考试结束后显示开始补考和讲解视频按钮 -->
+                              <div v-else class="exam-action-group">
+                                <button 
+                                  @click="startOJ(problem)" 
+                                  class="btn-exam-action btn-start-exam"
+                                  title="开始补考"
+                                >
+                                  <Icon name="refresh-cw" :size="16" />
+                                  <span>开始补考</span>
+                                </button>
+                                <button 
+                                  @click="openVideoDialog(problem)" 
+                                  class="btn-exam-action btn-video"
+                                  title="观看讲解视频"
+                                >
+                                  <Icon name="play-circle" :size="16" />
+                                  <span>讲解视频</span>
+                                </button>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -243,65 +229,9 @@
                 <!-- 任务信息卡片 -->
                 <div class="content-section task-info-card" v-if="selectedTask">
                   <div class="section-content">
-                    <h2>{{ selectedTask.name }}</h2>
-                    <p class="task-info-desc">{{ selectedTask.description }}</p>
-                    
-                    <!-- 标签切换 -->
-                    <div class="task-tabs-container">
-                      <div class="task-tabs">
-                        <button 
-                          v-if="selectedTask.review_video_url"
-                          class="task-tab" 
-                          :class="{ active: activeTab === 'video' }"
-                          @click="activeTab = 'video'"
-                        >
-                          <Icon name="video" :size="18" /> 专项复习课
-                        </button>
-                        <button 
-                          v-if="selectedTask.review_content"
-                          class="task-tab" 
-                          :class="{ active: activeTab === 'handbook' }"
-                          @click="activeTab = 'handbook'"
-                        >
-                          <Icon name="book-open" :size="18" /> 知识手册
-                        </button>
-                        <button 
-                          class="task-tab" 
-                          :class="{ active: activeTab === 'exercises' }"
-                          @click="activeTab = 'exercises'"
-                        >
-                          <Icon name="file-text" :size="18" /> 专项练习题
-                        </button>
-                        <button 
-                          class="task-tab" 
-                          :class="{ active: activeTab === 'programming' }"
-                          @click="activeTab = 'programming'"
-                        >
-                          <Icon name="code" :size="18" /> 编程题
-                        </button>
-                        <button 
-                          class="task-tab" 
-                          :class="{ active: activeTab === 'feynman' }"
-                          @click="activeTab = 'feynman'"
-                        >
-                          <Icon name="lightbulb" :size="18" /> 费恩曼学习
-                        </button>
-                      </div>
-                      
                       <!-- 专项复习课（视频） -->
                       <div v-if="activeTab === 'video'" class="tab-content">
                         <div v-if="selectedTask.review_video_url" class="video-section-top">
-                          <div class="video-header">
-                            <div class="video-title">
-                              <Icon name="play-circle" :size="20" />
-                              <span>{{ selectedTask.name }} - 专项复习课</span>
-                            </div>
-                            <div class="video-actions">
-                              <a :href="selectedTask.review_video_url" target="_blank" rel="noopener noreferrer" class="btn-video-external">
-                                <Icon name="external-link" :size="16" /> 新窗口播放
-                              </a>
-                            </div>
-                          </div>
                           <div class="video-player-container">
                             <!-- 如果是直接视频文件链接，使用video标签 -->
                             <template v-if="isDirectVideoUrl(selectedTask.review_video_url)">
@@ -342,6 +272,9 @@
                             <Icon name="alert-circle" :size="24" />
                             <p>视频加载失败，请尝试<a :href="selectedTask.review_video_url" target="_blank">在新窗口打开</a></p>
                           </div>
+                          <a :href="selectedTask.review_video_url" target="_blank" rel="noopener noreferrer" class="btn-open-new-window-large">
+                            <Icon name="external-link" :size="32" /> 新窗口打开
+                          </a>
                         </div>
                         <div v-else class="empty-tab-content">
                           <Icon name="video" :size="48" />
@@ -352,26 +285,8 @@
                       <!-- 知识手册 -->
                       <div v-if="activeTab === 'handbook'" class="tab-content">
                         <div v-if="selectedTask.review_content" class="review-section">
-                          <div class="review-label-row">
-                            <div class="review-label">
-                              <Icon name="book-open" :size="18" /> 知识手册
-                            </div>
-                            <div class="review-actions">
-                              <button class="btn-refresh-handbook" @click="refreshHandbook" :disabled="handbookRefreshing">
-                                <Icon name="refresh-cw" :size="16" :class="{ 'spin-animation': handbookRefreshing }" /> {{ handbookRefreshing ? '刷新中...' : '刷新' }}
-                              </button>
-                              <button v-if="selectedTask.review_content_type !== 'pdf'" class="btn-download-handbook" @click="downloadHandbook">
-                                <Icon name="download" :size="16" /> 下载
-                              </button>
-                            </div>
-                          </div>
                           <!-- PDF展示 -->
                           <div v-if="selectedTask.review_content_type === 'pdf'" class="pdf-viewer-container">
-                            <div class="pdf-actions-top">
-                              <a :href="getPdfUrl(selectedTask.review_content)" target="_blank" rel="noopener noreferrer" class="btn-open-pdf">
-                                <Icon name="external-link" :size="16" /> 在新窗口打开
-                              </a>
-                            </div>
                             <!-- 够快云盘链接使用iframe -->
                             <iframe 
                               v-if="isGokuaiUrl(selectedTask.review_content)"
@@ -390,12 +305,20 @@
                             >
                               <div class="pdf-fallback">
                                 <Icon name="file-text" :size="48" />
-                                <p>您的浏览器不支持PDF预览，请点击上方按钮查看</p>
+                                <p>您的浏览器不支持PDF预览，请点击下方按钮查看</p>
                               </div>
                             </object>
+                            <a :href="getPdfUrl(selectedTask.review_content)" target="_blank" rel="noopener noreferrer" class="btn-open-new-window-large">
+                              <Icon name="external-link" :size="32" /> 新窗口打开
+                            </a>
                           </div>
                           <!-- 普通HTML内容 -->
-                          <div v-else class="review-content-box" v-html="selectedTask.review_content"></div>
+                          <div v-else class="review-content-wrapper">
+                            <div class="review-content-box" v-html="selectedTask.review_content"></div>
+                            <button @click="openHandbookInNewWindow" class="btn-open-new-window-large">
+                              <Icon name="external-link" :size="32" /> 新窗口打开
+                            </button>
+                          </div>
                         </div>
                         <div v-else class="empty-tab-content">
                           <Icon name="book-open" :size="48" />
@@ -411,29 +334,46 @@
                               <Icon name="file-text" :size="20" /> 专项练习题
                             </h4>
                           </div>
-                          <div class="exercises-grid">
+                          <div class="exercises-list">
                             <div 
                               v-for="exam in selectedTask.exams" 
                               :key="exam.id"
-                              class="exercise-card"
-                              @click="startExam(exam)"
+                              class="exercise-item"
                             >
-                              <div class="exercise-icon"><Icon name="file-text" :size="40" /></div>
-                              <h4>{{ exam.name }}</h4>
-                              <p class="exercise-desc">{{ exam.description }}</p>
-                              <div class="exercise-status" :class="getExerciseStatusClass(exam)">
-                                {{ getExerciseStatusText(exam) }}
+                              <div class="exercise-card">
+                                <div class="exercise-icon"><Icon name="file-text" :size="40" /></div>
+                                <h4>{{ exam.name }}</h4>
+                                <p class="exercise-desc">{{ exam.description }}</p>
+                                <div class="exercise-status" :class="getExerciseStatusClass(exam)">
+                                  {{ getExerciseStatusText(exam) }}
+                                </div>
+                                <div class="exercise-actions">
+                                  <button 
+                                    @click="startExam(exam)" 
+                                    class="btn-start-exercise"
+                                    title="开始练习"
+                                  >
+                                    <Icon name="play" :size="16" />
+                                    <span>开始练习</span>
+                                  </button>
+                                  <button 
+                                    @click="viewExamSubmissions(exam)" 
+                                    class="btn-view-submissions"
+                                    title="查看提交记录"
+                                  >
+                                    <Icon name="clipboard-list" :size="16" />
+                                    <span>提交记录</span>
+                                  </button>
+                                </div>
                               </div>
-                              <div class="exercise-actions">
-                                <button 
-                                  @click.stop="viewExamSubmissions(exam)" 
-                                  class="btn-view-submissions"
-                                  title="查看提交记录"
-                                >
-                                  <Icon name="clipboard-list" :size="16" />
-                                  <span>查看提交记录</span>
-                                </button>
-                              </div>
+                              <button 
+                                @click="viewLatestSubmissionExplanation" 
+                                class="btn-explanation-side"
+                                title="查看最近一次提交的解析"
+                              >
+                                <Icon name="book-open" :size="24" />
+                                <span>查看解析</span>
+                              </button>
                             </div>
                           </div>
                         </div>
@@ -457,25 +397,31 @@
                               :key="problem.id"
                               class="programming-item"
                             >
-                              <div class="exercise-card" @click="startOJ(problem)">
+                              <div class="exercise-card">
                                 <div class="exercise-icon"><Icon name="code" :size="40" /></div>
                                 <h4>{{ problem.title }}</h4>
                                 <div class="exercise-info">
-                                  <span class="difficulty-badge" :class="'difficulty-' + problem.difficulty">
-                                    {{ getDifficultyText(problem.difficulty) }}
-                                  </span>
+                                 
                                 </div>
                                 <div class="exercise-status" :class="getExerciseStatusClass(problem)">
                                   {{ getExerciseStatusText(problem) }}
                                 </div>
                                 <div class="exercise-actions">
                                   <button 
-                                    @click.stop="viewOJSubmissions(problem)" 
+                                    @click="startOJ(problem)" 
+                                    class="btn-start-exercise"
+                                    title="开始练习"
+                                  >
+                                    <Icon name="play" :size="16" />
+                                    <span>开始练习</span>
+                                  </button>
+                                  <button 
+                                    @click="viewOJSubmissions(problem)" 
                                     class="btn-view-submissions"
                                     title="查看提交记录"
                                   >
                                     <Icon name="clipboard-list" :size="16" />
-                                    <span>查看提交记录</span>
+                                    <span>提交记录</span>
                                   </button>
                                 </div>
                               </div>
@@ -546,7 +492,6 @@
                       </div>
                     </div>
                   </div>
-                </div>
                 </template>
               </template>
           </div>
@@ -568,7 +513,7 @@
           <div class="video-dialog-header">
             <h3>{{ currentVideoProblem?.title }} - 讲解视频</h3>
             <button @click="closeVideoDialog" class="video-dialog-close">
-              <Icon name="x" :size="24" />
+              <Icon name="x" :size="18" />
             </button>
           </div>
           <div class="video-dialog-content">
@@ -594,13 +539,244 @@
           </div>
         </div>
       </div>
+
+      <!-- 查看解析弹窗 -->
+      <div v-if="showExplanationDialog" class="submission-detail-modal" @click="closeExplanationDialog">
+        <div class="modal-content" @click.stop>
+          <div class="modal-header">
+            <h3 v-if="selectedSubmission">第 {{ selectedSubmission.attempt_number }} 次提交详情</h3>
+            <h3 v-else>查看解析</h3>
+            <button @click="closeExplanationDialog" class="close-btn">×</button>
+          </div>
+          <div class="modal-body">
+            <!-- 没有提交记录的情况 -->
+            <div v-if="noSubmissionMessage" class="no-submission-message">
+              <div class="no-submission-icon">
+                <Icon name="file-text" :size="64" />
+              </div>
+              <h3>还没提交过</h3>
+              <p>需要先提交才能查看解析哦～！</p>
+            </div>
+            
+            <!-- 有提交记录的情况 -->
+            <template v-else-if="selectedSubmission">
+              <div class="detail-summary">
+                <div class="summary-header">
+                  <div class="summary-info">
+                    <h4>{{ selectedSubmission.exam_name || '专项练习题' }}</h4>
+                    <p class="summary-date">{{ formatDateTime(selectedSubmission.submit_time) }}</p>
+                  </div>
+                  <div class="summary-actions">
+                    <button 
+                      @click="goToExamSubmissions(selectedSubmission.exam_id)" 
+                      class="btn-go-to-submissions"
+                      title="查看提交记录"
+                    >
+                      <Icon name="clipboard-list" :size="18" />
+                      <span>查看提交记录</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="answers-section">
+                <h4>答题详情</h4>
+                <div v-if="loadingExplanation" class="loading-state">
+                  <div class="loading-spinner"></div>
+                  <p>正在加载解析...</p>
+                </div>
+                <div v-else class="answers-list">
+                  <div 
+                    v-for="(answer, index) in submissionAnswers" 
+                    :key="answer.id || index"
+                    class="answer-item"
+                    :class="{ 'correct': answer.is_correct, 'incorrect': !answer.is_correct }"
+                  >
+                    <div class="answer-header">
+                      <div class="question-header-left">
+                        <span class="question-number">第 {{ answer.question_number || (index + 1) }} 题</span>
+                        <div class="question-meta">
+                          <span class="meta-tag" v-if="answer.level">等级: {{ getLevelText(answer.level) }}</span>
+                          <span class="meta-tag" v-if="answer.difficulty">难度: {{ answer.difficulty }}</span>
+                          <span class="meta-tag" v-if="answer.question_type">类型: {{ answer.question_type }}</span>
+                        </div>
+                      </div>
+                      <span class="answer-status" :class="{ 'correct': answer.is_correct, 'incorrect': !answer.is_correct }">
+                        {{ answer.is_correct ? '✓ 正确' : '✗ 错误' }}
+                      </span>
+                    </div>
+                    
+                    <div class="question-content">
+                      <div class="question-text">{{ answer.question_text }}</div>
+                      <div v-if="answer.question_code" class="question-code">
+                        <pre><code>{{ answer.question_code }}</code></pre>
+                      </div>
+                    </div>
+
+                    <div class="options-section">
+                      <div class="options-title">选项：</div>
+                      <div class="options-list">
+                        <div 
+                          v-for="option in (answer.options || [])" 
+                          :key="option.id"
+                          class="option-item"
+                          :class="{
+                            'user-selected': option.value === answer.user_answer,
+                            'correct-option': option.value === answer.correct_answer,
+                            'wrong-selected': option.value === answer.user_answer && !answer.is_correct
+                          }"
+                        >
+                          <span class="option-label">{{ option.label }}.</span>
+                          <span class="option-text">{{ option.text }}</span>
+                          <span class="option-indicator">
+                            <span v-if="option.value === answer.correct_answer" class="correct-mark">✓ 正确答案</span>
+                            <span v-if="option.value === answer.user_answer && answer.is_correct" class="user-mark correct">您的答案</span>
+                            <span v-if="option.value === answer.user_answer && !answer.is_correct" class="user-mark wrong">您的答案</span>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="answer-summary">
+                      <div class="answer-choice">
+                        <span class="choice-label">您的答案:</span>
+                        <span class="choice-value" :class="{ 'correct': answer.is_correct, 'incorrect': !answer.is_correct }">
+                          {{ answer.user_answer }}
+                        </span>
+                      </div>
+                      <div class="correct-answer">
+                        <span class="choice-label">正确答案:</span>
+                        <span class="choice-value correct">{{ answer.correct_answer }}</span>
+                      </div>
+                    </div>
+
+                    <div v-if="answer.explanation" class="explanation-section">
+                      <div class="explanation-title">解析：</div>
+                      <div class="explanation-text">{{ answer.explanation }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </template>
+          </div>
+          <div class="modal-footer">
+            <button @click="closeExplanationDialog" class="btn btn-secondary">关闭</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右侧标签切换（固定在页面右侧） -->
+      <!-- 普通模式 -->
+      <div v-if="selectedTask && !isExamMode" class="task-tabs-right-fixed">
+        <!-- 任务标题和描述 -->
+        <div class="task-header-right">
+          <h2 class="task-title-right">{{ selectedTask.name }}</h2>
+          <p v-if="selectedTask.description" class="task-desc-right">{{ selectedTask.description }}</p>
+        </div>
+        <div class="task-tabs-right">
+          <button 
+            class="task-tab-right" 
+            :class="{ active: activeTab === 'exercises' }"
+            @click="activeTab = 'exercises'"
+          >
+            <Icon name="file-text" :size="32" /> 
+            <span>专项练习题</span>
+          </button>
+          <button 
+            class="task-tab-right" 
+            :class="{ active: activeTab === 'programming' }"
+            @click="activeTab = 'programming'"
+          >
+            <Icon name="code" :size="32" /> 
+            <span>编程题</span>
+          </button>
+          <button 
+            v-if="selectedTask.review_video_url"
+            class="task-tab-right" 
+            :class="{ active: activeTab === 'video' }"
+            @click="activeTab = 'video'"
+          >
+            <Icon name="video" :size="32" /> 
+            <span>专项复习课</span>
+          </button>
+          <button 
+            v-if="selectedTask.review_content"
+            class="task-tab-right" 
+            :class="{ active: activeTab === 'handbook' }"
+            @click="activeTab = 'handbook'"
+          >
+            <Icon name="book-open" :size="32" /> 
+            <span>知识手册</span>
+          </button>
+          <button 
+            class="task-tab-right" 
+            :class="{ active: activeTab === 'feynman' }"
+            @click="activeTab = 'feynman'"
+          >
+            <Icon name="lightbulb" :size="32" /> 
+            <span>费恩曼学习</span>
+          </button>
+        </div>
+      </div>
+      
+      <!-- 考试模式：显示考试成绩面板 -->
+      <div v-if="selectedTask && isExamMode" class="task-tabs-right-fixed exam-mode-sidebar">
+        <!-- 任务标题和描述 -->
+        <div class="task-header-right">
+          <h2 class="task-title-right">{{ selectedTask.name }}</h2>
+          <p v-if="selectedTask.description" class="task-desc-right">{{ selectedTask.description }}</p>
+        </div>
+        <!-- 考试成绩面板 -->
+        <div v-if="examModeScore" class="exam-score-panel-sidebar">
+          <div class="score-panel-header">
+            <Icon name="trophy" :size="32" />
+            <h3>考试成绩</h3>
+          </div>
+          <div class="score-panel-body">
+            <div class="total-score-display">
+              <span class="total-score-value">{{ examModeScore.total }}</span>
+              <span class="total-score-label">总分</span>
+            </div>
+            <div class="score-breakdown">
+              <div class="score-item">
+                <div class="score-item-header">
+                  <Icon name="file-text" :size="18" />
+                  <span>客观题 (50%)</span>
+                </div>
+                <div class="score-item-value" :class="{ 'no-submission': !examModeScore.hasExamSubmission }">
+                  {{ examModeScore.hasExamSubmission ? examModeScore.examScore : '未提交' }}
+                </div>
+              </div>
+              <div class="score-item">
+                <div class="score-item-header">
+                  <Icon name="code" :size="18" />
+                  <span>编程题1 (25%)</span>
+                </div>
+                <div class="score-item-value" :class="{ 'no-submission': !examModeScore.hasOJ1Submission, 'score-perfect': examModeScore.oj1Score === 100, 'score-partial': examModeScore.oj1Score > 0 && examModeScore.oj1Score < 100 }">
+                  {{ examModeScore.hasOJ1Submission ? examModeScore.oj1Score + '分' : '未提交' }}
+                </div>
+              </div>
+              <div class="score-item">
+                <div class="score-item-header">
+                  <Icon name="code" :size="18" />
+                  <span>编程题2 (25%)</span>
+                </div>
+                <div class="score-item-value" :class="{ 'no-submission': !examModeScore.hasOJ2Submission, 'score-perfect': examModeScore.oj2Score === 100, 'score-partial': examModeScore.oj2Score > 0 && examModeScore.oj2Score < 100 }">
+                  {{ examModeScore.hasOJ2Submission ? examModeScore.oj2Score + '分' : '未提交' }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </template>
   
   <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import Icon from '@/components/Icon.vue'
+import axios from 'axios'
   
   const router = useRouter()
 const route = useRoute()
@@ -625,6 +801,13 @@ const selectedPlanId = ref<number | null>(null)
   const videoPlayer = ref<HTMLVideoElement | null>(null)
   const videoError = ref(false)
   const videoPlaying = ref(false)
+  
+  // 查看解析弹窗相关状态
+  const showExplanationDialog = ref(false)
+  const selectedSubmission = ref<any>(null)
+  const submissionAnswers = ref<any[]>([])
+  const loadingExplanation = ref(false)
+  const noSubmissionMessage = ref(false)
   
   const fetchTaskExercises = async (taskId: number) => {
     if (!userInfo.value?.id) return null
@@ -720,6 +903,9 @@ const selectedPlanId = ref<number | null>(null)
     }
   }
 
+  // 计算属性：考试成绩（用于模板中安全访问）
+  const examModeScore = computed(() => getExamModeScore())
+
   const getOJProgressPercent = () => {
     if (!taskProgress.value?.oj_progress) return 0
     const total = taskProgress.value.oj_progress.total ?? 0
@@ -747,20 +933,58 @@ const selectedPlanId = ref<number | null>(null)
   }
   
   const startExam = (exam: any) => {
-  router.push(`/exam/${exam.id}?from=taskview&planId=${selectedPlanId.value ?? ''}&taskId=${selectedTask.value?.id ?? ''}`)
+    // 构建URL参数，只传递有效的值
+    const params = new URLSearchParams()
+    params.set('from', 'taskview')
+    if (selectedPlanId.value) {
+      params.set('planId', selectedPlanId.value.toString())
+    }
+    if (selectedTask.value?.id) {
+      params.set('taskId', selectedTask.value.id.toString())
+    }
+    // 从任务页面进入，使用任务内考试页面
+    router.push(`/plan-exam/${exam.id}?${params.toString()}`)
   }
   const startOJ = (problem: any) => {
-  router.push(`/smartoj/${problem.id}?from=taskview&planId=${selectedPlanId.value ?? ''}&taskId=${selectedTask.value?.id ?? ''}`)
-}
+    // 构建URL参数，只传递有效的值
+    const params = new URLSearchParams()
+    params.set('from', 'taskview')
+    if (selectedPlanId.value) {
+      params.set('planId', selectedPlanId.value.toString())
+    }
+    if (selectedTask.value?.id) {
+      params.set('taskId', selectedTask.value.id.toString())
+    }
+    // 从任务页面进入，使用任务内编程题页面
+    router.push(`/plan-smartoj/${problem.id}?${params.toString()}`)
+  }
 
 // 查看专项练习题提交记录
 const viewExamSubmissions = (exam: any) => {
-  router.push(`/exam-submissions/${exam.id}?from=taskview&planId=${selectedPlanId.value ?? ''}&taskId=${selectedTask.value?.id ?? ''}`)
+  // 构建URL参数，只传递有效的值
+  const params = new URLSearchParams()
+  params.set('from', 'taskview')
+  if (selectedPlanId.value) {
+    params.set('planId', selectedPlanId.value.toString())
+  }
+  if (selectedTask.value?.id) {
+    params.set('taskId', selectedTask.value.id.toString())
+  }
+  router.push(`/exam-submissions/${exam.id}?${params.toString()}`)
 }
 
 // 查看编程题提交记录
 const viewOJSubmissions = (problem: any) => {
-  router.push(`/oj-submissions/${problem.id}`)
+  // 构建URL参数，只传递有效的值
+  const params = new URLSearchParams()
+  params.set('from', 'taskview')
+  if (selectedPlanId.value) {
+    params.set('planId', selectedPlanId.value.toString())
+  }
+  if (selectedTask.value?.id) {
+    params.set('taskId', selectedTask.value.id.toString())
+  }
+  router.push(`/oj-submissions/${problem.id}?${params.toString()}`)
 }
 
 // 打开视频弹窗
@@ -787,6 +1011,132 @@ const openVideoDialog = async (problem: any) => {
 const closeVideoDialog = () => {
   showVideoDialog.value = false
   currentVideoProblem.value = null
+}
+
+// 查看最近一次提交的解析
+const viewLatestSubmissionExplanation = async () => {
+  if (!userInfo.value?.id || !selectedTask.value?.exams?.length) {
+    alert('无法获取用户信息或任务信息')
+    return
+  }
+  
+  loadingExplanation.value = true
+  noSubmissionMessage.value = false
+  
+  try {
+    // 获取所有专项练习题的提交记录
+    const allSubmissions: any[] = []
+    
+    for (const exam of selectedTask.value.exams) {
+      try {
+        const response = await axios.get(`${BASE_URL}/submissions`, {
+          params: {
+            user_id: userInfo.value.id,
+            exam_id: exam.id
+          }
+        })
+        
+        if (Array.isArray(response.data) && response.data.length > 0) {
+          allSubmissions.push(...response.data)
+        }
+      } catch (error) {
+        console.error(`获取考试 ${exam.id} 的提交记录失败:`, error)
+      }
+    }
+    
+    // 如果没有提交记录
+    if (allSubmissions.length === 0) {
+      noSubmissionMessage.value = true
+      showExplanationDialog.value = true
+      loadingExplanation.value = false
+      return
+    }
+    
+    // 按提交时间排序，获取最近一次提交
+    allSubmissions.sort((a: any, b: any) => {
+      const timeA = new Date(a.submit_time).getTime()
+      const timeB = new Date(b.submit_time).getTime()
+      return timeB - timeA
+    })
+    
+    const latestSubmission = allSubmissions[0]
+    selectedSubmission.value = latestSubmission
+    
+    // 获取提交详情
+    await fetchSubmissionDetail(latestSubmission.id)
+    showExplanationDialog.value = true
+  } catch (error: any) {
+    console.error('获取提交记录失败:', error)
+    alert('获取提交记录失败: ' + (error.response?.data?.error || error.message))
+  } finally {
+    loadingExplanation.value = false
+  }
+}
+
+// 获取提交详情
+const fetchSubmissionDetail = async (submissionId: number) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/submissions/${submissionId}`)
+    const answers = response.data.answers || []
+    // 按题目序号排序
+    submissionAnswers.value = answers.sort((a: any, b: any) => {
+      const numA = a.question_number || 0
+      const numB = b.question_number || 0
+      return numA - numB
+    })
+  } catch (error: any) {
+    console.error('获取提交详情失败:', error)
+    alert('获取提交详情失败: ' + (error.response?.data?.error || error.message))
+  }
+}
+
+// 关闭解析弹窗
+const closeExplanationDialog = () => {
+  showExplanationDialog.value = false
+  selectedSubmission.value = null
+  submissionAnswers.value = []
+  noSubmissionMessage.value = false
+}
+
+// 跳转到客观试卷的提交记录页面
+const goToExamSubmissions = (examId: number) => {
+  if (!examId) return
+  
+  // 构建URL参数
+  const params = new URLSearchParams()
+  params.set('from', 'taskview')
+  if (selectedPlanId.value) {
+    params.set('planId', selectedPlanId.value.toString())
+  }
+  if (selectedTask.value?.id) {
+    params.set('taskId', selectedTask.value.id.toString())
+  }
+  
+  // 关闭弹窗并跳转
+  closeExplanationDialog()
+  router.push(`/exam-submissions/${examId}?${params.toString()}`)
+}
+
+// 等级文本
+const getLevelText = (level: number) => {
+  if (level === 6) return 'CSP-J'
+  return `GESP ${level}级`
+}
+
+// 获取分数等级
+const getScoreClass = (score: number) => {
+  if (score >= 90) return 'excellent'
+  if (score >= 80) return 'good'
+  if (score >= 60) return 'pass'
+  return 'fail'
+}
+
+// 获取分数文本
+const getScoreText = (score: number) => {
+  if (score >= 90) return '优秀'
+  if (score >= 80) return '良好'
+  if (score >= 60) return '及格'
+  return '不及格'
 }
 
 const backToTasks = () => {
@@ -925,6 +1275,57 @@ const getFireworkStyle = (index: number) => {
     animationDelay: `${delay}s`,
     animationDuration: `${duration}s`,
   }
+}
+
+// 在新窗口打开知识手册
+const openHandbookInNewWindow = () => {
+  if (!selectedTask.value?.review_content) return
+  
+  // 创建新窗口并显示HTML内容
+  const newWindow = window.open('', '_blank')
+  if (!newWindow) {
+    alert('无法打开新窗口，请检查浏览器弹窗设置')
+    return
+  }
+  
+  const htmlContent = `
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${selectedTask.value.name} - 知识手册</title>
+  <style>
+    body { 
+      font-family: '微软雅黑', 'Microsoft YaHei', 'PingFang SC', sans-serif; 
+      line-height: 1.8; 
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      background: #f8fafc;
+      color: #1e293b;
+    }
+    h1, h2, h3, h4 { color: #1e293b; margin-top: 24px; margin-bottom: 12px; }
+    h1 { font-size: 2rem; border-bottom: 3px solid #1e90ff; padding-bottom: 12px; }
+    h2 { font-size: 1.5rem; }
+    h3 { font-size: 1.3rem; }
+    p { margin: 12px 0; }
+    table { border-collapse: collapse; width: 100%; margin: 16px 0; }
+    th, td { border: 1px solid #ccc; padding: 12px; text-align: left; }
+    th { background: #e0f2fe; font-weight: 600; }
+    ul, ol { margin: 12px 0; padding-left: 24px; }
+    li { margin: 6px 0; }
+    strong { color: #1e293b; font-weight: 700; }
+    img { max-width: 100%; height: auto; }
+  </style>
+</head>
+<body>
+  <h1>${selectedTask.value.name} - 知识手册</h1>
+  ${selectedTask.value.review_content}
+</body>
+</html>`
+  
+  newWindow.document.write(htmlContent)
+  newWindow.document.close()
 }
 
 // 下载知识手册为docx（使用Word兼容的HTML格式）
@@ -1379,21 +1780,21 @@ watch(() => taskProgress.value?.task_progress?.is_completed, (newVal, oldVal) =>
 .question-left-panel { flex: 1; overflow: visible; padding: 24px; display: flex; flex-direction: column; gap: 24px; background: transparent; /* 透明背景，融入页面背景 */ }
 .question-left-panel-centered { max-width: 1600px; margin: 0 auto; width: 100%; }
 .content-section { 
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); 
-  border-radius: 20px; 
-  box-shadow: 0 8px 32px rgba(30, 144, 255, 0.12); 
+  background: linear-gradient(135deg, #ffffff 0%, #e0f2fe 100%); 
+  border-radius: 24px; 
+  box-shadow: 0 12px 40px rgba(30, 144, 255, 0.3); 
   overflow: visible; 
-  border: 2px solid #e0f2fe; 
+  border: 6px solid #1e90ff; 
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
   position: relative; 
   display: flex; 
   flex-direction: column; 
   min-height: fit-content; 
 }
-.section-header { background: linear-gradient(135deg, #1e90ff 0%, #38bdf8 100%); padding: 18px 24px; border-bottom: 2px solid #e0f2fe; border-radius: 18px 18px 0 0; position: relative; }
-.section-title { margin: 0; color: white; font-size: 1.2rem; font-weight: 700; display: flex; align-items: center; gap: 8px; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }
-.section-title :deep(.lucide-icon) { color: white; }
-.section-content { padding: 24px; background: transparent; }
+.section-header { background: linear-gradient(135deg, #1e90ff 0%, #38bdf8 100%); padding: 24px 32px; border-bottom: 4px solid #0c7cd5; border-radius: 20px 20px 0 0; position: relative; }
+.section-title { margin: 0; color: white; font-size: 1.8rem; font-weight: 900; display: flex; align-items: center; gap: 12px; text-shadow: 0 3px 6px rgba(0, 0, 0, 0.3); letter-spacing: 1px; }
+.section-title :deep(.lucide-icon) { color: white; width: 32px; height: 32px; }
+.section-content { padding: 8px; background: transparent; }
 /* LevelExamsView风格统一返回按钮样式 */
 .back-btn {
   background: linear-gradient(135deg, #1e90ff 0%, #38bdf8 100%);
@@ -1415,27 +1816,30 @@ watch(() => taskProgress.value?.task_progress?.is_completed, (newVal, oldVal) =>
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(30,144,255,0.3);
 }
-.empty-state { text-align: center; padding: 60px 20px; }
-.empty-icon { font-size: 5rem; margin-bottom: 20px; }
-.empty-state h3 { color: #1e293b; font-size: 1.5rem; margin: 0 0 10px 0; }
-.empty-state p { color: #64748b; font-size: 1.1rem; }
-.error-state { text-align: center; padding: 60px 20px; background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border: 2px solid #fecaca; }
-.error-icon { font-size: 5rem; margin-bottom: 20px; }
-.error-state h3 { color: #dc2626; font-size: 1.5rem; margin: 0 0 10px 0; }
-.error-state p { color: #991b1b; font-size: 1.1rem; margin-bottom: 20px; }
-.retry-btn { background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); color: white; border: none; padding: 12px 24px; border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 8px; }
-.retry-btn:hover { background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3); }
-.loading-state { text-align: center; padding: 60px 20px; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border: 2px solid #bae6fd; }
-.loading-icon { font-size: 5rem; margin-bottom: 20px; display: flex; justify-content: center; align-items: center; color: #1e90ff; }
+.empty-state { text-align: center; padding: 80px 32px; }
+.empty-icon { font-size: 6rem; margin-bottom: 24px; }
+.empty-state h3 { color: #01579b; font-size: 2rem; margin: 0 0 16px 0; font-weight: 900; letter-spacing: 1px; }
+.empty-state p { color: #0277bd; font-size: 1.3rem; font-weight: 600; }
+.error-state { text-align: center; padding: 80px 32px; background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border: 6px solid #ef4444; border-radius: 24px; }
+.error-icon { font-size: 6rem; margin-bottom: 24px; }
+.error-state h3 { color: #dc2626; font-size: 2rem; margin: 0 0 16px 0; font-weight: 900; letter-spacing: 1px; }
+.error-state p { color: #991b1b; font-size: 1.3rem; margin-bottom: 24px; font-weight: 600; }
+.retry-btn { background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); color: white; border: 5px solid #b91c1c; padding: 16px 32px; border-radius: 16px; font-size: 1.2rem; font-weight: 900; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 10px; letter-spacing: 0.5px; box-shadow: 0 4px 16px rgba(220, 38, 38, 0.3); }
+.retry-btn:hover { background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%); transform: translateY(-2px) scale(1.05); box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4); border-width: 6px; }
+.loading-state { text-align: center; padding: 80px 32px; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border: 6px solid #1e90ff; border-radius: 24px; }
+.loading-icon { font-size: 6rem; margin-bottom: 24px; display: flex; justify-content: center; align-items: center; color: #1e90ff; }
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 .task-info-card { 
-  margin-bottom: 24px; 
+  margin-bottom: 32px; 
   background: linear-gradient(135deg, #e0f7fa 0%, #b3e5fc 100%) !important; /* 与费恩曼学习法相同的渐变色 */
+  border: 6px solid #0288d1 !important;
+  border-radius: 24px !important;
+  box-shadow: 0 12px 40px rgba(2, 136, 209, 0.3) !important;
 }
-.task-info-card h2 { color: #1e293b; font-size: 1.6rem; margin: 0 0 12px 0; font-weight: 700; }
-.task-info-desc { color: #64748b; font-size: 1rem; margin: 0 0 20px 0; line-height: 1.6; }
+.task-info-card h2 { color: #01579b; font-size: 2rem; margin: 0 0 16px 0; font-weight: 900; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }
+.task-info-desc { color: #0277bd; font-size: 1.2rem; margin: 0 0 24px 0; line-height: 1.8; font-weight: 600; }
 
-/* 标签切换容器 */
+/* 标签切换容器（已移除，保留样式以防其他地方使用） */
 .task-tabs-container {
   margin-top: 24px;
 }
@@ -1480,6 +1884,177 @@ watch(() => taskProgress.value?.task_progress?.is_completed, (newVal, oldVal) =>
   color: inherit;
 }
 
+/* 右侧固定标签切换 - 低幼化风格 */
+.task-tabs-right-fixed {
+  position: fixed;
+  top: 48px; /* 从导航栏下方开始，导航栏高度为48px */
+  right: 0;
+  bottom: 0;
+  width: 260px; /* 从320px减小到260px，让内容区更大 */
+  z-index: 999; /* 低于导航栏的z-index: 1000 */
+  background: linear-gradient(135deg, #1e90ff 0%, #38bdf8 100%);
+  border-left: 6px solid #0c7cd5;
+  box-shadow: -12px 0 40px rgba(30, 144, 255, 0.4);
+  padding: 20px 14px; /* 相应减小内边距 */
+  backdrop-filter: blur(10px);
+  animation: slideRight 0.4s ease-out;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+@keyframes slideRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* 右侧任务标题和描述 */
+.task-header-right {
+  text-align: center;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 3px solid rgba(255, 255, 255, 0.3);
+}
+
+.task-title-right {
+  margin: 0 0 8px 0;
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: white;
+  text-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+  letter-spacing: 1px;
+  line-height: 1.3;
+  word-break: break-word;
+}
+
+.task-desc-right {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.task-tabs-right {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+}
+
+.task-tab-right {
+  background: rgba(255, 255, 255, 0.98);
+  border: 5px solid rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
+  padding: 20px 16px;
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: #1e293b;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.task-tab-right::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(30, 144, 255, 0.1) 0%, rgba(56, 189, 248, 0.1) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.task-tab-right:hover {
+  transform: translateX(-4px) scale(1.05);
+  box-shadow: 0 12px 32px rgba(30, 144, 255, 0.5);
+  border-color: #fff;
+  background: #fff;
+  animation: bounceRight 0.5s ease;
+}
+
+@keyframes bounceRight {
+  0%, 100% {
+    transform: translateX(-4px) scale(1.05);
+  }
+  50% {
+    transform: translateX(-6px) scale(1.07);
+  }
+}
+
+.task-tab-right:hover::before {
+  opacity: 1;
+}
+
+.task-tab-right.active {
+  background: linear-gradient(135deg, #fff 0%, #e0f2fe 100%);
+  border-color: #1e90ff;
+  border-width: 6px;
+  color: #1e90ff;
+  box-shadow: 0 12px 40px rgba(30, 144, 255, 0.6);
+  transform: translateX(-3px) scale(1.03);
+  animation: pulseRight 2s ease-in-out infinite;
+}
+
+@keyframes pulseRight {
+  0%, 100% {
+    box-shadow: 0 12px 40px rgba(30, 144, 255, 0.6);
+  }
+  50% {
+    box-shadow: 0 12px 50px rgba(30, 144, 255, 0.8);
+  }
+}
+
+.task-tab-right.active::before {
+  opacity: 1;
+  background: linear-gradient(135deg, rgba(30, 144, 255, 0.2) 0%, rgba(56, 189, 248, 0.2) 100%);
+}
+
+.task-tab-right :deep(.lucide-icon) {
+  color: inherit;
+  flex-shrink: 0;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.task-tab-right span {
+  font-size: 1.6rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+  line-height: 1.2;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.task-tab-right.active span {
+  color: #1e90ff;
+  text-shadow: 0 3px 6px rgba(30, 144, 255, 0.3);
+}
+
+.task-tab-right:active {
+  transform: translateX(-2px) scale(1.01);
+}
+
+/* 为右侧标签预留空间，避免内容被遮挡 */
+.question-left-panel {
+  padding-right: 280px; /* 为右侧标签（包含标题和描述）预留空间，从340px减小到280px */
+}
+
 /* 标签内容区域 */
 .tab-content {
   min-height: 200px;
@@ -1500,39 +2075,47 @@ watch(() => taskProgress.value?.task_progress?.is_completed, (newVal, oldVal) =>
 /* 空状态 */
 .empty-tab-content {
   text-align: center;
-  padding: 60px 20px;
-  color: #94a3b8;
+  padding: 80px 32px;
+  color: #0277bd;
 }
 
 .empty-tab-content :deep(.lucide-icon) {
-  color: #cbd5e1;
-  margin-bottom: 16px;
+  color: #1e90ff;
+  margin-bottom: 24px;
+  width: 80px;
+  height: 80px;
 }
 
 .empty-tab-content p {
-  font-size: 1rem;
+  font-size: 1.4rem;
   margin: 0;
+  font-weight: 700;
+  letter-spacing: 0.5px;
 }
 
 /* 内联标题样式 */
 .section-header-inline {
-  margin-bottom: 20px;
-  padding-bottom: 12px;
-  border-bottom: 2px solid #e2e8f0;
+  margin-bottom: 28px;
+  padding-bottom: 16px;
+  border-bottom: 4px solid #1e90ff;
 }
 
 .section-title-inline {
   margin: 0;
-  color: #1e293b;
-  font-size: 1.2rem;
-  font-weight: 700;
+  color: #01579b;
+  font-size: 1.8rem;
+  font-weight: 900;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .section-title-inline :deep(.lucide-icon) {
   color: #1e90ff;
+  width: 32px;
+  height: 32px;
 }
 
 /* 练习题和编程题区域 */
@@ -1725,60 +2308,64 @@ watch(() => taskProgress.value?.task_progress?.is_completed, (newVal, oldVal) =>
   gap: 24px;
 }
 
+/* 大大的新窗口打开按钮 */
+.btn-open-new-window-large {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  padding: 24px 32px;
+  margin-top: 8px;
+  margin-bottom: 0;
+  background: linear-gradient(135deg, #1e90ff 0%, #38bdf8 100%);
+  color: white;
+  border: 6px solid #0c7cd5;
+  border-radius: 12px;
+  font-size: 1.8rem;
+  font-weight: 900;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(30, 144, 255, 0.3);
+  letter-spacing: 1px;
+  cursor: pointer;
+}
+
+.btn-open-new-window-large:hover {
+  background: linear-gradient(135deg, #0c7cd5 0%, #1e90ff 100%);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 12px 32px rgba(30, 144, 255, 0.5);
+  border-width: 7px;
+}
+
+.btn-open-new-window-large :deep(.lucide-icon) {
+  flex-shrink: 0;
+  color: inherit;
+}
+
 /* 专项复习课（视频区域） */
 .video-section-top {
-  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  background: transparent;
   padding: 0;
-  border-radius: 16px;
-  border: 2px solid #334155;
-  overflow: hidden;
+  border-radius: 0;
+  border: none;
+  overflow: visible;
 }
 
 .video-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 20px;
-  background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
-  border-bottom: 1px solid #475569;
+  display: none; /* 隐藏原来的header */
 }
 
 .video-title {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: white;
-  font-size: 1rem;
-  font-weight: 600;
-}
-
-.video-title :deep(.lucide-icon) {
-  color: #38bdf8;
+  display: none;
 }
 
 .video-actions {
-  display: flex;
-  gap: 8px;
+  display: none;
 }
 
 .btn-video-external {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
-  background: rgba(56, 189, 248, 0.2);
-  color: #38bdf8;
-  border: 1px solid #38bdf8;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 600;
-  text-decoration: none;
-  transition: all 0.3s ease;
-}
-
-.btn-video-external:hover {
-  background: rgba(56, 189, 248, 0.3);
-  transform: translateY(-1px);
+  display: none;
 }
 
 .video-error {
@@ -1815,31 +2402,27 @@ watch(() => taskProgress.value?.task_progress?.is_completed, (newVal, oldVal) =>
 }
 
 .review-section { 
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); 
-  padding: 20px; 
-  border-radius: 12px; 
-  border: 2px solid #fbbf24; 
+  background: transparent; 
+  padding: 0; 
+  border-radius: 0; 
+  border: none; 
 }
 
 .review-label-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
+  display: none; /* 隐藏标签行 */
 }
 
 .review-label { 
-  color: #78350f; 
-  font-size: 1.1rem; 
-  margin: 0; 
-  display: flex; 
-  align-items: center; 
-  gap: 8px; 
-  font-weight: 600;
+  display: none;
 }
 
 .review-actions {
+  display: none; /* 隐藏操作按钮 */
+}
+
+.review-content-wrapper {
   display: flex;
+  flex-direction: column;
   gap: 8px;
 }
 
@@ -1900,13 +2483,14 @@ watch(() => taskProgress.value?.task_progress?.is_completed, (newVal, oldVal) =>
 }
 .review-content-box { 
   background: rgba(255, 255, 255, 0.5); 
-  padding: 20px; 
+  padding: 8px; 
   border-radius: 8px; 
   color: #78350f; 
   line-height: 1.8; 
   word-wrap: break-word;
   flex: 1;
   min-width: 0;
+  border: none;
 }
 
 /* HTML内容样式 */
@@ -1965,64 +2549,37 @@ watch(() => taskProgress.value?.task_progress?.is_completed, (newVal, oldVal) =>
   width: 100%;
   height: 90vh;
   min-height: 800px;
-  border-radius: 12px;
+  border-radius: 0;
   overflow: hidden;
   background: #f8fafc;
-  border: 2px solid #e2e8f0;
+  border: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .pdf-viewer {
   width: 100%;
-  height: 100%;
+  flex: 1;
+  min-height: 0;
   border: none;
 }
 
 .pdf-viewer-iframe {
   width: 100%;
-  height: 100%;
+  flex: 1;
+  min-height: 0;
   border: none;
   background: #f8fafc;
 }
 
 .pdf-actions-top {
-  display: flex;
-  gap: 12px;
-  padding: 12px 16px;
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-  border-bottom: 2px solid #e2e8f0;
+  display: none; /* 隐藏原来的操作栏，使用大的按钮 */
 }
 
 .btn-open-pdf,
 .btn-download-pdf {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 20px;
-  border-radius: 8px;
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 14px;
-  transition: all 0.3s ease;
-}
-
-.btn-open-pdf {
-  background: linear-gradient(135deg, #1e90ff 0%, #38bdf8 100%);
-  color: white;
-}
-
-.btn-open-pdf:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(30, 144, 255, 0.3);
-}
-
-.btn-download-pdf {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: white;
-}
-
-.btn-download-pdf:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  display: none;
 }
 
 .pdf-fallback {
@@ -2063,9 +2620,12 @@ watch(() => taskProgress.value?.task_progress?.is_completed, (newVal, oldVal) =>
 .video-player-container {
   background: #000;
   overflow: hidden;
-  aspect-ratio: 16 / 9;
   position: relative;
   cursor: pointer;
+  width: 100%;
+  height: calc(100vh - 250px); /* 动态高度，减去顶部导航、按钮和底部空间 */
+  min-height: 600px;
+  max-height: calc(100vh - 250px);
 }
 
 .embedded-video-player {
@@ -2078,7 +2638,7 @@ watch(() => taskProgress.value?.task_progress?.is_completed, (newVal, oldVal) =>
 .embedded-iframe-player {
   width: 100%;
   height: 100%;
-  min-height: 500px;
+  min-height: 600px;
   border: none;
   background: #000;
 }
@@ -2158,56 +2718,107 @@ watch(() => taskProgress.value?.task_progress?.is_completed, (newVal, oldVal) =>
   transform: translateY(-2px); 
   box-shadow: 0 4px 12px rgba(30, 144, 255, 0.4); 
 }
-.exercises-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
-.exercise-card { background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border: 2px solid #e2e8f0; border-radius: 16px; padding: 20px; cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden; }
-.exercise-card:hover { border-color: #1e90ff; transform: translateY(-4px); box-shadow: 0 8px 24px rgba(30, 144, 255, 0.2); }
-.exercise-icon { font-size: 2.5rem; margin-bottom: 12px; display: flex; justify-content: center; align-items: center; color: #1e90ff; }
-.exercise-card h4 { color: #1e293b; font-size: 1.1rem; margin: 0 0 8px 0; font-weight: 700; }
-.exercise-desc { color: #64748b; font-size: 0.9rem; margin: 0 0 12px 0; line-height: 1.5; }
-.exercise-info { display: flex; gap: 12px; margin-bottom: 12px; font-size: 0.85rem; color: #64748b; }
-.difficulty-badge { padding: 4px 10px; border-radius: 10px; font-size: 0.8rem; font-weight: 600; }
-.difficulty-easy { background: #d1fae5; color: #059669; }
-.difficulty-medium { background: #fed7aa; color: #d97706; }
-.difficulty-hard { background: #fecaca; color: #dc2626; }
-.exercise-status { position: absolute; top: 16px; right: 16px; padding: 4px 10px; border-radius: 10px; font-size: 0.75rem; font-weight: 600; }
-.status-pending { background: #fee2e2; color: #dc2626; }
-.status-completed { background: #d1fae5; color: #059669; }
+/* 专项练习题列表布局 */
+.exercises-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.exercise-item {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.exercise-item .exercise-card {
+  flex: 1;
+  min-width: 0;
+}
+
+.exercise-card { background: linear-gradient(135deg, #ffffff 0%, #e0f2fe 100%); border: 5px solid #1e90ff; border-radius: 20px; padding: 28px; transition: all 0.3s ease; position: relative; overflow: hidden; box-shadow: 0 8px 24px rgba(30, 144, 255, 0.2); }
+.exercise-card:hover { border-color: #0c7cd5; border-width: 6px; box-shadow: 0 12px 32px rgba(30, 144, 255, 0.4); transform: translateY(-4px); }
+.exercise-icon { font-size: 3.5rem; margin-bottom: 16px; display: flex; justify-content: center; align-items: center; color: #1e90ff; }
+.exercise-card h4 { color: #01579b; font-size: 1.4rem; margin: 0 0 12px 0; font-weight: 900; letter-spacing: 0.5px; }
+.exercise-desc { color: #0277bd; font-size: 1.05rem; margin: 0 0 16px 0; line-height: 1.7; font-weight: 600; }
+.exercise-info { display: flex; gap: 12px; margin-bottom: 16px; font-size: 0.95rem; color: #0277bd; font-weight: 600; }
+.difficulty-badge { padding: 8px 16px; border-radius: 16px; font-size: 0.95rem; font-weight: 700; border: 3px solid; }
+.difficulty-easy { background: #d1fae5; color: #059669; border-color: #10b981 !important; }
+.difficulty-medium { background: #fed7aa; color: #d97706; border-color: #f59e0b !important; }
+.difficulty-hard { background: #fecaca; color: #dc2626; border-color: #ef4444 !important; }
+.exercise-status { position: absolute; top: 20px; right: 20px; padding: 8px 16px; border-radius: 16px; font-size: 0.9rem; font-weight: 700; border: 3px solid; }
+.status-pending { background: #fee2e2; color: #dc2626; border-color: #ef4444 !important; }
+.status-completed { background: #d1fae5; color: #059669; border-color: #10b981 !important; }
 
 /* 练习卡片操作按钮 */
 .exercise-actions {
   display: flex;
+  gap: 12px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 4px solid #1e90ff;
+}
+
+.btn-start-exercise {
+  flex: 1;
+  padding: 14px 20px;
+  border: 5px solid #0c7cd5;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1.1rem;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   gap: 8px;
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid #e2e8f0;
+  background: linear-gradient(135deg, #1e90ff 0%, #38bdf8 100%);
+  color: white;
+  box-shadow: 0 4px 16px rgba(30, 144, 255, 0.3);
+  letter-spacing: 0.5px;
+}
+
+.btn-start-exercise:hover {
+  background: linear-gradient(135deg, #0c7cd5 0%, #1e90ff 100%);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 20px rgba(30, 144, 255, 0.4);
+  border-width: 6px;
+}
+
+.btn-start-exercise :deep(.lucide-icon) {
+  font-size: 20px;
+  flex-shrink: 0;
+  color: inherit;
 }
 
 .btn-view-submissions {
   flex: 1;
-  padding: 8px 14px;
-  border: none;
-  border-radius: 8px;
+  padding: 14px 20px;
+  border: 5px solid #047857;
+  border-radius: 16px;
   cursor: pointer;
   transition: all 0.3s ease;
-  font-size: 13px;
-  font-weight: 500;
+  font-size: 1.1rem;
+  font-weight: 900;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 8px;
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: white;
-  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
+  letter-spacing: 0.5px;
 }
 
 .btn-view-submissions:hover {
-  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+  border-width: 6px;
 }
 
 .btn-view-submissions :deep(.lucide-icon) {
-  font-size: 14px;
+  font-size: 20px;
   flex-shrink: 0;
   color: inherit;
 }
@@ -2235,30 +2846,68 @@ watch(() => taskProgress.value?.task_progress?.is_completed, (newVal, oldVal) =>
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 12px 20px;
+  gap: 10px;
+  padding: 16px 24px;
   background: linear-gradient(135deg, #1e90ff 0%, #38bdf8 100%);
   color: white;
-  border: none;
-  border-radius: 10px;
+  border: 5px solid #0c7cd5;
+  border-radius: 16px;
   cursor: pointer;
   transition: all 0.3s ease;
-  font-size: 14px;
-  font-weight: 600;
-  box-shadow: 0 2px 8px rgba(30, 144, 255, 0.25);
+  font-size: 1.2rem;
+  font-weight: 900;
+  box-shadow: 0 4px 16px rgba(30, 144, 255, 0.3);
   width: 100%;
+  letter-spacing: 0.5px;
 }
 
 .btn-video-side:hover {
   background: linear-gradient(135deg, #0c7cd5 0%, #1e90ff 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(30, 144, 255, 0.35);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 20px rgba(30, 144, 255, 0.4);
+  border-width: 6px;
 }
 
-.btn-video-side :deep(.lucide-icon) {
-  flex-shrink: 0;
-  color: inherit;
-}
+  .btn-video-side :deep(.lucide-icon) {
+    flex-shrink: 0;
+    color: inherit;
+    width: 28px;
+    height: 28px;
+  }
+
+  .btn-explanation-side {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 16px 24px;
+    background: linear-gradient(135deg, #1e90ff 0%, #38bdf8 100%);
+    color: white;
+    border: 5px solid #0c7cd5;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1.2rem;
+    font-weight: 900;
+    box-shadow: 0 4px 16px rgba(30, 144, 255, 0.3);
+    width: 100%;
+    letter-spacing: 0.5px;
+  }
+
+  .btn-explanation-side:hover {
+    background: linear-gradient(135deg, #0c7cd5 0%, #1e90ff 100%);
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 20px rgba(30, 144, 255, 0.4);
+    border-width: 6px;
+  }
+
+  .btn-explanation-side :deep(.lucide-icon) {
+    flex-shrink: 0;
+    color: inherit;
+    width: 28px;
+    height: 28px;
+  }
 .enter-plan-btn { 
   background: linear-gradient(135deg, #1e90ff 0%, #38bdf8 100%); 
   color: #fff; 
@@ -2403,6 +3052,21 @@ watch(() => taskProgress.value?.task_progress?.is_completed, (newVal, oldVal) =>
     padding-top: 10px;
     position: static;
   }
+  
+  .summary-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  
+  .summary-actions {
+    width: 100%;
+  }
+  
+  .btn-go-to-submissions {
+    width: 100%;
+    justify-content: center;
+  }
   .back-nav-arrow {
     width: 48px;
     height: 48px;
@@ -2416,9 +3080,54 @@ watch(() => taskProgress.value?.task_progress?.is_completed, (newVal, oldVal) =>
     height: auto; 
     min-height: calc(100vh - 20px); 
   }
-  .question-left-panel { padding: 16px; gap: 16px; }
-  .exercises-grid { 
+  .question-left-panel { padding: 16px; gap: 16px; padding-right: 0; }
+  .exercises-list { 
     grid-template-columns: 1fr; 
+  }
+  .video-player-container {
+    height: calc(100vh - 150px);
+    min-height: 400px;
+  }
+  .embedded-iframe-player {
+    min-height: 400px;
+  }
+  .task-tabs-right-fixed {
+    width: 240px; /* 从280px减小到240px，让内容区更大 */
+    padding: 16px 12px;
+    border-left-width: 5px;
+  }
+  .task-header-right {
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+  }
+  .task-title-right {
+    font-size: 1.5rem;
+    margin-bottom: 6px;
+  }
+  .task-desc-right {
+    font-size: 1rem;
+  }
+  .task-tabs-right {
+    gap: 12px;
+  }
+  .task-tab-right {
+    padding: 16px 12px;
+    font-size: 1.4rem;
+    gap: 8px;
+    border-width: 4px;
+    border-radius: 18px;
+  }
+  .task-tab-right :deep(.lucide-icon) {
+    width: 28px;
+    height: 28px;
+  }
+  .task-tab-right span {
+    font-size: 1.4rem;
+    letter-spacing: 0.5px;
+  }
+  .task-tab-right.active {
+    border-width: 5px;
+    transform: translateX(-2px) scale(1.02);
   }
   }
 
@@ -2436,6 +3145,54 @@ watch(() => taskProgress.value?.task_progress?.is_completed, (newVal, oldVal) =>
     .number-badge {
       font-size: 0.95rem;
       padding: 8px 16px;
+    }
+    .task-tabs-right-fixed {
+      width: 220px; /* 从240px减小到220px，让内容区更大 */
+      padding: 12px 8px;
+      border-left-width: 4px;
+    }
+    .task-header-right {
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+    }
+    .task-title-right {
+      font-size: 1.3rem;
+      margin-bottom: 4px;
+    }
+    .task-desc-right {
+      font-size: 0.9rem;
+    }
+    .task-tabs-right {
+      gap: 10px;
+    }
+    .task-tab-right {
+      padding: 14px 10px;
+      font-size: 1.2rem;
+      gap: 6px;
+      border-width: 3px;
+      border-radius: 16px;
+    }
+    .task-tab-right :deep(.lucide-icon) {
+      width: 24px;
+      height: 24px;
+    }
+    .task-tab-right span {
+      font-size: 1.2rem;
+      letter-spacing: 0.5px;
+    }
+    .question-left-panel {
+      padding-right: 0;
+    }
+    /* 在移动端隐藏右侧边栏 */
+    .task-tabs-right-fixed {
+      display: none;
+    }
+    .video-player-container {
+      height: calc(100vh - 120px);
+      min-height: 300px;
+    }
+    .embedded-iframe-player {
+      min-height: 300px;
     }
   }
 
@@ -2531,9 +3288,9 @@ watch(() => taskProgress.value?.task_progress?.is_completed, (newVal, oldVal) =>
   .video-dialog-container {
     background: #1e293b;
     border-radius: 16px;
-    max-width: 90vw;
-    max-height: 90vh;
-    width: 900px;
+    max-width: 98vw;
+    max-height: 98vh;
+    width: 1600px;
     overflow: hidden;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
     animation: videoDialogIn 0.3s ease-out;
@@ -2554,14 +3311,14 @@ watch(() => taskProgress.value?.task_progress?.is_completed, (newVal, oldVal) =>
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px 20px;
+    padding: 8px 16px;
     background: linear-gradient(135deg, #1e90ff 0%, #38bdf8 100%);
   }
 
   .video-dialog-header h3 {
     margin: 0;
     color: white;
-    font-size: 1.1rem;
+    font-size: 0.95rem;
     font-weight: 600;
   }
 
@@ -2570,12 +3327,14 @@ watch(() => taskProgress.value?.task_progress?.is_completed, (newVal, oldVal) =>
     border: none;
     color: white;
     cursor: pointer;
-    padding: 8px;
-    border-radius: 8px;
+    padding: 6px;
+    border-radius: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease;
+    width: 32px;
+    height: 32px;
   }
 
   .video-dialog-close:hover {
@@ -2590,26 +3349,591 @@ watch(() => taskProgress.value?.task_progress?.is_completed, (newVal, oldVal) =>
 
   .video-dialog-player {
     width: 100%;
-    max-height: 70vh;
+    max-height: 85vh;
     object-fit: contain;
     display: block;
   }
 
   .video-dialog-iframe {
     width: 100%;
-    height: 70vh;
-    min-height: 500px;
+    height: 85vh;
+    min-height: 600px;
     border: none;
     display: block;
   }
 
+  /* 解析弹窗样式 */
+  .submission-detail-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10004;
+    backdrop-filter: blur(4px);
+  }
+
+  .modal-content {
+    background: white;
+    border-radius: 18px;
+    max-width: 1400px;
+    width: 95%;
+    max-height: 95vh;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px;
+    background: linear-gradient(90deg, #1e90ff 0%, #87ceeb 100%);
+    color: white;
+  }
+
+  .modal-header h3 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  .close-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    transition: background 0.3s;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .close-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  .modal-body {
+    flex: 1;
+    padding: 24px;
+    overflow-y: auto;
+  }
+
+  /* 没有提交记录提示 */
+  .no-submission-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 24px;
+    text-align: center;
+  }
+
+  .no-submission-icon {
+    margin-bottom: 24px;
+    color: #94a3b8;
+  }
+
+  .no-submission-message h3 {
+    margin: 0 0 12px 0;
+    color: #1e293b;
+    font-size: 24px;
+    font-weight: 600;
+  }
+
+  .no-submission-message p {
+    margin: 0;
+    color: #64748b;
+    font-size: 16px;
+  }
+
+  .detail-summary {
+    margin-bottom: 24px;
+    padding: 20px;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+  }
+
+  .summary-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  .summary-info {
+    flex: 1;
+  }
+
+  .summary-info h4 {
+    margin: 0 0 8px 0;
+    color: #1e293b;
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .summary-date {
+    margin: 0;
+    color: #64748b;
+    font-size: 14px;
+  }
+
+  .summary-actions {
+    flex-shrink: 0;
+  }
+
+  .btn-go-to-submissions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #1e90ff 0%, #38bdf8 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(30, 144, 255, 0.3);
+  }
+
+  .btn-go-to-submissions:hover {
+    background: linear-gradient(135deg, #38bdf8 0%, #1e90ff 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(30, 144, 255, 0.4);
+  }
+
+  .btn-go-to-submissions:active {
+    transform: translateY(0);
+  }
+
+  .answers-section {
+    margin-top: 24px;
+  }
+
+  .answers-section h4 {
+    margin: 0 0 16px 0;
+    color: #1e293b;
+    font-size: 16px;
+    font-weight: 600;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 8px;
+  }
+
+  .answers-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .answer-item {
+    padding: 16px;
+    border-radius: 12px;
+    border: 2px solid #e2e8f0;
+    background: #f8fafc;
+    transition: all 0.3s ease;
+  }
+
+  .answer-item.correct {
+    border-color: #22c55e;
+    background: #f0fdf4;
+  }
+
+  .answer-item.incorrect {
+    border-color: #ef4444;
+    background: #fef2f2;
+  }
+
+  .answer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+    gap: 16px;
+  }
+
+  .question-header-left {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .question-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .meta-tag {
+    padding: 4px 8px;
+    background: rgba(30, 144, 255, 0.1);
+    border-radius: 4px;
+    font-size: 12px;
+    color: #1e90ff;
+    font-weight: 500;
+  }
+
+  .question-number {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1e293b;
+  }
+
+  .answer-status {
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .answer-status.correct {
+    background: #22c55e;
+    color: white;
+  }
+
+  .answer-status.incorrect {
+    background: #ef4444;
+    color: white;
+  }
+
+  .question-content {
+    margin-bottom: 16px;
+  }
+
+  .question-text {
+    margin-bottom: 12px;
+    color: #374151;
+    font-size: 15px;
+    line-height: 1.6;
+    font-weight: 500;
+  }
+
+  .question-code {
+    margin-top: 12px;
+    background: #1e293b;
+    border-radius: 8px;
+    padding: 16px;
+    overflow-x: auto;
+  }
+
+  .question-code pre {
+    margin: 0;
+    padding: 0;
+  }
+
+  .question-code code {
+    color: #e2e8f0;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+
+  .options-section {
+    margin-bottom: 16px;
+    padding: 16px;
+    background: #ffffff;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+  }
+
+  .options-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 12px;
+  }
+
+  .options-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .option-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    position: relative;
+  }
+
+  .option-item.user-selected {
+    background: #eff6ff;
+    border-color: #3b82f6;
+  }
+
+  .option-item.correct-option {
+    background: #f0fdf4;
+    border-color: #22c55e;
+  }
+
+  .option-item.wrong-selected {
+    background: #fef2f2;
+    border-color: #ef4444;
+  }
+
+  .option-item.user-selected.correct-option {
+    background: #f0fdf4;
+    border-color: #22c55e;
+  }
+
+  .option-label {
+    font-weight: 700;
+    color: #1e293b;
+    min-width: 24px;
+    font-size: 15px;
+  }
+
+  .option-text {
+    flex: 1;
+    color: #374151;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .option-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .correct-mark {
+    padding: 4px 8px;
+    background: #22c55e;
+    color: white;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .user-mark {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .user-mark.correct {
+    background: #22c55e;
+    color: white;
+  }
+
+  .user-mark.wrong {
+    background: #ef4444;
+    color: white;
+  }
+
+  .answer-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 16px;
+    background: #f8fafc;
+    border-radius: 8px;
+    margin-bottom: 16px;
+  }
+
+  .answer-choice, .correct-answer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .choice-label {
+    font-size: 14px;
+    color: #64748b;
+    font-weight: 500;
+  }
+
+  .choice-value {
+    font-size: 14px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: #e2e8f0;
+  }
+
+  .choice-value.correct {
+    background: #22c55e;
+    color: white;
+  }
+
+  .choice-value.incorrect {
+    background: #ef4444;
+    color: white;
+  }
+
+  .explanation-section {
+    margin-top: 16px;
+    padding: 16px;
+    background: #fefce8;
+    border-left: 4px solid #f59e0b;
+    border-radius: 8px;
+  }
+
+  .explanation-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #92400e;
+    margin-bottom: 8px;
+  }
+
+  .explanation-text {
+    color: #78350f;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .modal-footer {
+    display: flex;
+    gap: 12px;
+    padding: 24px;
+    border-top: 1px solid #e2e8f0;
+    background: #f8fafc;
+    justify-content: flex-end;
+  }
+
+  .btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(107,114,128,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .btn-secondary {
+    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+    color: white;
+  }
+
+  .btn-secondary:hover {
+    background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(107,114,128,0.3);
+  }
+
+  .loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    color: #64748b;
+  }
+
+  .loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #e2e8f0;
+    border-top: 4px solid #1e90ff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 16px;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
   /* 考试模式样式 */
   
-  /* 考试成绩面板 */
+  /* 考试模式侧边栏 */
+  .exam-mode-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  /* 考试成绩面板（主内容区域） */
   .exam-score-panel {
     background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%) !important;
     border: 3px solid #10b981 !important;
     margin-bottom: 24px;
+  }
+  
+  /* 考试成绩面板（右侧边栏） */
+  .exam-score-panel-sidebar {
+    background: rgba(255, 255, 255, 0.98);
+    border: 5px solid #10b981;
+    border-radius: 20px;
+    padding: 20px 16px;
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+  }
+  
+  .exam-score-panel-sidebar .score-panel-header {
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #a7f3d0;
+  }
+  
+  .exam-score-panel-sidebar .score-panel-header h3 {
+    font-size: 1.2rem;
+  }
+  
+  .exam-score-panel-sidebar .score-panel-body {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+  }
+  
+  .exam-score-panel-sidebar .total-score-display {
+    padding: 16px 24px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .exam-score-panel-sidebar .total-score-value {
+    font-size: 2.5rem;
+  }
+  
+  .exam-score-panel-sidebar .score-breakdown {
+    width: 100%;
+  }
+  
+  .exam-score-panel-sidebar .score-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 12px;
+  }
+  
+  .exam-score-panel-sidebar .score-item-header {
+    width: 100%;
+    font-size: 0.9rem;
+  }
+  
+  .exam-score-panel-sidebar .score-item-value {
+    width: 100%;
+    text-align: center;
+    font-size: 1rem;
   }
 
   .score-panel-header {
@@ -2826,14 +4150,12 @@ watch(() => taskProgress.value?.task_progress?.is_completed, (newVal, oldVal) =>
     padding: 16px 20px;
     border-radius: 12px;
     border: 2px solid #e2e8f0;
-    cursor: pointer;
     transition: all 0.3s ease;
   }
 
   .exam-item-card:hover {
     border-color: #f59e0b;
     background: #fffbeb;
-    transform: translateX(4px);
     box-shadow: 0 4px 16px rgba(245, 158, 11, 0.2);
   }
 
@@ -2947,15 +4269,19 @@ watch(() => taskProgress.value?.task_progress?.is_completed, (newVal, oldVal) =>
   }
 
   .exam-item-card.exam-ended {
-    cursor: pointer;
     opacity: 0.9;
   }
 
   .exam-item-card.exam-ended:hover {
     border-color: #f59e0b;
     background: #fffbeb;
-    transform: translateX(4px);
     box-shadow: 0 4px 16px rgba(245, 158, 11, 0.2);
+  }
+
+  .exam-action-group {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
   }
 
   .btn-exam-action {
@@ -2977,6 +4303,14 @@ watch(() => taskProgress.value?.task_progress?.is_completed, (newVal, oldVal) =>
   .btn-exam-action:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  }
+
+  .btn-exam-action.btn-start-exam {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  }
+
+  .btn-exam-action.btn-start-exam:hover {
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
   }
 
   .btn-exam-action.btn-video {

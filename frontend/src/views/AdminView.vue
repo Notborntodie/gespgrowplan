@@ -84,6 +84,7 @@ import ExamManagement from '@/components/admin/ExamManagement.vue'
 import UserManagement from '@/components/admin/UserManagement.vue'
 import OJManagement from '@/components/admin/OJManagement.vue'
 import LeaningPlanManagement from '@/components/admin/LeaningPlanManagement.vue'
+import AdminPlanProgressSection from '@/components/admin/AdminPlanProgressSection.vue'
 
 // 侧边栏菜单项
 const menuItems = [
@@ -93,6 +94,7 @@ const menuItems = [
   { key: 'exam-management', label: '练习管理' },
   { key: 'oj-management', label: 'OJ 题目管理' },
   { key: 'plan-management', label: '学习计划管理' },
+  { key: 'plan-progress', label: '计划完成' },
   { key: 'user-management', label: '用户管理' }
 ]
 
@@ -184,6 +186,7 @@ const sectionComponentMap: Record<string, any> = {
   'exam-management': ExamManagement,
   'oj-management': OJManagement,
   'plan-management': LeaningPlanManagement,
+  'plan-progress': AdminPlanProgressSection,
   'user-management': UserManagement,
 }
 

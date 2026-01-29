@@ -1,14 +1,25 @@
 <template>
   <BaseTeacherSection title="OJ提交">
     <template #filters>
-      <div class="level-filter">
-        <label>级别筛选：</label>
-        <select v-model="selectedOJLevel" @change="handleOJLevelChange" class="level-select">
-          <option value="">全部级别</option>
-          <option v-for="level in [1, 2, 3, 4, 5, 6, 7, 8]" :key="level" :value="level">
-            {{ level }}级
-          </option>
-        </select>
+      <div class="filters-container">
+        <div class="search-box">
+          <input 
+            v-model="searchQuery" 
+            type="text" 
+            placeholder="搜索题目名称..."
+            class="search-input"
+          />
+          <Icon name="search" :size="18" class="search-icon" />
+        </div>
+        <div class="level-filter">
+          <label>级别筛选：</label>
+          <select v-model="selectedOJLevel" @change="handleOJLevelChange" class="level-select">
+            <option value="">全部级别</option>
+            <option v-for="level in [1, 2, 3, 4, 5, 6, 7, 8]" :key="level" :value="level">
+              {{ level }}级
+            </option>
+          </select>
+        </div>
       </div>
     </template>
     
@@ -100,6 +111,7 @@ const getInitialSelectedOJLevel = () => {
 }
 
 const selectedOJLevel = ref<number | string | null>(getInitialSelectedOJLevel())
+const searchQuery = ref('')
 const ojProblems = ref<any[]>([])
 const ojProblemsLoading = ref(false)
 
@@ -108,10 +120,23 @@ const userInfo = ref<any>(null)
 
 // 过滤后的OJ题目列表
 const filteredOJProblems = computed(() => {
-  if (selectedOJLevel.value === null || selectedOJLevel.value === '') {
-    return ojProblems.value
+  let result = ojProblems.value
+  
+  // 按级别筛选
+  if (selectedOJLevel.value !== null && selectedOJLevel.value !== '') {
+    result = result.filter(problem => problem.level === selectedOJLevel.value)
   }
-  return ojProblems.value.filter(problem => problem.level === selectedOJLevel.value)
+  
+  // 按搜索关键词筛选
+  if (searchQuery.value.trim()) {
+    const query = searchQuery.value.toLowerCase().trim()
+    result = result.filter(problem => {
+      const title = (problem.title || '').toLowerCase()
+      return title.includes(query)
+    })
+  }
+  
+  return result
 })
 
 // 计算通过率
@@ -240,6 +265,47 @@ watch(selectedOJLevel, (newLevel) => {
 </script>
 
 <style scoped>
+.filters-container {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-input {
+  padding: 16px 20px 16px 48px;
+  border: 3px solid #87ceeb;
+  border-radius: 16px;
+  font-size: 16px;
+  font-weight: 600;
+  width: 300px;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #ffffff 0%, #e0f2fe 100%);
+  box-shadow: 0 2px 8px rgba(30, 144, 255, 0.15);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #1e90ff;
+  border-width: 4px;
+  box-shadow: 0 4px 16px rgba(30, 144, 255, 0.3);
+  transform: scale(1.02);
+}
+
+.search-icon {
+  position: absolute;
+  left: 16px;
+  color: #1e90ff;
+  font-size: 20px;
+  pointer-events: none;
+}
+
 .level-filter {
   display: flex;
   align-items: center;
@@ -253,19 +319,23 @@ watch(selectedOJLevel, (newLevel) => {
 }
 
 .level-select {
-  padding: 8px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  font-size: 14px;
-  background: white;
+  padding: 12px 16px;
+  border: 3px solid #87ceeb;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  background: linear-gradient(135deg, #ffffff 0%, #e0f2fe 100%);
   cursor: pointer;
   transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(30, 144, 255, 0.15);
 }
 
 .level-select:focus {
   outline: none;
   border-color: #1e90ff;
-  box-shadow: 0 0 0 3px rgba(30, 144, 255, 0.1);
+  border-width: 4px;
+  box-shadow: 0 4px 16px rgba(30, 144, 255, 0.3);
+  transform: scale(1.02);
 }
 
 .count-info {

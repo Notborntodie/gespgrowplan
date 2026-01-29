@@ -107,6 +107,17 @@
                           开始练习
                         </button>
                       </div>
+                      <div class="link-item">
+                        <div class="link-icon">⚠️</div>
+                        <h4>GESP 易错题</h4>
+                        <p>查看各级易错客观题，针对性提升</p>
+                        <div class="wrong-questions-buttons">
+                          <button class="link-button-small" @click="goToTopWrongQuestions(1)">1级</button>
+                          <button class="link-button-small" @click="goToTopWrongQuestions(2)">2级</button>
+                          <button class="link-button-small" @click="goToTopWrongQuestions(3)">3级</button>
+                          <button class="link-button-small" @click="goToTopWrongQuestions(4)">4级</button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -269,6 +280,16 @@ const goToProgramming = () => {
 const goToObjective = () => {
   // 跳转到SelectLevelView.vue
   window.location.href = '/select'
+}
+
+// 跳转到易错题页面
+const goToTopWrongQuestions = (level?: number) => {
+  // 跳转到TopWrongQuestionsView.vue
+  if (level) {
+    window.location.href = `/top-wrong-questions/${level}`
+  } else {
+    window.location.href = '/top-wrong-questions'
+  }
 }
 
 // 组件挂载时启动倒计时
@@ -779,6 +800,33 @@ onUnmounted(() => {
 .link-button:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(135, 206, 235, 0.5);
+}
+
+.wrong-questions-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.link-button-small {
+  background: linear-gradient(135deg, #87ceeb, #b0e0e6);
+  color: #2c5282;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(135, 206, 235, 0.2);
+  min-width: 60px;
+}
+
+.link-button-small:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(135, 206, 235, 0.4);
+  background: linear-gradient(135deg, #b0e0e6, #87ceeb);
 }
 
 /* GESP官方链接样式 */

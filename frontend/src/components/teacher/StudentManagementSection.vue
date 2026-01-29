@@ -13,25 +13,27 @@
     </template>
     
     <template #header-right>
-      <span class="count-info">共 {{ filteredStudents.length }} 个学生</span>
-      <div class="header-actions">
-        <button @click="$emit('bind-student')" class="btn-secondary">
-          <Icon name="plus" :size="18" />
-          绑定学生
-        </button>
-        <button @click="$emit('batch-create-student')" class="btn-secondary">
-          <Icon name="users" :size="18" />
-          批量导入
-        </button>
-        <button @click="$emit('create-student')" class="btn-primary">
-          <Icon name="plus" :size="18" />
-          创建学生
-        </button>
+      <div class="header-right-content" :class="{ collapsed: hasPanel }">
+        <span class="count-info">共 {{ filteredStudents.length }} 个学生</span>
+        <div class="header-actions">
+          <button @click="$emit('bind-student')" class="btn-secondary">
+            <Icon name="plus" :size="18" />
+            绑定学生
+          </button>
+          <button @click="$emit('batch-create-student')" class="btn-secondary">
+            <Icon name="users" :size="18" />
+            批量创建学生
+          </button>
+          <button @click="$emit('create-student')" class="btn-primary">
+            <Icon name="plus" :size="18" />
+            创建学生
+          </button>
+        </div>
       </div>
     </template>
     
     <template #content>
-      <div v-if="studentsLoading" class="loading-state">
+      <div v-if="loading" class="loading-state">
         <div class="loading-spinner"></div>
         <p>正在加载学生列表...</p>
       </div>
@@ -46,9 +48,6 @@
             <tr>
               <th>学生姓名</th>
               <th>用户名</th>
-              <th>邮箱</th>
-              <th>总提交次数</th>
-              <th>正确率</th>
               <th>操作</th>
             </tr>
           </thead>
@@ -57,7 +56,6 @@
               v-for="student in filteredStudents" 
               :key="student.id"
               class="table-row"
-              @click="$emit('view-student', student)"
             >
               <td>
                 <div class="student-name-cell">
@@ -68,20 +66,18 @@
                 <span class="username-text">@{{ student.username }}</span>
               </td>
               <td>
-                <span class="email-text">{{ student.email || '未设置' }}</span>
-              </td>
-              <td>
-                <span class="submission-count">{{ student.total_submissions || 0 }}</span>
-              </td>
-              <td>
-                <span class="accuracy-rate" :class="getAccuracyClass(student.accuracy_rate)">
-                  {{ student.accuracy_rate || 0 }}%
-                </span>
-              </td>
-              <td>
                 <div class="action-buttons" @click.stop>
-                  <button @click="$emit('view-student', student)" class="btn-action btn-view" title="查看详情">
-                    <Icon name="eye" :size="18" />
+                  <button @click="$emit('view-plan-progress', student)" class="btn-action btn-view-plan" title="查看计划完成">
+                    <Icon name="book-open" :size="16" />
+                    <span>查看计划完成</span>
+                  </button>
+                  <button @click="$emit('manage-plans', student)" class="btn-action btn-manage-plans" title="增加/删除计划">
+                    <Icon name="settings" :size="16" />
+                    <span>增加/删除计划</span>
+                  </button>
+                  <button @click="$emit('unbind-student', student)" class="btn-action btn-unbind" title="解除绑定">
+                    <Icon name="user-x" :size="16" />
+                    <span>解除绑定</span>
                   </button>
                 </div>
               </td>
@@ -101,13 +97,16 @@ import Icon from '@/components/Icon.vue'
 const props = defineProps<{
   students: any[]
   loading: boolean
+  hasPanel?: boolean
 }>()
 
 const emit = defineEmits<{
   'bind-student': []
   'create-student': []
   'batch-create-student': []
-  'view-student': [student: any]
+  'view-plan-progress': [student: any]
+  'manage-plans': [student: any]
+  'unbind-student': [student: any]
 }>()
 
 const studentSearchQuery = ref('')
@@ -125,14 +124,6 @@ const filteredStudents = computed(() => {
     return username.includes(query) || realName.includes(query)
   })
 })
-
-// 获取正确率等级样式
-function getAccuracyClass(accuracy: number) {
-  if (accuracy >= 90) return 'excellent'
-  if (accuracy >= 80) return 'good'
-  if (accuracy >= 60) return 'pass'
-  return 'fail'
-}
 </script>
 
 <style scoped>
@@ -143,32 +134,64 @@ function getAccuracyClass(accuracy: number) {
 }
 
 .search-input {
-  padding: 12px 16px 12px 40px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  font-size: 14px;
+  padding: 16px 20px 16px 48px;
+  border: 3px solid #87ceeb;
+  border-radius: 16px;
+  font-size: 16px;
+  font-weight: 600;
   width: 300px;
   transition: all 0.3s ease;
+  background: linear-gradient(135deg, #ffffff 0%, #e0f2fe 100%);
+  box-shadow: 0 2px 8px rgba(30, 144, 255, 0.15);
 }
 
 .search-input:focus {
   outline: none;
   border-color: #1e90ff;
-  box-shadow: 0 0 0 3px rgba(30, 144, 255, 0.1);
+  border-width: 4px;
+  box-shadow: 0 4px 16px rgba(30, 144, 255, 0.3);
+  transform: scale(1.02);
 }
 
 .search-icon {
   position: absolute;
-  left: 12px;
-  color: #64748b;
-  font-size: 16px;
+  left: 16px;
+  color: #1e90ff;
+  font-size: 20px;
   pointer-events: none;
 }
 
+.header-right-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: opacity 0.3s ease, max-width 0.3s ease, visibility 0.3s ease;
+  overflow: hidden;
+  max-width: 1000px;
+}
+
+.header-right-content.collapsed {
+  max-width: 0;
+  opacity: 0;
+  visibility: hidden;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.header-right-content.collapsed * {
+  display: none;
+}
+
 .count-info {
-  color: #64748b;
-  font-size: 14px;
-  font-weight: 500;
+  color: #0369a1;
+  font-size: 16px;
+  font-weight: 700;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%);
+  border-radius: 12px;
+  border: 2px solid #87ceeb;
+  box-shadow: 0 2px 8px rgba(30, 144, 255, 0.15);
 }
 
 .header-actions {
@@ -178,43 +201,48 @@ function getAccuracyClass(accuracy: number) {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #1e90ff 0%, #87ceeb 100%);
+  background: linear-gradient(135deg, #1e90ff 0%, #38bdf8 100%);
   color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-weight: 600;
+  border: 3px solid white;
+  padding: 14px 28px;
+  border-radius: 16px;
+  font-weight: 800;
+  font-size: 16px;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
   gap: 8px;
-}
-
-.btn-primary:hover {
-  transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(30, 144, 255, 0.3);
 }
 
+.btn-primary:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 20px rgba(30, 144, 255, 0.5);
+}
+
 .btn-secondary {
-  background: #f8fafc;
-  color: #64748b;
-  border: 1px solid #e2e8f0;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-weight: 600;
+  background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%);
+  color: #0369a1;
+  border: 3px solid #87ceeb;
+  padding: 14px 28px;
+  border-radius: 16px;
+  font-weight: 800;
+  font-size: 16px;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
   gap: 8px;
+  box-shadow: 0 2px 8px rgba(30, 144, 255, 0.2);
 }
 
 .btn-secondary:hover {
-  background: #e2e8f0;
-  color: #475569;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(100, 116, 139, 0.2);
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  color: #0c4a6e;
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 4px 16px rgba(30, 144, 255, 0.3);
+  border-color: #1e90ff;
 }
 
 .loading-state {
@@ -227,13 +255,14 @@ function getAccuracyClass(accuracy: number) {
 }
 
 .loading-spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid #e2e8f0;
-  border-top: 4px solid #1e90ff;
+  width: 48px;
+  height: 48px;
+  border: 5px solid #dbeafe;
+  border-top: 5px solid #1e90ff;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(30, 144, 255, 0.3);
 }
 
 @keyframes spin {
@@ -251,67 +280,88 @@ function getAccuracyClass(accuracy: number) {
 }
 
 .empty-icon {
-  font-size: 64px;
-  margin-bottom: 16px;
+  font-size: 80px;
+  margin-bottom: 20px;
   display: flex;
   justify-content: center;
   align-items: center;
-  color: #64748b;
+  color: #87ceeb;
+  filter: drop-shadow(0 4px 8px rgba(30, 144, 255, 0.3));
 }
 
 .empty-state h3 {
-  margin: 0 0 8px 0;
-  color: #1e293b;
-  font-size: 20px;
-  font-weight: 600;
+  margin: 0 0 12px 0;
+  color: #0c4a6e;
+  font-size: 24px;
+  font-weight: 900;
+  text-shadow: 0 2px 4px rgba(255, 255, 255, 0.5);
 }
 
 .empty-state p {
   margin: 0;
-  color: #64748b;
-  font-size: 16px;
+  color: #0369a1;
+  font-size: 18px;
+  font-weight: 600;
 }
 
 .data-table-container {
-  background: white;
-  border-radius: 12px;
-  border: 1.5px solid #e2e8f0;
+  background: linear-gradient(135deg, #cce5ff 0%, #e0f2fe 50%, #ffffff 100%);
+  border-radius: 0 0 16px 16px;
+  border: none;
   overflow: hidden;
   width: 100%;
+  margin: 0;
+  padding: 0;
+  box-shadow: none;
 }
 
 .data-table {
   width: 100%;
   border-collapse: collapse;
+  margin: 0;
+  border-spacing: 0;
 }
 
 .data-table thead {
-  background: linear-gradient(135deg, #1e90ff 0%, #38bdf8 100%);
+  background: linear-gradient(135deg, #87ceeb 0%, #b3d9ff 50%, #cce5ff 100%);
+  box-shadow: none;
+  border-top: none;
+  margin: 0;
+  padding: 0;
+  display: table-header-group;
 }
 
 .data-table th {
-  padding: 16px;
+  padding: 20px;
+  padding-top: 20px;
   text-align: left;
-  font-weight: 600;
-  font-size: 14px;
+  font-weight: 800;
+  font-size: 16px;
   color: white;
   white-space: nowrap;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  margin: 0;
+  border-top: none;
 }
 
 .data-table td {
-  padding: 16px;
-  border-top: 1px solid #e2e8f0;
-  font-size: 14px;
-  color: #1e293b;
+  padding: 20px;
+  border-top: 2px solid #b3d9ff;
+  font-size: 15px;
+  color: #0c4a6e;
+  font-weight: 600;
 }
 
 .table-row {
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
 }
 
 .table-row:hover {
-  background: #f8fafc;
+  background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%);
+  transform: scale(1.01);
+  box-shadow: 0 2px 8px rgba(30, 144, 255, 0.15);
 }
 
 .student-name-cell {
@@ -321,73 +371,70 @@ function getAccuracyClass(accuracy: number) {
 }
 
 .student-name-text {
-  font-weight: 600;
-  color: #1e293b;
-  font-size: 14px;
+  font-weight: 800;
+  color: #0c4a6e;
+  font-size: 16px;
 }
 
 .username-text {
-  color: #64748b;
-  font-size: 14px;
-}
-
-.email-text {
-  color: #64748b;
-  font-size: 14px;
-}
-
-.submission-count {
+  color: #0369a1;
+  font-size: 15px;
   font-weight: 600;
-  color: #1e293b;
-}
-
-.accuracy-rate {
-  font-weight: 600;
-  font-size: 14px;
-}
-
-.accuracy-rate.excellent {
-  color: #22c55e;
-}
-
-.accuracy-rate.good {
-  color: #3b82f6;
-}
-
-.accuracy-rate.pass {
-  color: #f59e0b;
-}
-
-.accuracy-rate.fail {
-  color: #ef4444;
 }
 
 .action-buttons {
   display: flex;
   gap: 8px;
+  flex-wrap: wrap;
 }
 
 .btn-action {
-  padding: 6px 10px;
-  border: none;
-  border-radius: 6px;
+  padding: 10px 16px;
+  border: 2px solid white;
+  border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 6px;
   font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-.btn-view {
-  background: #0ea5e9;
+.btn-view-plan {
+  background: linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%);
   color: white;
 }
 
-.btn-view:hover {
-  background: #0284c7;
-  transform: translateY(-1px);
+.btn-view-plan:hover {
+  background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.4);
+}
+
+.btn-manage-plans {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  color: white;
+}
+
+.btn-manage-plans:hover {
+  background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+}
+
+.btn-unbind {
+  background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+  color: white;
+}
+
+.btn-unbind:hover {
+  background: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
 }
 </style>
 
