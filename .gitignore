@@ -15,6 +15,7 @@ build/
 .env.local
 .env.production
 .env.development
+Al_server/.env
 
 # Logs
 logs/
