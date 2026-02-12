@@ -33,8 +33,29 @@ explanation_processor = ExplanationProcessor(max_tokens=400)
 # Initialize LLM stream processor for true streaming LLM output
 llm_stream_processor = LLMStreamProcessor(max_tokens=16000)
 
+# Agent SQL 生成：使用 LLM_MODE_ID，默认 glm-4.7
+sql_llm = LLMProcessor(
+    max_tokens=2000,
+    model=os.getenv("LLM_MODE_ID", "glm-4.7")
+)
+
 # 进度存储
 progress_storage = {}
+
+# 学习计划相关表结构摘要，供 Agent 生成 SQL 使用
+DEFAULT_SCHEMA_HINT = """
+涉及的学习计划相关表（MySQL）：
+- learning_plans: id, name, description, level(GESP级别1-6), start_time, end_time, created_by, is_active
+- learning_tasks: id, plan_id, name, description, task_order, start_time, end_time
+- user_learning_plans: id, user_id, plan_id, joined_at, status
+- user_task_progress: id, user_id, task_id, is_completed, completed_at
+- user_exam_progress: user_id, exam_id, task_id, is_completed, best_score, attempt_count, completed_at
+- user_oj_progress: user_id, problem_id, task_id, is_completed, best_verdict, attempt_count, completed_at
+- task_exams: task_id, exam_id, exam_order
+- task_oj_problems: task_id, problem_id, problem_order
+- users: id, username, real_name, email
+请只生成一条 SELECT 语句，不要包含分号或多条语句，不要使用 INSERT/UPDATE/DELETE/DROP 等。
+"""
 
 def extract_pdf_text(file_path: str) -> str:
     """
@@ -353,6 +374,151 @@ async def generate_batch_explanations(request: Request):
             status_code=500,
             content={"error": f"批量生成解析失败: {str(e)}"}
         )
+
+
+ALLOWED_ACTIONS = frozenset({"think", "execute_sql", "query_schema", "ask_user", "present_result"})
+
+
+def _parse_next_action_response(text: str) -> dict:
+    """从 LLM 回复中解析出 thought, action, args（单行 JSON 或代码块内 JSON）"""
+    import re
+    raw = (text or "").strip()
+    if not raw:
+        return {}
+    # 尝试提取 ```json ... ``` 或 ``` ... ``` 内的内容
+    m = re.search(r"```(?:json)?\s*([\s\S]*?)```", raw, re.IGNORECASE)
+    if m:
+        raw = m.group(1).strip()
+    # 找第一行看起来像 JSON 的
+    for line in raw.split("\n"):
+        line = line.strip()
+        if line.startswith("{") and "action" in line:
+            try:
+                out = json.loads(line)
+                return out
+            except json.JSONDecodeError:
+                continue
+    # 整段作为 JSON（支持多行）
+    try:
+        return json.loads(raw)
+    except json.JSONDecodeError:
+        pass
+    # 尝试从文本中找第一个 { ... } 块
+    brace = raw.find("{")
+    if brace != -1:
+        depth = 0
+        for i in range(brace, len(raw)):
+            if raw[i] == "{":
+                depth += 1
+            elif raw[i] == "}":
+                depth -= 1
+                if depth == 0:
+                    try:
+                        return json.loads(raw[brace : i + 1])
+                    except json.JSONDecodeError:
+                        break
+    return {}
+
+
+@app.post("/api/admin/agent/next-action")
+async def agent_next_action(request: Request):
+    """
+    ReAct 单步：根据当前上下文生成下一步 thought + action + args。
+    请求体: { "system_prompt": string, "context": string }
+    返回: { "thought": string, "action": string, "args": object }
+    """
+    try:
+        body = await request.json()
+        system_prompt = (body.get("system_prompt") or "").strip()
+        context = (body.get("context") or "").strip()
+        if not context:
+            return JSONResponse(status_code=400, content={"error": "缺少 context"})
+        prompt_suffix = (
+            "\n\n请只输出一行 JSON，不要其他文字，格式: {\"thought\":\"你的推理\",\"action\":\"动作名\",\"args\":{...}}。"
+            "action 只能是: think, execute_sql, query_schema, ask_user, present_result 之一。"
+        )
+        user_content = context + prompt_suffix
+        raw = sql_llm.call_api_with_messages(system_prompt or "你是数据查询助手。", user_content)
+        raw = (raw or "").strip()
+        # LLM 返回空或无效时给出安全 fallback，避免 400 导致前端 502
+        if not raw:
+            return JSONResponse(
+                content={
+                    "thought": "模型未返回有效内容，转为向用户提示重试。",
+                    "action": "ask_user",
+                    "args": {"message": "请求暂时无有效回复，请简化问题或稍后重试。"},
+                }
+            )
+        parsed = _parse_next_action_response(raw)
+        thought = (parsed.get("thought") or "").strip()
+        action = (parsed.get("action") or "").strip().lower()
+        args = parsed.get("args")
+        if not isinstance(args, dict):
+            args = {}
+        if action not in ALLOWED_ACTIONS:
+            # 解析失败或 action 不合法时返回安全 fallback，避免前端 502
+            if not action and raw:
+                return JSONResponse(
+                    content={
+                        "thought": "模型返回内容无法解析为规定 JSON 格式，转为提示用户重试。",
+                        "action": "ask_user",
+                        "args": {"message": "当前回复格式异常，请简化问题或换一种说法重试。"},
+                    }
+                )
+            return JSONResponse(
+                status_code=400,
+                content={"error": f"无效 action: {action}", "raw": (raw or "")[:500]}
+            )
+        return JSONResponse(content={"thought": thought, "action": action, "args": args})
+    except json.JSONDecodeError:
+        return JSONResponse(status_code=400, content={"error": "请求体不是有效 JSON"})
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": f"生成下一步失败: {str(e)}"})
+
+
+def _extract_sql_from_response(text: str) -> str:
+    """从 LLM 回复中提取单条 SQL，去除 markdown 代码块等"""
+    import re
+    text = (text or "").strip()
+    # 去除 ```sql ... ``` 或 ``` ... ```
+    m = re.search(r"```(?:sql)?\s*([\s\S]*?)```", text, re.IGNORECASE)
+    if m:
+        text = m.group(1).strip()
+    # 只保留第一条语句（按分号或换行截断，且忽略注释后的分号）
+    first_stmt = text.split(";")[0].strip()
+    if first_stmt:
+        text = first_stmt
+    return text.strip()
+
+
+@app.post("/api/admin/generate-sql")
+async def generate_sql(request: Request):
+    """
+    根据自然语言问题生成只读 SELECT SQL（Agent 使用）。
+    使用环境变量 LLM_MODE_ID，默认 glm-4.7。
+    请求体: { "question": "用户问题", "schemaHint": "可选，表结构摘要" }
+    返回: { "sql": "SELECT ..." }
+    """
+    try:
+        body = await request.json()
+        question = (body.get("question") or "").strip()
+        if not question:
+            return JSONResponse(status_code=400, content={"error": "缺少 question 字段"})
+        schema_hint = (body.get("schemaHint") or "").strip() or DEFAULT_SCHEMA_HINT
+        system_content = (
+            "你是数据库查询助手。根据用户问题与给定的表结构，生成一条且仅一条 MySQL 的 SELECT 语句。"
+            "不要输出任何解释，只输出 SQL。禁止 INSERT/UPDATE/DELETE/DROP 等写操作与多语句。"
+        )
+        user_content = f"表结构说明：\n{schema_hint}\n\n用户问题：{question}"
+        raw = sql_llm.call_api_with_messages(system_content, user_content)
+        sql = _extract_sql_from_response(raw)
+        if not sql.upper().startswith("SELECT"):
+            return JSONResponse(status_code=400, content={"error": "仅允许 SELECT 语句", "raw": raw[:200]})
+        return JSONResponse(content={"sql": sql})
+    except json.JSONDecodeError:
+        return JSONResponse(status_code=400, content={"error": "请求体不是有效 JSON"})
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": f"生成 SQL 失败: {str(e)}"})
 
 
 @app.post("/api/stream-extract")

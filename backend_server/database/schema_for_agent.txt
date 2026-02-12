@@ -1,0 +1,425 @@
+# 当前数据库表结构（由 export_schema_for_agent.js 从 information_schema 生成，供 Agent 生成 SQL 使用）
+# 生成时间: 2026-02-12T03:43:30.408Z
+# 仅包含表名与列（类型、是否非空、是否主键），便于 LLM 生成正确 SELECT。
+
+表 animations:
+  - id int 非空 (主键)
+  - title varchar 非空
+  - description text
+  - file_path varchar 非空
+  - file_name varchar 非空
+  - category varchar
+  - icon varchar
+  - uploader_id int 非空
+  - is_active tinyint
+  - view_count int
+  - created_at timestamp
+  - updated_at timestamp
+
+表 exam_questions:
+  - id int 非空 (主键)
+  - exam_id int 非空
+  - question_id int 非空
+  - question_number int 非空
+  - created_at timestamp
+
+表 exam_stats:
+  - exam_id int 非空
+  - exam_name varchar 非空
+  - exam_level int 非空
+  - total_participants bigint 非空
+  - total_submissions bigint 非空
+  - average_score decimal
+  - best_score int
+  - worst_score int
+  - excellent_count decimal
+  - good_count decimal
+  - pass_count decimal
+  - fail_count decimal
+
+表 exams:
+  - id int 非空 (主键)
+  - name varchar 非空
+  - level int 非空
+  - description text
+  - total_questions int 非空
+  - created_at timestamp
+  - type enum 非空
+
+表 knowledge_point_stats:
+  - id int 非空
+  - name varchar 非空
+  - category varchar 非空
+  - level int 非空
+  - question_count bigint 非空
+  - usage_count bigint 非空
+  - correct_rate decimal
+
+表 knowledge_point_wrong_stats:
+  - knowledge_point_id int 非空
+  - knowledge_point_name varchar 非空
+  - category varchar 非空
+  - level int 非空
+  - total_questions bigint 非空
+  - total_attempts bigint 非空
+  - correct_attempts decimal
+  - wrong_attempts decimal
+  - correct_rate decimal
+
+表 knowledge_points:
+  - id int 非空 (主键)
+  - name varchar 非空
+  - description text
+  - category varchar 非空
+  - level int 非空
+  - created_at timestamp
+  - updated_at timestamp
+
+表 learning_plans:
+  - id int 非空 (主键)
+  - name varchar 非空
+  - description text
+  - level int 非空
+  - start_time datetime 非空
+  - end_time datetime 非空
+  - created_at datetime
+  - updated_at datetime
+  - created_by int
+  - is_active tinyint
+
+表 learning_tasks:
+  - id int 非空 (主键)
+  - plan_id int 非空
+  - name varchar 非空
+  - description text
+  - review_content text
+  - review_content_type enum
+  - review_video_url varchar
+  - start_time datetime 非空
+  - end_time datetime 非空
+  - task_order int
+  - is_exam_mode tinyint
+  - created_at datetime
+  - updated_at datetime
+
+表 oj_problems:
+  - id int 非空 (主键)
+  - title varchar 非空
+  - description text 非空
+  - input_format text
+  - output_format text
+  - data_range text
+  - video_url varchar
+  - time_limit int
+  - memory_limit int
+  - level int 非空
+  - publish_date date
+  - total_submissions int
+  - accepted_submissions int
+  - created_at timestamp
+  - updated_at timestamp
+
+表 oj_samples:
+  - id int 非空 (主键)
+  - problem_id int 非空
+  - input text 非空
+  - output text 非空
+  - explanation text
+  - is_hidden tinyint
+  - is_displayed tinyint
+  - sort_order int
+  - created_at timestamp
+
+表 oj_submissions:
+  - id int 非空 (主键)
+  - problem_id int 非空
+  - task_id int
+  - code text 非空
+  - language varchar 非空
+  - status enum 非空
+  - verdict varchar
+  - total_tests int
+  - passed_tests int
+  - results json
+  - error_message text
+  - submit_time datetime 非空
+  - practice_duration_seconds int
+  - judge_start_time datetime
+  - judge_end_time datetime
+  - judge_duration int
+  - user_id int
+  - ip_address varchar
+
+表 options:
+  - id int 非空 (主键)
+  - question_id int 非空
+  - option_label varchar 非空
+  - option_value varchar 非空
+  - option_text text 非空
+  - created_at timestamp
+
+表 permission_resource_stats:
+  - resource varchar 非空
+  - permission_count bigint 非空
+  - role_count bigint 非空
+  - available_actions text
+
+表 permissions:
+  - id int 非空 (主键)
+  - name varchar 非空
+  - display_name varchar 非空
+  - description text
+  - resource varchar 非空
+  - action varchar 非空
+  - created_at timestamp
+  - updated_at timestamp
+
+表 question_difficulty_stats:
+  - id int 非空
+  - question_text text 非空
+  - level int 非空
+  - difficulty enum
+  - total_attempts bigint 非空
+  - correct_attempts decimal
+  - wrong_attempts decimal
+  - correct_rate decimal
+
+表 question_images:
+  - id int 非空 (主键)
+  - question_id int 非空
+  - image_url varchar 非空
+  - image_type enum
+  - display_order int
+  - created_at timestamp
+
+表 question_knowledge_points:
+  - id int 非空 (主键)
+  - question_id int 非空
+  - knowledge_point_id int 非空
+  - created_at timestamp
+
+表 question_uploads:
+  - id int 非空 (主键)
+  - user_id int 非空
+  - question_id int 非空
+  - upload_type enum
+  - upload_status enum
+  - review_notes text
+  - created_at timestamp
+  - updated_at timestamp
+
+表 questions:
+  - id int 非空 (主键)
+  - question_text text 非空
+  - question_type enum
+  - question_code text
+  - correct_answer varchar 非空
+  - explanation text
+  - level int 非空
+  - difficulty enum
+  - image_url varchar
+  - question_date varchar
+  - created_at timestamp
+  - updated_at timestamp
+
+表 role_permissions:
+  - id int 非空 (主键)
+  - role_id int 非空
+  - permission_id int 非空
+  - created_at timestamp
+
+表 role_permissions_summary:
+  - role_id int 非空
+  - role_name varchar 非空
+  - role_display_name varchar 非空
+  - role_description text
+  - is_system tinyint
+  - permission_names text
+  - permission_display_names text
+  - permission_count bigint 非空
+  - user_count bigint 非空
+
+表 roles:
+  - id int 非空 (主键)
+  - name varchar 非空
+  - display_name varchar 非空
+  - description text
+  - is_system tinyint
+  - created_at timestamp
+  - updated_at timestamp
+
+表 submission_answers:
+  - id int 非空 (主键)
+  - submission_id int 非空
+  - question_id int 非空
+  - user_answer varchar 非空
+  - is_correct tinyint 非空
+  - created_at timestamp
+
+表 submission_stats:
+  - id int 非空
+  - user_id int 非空
+  - exam_id int 非空
+  - attempt_number int 非空
+  - score int 非空
+  - submit_time timestamp
+  - exam_name varchar 非空
+  - total_questions int 非空
+  - percentage decimal
+
+表 submissions:
+  - id int 非空 (主键)
+  - user_id int 非空
+  - exam_id int 非空
+  - task_id int
+  - attempt_number int 非空
+  - score int 非空
+  - submit_time timestamp
+  - practice_duration_seconds int
+
+表 task_exams:
+  - id int 非空 (主键)
+  - task_id int 非空
+  - exam_id int 非空
+  - exam_order int
+  - created_at datetime
+
+表 task_oj_problems:
+  - id int 非空 (主键)
+  - task_id int 非空
+  - problem_id int 非空
+  - problem_order int
+  - created_at datetime
+
+表 teacher_students:
+  - id int 非空 (主键)
+  - teacher_id int 非空
+  - student_id int 非空
+  - class_no varchar
+  - created_at timestamp
+  - updated_at timestamp
+
+表 user_answer_stats:
+  - user_id int 非空
+  - username varchar 非空
+  - level int 非空
+  - difficulty enum
+  - total_attempts bigint 非空
+  - correct_attempts decimal
+  - wrong_attempts decimal
+  - correct_rate decimal
+
+表 user_exam_progress:
+  - id int 非空 (主键)
+  - user_id int 非空
+  - exam_id int 非空
+  - task_id int
+  - is_completed tinyint
+  - best_score int
+  - attempt_count int
+  - completed_at datetime
+  - created_at datetime
+  - updated_at datetime
+
+表 user_learning_plans:
+  - id int 非空 (主键)
+  - user_id int 非空
+  - plan_id int 非空
+  - joined_at datetime
+  - status varchar
+
+表 user_oj_progress:
+  - id int 非空 (主键)
+  - user_id int 非空
+  - problem_id int 非空
+  - task_id int
+  - is_completed tinyint
+  - best_verdict varchar
+  - attempt_count int
+  - completed_at datetime
+  - created_at datetime
+  - updated_at datetime
+
+表 user_permissions:
+  - user_id int 非空
+  - username varchar 非空
+  - email varchar
+  - user_status varchar 非空
+  - role_id int 非空
+  - role_name varchar 非空
+  - role_display_name varchar 非空
+  - permission_id int 非空
+  - permission_name varchar 非空
+  - permission_display_name varchar 非空
+  - resource varchar 非空
+  - action varchar 非空
+  - role_assigned_at timestamp
+  - assigned_by int
+
+表 user_plan_progress:
+  - id int 非空 (主键)
+  - user_id int 非空
+  - plan_id int 非空
+  - is_completed tinyint
+  - completed_tasks int
+  - total_tasks int
+  - completed_at datetime
+  - created_at datetime
+  - updated_at datetime
+
+表 user_roles:
+  - id int 非空 (主键)
+  - user_id int 非空
+  - role_id int 非空
+  - assigned_by int
+  - created_at timestamp
+
+表 user_roles_summary:
+  - user_id int 非空
+  - username varchar 非空
+  - email varchar
+  - status varchar 非空
+  - role_names text
+  - role_display_names text
+  - role_count bigint 非空
+  - permission_count bigint 非空
+
+表 user_task_progress:
+  - id int 非空 (主键)
+  - user_id int 非空
+  - task_id int 非空
+  - is_completed tinyint
+  - completed_at datetime
+  - created_at datetime
+  - updated_at datetime
+
+表 user_wrong_questions:
+  - question_id int 非空
+  - question_text text 非空
+  - question_type enum
+  - question_code text
+  - correct_answer varchar 非空
+  - explanation text
+  - level int 非空
+  - difficulty enum
+  - image_url varchar
+  - user_answer varchar 非空
+  - is_correct tinyint 非空
+  - answered_at timestamp
+  - user_id int 非空
+  - exam_id int 非空
+  - exam_name varchar 非空
+  - exam_level int 非空
+  - username varchar 非空
+  - attempt_number int 非空
+  - exam_score int 非空
+
+表 users:
+  - id int 非空 (主键)
+  - username varchar 非空
+  - password varchar 非空
+  - phone varchar
+  - email varchar
+  - real_name varchar
+  - created_at timestamp
+  - updated_at timestamp

@@ -78,6 +78,10 @@
                 <Icon name="graduation-cap" :size="18" class="item-icon" />
                 教师管理
               </button>
+              <button v-if="isAdmin" @click="goToAiManagement" class="dropdown-item">
+                <Icon name="fa-bot" :size="18" class="item-icon" />
+                AI 管理
+              </button>
               <div class="dropdown-divider"></div>
               <button @click="logout" class="dropdown-item logout-item">
                 <Icon name="log-out" :size="18" class="item-icon" />
@@ -362,6 +366,11 @@ const goToAdmin = () => {
 const goToTeacher = () => {
   closeDropdown()
   router.push('/teacher')
+}
+
+const goToAiManagement = () => {
+  closeDropdown()
+  router.push('/ai-management')
 }
 
 // 跳转到动画演示页面

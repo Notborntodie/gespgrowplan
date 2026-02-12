@@ -7,12 +7,15 @@ module.exports = {
     env: {
       NODE_ENV: 'development',
       PORT: 3000,
-      HOST: '127.0.0.1'
+      HOST: '127.0.0.1',
+      AL_SERVER_URL: 'http://127.0.0.1:8000'
     },
     env_production: {
       NODE_ENV: 'production',
       PORT: 3000,
-      HOST: '127.0.0.1'
+      HOST: '127.0.0.1',
+      AL_SERVER_URL: 'http://127.0.0.1:8000',
+      ANIMATIONS_UPLOAD_DIR: '/var/www/gesp-uploads/html'
     },
     // 自动重启配置
     autorestart: true,

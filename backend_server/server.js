@@ -16,10 +16,10 @@ const server = app.listen(port, host, () => {
   });
 });
 
-// 设置超时配置，防止socket hang up
-server.timeout = 30000; // 30秒超时
-server.keepAliveTimeout = 65000; // 65秒keep-alive超时
-server.headersTimeout = 66000; // 66秒headers超时
+// 设置超时配置，防止socket hang up（AI 对话接口需较长时间，取 120s）
+server.timeout = 120000; // 120秒，兼容 /api/admin/agent/message 多轮 LLM 调用
+server.keepAliveTimeout = 65000;
+server.headersTimeout = 66000;
 
 // 优雅关闭
 process.on('SIGTERM', () => {

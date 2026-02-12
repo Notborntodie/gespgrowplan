@@ -86,7 +86,7 @@ import OJManagement from '@/components/admin/OJManagement.vue'
 import LeaningPlanManagement from '@/components/admin/LeaningPlanManagement.vue'
 import AdminPlanProgressSection from '@/components/admin/AdminPlanProgressSection.vue'
 
-// 侧边栏菜单项
+// 侧边栏菜单项（AI 管理已移至独立页面 /ai-management，从顶部用户下拉进入）
 const menuItems = [
   { key: 'upload', label: '上传题目' },
   { key: 'knowledge-points', label: '知识点管理' },

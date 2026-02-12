@@ -25,6 +25,7 @@ import StudentPlanProgressView from '../views/StudentPlanProgressView.vue'
 import AnimationDemoView from '../views/AnimationDemoView.vue'
 import AnimationView from '../views/AnimationView.vue'
 import TopWrongQuestionsView from '../views/TopWrongQuestionsView.vue'
+import AiManagementView from '../views/AiManagementView.vue'
 
 const routes = [
   { path: '/login', component: LoginView },
@@ -52,6 +53,7 @@ const routes = [
   { path: '/profile', component: ProfileView },
   { path: '/gesp5', redirect: '/practice/1' }, // 保持向后兼容
   { path: '/admin', component: AdminView },
+  { path: '/ai-management', component: AiManagementView },
   { path: '/teacher', component: TeacherView },
   { path: '/teacher/:teacherId/student/:studentId/plan-progress', component: StudentPlanProgressView },
   { path: '/feynman-summary', component: FeynmanSummaryView },
