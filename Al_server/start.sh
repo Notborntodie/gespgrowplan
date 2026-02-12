@@ -59,7 +59,7 @@ if [ -f "server.pid" ]; then
         echo "✅ 服务已在后台启动"
         echo "📝 进程ID: $PID"
         echo "📋 日志文件: server.log"
-        echo "🌐 服务地址: http://0.0.0.0:8000"
+        echo "🌐 服务地址: http://127.0.0.1:8000（仅本机，由 Nginx /ai-api/ 代理）"
         echo ""
         echo "提示："
         echo "  查看日志: tail -f server.log"

@@ -176,7 +176,7 @@
                     
                     <!-- 如果已有图片，显示图片 -->
                     <div v-if="currentQuestion.image_url" class="image-preview-container">
-                      <img :src="currentQuestion.image_url" alt="题目图片" class="question-image-preview" />
+                      <img :src="getImageUrl(currentQuestion.image_url)" alt="题目图片" class="question-image-preview" />
                       <button type="button" @click="removeImage" class="btn-remove-image">删除图片</button>
                     </div>
                     
@@ -387,7 +387,15 @@
   />
 </template>
 
-<script setup lang="ts">import { BASE_URL, API_SERVER_BASE, AI_API_BASE_URL } from '@/config/api'
+<script setup lang="ts">import { BASE_URL, API_SERVER_BASE, AI_API_BASE_URL, normalizeImageUrl } from '@/config/api'
+
+function getImageUrl(url: string | undefined): string {
+  if (!url || !url.trim()) return ''
+  const n = normalizeImageUrl(url)
+  if (!n) return ''
+  if (n.startsWith('http://') || n.startsWith('https://')) return n
+  return n.startsWith('/') ? `${API_SERVER_BASE}${n}` : `${API_SERVER_BASE}/${n}`
+}
 
 import { ref, computed, onMounted, nextTick } from 'vue'
 import axios from 'axios'
@@ -822,7 +830,6 @@ async function uploadImage(file: File) {
     const formData = new FormData()
     formData.append('image', file)
     
-    console.log('发送上传请求到:', `${BASE_URL}/upload-image`)
     
     const response = await axios.post(`${BASE_URL}/upload-image`, formData, {
       headers: {
@@ -850,21 +857,18 @@ async function uploadImage(file: File) {
     }
     
     if (imageUrl) {
-      // 确保URL是完整的
-      if (!imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
-        imageUrl = imageUrl.startsWith('/') 
-          ? `${API_SERVER_BASE}${imageUrl}` 
-          : `${API_SERVER_BASE}/${imageUrl}`
+      // 规范化 URL，避免 HTTPS 下 Mixed Content 及错误端口导致 404
+      let normalized = normalizeImageUrl(imageUrl)
+      if (!normalized) normalized = imageUrl
+      if (!normalized.startsWith('http://') && !normalized.startsWith('https://')) {
+        normalized = normalized.startsWith('/')
+          ? `${API_SERVER_BASE}${normalized}`
+          : `${API_SERVER_BASE}/${normalized}`
       }
-      
-      // 替换localhost为实际服务器地址
-      imageUrl = imageUrl.replace(/http:\/\/localhost:3000/g, `${API_SERVER_BASE}`)
-      imageUrl = imageUrl.replace(/http:\/\/127\.0\.0\.1:3000/g, `${API_SERVER_BASE}`)
-      
-      currentQuestion.value.image_url = imageUrl
+      currentQuestion.value.image_url = normalized
       markAsEdited()
       
-      console.log('图片上传成功！URL:', imageUrl)
+      console.log('图片上传成功！URL:', normalized)
       successMessage.value = '图片上传成功！'
       showSuccessMessage.value = true
     } else {

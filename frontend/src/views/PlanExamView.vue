@@ -15,6 +15,18 @@
     </div>
   
     <div v-else class="exam-layout">
+      <!-- 提示信息：只在非考试模式下显示（从任务页面进入的专项练习题页面） -->
+      <!-- 临时测试：显示 practiceMode 和 fromTaskView 的值 -->
+      <!-- <div style="position: fixed; top: 0; left: 0; background: red; color: white; padding: 10px; z-index: 99999;">
+        practiceMode: {{ practiceMode }}, fromTaskView: {{ fromTaskView }}
+      </div> -->
+      <div v-if="practiceMode !== 'exam'" class="practice-tip-banner">
+        <div class="practice-tip-content">
+          <Icon name="info" :size="18" />
+          <span>先复习，再练习客观和编程题目哦！可以在右侧边栏切换到题目页面</span>
+        </div>
+      </div>
+      
       <div class="exam-content exam-content-flex-row">
         <!-- 新的 exam 卡片容器，占屏幕70% -->
         <div class="exam-card-wrapper">
@@ -25,10 +37,15 @@
               <div class="exam-title-section">
                 <h2 class="exam-title">{{ examInfo.name || 'GESP 考试' }}</h2>
                 <span class="exam-level-badge">GESP {{ examInfo.level || 1 }}级</span>
-                <!-- 任务内提交状态标识 -->
-                <span class="submission-mode-badge task-submission-badge" title="任务内提交，提交后会更新任务进度">
+                <!-- 计划标识 -->
+                <span class="submission-mode-badge task-submission-badge" title="计划内提交，提交后会更新任务进度">
                   <Icon name="clipboard-check" :size="14" />
-                  <span>任务内提交</span>
+                  <span>计划</span>
+                </span>
+                <!-- 本次练习计时器（计划标签后） -->
+                <span class="practice-timer-badge" title="本次练习已持续时间">
+                  <Icon name="clock" :size="14" />
+                  <span>{{ practiceTimerDisplay }}</span>
                 </span>
               </div>
               
@@ -422,7 +439,7 @@
           <button @click="closeAlertDialog" class="alert-modal-close">×</button>
         </div>
         <div class="alert-modal-body">
-          <div class="alert-icon">⚠️</div>
+          <div class="alert-icon">{{ alertTitle === '温馨提示' ? '💡' : '⚠️' }}</div>
           <p class="alert-message">{{ alertMessage }}</p>
         </div>
         <div class="alert-modal-footer">
@@ -434,7 +451,7 @@
     </div>
   </template>
   
-  <script lang="ts">import { BASE_URL, API_SERVER_BASE } from '@/config/api'
+  <script lang="ts">import { BASE_URL, API_SERVER_BASE, normalizeImageUrl } from '@/config/api'
   
   import { defineComponent } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
@@ -577,7 +594,16 @@
         fromPlan: false,
         fromTaskView: false,
         planId: null as string | null,
-        taskId: null as string | null
+        taskId: null as string | null,
+        // 提交次数相关状态
+        todaySubmissionCount: 0,
+        remainingSubmissions: 3,
+        submissionLimit: 3,
+        // 本次练习开始时间（用于计算练习持续时间，单位：毫秒时间戳）
+        practiceStartTime: null as number | null,
+        // 计时器显示文案（每 1 秒更新）
+        practiceTimerDisplay: '00:00',
+        practiceTimerIntervalId: null as ReturnType<typeof setInterval> | null
       };
     },
     computed: {
@@ -603,7 +629,7 @@
         }));
       }
     },
-    mounted() {
+    async mounted() {
       // 从路由参数获取考试ID
       const route = useRoute();
       this.EXAM_ID = parseInt(route.params.examId as string) || 1;
@@ -636,10 +662,19 @@
         fromTaskView,
         planId: this.planId,
         taskId: this.taskId,
+        practiceMode: this.practiceMode,
         fullUrl: window.location.href
       });
       
       this.loadExamData();
+      
+      // 每秒更新练习计时器显示
+      this.practiceTimerIntervalId = setInterval(() => this.updatePracticeTimerDisplay(), 1000);
+      
+      // 获取今天的提交次数
+      if (this.taskId && this.EXAM_ID && this.userInfo?.id) {
+        this.fetchTodaySubmissionCount();
+      }
       
       // 添加浏览器返回键拦截
       this.setupBeforeUnload();
@@ -668,12 +703,42 @@
       }
     },
     beforeUnmount() {
+      if (this.practiceTimerIntervalId) {
+        clearInterval(this.practiceTimerIntervalId);
+        this.practiceTimerIntervalId = null;
+      }
       // 清理事件监听器
       this.cleanupBeforeUnload();
       this.cleanupKeyboardShortcuts();
       window.removeEventListener('exitExamRequest', this.handleExitExamRequest);
     },
     methods: {
+      /** 更新顶部练习计时器显示（格式 MM:SS 或 HH:MM:SS） */
+      updatePracticeTimerDisplay() {
+        if (this.practiceStartTime == null) {
+          this.practiceTimerDisplay = '00:00';
+          return;
+        }
+        const totalSeconds = Math.max(0, Math.floor((Date.now() - this.practiceStartTime) / 1000));
+        const h = Math.floor(totalSeconds / 3600);
+        const m = Math.floor((totalSeconds % 3600) / 60);
+        const s = totalSeconds % 60;
+        if (h > 0) {
+          this.practiceTimerDisplay = `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        } else {
+          this.practiceTimerDisplay = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        }
+      },
+      /**
+       * Fisher-Yates 洗牌算法：原地随机打乱数组顺序。
+       * 保证每次进入考试时题目顺序随机，且每种排列等概率。
+       */
+      shuffleQuestionsInPlace<T>(arr: T[]) {
+        for (let i = arr.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+      },
       async loadExamData() {
         if (!this.EXAM_ID) {
           this.error = '无效的考试ID';
@@ -689,9 +754,14 @@
           }
           const data = await response.json();
           this.examInfo = data.exam;
-          this.questions = data.questions;
+          this.questions = Array.isArray(data.questions) ? [...data.questions] : [];
+          // 每次进入考试时对题目进行随机乱序，保证题目顺序随机
+          this.shuffleQuestionsInPlace(this.questions);
           this.answers = Array(this.questions.length).fill('');
           this.currentQuestionIndex = 0;
+          // 记录本次练习开始时间（用于提交时计算练习持续时间）
+          this.practiceStartTime = Date.now();
+          this.updatePracticeTimerDisplay();
           
           // 调试信息：检查题目数据
           console.log('加载的题目数据:', this.questions);
@@ -705,28 +775,20 @@
             console.log('第一题附加图片:', this.questions[0].images);
           }
           
-          // 处理图片URL，确保是完整的URL
+          // 处理图片URL，避免 HTTPS 下 Mixed Content（如 http://ip:3000/uploads/xxx）
           this.questions = this.questions.map((q: Question) => {
             if (q.image_url) {
-              // 替换localhost为实际服务器地址
-              q.image_url = q.image_url.replace(/http:\/\/localhost:3000/g, `${API_SERVER_BASE}`);
-              q.image_url = q.image_url.replace(/http:\/\/127\.0\.0\.1:3000/g, `${API_SERVER_BASE}`);
-              
-              // 如果图片URL是相对路径，转换为绝对路径
+              q.image_url = normalizeImageUrl(q.image_url) || q.image_url;
               if (!q.image_url.startsWith('http://') && !q.image_url.startsWith('https://')) {
-                q.image_url = q.image_url.startsWith('/') 
-                  ? `${API_SERVER_BASE}${q.image_url}` 
+                q.image_url = q.image_url.startsWith('/')
+                  ? `${API_SERVER_BASE}${q.image_url}`
                   : `${API_SERVER_BASE}/${q.image_url}`;
               }
             }
             if (q.images && q.images.length > 0) {
               q.images = q.images.map((img: any) => {
                 if (img.image_url) {
-                  // 替换localhost为实际服务器地址
-                  img.image_url = img.image_url.replace(/http:\/\/localhost:3000/g, `${API_SERVER_BASE}`);
-                  img.image_url = img.image_url.replace(/http:\/\/127\.0\.0\.1:3000/g, `${API_SERVER_BASE}`);
-                  
-                  // 如果图片URL是相对路径，转换为绝对路径
+                  img.image_url = normalizeImageUrl(img.image_url) || img.image_url;
                   if (!img.image_url.startsWith('http://') && !img.image_url.startsWith('https://')) {
                     img.image_url = img.image_url.startsWith('/')
                       ? `${API_SERVER_BASE}${img.image_url}`
@@ -746,6 +808,11 @@
           setTimeout(() => {
             localStorage.setItem('currentExamInfo', JSON.stringify(this.examInfo));
             this.loading = false;
+            
+            // 温馨提醒：每次进入考试题目随机乱序
+            this.alertTitle = '温馨提示';
+            this.alertMessage = '每次进入考试，题目顺序会随机打乱，祝您答题顺利！';
+            this.showAlertDialog = true;
             
             // 数据加载完成后滚动到合适位置
             setTimeout(() => {
@@ -779,6 +846,17 @@
           return;
         }
         
+        // 检查今天的提交次数
+        if (this.taskId && this.EXAM_ID) {
+          await this.fetchTodaySubmissionCount();
+          if (this.remainingSubmissions <= 0) {
+            this.alertTitle = '提交次数已用完';
+            this.alertMessage = '今天已提交3次，请明天再试。客观题规则：一天只能提交3次，60分以上才算通过。';
+            this.showAlertDialog = true;
+            return;
+          }
+        }
+        
         this.submitting = true;
         try {
           // 准备提交数据
@@ -786,11 +864,16 @@
             question_id: question.id,
             user_answer: this.answers[index]
           }));
+          // 本次练习持续时间（秒），从进入页面到提交
+          const practiceDurationSeconds = this.practiceStartTime != null
+            ? Math.max(0, Math.round((Date.now() - this.practiceStartTime) / 1000))
+            : null;
           
           const submitData = {
             user_id: this.userInfo.id,
             exam_id: this.EXAM_ID,
-            answers: answers
+            answers: answers,
+            practice_duration_seconds: practiceDurationSeconds
           };
           
           console.log('提交数据:', submitData);
@@ -826,6 +909,11 @@
           
           const result = await response.json();
           console.log('提交结果:', result);
+          
+          // 更新今天的提交次数
+          if (this.taskId && this.EXAM_ID) {
+            await this.fetchTodaySubmissionCount();
+          }
           
           // 显示提交结果
           this.submitResult = result;
@@ -1141,9 +1229,8 @@
                 
                 // 高亮题目代码
                 const codeBlocks = document.querySelectorAll('.code-block code');
-                console.log('找到代码块数量:', codeBlocks.length);
-                
-                if (codeBlocks.length === 0) {
+                const hasCode = this.currentQuestion?.question_type === 'code' && this.currentQuestion?.question_code;
+                if (hasCode && codeBlocks.length === 0) {
                   console.warn('⚠️ 未找到代码块，可能是 DOM 还未渲染完成');
                 }
                 
@@ -1197,6 +1284,28 @@
           });
         });
       },
+      // 获取今天提交次数
+      async fetchTodaySubmissionCount() {
+        if (!this.taskId || !this.EXAM_ID || !this.userInfo?.id) {
+          return;
+        }
+        
+        try {
+          const url = `${this.BASE_URL}/learning-tasks/${this.taskId}/exam-submission-count?user_id=${this.userInfo.id}&exam_id=${this.EXAM_ID}`;
+          const response = await fetch(url);
+          
+          if (response.ok) {
+            const result = await response.json();
+            if (result.success) {
+              this.todaySubmissionCount = result.data.today_count;
+              this.remainingSubmissions = result.data.remaining;
+              this.submissionLimit = result.data.limit;
+            }
+          }
+        } catch (error) {
+          console.error('获取今天提交次数失败:', error);
+        }
+      },
       // 通知提交状态更新
       notifySubmissionUpdate() {
         // 使用 localStorage 存储提交状态更新事件
@@ -1226,33 +1335,17 @@
             return '考试模式';
         }
       },
-      // 获取完整的图片URL
+      // 获取完整的图片URL（规范化以避免 HTTPS 下 Mixed Content）
       getImageUrl(url: string | undefined): string {
-        if (!url || !url.trim()) {
-          console.warn('图片URL为空');
-          return '';
+        if (!url || !url.trim()) return '';
+        const normalized = normalizeImageUrl(url);
+        if (!normalized) return '';
+        // 相对路径补全
+        if (!normalized.startsWith('http://') && !normalized.startsWith('https://')) {
+          const base = API_SERVER_BASE;
+          return normalized.startsWith('/') ? `${base}${normalized}` : `${base}/${normalized}`;
         }
-        
-        let trimmedUrl = url.trim();
-        
-        // 替换localhost为实际服务器地址
-        trimmedUrl = trimmedUrl.replace(/http:\/\/localhost:3000/g, `${API_SERVER_BASE}`);
-        trimmedUrl = trimmedUrl.replace(/http:\/\/127\.0\.0\.1:3000/g, `${API_SERVER_BASE}`);
-        
-        // 如果已经是完整URL，直接返回
-        if (trimmedUrl.startsWith('http://') || trimmedUrl.startsWith('https://')) {
-          console.log('图片URL已经是完整URL:', trimmedUrl);
-          return trimmedUrl;
-        }
-        
-        // 如果是相对路径，转换为绝对路径
-        const baseUrl = `${API_SERVER_BASE}`;
-        const fullUrl = trimmedUrl.startsWith('/') 
-          ? `${baseUrl}${trimmedUrl}` 
-          : `${baseUrl}/${trimmedUrl}`;
-        
-        console.log('转换后的图片URL:', fullUrl);
-        return fullUrl;
+        return normalized;
       },
       // 图片加载错误处理
       handleImageError(event: Event) {
@@ -1435,6 +1528,41 @@
     transition: width 0.3s;
   }
   
+  /* 练习提示横幅 */
+  .practice-tip-banner {
+    width: 100%;
+    max-width: 1800px;
+    margin: 20px auto 0;
+    padding: 0 20px;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 10;
+  }
+  
+  .practice-tip-content {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border: 1px solid #fbbf24;
+    border-radius: 12px;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 2px 8px rgba(251, 191, 36, 0.2);
+    color: #92400e;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.5;
+  }
+  
+  .practice-tip-content Icon {
+    flex-shrink: 0;
+    color: #d97706;
+  }
+  
+  .practice-tip-content span {
+    flex: 1;
+  }
+  
   /* 新增横向flex布局 - 居中布局 */
   .exam-content-flex-row {
     display: flex;
@@ -1442,16 +1570,14 @@
     gap: 32px;
     width: 100% !important;
     max-width: 1800px !important;
-    margin: 0 auto;
+    margin: 16px auto 0;
     padding: 0 20px;
     box-sizing: border-box;
     flex-shrink: 0;
     align-items: flex-start;
     justify-content: center;
-    margin-top: 20px; /* 为 NavBar 留出少量空间 */
     margin-bottom: 60px; /* 为底部固定的 exam-header 留出空间 */
     padding-bottom: 0;
-    justify-content: center;
   }
   
   /* 新的 exam 卡片容器 - 占屏幕90% */
@@ -1557,6 +1683,26 @@
   
   .task-submission-badge :deep(.lucide-icon) {
     color: white;
+  }
+  
+  /* 本次练习计时器（计划标签后） */
+  .practice-timer-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.15) 100%);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 18px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    font-variant-numeric: tabular-nums;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    backdrop-filter: blur(10px);
+  }
+  .practice-timer-badge :deep(.lucide-icon) {
+    color: white;
+    flex-shrink: 0;
   }
   
   .exam-progress-section {
@@ -2863,8 +3009,18 @@
   }
   
   @media (max-width: 768px) {
+    .practice-tip-banner {
+      padding: 0 10px;
+      margin-top: 10px;
+    }
+    
+    .practice-tip-content {
+      padding: 12px 16px;
+      font-size: 14px;
+    }
+    
     .exam-content-flex-row {
-      margin-top: 20px; /* 移动端：为 NavBar 留出少量空间 */
+      margin-top: 16px; /* 移动端：为 NavBar 留出少量空间 */
       margin-bottom: 20px;
       padding: 0 10px;
     }

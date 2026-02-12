@@ -1,14 +1,20 @@
 <template>
   <BaseTeacherSection title="学生管理">
     <template #filters>
-      <div class="search-box">
-        <input 
-          v-model="studentSearchQuery" 
-          type="text" 
-          placeholder="搜索学生用户名或真实姓名..."
-          class="search-input"
-        />
-        <Icon name="search" :size="18" class="search-icon" />
+      <div class="filters-row">
+        <div class="search-box">
+          <input 
+            v-model="studentSearchQuery" 
+            type="text" 
+            placeholder="搜索学生用户名或真实姓名..."
+            class="search-input"
+          />
+          <Icon name="search" :size="16" class="search-icon" />
+        </div>
+        <select v-model="classFilter" class="class-filter-select" title="按班级筛选">
+          <option value="">全部班级</option>
+          <option v-for="c in classOptions" :key="c" :value="c">{{ c }}</option>
+        </select>
       </div>
     </template>
     
@@ -16,16 +22,25 @@
       <div class="header-right-content" :class="{ collapsed: hasPanel }">
         <span class="count-info">共 {{ filteredStudents.length }} 个学生</span>
         <div class="header-actions">
+          <button 
+            @click="exportFilteredStudents" 
+            class="btn-secondary btn-export" 
+            :disabled="filteredStudents.length === 0"
+            title="导出当前筛选结果（姓名、用户名）"
+          >
+            <Icon name="download" :size="16" />
+            导出
+          </button>
           <button @click="$emit('bind-student')" class="btn-secondary">
-            <Icon name="plus" :size="18" />
+            <Icon name="plus" :size="16" />
             绑定学生
           </button>
           <button @click="$emit('batch-create-student')" class="btn-secondary">
-            <Icon name="users" :size="18" />
+            <Icon name="users" :size="16" />
             批量创建学生
           </button>
           <button @click="$emit('create-student')" class="btn-primary">
-            <Icon name="plus" :size="18" />
+            <Icon name="plus" :size="16" />
             创建学生
           </button>
         </div>
@@ -46,6 +61,7 @@
         <table class="data-table">
           <thead>
             <tr>
+              <th>班级</th>
               <th>学生姓名</th>
               <th>用户名</th>
               <th>操作</th>
@@ -58,12 +74,35 @@
               class="table-row"
             >
               <td>
+                <div class="class-cell">
+                  <span v-if="editingClassStudentId === student.id" class="class-edit-inline">
+                    <input 
+                      ref="classEditInput"
+                      v-model="editingClassValue" 
+                      type="text" 
+                      placeholder="如：1班"
+                      class="class-edit-input"
+                      @keyup.enter="saveClassEdit(student)"
+                      @keyup.escape="cancelClassEdit"
+                    />
+                    <button @click="saveClassEdit(student)" class="btn-save-class" title="保存">✓</button>
+                    <button @click="cancelClassEdit" class="btn-cancel-class" title="取消">×</button>
+                  </span>
+                  <span v-else class="class-display">
+                    <span class="class-no-text">{{ student.class_no || '—' }}</span>
+                    <button @click.stop="startClassEdit(student)" class="btn-edit-class" title="编辑班级">
+                      <Icon name="edit" :size="14" />
+                    </button>
+                  </span>
+                </div>
+              </td>
+              <td>
                 <div class="student-name-cell">
                   <span class="student-name-text">{{ student.real_name || student.username || '未知学生' }}</span>
                 </div>
               </td>
               <td>
-                <span class="username-text">@{{ student.username }}</span>
+                <span class="username-text">{{ student.username }}</span>
               </td>
               <td>
                 <div class="action-buttons" @click.stop>
@@ -74,6 +113,10 @@
                   <button @click="$emit('manage-plans', student)" class="btn-action btn-manage-plans" title="增加/删除计划">
                     <Icon name="settings" :size="16" />
                     <span>增加/删除计划</span>
+                  </button>
+                  <button @click="$emit('reset-password', student)" class="btn-action btn-reset-pwd" title="重置密码">
+                    <Icon name="key" :size="16" />
+                    <span>重置密码</span>
                   </button>
                   <button @click="$emit('unbind-student', student)" class="btn-action btn-unbind" title="解除绑定">
                     <Icon name="user-x" :size="16" />
@@ -90,7 +133,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, nextTick } from 'vue'
 import BaseTeacherSection from './BaseTeacherSection.vue'
 import Icon from '@/components/Icon.vue'
 
@@ -106,40 +149,194 @@ const emit = defineEmits<{
   'batch-create-student': []
   'view-plan-progress': [student: any]
   'manage-plans': [student: any]
+  'reset-password': [student: any]
   'unbind-student': [student: any]
+  'update-class': [student: any, classNo: string | null]
 }>()
 
 const studentSearchQuery = ref('')
+const classFilter = ref('')
+const editingClassStudentId = ref<number | null>(null)
+const editingClassValue = ref('')
+const classEditInput = ref<HTMLInputElement | null>(null)
 
-// 过滤后的学生列表
+// 班级选项（从已有学生中提取）
+const classOptions = computed(() => {
+  const set = new Set<string>()
+  props.students.forEach(s => {
+    if (s.class_no && s.class_no.trim()) {
+      set.add(s.class_no.trim())
+    }
+  })
+  return Array.from(set).sort()
+})
+
+// 过滤后的学生列表（搜索 + 班级筛选）
 const filteredStudents = computed(() => {
-  if (!studentSearchQuery.value.trim()) {
-    return props.students
+  let list = props.students
+  
+  if (studentSearchQuery.value.trim()) {
+    const query = studentSearchQuery.value.toLowerCase().trim()
+    list = list.filter(student => {
+      const username = (student.username || '').toLowerCase()
+      const realName = (student.real_name || '').toLowerCase()
+      const classNo = (student.class_no || '').toLowerCase()
+      return username.includes(query) || realName.includes(query) || classNo.includes(query)
+    })
   }
   
-  const query = studentSearchQuery.value.toLowerCase().trim()
-  return props.students.filter(student => {
-    const username = (student.username || '').toLowerCase()
-    const realName = (student.real_name || '').toLowerCase()
-    return username.includes(query) || realName.includes(query)
-  })
+  if (classFilter.value) {
+    list = list.filter(student => (student.class_no || '').trim() === classFilter.value)
+  }
+  
+  return list
 })
+
+function startClassEdit(student: any) {
+  editingClassStudentId.value = student.id
+  editingClassValue.value = student.class_no || ''
+  nextTick(() => {
+    classEditInput.value?.focus()
+  })
+}
+
+function cancelClassEdit() {
+  editingClassStudentId.value = null
+  editingClassValue.value = ''
+}
+
+function saveClassEdit(student: any) {
+  const newVal = editingClassValue.value.trim() || null
+  emit('update-class', student, newVal)
+  cancelClassEdit()
+}
+
+// 导出当前筛选的学生（姓名、用户名）为 CSV
+function exportFilteredStudents() {
+  if (filteredStudents.value.length === 0) return
+  const headers = ['姓名', '用户名']
+  const rows = filteredStudents.value.map(s => [
+    s.real_name || s.username || '—',
+    s.username || '—'
+  ])
+  const csvContent = '\uFEFF' + [headers, ...rows]
+    .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+    .join('\n')
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  const suffix = classFilter.value ? `_${classFilter.value}` : ''
+  a.download = `学生名单${suffix}_${new Date().toISOString().slice(0, 10)}.csv`
+  a.click()
+  URL.revokeObjectURL(url)
+}
 </script>
 
 <style scoped>
+.filters-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
 .search-box {
   position: relative;
   display: flex;
   align-items: center;
 }
 
-.search-input {
-  padding: 16px 20px 16px 48px;
-  border: 3px solid #87ceeb;
-  border-radius: 16px;
-  font-size: 16px;
+.class-filter-select {
+  padding: 8px 12px;
+  border: 2px solid #87ceeb;
+  border-radius: 10px;
+  font-size: 14px;
   font-weight: 600;
-  width: 300px;
+  background: linear-gradient(135deg, #ffffff 0%, #e0f2fe 100%);
+  color: #0c4a6e;
+  cursor: pointer;
+  min-width: 140px;
+}
+
+.class-filter-select:focus {
+  outline: none;
+  border-color: #1e90ff;
+}
+
+.class-cell {
+  display: flex;
+  align-items: center;
+}
+
+.class-display {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.class-no-text {
+  font-weight: 600;
+  color: #0369a1;
+  font-size: 15px;
+}
+
+.btn-edit-class {
+  padding: 4px 6px;
+  border: none;
+  border-radius: 6px;
+  background: rgba(30, 144, 255, 0.2);
+  color: #1e90ff;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.btn-edit-class:hover {
+  background: rgba(30, 144, 255, 0.4);
+}
+
+.class-edit-inline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.class-edit-input {
+  width: 80px;
+  padding: 6px 10px;
+  border: 2px solid #1e90ff;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.btn-save-class, .btn-cancel-class {
+  padding: 4px 8px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.btn-save-class {
+  background: #10b981;
+  color: white;
+}
+
+.btn-cancel-class {
+  background: #94a3b8;
+  color: white;
+}
+
+.search-input {
+  padding: 10px 14px 10px 40px;
+  border: 2px solid #87ceeb;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  width: 260px;
   transition: all 0.3s ease;
   background: linear-gradient(135deg, #ffffff 0%, #e0f2fe 100%);
   box-shadow: 0 2px 8px rgba(30, 144, 255, 0.15);
@@ -155,16 +352,16 @@ const filteredStudents = computed(() => {
 
 .search-icon {
   position: absolute;
-  left: 16px;
+  left: 12px;
   color: #1e90ff;
-  font-size: 20px;
+  font-size: 16px;
   pointer-events: none;
 }
 
 .header-right-content {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 10px;
   transition: opacity 0.3s ease, max-width 0.3s ease, visibility 0.3s ease;
   overflow: hidden;
   max-width: 1000px;
@@ -185,34 +382,34 @@ const filteredStudents = computed(() => {
 
 .count-info {
   color: #0369a1;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 700;
-  padding: 8px 16px;
+  padding: 6px 12px;
   background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%);
-  border-radius: 12px;
+  border-radius: 8px;
   border: 2px solid #87ceeb;
-  box-shadow: 0 2px 8px rgba(30, 144, 255, 0.15);
+  box-shadow: 0 2px 6px rgba(30, 144, 255, 0.15);
 }
 
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 10px;
 }
 
 .btn-primary {
   background: linear-gradient(135deg, #1e90ff 0%, #38bdf8 100%);
   color: white;
-  border: 3px solid white;
-  padding: 14px 28px;
-  border-radius: 16px;
+  border: 2px solid white;
+  padding: 8px 16px;
+  border-radius: 10px;
   font-weight: 800;
-  font-size: 16px;
+  font-size: 14px;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   box-shadow: 0 4px 12px rgba(30, 144, 255, 0.3);
 }
 
@@ -224,11 +421,11 @@ const filteredStudents = computed(() => {
 .btn-secondary {
   background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%);
   color: #0369a1;
-  border: 3px solid #87ceeb;
-  padding: 14px 28px;
-  border-radius: 16px;
+  border: 2px solid #87ceeb;
+  padding: 8px 16px;
+  border-radius: 10px;
   font-weight: 800;
-  font-size: 16px;
+  font-size: 14px;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
@@ -237,12 +434,15 @@ const filteredStudents = computed(() => {
   box-shadow: 0 2px 8px rgba(30, 144, 255, 0.2);
 }
 
-.btn-secondary:hover {
+.btn-secondary:hover:not(:disabled) {
   background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
   color: #0c4a6e;
   transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 4px 16px rgba(30, 144, 255, 0.3);
-  border-color: #1e90ff;
+}
+
+.btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .loading-state {
@@ -306,12 +506,12 @@ const filteredStudents = computed(() => {
 
 .data-table-container {
   background: linear-gradient(135deg, #cce5ff 0%, #e0f2fe 50%, #ffffff 100%);
-  border-radius: 0 0 16px 16px;
+  border-radius: 0 0 10px 10px;
   border: none;
-  overflow: hidden;
+  overflow: visible;
   width: 100%;
   margin: 0;
-  padding: 0;
+  padding: 0 0 32px 0;
   box-shadow: none;
 }
 
@@ -332,11 +532,10 @@ const filteredStudents = computed(() => {
 }
 
 .data-table th {
-  padding: 20px;
-  padding-top: 20px;
+  padding: 12px 16px;
   text-align: left;
   font-weight: 800;
-  font-size: 16px;
+  font-size: 14px;
   color: white;
   white-space: nowrap;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
@@ -345,7 +544,7 @@ const filteredStudents = computed(() => {
 }
 
 .data-table td {
-  padding: 20px;
+  padding: 12px 16px;
   border-top: 2px solid #b3d9ff;
   font-size: 15px;
   color: #0c4a6e;
@@ -424,6 +623,17 @@ const filteredStudents = computed(() => {
   background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
   transform: translateY(-2px) scale(1.05);
   box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+}
+
+.btn-reset-pwd {
+  background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
+  color: white;
+}
+
+.btn-reset-pwd:hover {
+  background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
 }
 
 .btn-unbind {

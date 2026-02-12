@@ -16,6 +16,14 @@ import axios from 'axios'
 // Cache-Control 头需要后端 CORS 配置允许，为避免 CORS 错误，不在这里设置
 axios.defaults.timeout = 30000 // 30秒超时
 
+// 开发环境下获取当前访问的 host（外网访问时用服务器 host，本地访问用 localhost）
+const getDevApiHost = (): string => {
+  if (typeof window !== 'undefined' && window.location?.hostname) {
+    return window.location.hostname
+  }
+  return 'localhost'
+}
+
 // 从环境变量获取API基础URL
 const getApiBaseUrl = (): string => {
   // 优先使用环境变量
@@ -23,9 +31,10 @@ const getApiBaseUrl = (): string => {
     return import.meta.env.VITE_API_BASE_URL
   }
   
-  // 开发环境默认值
+  // 开发环境：使用当前页面的 host，便于外网访问时请求发往同一台服务器
   if (import.meta.env.DEV) {
-    return 'http://localhost:3000/api'
+    const host = getDevApiHost()
+    return `http://${host}:3000/api`
   }
   
   // 生产环境必须通过环境变量设置
@@ -57,9 +66,10 @@ const getAiApiBaseUrl = (): string => {
     return import.meta.env.VITE_AI_API_BASE_URL
   }
   
-  // 开发环境默认值
+  // 开发环境：使用当前页面的 host，便于外网访问
   if (import.meta.env.DEV) {
-    return 'http://localhost:8000/api'
+    const host = getDevApiHost()
+    return `http://${host}:8000/api`
   }
   
   // 生产环境必须通过环境变量设置
@@ -93,10 +103,10 @@ const getOJApiConfigs = (): OJApiConfig[] => {
         throw new Error('VITE_OJ_API_CONFIGS 必须是数组格式')
       }
       
-      // 验证每个配置项
+      // 验证每个配置项（url 可为空字符串，表示与当前页面同源，避免 HTTPS 下 Mixed Content）
       const validConfigs = configs.filter(config => {
-        if (!config.url || typeof config.url !== 'string') {
-          console.warn('无效的判题机配置（缺少 url）:', config)
+        if (config.url === undefined || config.url === null || typeof config.url !== 'string') {
+          if (import.meta.env.DEV) console.warn('无效的判题机配置（缺少 url）:', config)
           return false
         }
         return true
@@ -110,8 +120,10 @@ const getOJApiConfigs = (): OJApiConfig[] => {
         enabled: config.enabled !== undefined ? config.enabled : true,
       }))
     } catch (error) {
-      console.error('解析 VITE_OJ_API_CONFIGS 失败:', error)
-      console.warn('使用默认判题机配置')
+      if (import.meta.env.DEV) {
+        console.error('解析 VITE_OJ_API_CONFIGS 失败:', error)
+        console.warn('使用默认判题机配置')
+      }
     }
   }
   
@@ -140,18 +152,15 @@ const getOJApiConfigs = (): OJApiConfig[] => {
 
 export const OJ_API_CONFIGS = getOJApiConfigs()
 
-console.log('=== API配置已加载 ===')
-console.log('环境变量 VITE_API_BASE_URL:', import.meta.env.VITE_API_BASE_URL || '(未设置，使用默认值)')
-console.log('环境变量 VITE_AI_API_BASE_URL:', import.meta.env.VITE_AI_API_BASE_URL || '(未设置，使用默认值)')
-console.log('环境变量 VITE_OJ_API_CONFIGS:', import.meta.env.VITE_OJ_API_CONFIGS || '(未设置，使用默认值)')
-console.log('实际使用的 BASE_URL:', BASE_URL)
-console.log('实际使用的 API_SERVER_BASE:', API_SERVER_BASE)
-console.log('实际使用的 AI_API_BASE_URL:', AI_API_BASE_URL)
-console.log('判题机配置数量:', OJ_API_CONFIGS.length)
-OJ_API_CONFIGS.forEach((config, index) => {
-  console.log(`  判题机 ${index + 1}: ${config.name} (${config.url}) - 优先级: ${config.priority}, 启用: ${config.enabled}`)
-})
-console.log('运行模式:', import.meta.env.MODE)
-console.log('是否为开发环境:', import.meta.env.DEV)
-console.log('========================')
+/**
+ * 将图片 URL 规范化为同源路径，避免 HTTPS 下的 Mixed Content
+ * 例如：http://example.com:3000/uploads/xxx.png → /uploads/xxx.png（同源加载）
+ */
+export function normalizeImageUrl(url: string | undefined): string {
+  if (!url || !url.trim()) return ''
+  let u = url.trim()
+  // 将 http(s)://host:port 替换为 API_SERVER_BASE（同源时为 ''，得到 /uploads/xxx）
+  u = u.replace(/^https?:\/\/[^/]+/, API_SERVER_BASE)
+  return u
+}
 

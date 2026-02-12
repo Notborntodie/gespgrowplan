@@ -220,15 +220,6 @@ const checkExamPage = () => {
   isOJPage.value = (currentPath.startsWith('/smartoj/') && currentPath !== '/smartoj') ||
                     (currentPath.startsWith('/plan-smartoj/') && currentPath !== '/plan-smartoj')
   
-  console.log('NavBar检测路径:', currentPath, '| isExamPage:', isExamPage.value, '| isOJPage:', isOJPage.value)
-  console.log('路径检查详情:', {
-    currentPath,
-    startsWithSmartoj: currentPath.startsWith('/smartoj/'),
-    startsWithPlanSmartoj: currentPath.startsWith('/plan-smartoj/'),
-    notEqualSmartoj: currentPath !== '/smartoj',
-    isOJPageResult: isOJPage.value
-  })
-  
   if (isExamPage.value) {
     // 显示客观题模式
     examTitle.value = '客观题模式'
@@ -262,18 +253,12 @@ const goToLogin = () => {
 
 // 退出OJ页面
 const exitOJ = () => {
-  console.log('退出OJ按钮被点击')
-  // 获取当前路由参数和查询参数
   const currentPath = route.path
-  const problemId = route.params.problemId
   const urlParams = new URLSearchParams(window.location.search)
   const from = urlParams.get('from')
   const planId = urlParams.get('planId')
   const taskId = urlParams.get('taskId')
-  
-  console.log('当前路径:', currentPath, '问题ID:', problemId)
-  console.log('来源信息:', { from, planId, taskId })
-  
+
   // 如果是任务内OJ页面（/plan-smartoj/），触发退出确认弹窗
   if (currentPath.includes('/plan-smartoj/')) {
     // 触发 PlanSmartOJView 中的退出确认弹窗
@@ -289,7 +274,6 @@ const exitOJ = () => {
 
 // 退出考试页面
 const exitExam = () => {
-  console.log('退出考试按钮被点击')
   // 触发考试页面中的退出确认弹窗（包括 GESPEaxmView 和 PlanExamView）
   // 通过 window 事件来触发
   window.dispatchEvent(new CustomEvent('exitExamRequest'))
@@ -433,7 +417,6 @@ onMounted(() => {
     isDark.value = window.matchMedia('(prefers-color-scheme: dark)').matches
     document.documentElement.setAttribute('data-theme', isDark.value ? 'dark' : 'light')
   }
-  console.log('NavBar: 组件已挂载，退出按钮应该可用');
 })
 
 // 监听路由变化

@@ -74,7 +74,7 @@
                     <div class="student-name-text">{{ student.real_name || student.username }}</div>
                   </td>
                   <td>
-                    <span class="username-text">@{{ student.username }}</span>
+                    <span class="username-text">{{ student.username }}</span>
                   </td>
                   <td>
                     <span 
@@ -270,7 +270,7 @@
                 </div>
               <div class="info-row">
                 <span class="info-label">用户名:</span>
-                <span class="info-value">@{{ taskStudentDetail.student.username }}</span>
+                <span class="info-value">{{ taskStudentDetail.student.username }}</span>
               </div>
               <div class="info-row">
                 <span class="info-label">任务名称:</span>

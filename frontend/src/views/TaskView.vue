@@ -68,7 +68,7 @@
                         <p class="exam-mode-desc">{{ selectedTask.description }}</p>
                         <p class="exam-mode-notice">
                           <Icon name="alert-circle" :size="16" />
-                          考试模式下不显示答案和解析，请认真作答
+                          考试模式下不显示答案和解析，请认真作答。客观题和编程题的解析将于考试时间结束（{{ taskEndTimeFormatted ? `任务结束时间：${taskEndTimeFormatted}` : '任务时间结束' }}）后才开放。
                         </p>
                       </div>
 
@@ -100,6 +100,11 @@
                               <div class="exam-item-info">
                                 <h4>{{ exam.name }}</h4>
                                 <p v-if="exam.description">{{ exam.description }}</p>
+                                <!-- 今天剩余提交次数 -->
+                                <div class="exam-submission-count-info" v-if="examSubmissionCounts[exam.id] !== undefined">
+                                  <Icon name="clock" :size="12" />
+                                  <span>今日剩余: {{ examSubmissionCounts[exam.id]?.remaining || 0 }}/3次</span>
+                                </div>
                               </div>
                               <div class="exam-item-score" :class="{ 'has-score': exam.best_score !== undefined && exam.best_score !== null }">
                                 {{ exam.best_score !== undefined && exam.best_score !== null ? exam.best_score + '分' : '未作答' }}
@@ -109,20 +114,24 @@
                                 v-if="!isExamExpired()"
                                 @click="startExam(exam)" 
                                 class="btn-exam-action btn-start-exam"
-                                title="开始考试"
+                                :class="{ 'btn-frozen': examSubmissionCounts[exam.id]?.remaining === 0 }"
+                                :disabled="examSubmissionCounts[exam.id]?.remaining === 0"
+                                :title="examSubmissionCounts[exam.id]?.remaining === 0 ? '今日提交次数已用完，请明天再试' : '开始考试'"
                               >
-                                <Icon name="play" :size="16" />
-                                <span>开始考试</span>
+                                <Icon :name="examSubmissionCounts[exam.id]?.remaining === 0 ? 'lock' : 'play'" :size="16" />
+                                <span>{{ examSubmissionCounts[exam.id]?.remaining === 0 ? '已冻结' : '开始考试' }}</span>
                               </button>
                               <!-- 考试结束后显示开始补考和查看提交记录按钮 -->
                               <div v-else class="exam-action-group">
                                 <button 
                                   @click="startExam(exam)" 
                                   class="btn-exam-action btn-start-exam"
-                                  title="开始补考"
+                                  :class="{ 'btn-frozen': examSubmissionCounts[exam.id]?.remaining === 0 }"
+                                  :disabled="examSubmissionCounts[exam.id]?.remaining === 0"
+                                  :title="examSubmissionCounts[exam.id]?.remaining === 0 ? '今日提交次数已用完，请明天再试' : '开始补考'"
                                 >
-                                  <Icon name="refresh-cw" :size="16" />
-                                  <span>开始补考</span>
+                                  <Icon :name="examSubmissionCounts[exam.id]?.remaining === 0 ? 'lock' : 'refresh-cw'" :size="16" />
+                                  <span>{{ examSubmissionCounts[exam.id]?.remaining === 0 ? '已冻结' : '开始补考' }}</span>
                                 </button>
                                 <button 
                                   @click="viewExamSubmissions(exam)" 
@@ -142,6 +151,16 @@
                           <div class="exam-section-header">
                             <Icon name="code" :size="22" />
                             <h3>编程题</h3>
+                          </div>
+                          <!-- 规则说明 -->
+                          <div class="oj-rules-info exam-mode-rules">
+                            <Icon name="info" :size="18" />
+                            <div class="rules-content">
+                              <div class="rules-title">编程题规则</div>
+                              <div class="rules-details">
+                                <span class="rule-item">必须AC才算完成</span>
+                              </div>
+                            </div>
                           </div>
                           <div class="exam-items-grid">
                             <div 
@@ -228,6 +247,14 @@
 
                 <!-- 任务信息卡片 -->
                 <div class="content-section task-info-card" v-if="selectedTask">
+                  <!-- 提示横幅：只在非考试模式下显示，放在标签页内容外面 -->
+                  <div v-if="!isExamMode" class="practice-tip-banner">
+                    <div class="practice-tip-content">
+                      <Icon name="info" :size="18" />
+                      <span>先复习，再练习客观和编程题目哦！可以在右侧边栏切换到题目页面</span>
+                    </div>
+                  </div>
+                  
                   <div class="section-content">
                       <!-- 专项复习课（视频） -->
                       <div v-if="activeTab === 'video'" class="tab-content">
@@ -333,6 +360,18 @@
                             <h4 class="section-title-inline">
                               <Icon name="file-text" :size="20" /> 专项练习题
                             </h4>
+                            <!-- 规则说明 -->
+                            <div class="exam-rules-info">
+                              <Icon name="info" :size="18" />
+                              <div class="rules-content">
+                                <div class="rules-title">客观题规则</div>
+                                <div class="rules-details">
+                                  <span class="rule-item">每天只能提交3次</span>
+                                  <span class="rule-divider">•</span>
+                                  <span class="rule-item">60分以上才算通过</span>
+                                </div>
+                              </div>
+                            </div>
                           </div>
                           <div class="exercises-list">
                             <div 
@@ -344,6 +383,11 @@
                                 <div class="exercise-icon"><Icon name="file-text" :size="40" /></div>
                                 <h4>{{ exam.name }}</h4>
                                 <p class="exercise-desc">{{ exam.description }}</p>
+                                <!-- 今天剩余提交次数 -->
+                                <div class="submission-count-info" v-if="examSubmissionCounts[exam.id] !== undefined">
+                                  <Icon name="clock" :size="14" />
+                                  <span>今日剩余: {{ examSubmissionCounts[exam.id]?.remaining || 0 }}/3次</span>
+                                </div>
                                 <div class="exercise-status" :class="getExerciseStatusClass(exam)">
                                   {{ getExerciseStatusText(exam) }}
                                 </div>
@@ -351,10 +395,12 @@
                                   <button 
                                     @click="startExam(exam)" 
                                     class="btn-start-exercise"
-                                    title="开始练习"
+                                    :class="{ 'btn-frozen': examSubmissionCounts[exam.id]?.remaining === 0 }"
+                                    :disabled="examSubmissionCounts[exam.id]?.remaining === 0"
+                                    :title="examSubmissionCounts[exam.id]?.remaining === 0 ? '今日提交次数已用完，请明天再试' : '开始练习'"
                                   >
-                                    <Icon name="play" :size="16" />
-                                    <span>开始练习</span>
+                                    <Icon :name="examSubmissionCounts[exam.id]?.remaining === 0 ? 'lock' : 'play'" :size="16" />
+                                    <span>{{ examSubmissionCounts[exam.id]?.remaining === 0 ? '已冻结' : '开始练习' }}</span>
                                   </button>
                                   <button 
                                     @click="viewExamSubmissions(exam)" 
@@ -390,6 +436,16 @@
                             <h4 class="section-title-inline">
                               <Icon name="code" :size="20" /> 编程题
                             </h4>
+                            <!-- 规则说明 -->
+                            <div class="oj-rules-info">
+                              <Icon name="info" :size="18" />
+                              <div class="rules-content">
+                                <div class="rules-title">编程题规则</div>
+                                <div class="rules-details">
+                                  <span class="rule-item">必须AC才算完成</span>
+                                </div>
+                              </div>
+                            </div>
                           </div>
                           <div class="programming-list">
                             <div 
@@ -549,17 +605,8 @@
             <button @click="closeExplanationDialog" class="close-btn">×</button>
           </div>
           <div class="modal-body">
-            <!-- 没有提交记录的情况 -->
-            <div v-if="noSubmissionMessage" class="no-submission-message">
-              <div class="no-submission-icon">
-                <Icon name="file-text" :size="64" />
-              </div>
-              <h3>还没提交过</h3>
-              <p>需要先提交才能查看解析哦～！</p>
-            </div>
-            
             <!-- 有提交记录的情况 -->
-            <template v-else-if="selectedSubmission">
+            <template v-if="selectedSubmission">
               <div class="detail-summary">
                 <div class="summary-header">
                   <div class="summary-info">
@@ -661,6 +708,30 @@
           </div>
           <div class="modal-footer">
             <button @click="closeExplanationDialog" class="btn btn-secondary">关闭</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 访问被拒绝弹窗（提交记录、讲解视频和查看解析） -->
+      <div v-if="showAccessDeniedDialog" class="access-denied-modal" @click="closeAccessDeniedDialog">
+        <div class="modal-content" @click.stop>
+          <div class="modal-header">
+            <h3>{{ accessDeniedReasonForSubmissions === 'expired' ? '提交时间已过期' : '暂无提交记录' }}</h3>
+            <button @click="closeAccessDeniedDialog" class="close-btn">×</button>
+          </div>
+          <div class="modal-body">
+            <div class="access-denied-message">
+              <div class="access-denied-icon">
+                <Icon name="lock" :size="64" />
+              </div>
+              <p>{{ accessDeniedReasonForSubmissions === 'expired' ? '只有近24小时内的提交才能查看提交记录、讲解视频和解析，请重新提交后再查看。' : '您还没有提交过该题目，请先提交后再查看提交记录、讲解视频或解析。' }}</p>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button @click="closeAccessDeniedDialog" class="btn btn-primary">
+              <Icon name="arrow-left" :size="16" />
+              <span>确定</span>
+            </button>
           </div>
         </div>
       </div>
@@ -808,6 +879,14 @@ const selectedPlanId = ref<number | null>(null)
   const submissionAnswers = ref<any[]>([])
   const loadingExplanation = ref(false)
   const noSubmissionMessage = ref(false)
+  const noSubmissionReason = ref<'none' | 'expired'>('none') // 'none': 没有提交, 'expired': 提交时间超过24小时
+  
+  // 存储每个考试今天的提交次数
+  const examSubmissionCounts = ref<Record<number, { today_count: number; remaining: number; limit: number }>>({})
+  
+  // 访问被拒绝弹窗状态（用于提交记录）
+  const showAccessDeniedDialog = ref(false)
+  const accessDeniedReasonForSubmissions = ref<'none' | 'expired'>('none')
   
   const fetchTaskExercises = async (taskId: number) => {
     if (!userInfo.value?.id) return null
@@ -822,6 +901,34 @@ const selectedPlanId = ref<number | null>(null)
       error.value = err instanceof Error ? err.message : '获取任务练习失败'
       return null
     }
+  }
+
+  // 获取每个考试今天的提交次数
+  const fetchExamSubmissionCounts = async () => {
+    if (!userInfo.value?.id || !selectedTask.value?.id || !selectedTask.value?.exams?.length) {
+      return
+    }
+    
+    const taskId = selectedTask.value.id
+    const counts: Record<number, { today_count: number; remaining: number; limit: number }> = {}
+    
+    for (const exam of selectedTask.value.exams) {
+      try {
+        const response = await fetch(
+          `${BASE_URL}/learning-tasks/${taskId}/exam-submission-count?user_id=${userInfo.value.id}&exam_id=${exam.id}`
+        )
+        if (response.ok) {
+          const result = await response.json()
+          if (result.success) {
+            counts[exam.id] = result.data
+          }
+        }
+      } catch (error) {
+        console.error(`获取考试 ${exam.id} 的提交次数失败:`, error)
+      }
+    }
+    
+    examSubmissionCounts.value = counts
   }
 
   const fetchTaskProgress = async (taskId: number) => {
@@ -931,7 +1038,21 @@ const selectedPlanId = ref<number | null>(null)
     const endTime = new Date(selectedTask.value.end_time)
     return new Date() > endTime
   }
-  
+
+  // 当前任务的结束时间（格式化用于展示）
+  const taskEndTimeFormatted = computed(() => {
+    const t = selectedTask.value?.end_time
+    if (!t) return ''
+    const date = new Date(t)
+    return date.toLocaleString('zh-CN', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  })
+
   const startExam = (exam: any) => {
     // 构建URL参数，只传递有效的值
     const params = new URLSearchParams()
@@ -960,50 +1081,196 @@ const selectedPlanId = ref<number | null>(null)
   }
 
 // 查看专项练习题提交记录
-const viewExamSubmissions = (exam: any) => {
-  // 构建URL参数，只传递有效的值
-  const params = new URLSearchParams()
-  params.set('from', 'taskview')
-  if (selectedPlanId.value) {
-    params.set('planId', selectedPlanId.value.toString())
+const viewExamSubmissions = async (exam: any) => {
+  if (!userInfo.value?.id) {
+    alert('请先登录')
+    return
   }
-  if (selectedTask.value?.id) {
-    params.set('taskId', selectedTask.value.id.toString())
+  
+  // 先检查是否有近1天的提交记录
+  try {
+    const response = await axios.get(`${BASE_URL}/submissions`, {
+      params: {
+        user_id: userInfo.value.id,
+        exam_id: exam.id
+      }
+    })
+    
+    const submissions = Array.isArray(response.data) ? response.data : []
+    
+    if (submissions.length === 0) {
+      accessDeniedReasonForSubmissions.value = 'none'
+      showAccessDeniedDialog.value = true
+      return
+    }
+    
+    // 按提交时间排序，获取最近一次提交
+    submissions.sort((a: any, b: any) => {
+      const timeA = new Date(a.submit_time).getTime()
+      const timeB = new Date(b.submit_time).getTime()
+      return timeB - timeA
+    })
+    
+    const latestSubmission = submissions[0]
+    
+    // 检查最近一次提交是否在24小时内
+    const submissionTime = new Date(latestSubmission.submit_time).getTime()
+    const now = new Date().getTime()
+    const oneDayInMs = 24 * 60 * 60 * 1000 // 24小时
+    const timeDiff = now - submissionTime
+    
+    if (timeDiff > oneDayInMs) {
+      accessDeniedReasonForSubmissions.value = 'expired'
+      showAccessDeniedDialog.value = true
+      return
+    }
+    
+    // 有近1天的提交，允许进入
+    // 构建URL参数，只传递有效的值
+    const params = new URLSearchParams()
+    params.set('from', 'taskview')
+    if (selectedPlanId.value) {
+      params.set('planId', selectedPlanId.value.toString())
+    }
+    if (selectedTask.value?.id) {
+      params.set('taskId', selectedTask.value.id.toString())
+    }
+    router.push(`/exam-submissions/${exam.id}?${params.toString()}`)
+  } catch (error: any) {
+    console.error('检查提交记录失败:', error)
+    accessDeniedReasonForSubmissions.value = 'none'
+    showAccessDeniedDialog.value = true
   }
-  router.push(`/exam-submissions/${exam.id}?${params.toString()}`)
 }
 
 // 查看编程题提交记录
-const viewOJSubmissions = (problem: any) => {
-  // 构建URL参数，只传递有效的值
-  const params = new URLSearchParams()
-  params.set('from', 'taskview')
-  if (selectedPlanId.value) {
-    params.set('planId', selectedPlanId.value.toString())
+const viewOJSubmissions = async (problem: any) => {
+  if (!userInfo.value?.id) {
+    alert('请先登录')
+    return
   }
-  if (selectedTask.value?.id) {
-    params.set('taskId', selectedTask.value.id.toString())
+  
+  // 先检查是否有近1天的OJ提交记录
+  try {
+    const response = await axios.get(`${BASE_URL}/oj/submissions`, {
+      params: {
+        userId: userInfo.value.id,
+        problemId: problem.id,
+        page: 1,
+        pageSize: 100
+      }
+    })
+    
+    const submissions = response.data?.data || []
+    
+    if (submissions.length === 0) {
+      accessDeniedReasonForSubmissions.value = 'none'
+      showAccessDeniedDialog.value = true
+      return
+    }
+    
+    // 按提交时间排序，获取最近一次提交
+    submissions.sort((a: any, b: any) => {
+      const timeA = new Date(a.submit_time).getTime()
+      const timeB = new Date(b.submit_time).getTime()
+      return timeB - timeA
+    })
+    
+    const latestSubmission = submissions[0]
+    
+    // 检查最近一次提交是否在24小时内
+    const submissionTime = new Date(latestSubmission.submit_time).getTime()
+    const now = new Date().getTime()
+    const oneDayInMs = 24 * 60 * 60 * 1000 // 24小时
+    const timeDiff = now - submissionTime
+    
+    if (timeDiff > oneDayInMs) {
+      accessDeniedReasonForSubmissions.value = 'expired'
+      showAccessDeniedDialog.value = true
+      return
+    }
+    
+    // 有近1天的提交，允许进入
+    // 构建URL参数，只传递有效的值
+    const params = new URLSearchParams()
+    params.set('from', 'taskview')
+    if (selectedPlanId.value) {
+      params.set('planId', selectedPlanId.value.toString())
+    }
+    if (selectedTask.value?.id) {
+      params.set('taskId', selectedTask.value.id.toString())
+    }
+    router.push(`/oj-submissions/${problem.id}?${params.toString()}`)
+  } catch (error: any) {
+    console.error('检查提交记录失败:', error)
+    accessDeniedReasonForSubmissions.value = 'none'
+    showAccessDeniedDialog.value = true
   }
-  router.push(`/oj-submissions/${problem.id}?${params.toString()}`)
 }
 
 // 打开视频弹窗
 const openVideoDialog = async (problem: any) => {
+  if (!userInfo.value?.id) {
+    alert('请先登录')
+    return
+  }
+  
+  // 先检查是否有近1天的OJ提交记录
   try {
-    const response = await fetch(`${BASE_URL}/oj/problems/${problem.id}/video`)
-    const result = await response.json()
-    if (result.success && result.data.video_url) {
+    const response = await axios.get(`${BASE_URL}/oj/submissions`, {
+      params: {
+        userId: userInfo.value.id,
+        problemId: problem.id,
+        page: 1,
+        pageSize: 100
+      }
+    })
+    
+    const submissions = response.data?.data || []
+    
+    if (submissions.length === 0) {
+      accessDeniedReasonForSubmissions.value = 'none'
+      showAccessDeniedDialog.value = true
+      return
+    }
+    
+    // 按提交时间排序，获取最近一次提交
+    submissions.sort((a: any, b: any) => {
+      const timeA = new Date(a.submit_time).getTime()
+      const timeB = new Date(b.submit_time).getTime()
+      return timeB - timeA
+    })
+    
+    const latestSubmission = submissions[0]
+    
+    // 检查最近一次提交是否在24小时内
+    const submissionTime = new Date(latestSubmission.submit_time).getTime()
+    const now = new Date().getTime()
+    const oneDayInMs = 24 * 60 * 60 * 1000 // 24小时
+    const timeDiff = now - submissionTime
+    
+    if (timeDiff > oneDayInMs) {
+      accessDeniedReasonForSubmissions.value = 'expired'
+      showAccessDeniedDialog.value = true
+      return
+    }
+    
+    // 有近1天的提交，允许查看视频
+    const videoResponse = await fetch(`${BASE_URL}/oj/problems/${problem.id}/video`)
+    const videoResult = await videoResponse.json()
+    if (videoResult.success && videoResult.data.video_url) {
       currentVideoProblem.value = {
         ...problem,
-        video_url: result.data.video_url
+        video_url: videoResult.data.video_url
       }
       showVideoDialog.value = true
     } else {
       alert('该题目暂无讲解视频')
     }
-  } catch (err) {
-    console.error('获取视频链接失败:', err)
-    alert('获取视频链接失败')
+  } catch (err: any) {
+    console.error('检查提交记录或获取视频链接失败:', err)
+    accessDeniedReasonForSubmissions.value = 'none'
+    showAccessDeniedDialog.value = true
   }
 }
 
@@ -1021,7 +1288,6 @@ const viewLatestSubmissionExplanation = async () => {
   }
   
   loadingExplanation.value = true
-  noSubmissionMessage.value = false
   
   try {
     // 获取所有专项练习题的提交记录
@@ -1046,8 +1312,8 @@ const viewLatestSubmissionExplanation = async () => {
     
     // 如果没有提交记录
     if (allSubmissions.length === 0) {
-      noSubmissionMessage.value = true
-      showExplanationDialog.value = true
+      accessDeniedReasonForSubmissions.value = 'none'
+      showAccessDeniedDialog.value = true
       loadingExplanation.value = false
       return
     }
@@ -1060,6 +1326,21 @@ const viewLatestSubmissionExplanation = async () => {
     })
     
     const latestSubmission = allSubmissions[0]
+    
+    // 检查最近一次提交是否在24小时内
+    const submissionTime = new Date(latestSubmission.submit_time).getTime()
+    const now = new Date().getTime()
+    const oneDayInMs = 24 * 60 * 60 * 1000 // 24小时的毫秒数
+    const timeDiff = now - submissionTime
+    
+    if (timeDiff > oneDayInMs) {
+      // 提交时间超过24小时，不允许查看解析
+      accessDeniedReasonForSubmissions.value = 'expired'
+      showAccessDeniedDialog.value = true
+      loadingExplanation.value = false
+      return
+    }
+    
     selectedSubmission.value = latestSubmission
     
     // 获取提交详情
@@ -1067,7 +1348,8 @@ const viewLatestSubmissionExplanation = async () => {
     showExplanationDialog.value = true
   } catch (error: any) {
     console.error('获取提交记录失败:', error)
-    alert('获取提交记录失败: ' + (error.response?.data?.error || error.message))
+    accessDeniedReasonForSubmissions.value = 'none'
+    showAccessDeniedDialog.value = true
   } finally {
     loadingExplanation.value = false
   }
@@ -1096,6 +1378,13 @@ const closeExplanationDialog = () => {
   selectedSubmission.value = null
   submissionAnswers.value = []
   noSubmissionMessage.value = false
+  noSubmissionReason.value = 'none'
+}
+
+// 关闭访问被拒绝弹窗
+const closeAccessDeniedDialog = () => {
+  showAccessDeniedDialog.value = false
+  accessDeniedReasonForSubmissions.value = 'none'
 }
 
 // 跳转到客观试卷的提交记录页面
@@ -1450,6 +1739,10 @@ const downloadHandbook = () => {
       exams: uniqueExams,
       oj_problems: uniqueOJProblems
     }
+    
+    // 获取每个考试今天的提交次数（需要在设置 selectedTask.value 之后）
+    await fetchExamSubmissionCounts()
+    
     // 设置考试模式
     isExamMode.value = taskData.task?.is_exam_mode === true || taskData.task?.is_exam_mode === 1 || taskData.task?.is_exam_mode === '1'
     console.log('📋 [TaskView] 任务数据:', taskData.task)
@@ -2118,6 +2411,36 @@ watch(() => taskProgress.value?.task_progress?.is_completed, (newVal, oldVal) =>
   height: 32px;
 }
 
+/* 练习提示横幅 */
+.practice-tip-banner {
+  margin: 20px 20px 0 20px;
+  padding: 0;
+}
+
+.practice-tip-content {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border: 1px solid #fbbf24;
+  border-radius: 12px;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 2px 8px rgba(251, 191, 36, 0.2);
+  color: #92400e;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.practice-tip-content :deep(.lucide-icon) {
+  flex-shrink: 0;
+  color: #d97706;
+}
+
+.practice-tip-content span {
+  flex: 1;
+}
+
 /* 练习题和编程题区域 */
 .exercises-section,
 .programming-section {
@@ -2718,6 +3041,105 @@ watch(() => taskProgress.value?.task_progress?.is_completed, (newVal, oldVal) =>
   transform: translateY(-2px); 
   box-shadow: 0 4px 12px rgba(30, 144, 255, 0.4); 
 }
+/* 规则说明样式 */
+.exam-rules-info,
+.oj-rules-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  margin-top: 12px;
+}
+
+.exam-rules-info {
+  background: linear-gradient(135deg, rgba(255, 193, 7, 0.15) 0%, rgba(255, 152, 0, 0.1) 100%);
+  border: 2px solid rgba(255, 193, 7, 0.3);
+}
+
+.oj-rules-info {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(22, 163, 74, 0.1) 100%);
+  border: 2px solid rgba(34, 197, 94, 0.3);
+}
+
+.exam-mode-rules {
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+.exam-rules-info :deep(.lucide-icon) {
+  color: #f57c00;
+  flex-shrink: 0;
+}
+
+.oj-rules-info :deep(.lucide-icon) {
+  color: #16a34a;
+  flex-shrink: 0;
+}
+
+.rules-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rules-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.exam-rules-info .rules-title {
+  color: #f57c00;
+}
+
+.oj-rules-info .rules-title {
+  color: #16a34a;
+}
+
+.rules-details {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+}
+
+.exam-rules-info .rules-details {
+  color: #e65100;
+}
+
+.oj-rules-info .rules-details {
+  color: #15803d;
+}
+
+.rule-item {
+  font-weight: 600;
+}
+
+.rule-divider {
+  color: #ff9800;
+  font-weight: 700;
+}
+
+/* 提交次数信息样式 */
+.submission-count-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(30, 144, 255, 0.1);
+  border: 1.5px solid rgba(30, 144, 255, 0.3);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #0277bd;
+  margin-bottom: 12px;
+}
+
+.submission-count-info :deep(.lucide-icon) {
+  color: #1e90ff;
+  flex-shrink: 0;
+}
+
 /* 专项练习题列表布局 */
 .exercises-list {
   display: grid;
@@ -2778,11 +3200,29 @@ watch(() => taskProgress.value?.task_progress?.is_completed, (newVal, oldVal) =>
   letter-spacing: 0.5px;
 }
 
-.btn-start-exercise:hover {
+.btn-start-exercise:hover:not(:disabled) {
   background: linear-gradient(135deg, #0c7cd5 0%, #1e90ff 100%);
   transform: translateY(-2px) scale(1.05);
   box-shadow: 0 6px 20px rgba(30, 144, 255, 0.4);
   border-width: 6px;
+}
+
+/* 冻结状态样式 */
+.btn-start-exercise.btn-frozen,
+.btn-start-exercise:disabled {
+  background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
+  border-color: #6b7280;
+  color: #f3f4f6;
+  cursor: not-allowed;
+  opacity: 0.7;
+  box-shadow: 0 2px 8px rgba(107, 114, 128, 0.2);
+}
+
+.btn-start-exercise.btn-frozen:hover,
+.btn-start-exercise:disabled:hover {
+  transform: none;
+  box-shadow: 0 2px 8px rgba(107, 114, 128, 0.2);
+  border-width: 5px;
 }
 
 .btn-start-exercise :deep(.lucide-icon) {
@@ -3363,7 +3803,8 @@ watch(() => taskProgress.value?.task_progress?.is_completed, (newVal, oldVal) =>
   }
 
   /* 解析弹窗样式 */
-  .submission-detail-modal {
+  .submission-detail-modal,
+  .access-denied-modal {
     position: fixed;
     top: 0;
     left: 0;
@@ -3375,6 +3816,74 @@ watch(() => taskProgress.value?.task_progress?.is_completed, (newVal, oldVal) =>
     justify-content: center;
     z-index: 10004;
     backdrop-filter: blur(4px);
+  }
+  
+  .access-denied-modal {
+    z-index: 10005;
+  }
+  
+  .access-denied-modal .modal-content {
+    max-width: 500px;
+    width: 90%;
+    animation: modalSlideIn 0.3s ease;
+  }
+  
+  @keyframes modalSlideIn {
+    from {
+      opacity: 0;
+      transform: translateY(30px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+  
+  .access-denied-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+    text-align: center;
+  }
+  
+  .access-denied-icon {
+    margin-bottom: 24px;
+    color: #f59e0b;
+  }
+  
+  .access-denied-message p {
+    margin: 0;
+    color: #64748b;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+  
+  .access-denied-modal .modal-footer {
+    justify-content: center;
+  }
+  
+  .access-denied-modal .btn-primary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #1e90ff 0%, #38bdf8 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(30, 144, 255, 0.3);
+  }
+  
+  .access-denied-modal .btn-primary:hover {
+    background: linear-gradient(135deg, #0c7cd5 0%, #1e90ff 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(30, 144, 255, 0.4);
   }
 
   .modal-content {
@@ -3430,32 +3939,33 @@ watch(() => taskProgress.value?.task_progress?.is_completed, (newVal, oldVal) =>
     overflow-y: auto;
   }
 
-  /* 没有提交记录提示 */
-  .no-submission-message {
+  /* 没有提交记录提示 - 使用与访问被拒绝弹窗一致的样式 */
+  .access-denied-message {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 60px 24px;
+    padding: 40px 24px;
     text-align: center;
   }
 
-  .no-submission-icon {
+  .access-denied-icon {
     margin-bottom: 24px;
-    color: #94a3b8;
+    color: #f59e0b;
   }
 
-  .no-submission-message h3 {
-    margin: 0 0 12px 0;
+  .access-denied-message h3 {
+    margin: 0 0 16px 0;
     color: #1e293b;
     font-size: 24px;
     font-weight: 600;
   }
 
-  .no-submission-message p {
+  .access-denied-message p {
     margin: 0;
     color: #64748b;
     font-size: 16px;
+    line-height: 1.6;
   }
 
   .detail-summary {
@@ -4197,6 +4707,25 @@ watch(() => taskProgress.value?.task_progress?.is_completed, (newVal, oldVal) =>
     white-space: nowrap;
   }
 
+  .exam-submission-count-info {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 6px;
+    padding: 4px 8px;
+    background: rgba(30, 144, 255, 0.1);
+    border: 1px solid rgba(30, 144, 255, 0.2);
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #0277bd;
+  }
+
+  .exam-submission-count-info :deep(.lucide-icon) {
+    color: #1e90ff;
+    flex-shrink: 0;
+  }
+
   .exam-item-status {
     padding: 6px 12px;
     border-radius: 20px;
@@ -4300,7 +4829,7 @@ watch(() => taskProgress.value?.task_progress?.is_completed, (newVal, oldVal) =>
     flex-shrink: 0;
   }
 
-  .btn-exam-action:hover {
+  .btn-exam-action:hover:not(:disabled) {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
   }
@@ -4309,8 +4838,24 @@ watch(() => taskProgress.value?.task_progress?.is_completed, (newVal, oldVal) =>
     background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
   }
 
-  .btn-exam-action.btn-start-exam:hover {
+  .btn-exam-action.btn-start-exam:hover:not(:disabled) {
     box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+  }
+
+  /* 考试模式按钮冻结状态 */
+  .btn-exam-action.btn-frozen,
+  .btn-exam-action:disabled {
+    background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
+    color: #f3f4f6;
+    cursor: not-allowed;
+    opacity: 0.7;
+    box-shadow: 0 2px 6px rgba(107, 114, 128, 0.2);
+  }
+
+  .btn-exam-action.btn-frozen:hover,
+  .btn-exam-action:disabled:hover {
+    transform: none;
+    box-shadow: 0 2px 6px rgba(107, 114, 128, 0.2);
   }
 
   .btn-exam-action.btn-video {

@@ -8,7 +8,7 @@
         </div>
         <div class="student-details-header">
           <h3 class="student-name-header">{{ studentInfo?.real_name || studentInfo?.username || '未知学生' }}</h3>
-          <p class="student-username-header">@{{ studentInfo?.username }}</p>
+          <p class="student-username-header">{{ studentInfo?.username }}</p>
         </div>
       </div>
       <button @click="$emit('close')" class="btn-close-panel">

@@ -1279,7 +1279,7 @@ router.put('/learning-plans/:planId', async (req, res) => {
 router.post('/learning-tasks/:taskId/submit-exam', async (req, res) => {
   try {
     const { taskId } = req.params;
-    const { user_id, exam_id, answers } = req.body;
+    const { user_id, exam_id, answers, practice_duration_seconds } = req.body;
     
     // 验证必需参数
     if (!user_id || !exam_id || !answers || !Array.isArray(answers)) {
@@ -1341,8 +1341,31 @@ router.post('/learning-tasks/:taskId/submit-exam', async (req, res) => {
         });
       }
       
-      // 4. 调用可复用的提交函数（传入task_id以更新任务进度）
-      const result = await submitExamInternal(connection, user_id, exam_id, answers, taskId);
+      // 4. 检查今天的提交次数（一天只能提交3次）
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      
+      const [todaySubmissions] = await connection.execute(
+        `SELECT COUNT(*) as count FROM submissions 
+         WHERE user_id = ? AND exam_id = ? AND task_id = ? 
+         AND submit_time >= ? AND submit_time < ?`,
+        [user_id, exam_id, taskId, today, tomorrow]
+      );
+      
+      const todayCount = todaySubmissions[0]?.count || 0;
+      if (todayCount >= 3) {
+        await connection.rollback();
+        connection.release();
+        return res.status(400).json({ 
+          success: false,
+          error: '今天已提交3次，请明天再试' 
+        });
+      }
+      
+      // 5. 调用可复用的提交函数（传入task_id以更新任务进度，practice_duration_seconds 为本次练习持续时间）
+      const result = await submitExamInternal(connection, user_id, exam_id, answers, taskId, practice_duration_seconds ?? null);
       
       await connection.commit();
       connection.release();
@@ -1399,11 +1422,67 @@ router.post('/learning-tasks/:taskId/submit-exam', async (req, res) => {
   }
 });
 
+// ==================== 11.5. 获取今天客观题提交次数 ====================
+router.get('/learning-tasks/:taskId/exam-submission-count', async (req, res) => {
+  try {
+    const { taskId } = req.params;
+    const { user_id, exam_id } = req.query;
+    
+    if (!user_id || !exam_id) {
+      return res.status(400).json({ 
+        success: false,
+        error: '缺少必需参数: user_id, exam_id'
+      });
+    }
+    
+    const connection = await pool.getConnection();
+    
+    try {
+      // 计算今天的日期范围
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      
+      const [todaySubmissions] = await connection.execute(
+        `SELECT COUNT(*) as count FROM submissions 
+         WHERE user_id = ? AND exam_id = ? AND task_id = ? 
+         AND submit_time >= ? AND submit_time < ?`,
+        [user_id, exam_id, taskId, today, tomorrow]
+      );
+      
+      const todayCount = todaySubmissions[0]?.count || 0;
+      const remaining = Math.max(0, 3 - todayCount);
+      
+      connection.release();
+      
+      res.json({
+        success: true,
+        data: {
+          today_count: todayCount,
+          remaining: remaining,
+          limit: 3
+        }
+      });
+    } catch (error) {
+      connection.release();
+      throw error;
+    }
+  } catch (error) {
+    logger.error('获取今天提交次数失败:', error);
+    res.status(500).json({ 
+      success: false,
+      error: '获取今天提交次数失败',
+      message: error.message 
+    });
+  }
+});
+
 // ==================== 12. 任务内提交OJ ====================
 router.post('/learning-tasks/:taskId/submit-oj', async (req, res) => {
   try {
     const { taskId } = req.params;
-    const { user_id, problem_id, code, language } = req.body;
+    const { user_id, problem_id, code, language, practice_duration_seconds } = req.body;
     
     // 验证必需参数
     if (!user_id || !problem_id || !code || !language) {
@@ -1465,8 +1544,8 @@ router.post('/learning-tasks/:taskId/submit-oj', async (req, res) => {
         });
       }
       
-      // 4. 调用可复用的提交函数（传入task_id以更新任务进度）
-      const result = await submitOjInternal(connection, user_id, problem_id, code, language, taskId);
+      // 4. 调用可复用的提交函数（传入task_id以更新任务进度，practice_duration_seconds 为本次练习持续时间）
+      const result = await submitOjInternal(connection, user_id, problem_id, code, language, taskId, practice_duration_seconds ?? null);
       
       await connection.commit();
       connection.release();

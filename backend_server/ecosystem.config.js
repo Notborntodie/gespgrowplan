@@ -6,11 +6,13 @@ module.exports = {
     exec_mode: 'cluster',
     env: {
       NODE_ENV: 'development',
-      PORT: 3000
+      PORT: 3000,
+      HOST: '127.0.0.1'
     },
     env_production: {
       NODE_ENV: 'production',
-      PORT: 3000
+      PORT: 3000,
+      HOST: '127.0.0.1'
     },
     // 自动重启配置
     autorestart: true,

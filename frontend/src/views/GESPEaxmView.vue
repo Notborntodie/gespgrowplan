@@ -434,7 +434,7 @@
   </div>
 </template>
 
-<script lang="ts">import { BASE_URL, API_SERVER_BASE } from '@/config/api'
+<script lang="ts">import { BASE_URL, API_SERVER_BASE, normalizeImageUrl } from '@/config/api'
 
 import { defineComponent } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -705,28 +705,20 @@ export default defineComponent({
           console.log('第一题附加图片:', this.questions[0].images);
         }
         
-        // 处理图片URL，确保是完整的URL
+        // 处理图片URL，避免 HTTPS 下 Mixed Content（如 http://ip:3000/uploads/xxx）
         this.questions = this.questions.map((q: Question) => {
           if (q.image_url) {
-            // 替换localhost为实际服务器地址
-            q.image_url = q.image_url.replace(/http:\/\/localhost:3000/g, `${API_SERVER_BASE}`);
-            q.image_url = q.image_url.replace(/http:\/\/127\.0\.0\.1:3000/g, `${API_SERVER_BASE}`);
-            
-            // 如果图片URL是相对路径，转换为绝对路径
+            q.image_url = normalizeImageUrl(q.image_url) || q.image_url;
             if (!q.image_url.startsWith('http://') && !q.image_url.startsWith('https://')) {
-              q.image_url = q.image_url.startsWith('/') 
-                ? `${API_SERVER_BASE}${q.image_url}` 
+              q.image_url = q.image_url.startsWith('/')
+                ? `${API_SERVER_BASE}${q.image_url}`
                 : `${API_SERVER_BASE}/${q.image_url}`;
             }
           }
           if (q.images && q.images.length > 0) {
             q.images = q.images.map((img: any) => {
               if (img.image_url) {
-                // 替换localhost为实际服务器地址
-                img.image_url = img.image_url.replace(/http:\/\/localhost:3000/g, `${API_SERVER_BASE}`);
-                img.image_url = img.image_url.replace(/http:\/\/127\.0\.0\.1:3000/g, `${API_SERVER_BASE}`);
-                
-                // 如果图片URL是相对路径，转换为绝对路径
+                img.image_url = normalizeImageUrl(img.image_url) || img.image_url;
                 if (!img.image_url.startsWith('http://') && !img.image_url.startsWith('https://')) {
                   img.image_url = img.image_url.startsWith('/')
                     ? `${API_SERVER_BASE}${img.image_url}`
@@ -1146,9 +1138,8 @@ export default defineComponent({
               
               // 高亮题目代码
               const codeBlocks = document.querySelectorAll('.code-block code');
-              console.log('找到代码块数量:', codeBlocks.length);
-              
-              if (codeBlocks.length === 0) {
+              const hasCode = this.currentQuestion?.question_type === 'code' && this.currentQuestion?.question_code;
+              if (hasCode && codeBlocks.length === 0) {
                 console.warn('⚠️ 未找到代码块，可能是 DOM 还未渲染完成');
               }
               
@@ -1231,33 +1222,16 @@ export default defineComponent({
           return '考试模式';
       }
     },
-    // 获取完整的图片URL
+    // 获取完整的图片URL（规范化以避免 HTTPS 下 Mixed Content）
     getImageUrl(url: string | undefined): string {
-      if (!url || !url.trim()) {
-        console.warn('图片URL为空');
-        return '';
+      if (!url || !url.trim()) return '';
+      const normalized = normalizeImageUrl(url);
+      if (!normalized) return '';
+      if (!normalized.startsWith('http://') && !normalized.startsWith('https://')) {
+        const base = API_SERVER_BASE;
+        return normalized.startsWith('/') ? `${base}${normalized}` : `${base}/${normalized}`;
       }
-      
-      let trimmedUrl = url.trim();
-      
-      // 替换localhost为实际服务器地址
-      trimmedUrl = trimmedUrl.replace(/http:\/\/localhost:3000/g, `${API_SERVER_BASE}`);
-      trimmedUrl = trimmedUrl.replace(/http:\/\/127\.0\.0\.1:3000/g, `${API_SERVER_BASE}`);
-      
-      // 如果已经是完整URL，直接返回
-      if (trimmedUrl.startsWith('http://') || trimmedUrl.startsWith('https://')) {
-        console.log('图片URL已经是完整URL:', trimmedUrl);
-        return trimmedUrl;
-      }
-      
-      // 如果是相对路径，转换为绝对路径
-      const baseUrl = `${API_SERVER_BASE}`;
-      const fullUrl = trimmedUrl.startsWith('/') 
-        ? `${baseUrl}${trimmedUrl}` 
-        : `${baseUrl}/${trimmedUrl}`;
-      
-      console.log('转换后的图片URL:', fullUrl);
-      return fullUrl;
+      return normalized;
     },
     // 图片加载错误处理
     handleImageError(event: Event) {

@@ -528,10 +528,19 @@ router.put('/users/:userId/reset-password', async (req, res) => {
         WHERE user_id = ? AND role_id = 4
       `, [admin_user_id]);
       
-      if (superAdminCheck[0].is_super_admin === 0) {
-        await connection.rollback();
-        connection.release();
-        return res.status(403).json({ error: '只有超级管理员才能重置用户密码' });
+      const isSuperAdmin = superAdminCheck[0].is_super_admin > 0;
+      
+      if (!isSuperAdmin) {
+        // 非超级管理员：仅允许教师重置其绑定学生的密码
+        const [teacherStudentCheck] = await connection.execute(
+          'SELECT id FROM teacher_students WHERE teacher_id = ? AND student_id = ?',
+          [admin_user_id, userId]
+        );
+        if (teacherStudentCheck.length === 0) {
+          await connection.rollback();
+          connection.release();
+          return res.status(403).json({ error: '只有超级管理员或该学生的指导教师才能重置密码' });
+        }
       }
       
       // 重置密码

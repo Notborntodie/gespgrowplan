@@ -456,7 +456,6 @@ const getCurrentApiConfig = () => {
 // 获取当前API基础URL（使用负载均衡）
 const getCurrentApiBaseUrl = () => {
   const config = getRandomApiConfig()
-  console.log(`负载均衡选择: ${config.name} (${config.url})`)
   return config ? config.url : OJ_API_CONFIGS[0].url
 }
   
@@ -467,13 +466,11 @@ const getCurrentApiBaseUrl = () => {
       .sort((a, b) => a.priority - b.priority)
     
     if (availableConfigs.length <= 1) {
-      console.warn('没有可用的备用API配置')
+      if (import.meta.env.DEV) console.warn('没有可用的备用API配置')
       return false
     }
-    
     currentApiIndex = (currentApiIndex + 1) % availableConfigs.length
-    const newConfig = getCurrentApiConfig()
-    console.log(`切换到备用API: ${newConfig.name} (${newConfig.url})`)
+    getCurrentApiConfig()
     return true
   }
   
@@ -486,7 +483,6 @@ const getCurrentApiBaseUrl = () => {
       const fullUrl = `${currentApiUrl}${url}`
       
       try {
-        console.log(`API请求尝试 ${attempt + 1}: ${fullUrl}`)
         const response = await fetch(fullUrl, options)
         
         if (response.ok) {

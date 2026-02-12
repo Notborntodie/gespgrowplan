@@ -8,7 +8,7 @@ const dbConfig = {
   host: process.env.DB_HOST || 'localhost',
   port: parseInt(process.env.DB_PORT) || 3306,
   user: process.env.DB_USER || 'gesp_user',
-  password: process.env.DB_PASSWORD || 'Gesp@2025!',
+  password: process.env.DB_PASSWORD || '',
   database: process.env.DB_NAME || 'gesp_practice_system',
   charset: 'utf8mb4',
   connectTimeout: 60000

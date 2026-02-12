@@ -1,11 +1,12 @@
 const mysql = require('mysql2/promise');
+require('dotenv').config({ path: require('path').join(__dirname, '../.env') });
 
-// 数据库连接配置
+// 数据库连接配置（从环境变量读取）
 const dbConfig = {
-  host: '106.14.143.27',
-  user: 'gesp_user',
-  password: 'Gesp@2025!',
-  database: 'gesp_practice_system',
+  host: process.env.DB_HOST || 'localhost',
+  user: process.env.DB_USER || 'gesp_user',
+  password: process.env.DB_PASSWORD || '',
+  database: process.env.DB_NAME || 'gesp_practice_system',
   charset: 'utf8mb4'
 };
 

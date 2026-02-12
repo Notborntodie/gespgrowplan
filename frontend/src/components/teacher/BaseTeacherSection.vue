@@ -26,11 +26,11 @@ defineProps<{
 .content-section {
   background: linear-gradient(135deg, #87ceeb 0%, #b3d9ff 50%, #cce5ff 100%);
   padding: 0;
-  border-radius: 20px;
-  box-shadow: 0 8px 24px rgba(30, 144, 255, 0.2);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(30, 144, 255, 0.2);
   width: 100%;
-  margin: 0 auto 32px auto;
-  border: 4px solid #87ceeb;
+  margin: 0;
+  border: 2px solid #87ceeb;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -42,9 +42,9 @@ defineProps<{
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 6px 28px;
+  padding: 8px 12px;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 8px;
   background: linear-gradient(135deg, #87ceeb 0%, #b3d9ff 50%, #cce5ff 100%);
   border-bottom: none;
   position: sticky;
@@ -58,14 +58,14 @@ defineProps<{
 .section-header .header-left {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 12px;
   flex-wrap: wrap;
 }
 
 .section-header h2 {
   margin: 0;
   color: #0c4a6e;
-  font-size: 2rem;
+  font-size: 1.35rem;
   font-weight: 900;
   text-shadow: 0 2px 4px rgba(255, 255, 255, 0.5);
 }
@@ -73,7 +73,7 @@ defineProps<{
 .section-header .header-right {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 10px;
 }
 
 .table-container {

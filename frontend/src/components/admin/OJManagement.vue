@@ -168,11 +168,9 @@ async function editProblem(id: number) {
   try {
     // 使用 /all 接口获取完整题目详情（包括所有样例）
     const url = `${BASE_URL}/oj/problems/${id}/all`
-    console.log('🌐 [OJManagement] 请求URL:', url)
     
     const response = await axios.get(url)
-    console.log('📡 [OJManagement] 接口响应:', response.data)
-    
+
     if (response.data.success) {
       editingProblem.value = response.data.data
       console.log('📦 [OJManagement] 设置 editingProblem:', editingProblem.value)

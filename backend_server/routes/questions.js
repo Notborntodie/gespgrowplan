@@ -143,9 +143,14 @@ router.post('/upload-image', upload.single('image'), async (req, res) => {
       return res.status(400).json({ error: '请选择图片文件' });
     }
     
-    // 从环境变量读取基础URL，如果没有配置则使用默认值
-    const baseUrl = process.env.BASE_URL || `http://localhost:${process.env.PORT || 3000}`;
-    const imageUrl = `${baseUrl}/uploads/${req.file.filename}`;
+    // 图片 URL：优先用 BASE_URL；在反向代理后从请求头推断（避免 IP 或错误端口导致 404/Mixed Content）
+    let baseUrl = process.env.BASE_URL;
+    const proto = req.get('x-forwarded-proto') || (req.secure ? 'https' : 'http');
+    const host = req.get('x-forwarded-host') || req.get('host');
+    if (!baseUrl || (host && /https?:\/\/\d+\.\d+\.\d+\.\d+/.test(baseUrl))) {
+      baseUrl = host ? `${proto}://${host}` : `http://localhost:${process.env.PORT || 3000}`;
+    }
+    const imageUrl = `${baseUrl.replace(/\/$/, '')}/uploads/${req.file.filename}`;
     res.json({ 
       message: '图片上传成功',
       imageUrl: imageUrl,

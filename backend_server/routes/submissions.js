@@ -11,9 +11,10 @@ const { logger } = require('../config/logger');
  * @param {number} exam_id - 考试ID
  * @param {Array} answers - 答案数组
  * @param {number|null} task_id - 任务ID（可选，用于任务内提交）
+ * @param {number|null} practice_duration_seconds - 本次练习持续时间（秒，可选）
  * @returns {Promise<Object>} 提交结果
  */
-async function submitExamInternal(connection, user_id, exam_id, answers, task_id = null) {
+async function submitExamInternal(connection, user_id, exam_id, answers, task_id = null, practice_duration_seconds = null) {
   // 获取考试信息
   const [examRows] = await connection.execute(
     'SELECT * FROM exams WHERE id = ?',
@@ -55,10 +56,10 @@ async function submitExamInternal(connection, user_id, exam_id, answers, task_id
   
   const attemptNumber = (attemptRows[0].max_attempt || 0) + 1;
   
-  // 创建提交记录（如果提供了task_id，则记录任务ID）
+  // 创建提交记录（如果提供了task_id，则记录任务ID；practice_duration_seconds 为本次练习持续时间）
   const [submissionResult] = await connection.execute(
-    'INSERT INTO submissions (user_id, exam_id, task_id, attempt_number, score) VALUES (?, ?, ?, ?, 0)',
-    [user_id, exam_id, task_id, attemptNumber]
+    'INSERT INTO submissions (user_id, exam_id, task_id, attempt_number, score, practice_duration_seconds) VALUES (?, ?, ?, ?, 0, ?)',
+    [user_id, exam_id, task_id, attemptNumber, practice_duration_seconds]
   );
   
   const submissionId = submissionResult.insertId;
@@ -99,10 +100,10 @@ async function submitExamInternal(connection, user_id, exam_id, answers, task_id
   // 计算得分
   const score = Math.round((correctCount / questionRows.length) * 100);
   
-  // 更新提交记录的得分
+  // 更新提交记录的得分和练习时长
   await connection.execute(
-    'UPDATE submissions SET score = ? WHERE id = ?',
-    [score, submissionId]
+    'UPDATE submissions SET score = ?, practice_duration_seconds = ? WHERE id = ?',
+    [score, practice_duration_seconds, submissionId]
   );
   
   // 如果提供了task_id，更新任务内的客观题进度（只有60分以上才标记为完成）
@@ -152,7 +153,7 @@ async function submitExamInternal(connection, user_id, exam_id, answers, task_id
 // 提交考试答案
 router.post('/submit-exam', async (req, res) => {
   try {
-    const { user_id, exam_id, answers } = req.body;
+    const { user_id, exam_id, answers, practice_duration_seconds } = req.body;
     
     // 验证必需参数
     if (!user_id || !exam_id || !answers || !Array.isArray(answers)) {
@@ -168,7 +169,7 @@ router.post('/submit-exam', async (req, res) => {
     await connection.beginTransaction();
     
     try {
-      const result = await submitExamInternal(connection, user_id, exam_id, answers, null);
+      const result = await submitExamInternal(connection, user_id, exam_id, answers, null, practice_duration_seconds ?? null);
       
       await connection.commit();
       connection.release();

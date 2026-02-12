@@ -6,6 +6,7 @@
 const mysql = require('mysql2/promise');
 const fs = require('fs').promises;
 const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
 async function runMigration() {
   let connection;
@@ -13,12 +14,12 @@ async function runMigration() {
   try {
     console.log('开始数据库迁移：添加 is_displayed 字段到 oj_samples 表\n');
     
-    // 连接数据库（使用项目配置）
+    // 连接数据库（从环境变量读取）
     connection = await mysql.createConnection({
-      host: '106.14.143.27',
-      user: 'gesp_user',
-      password: 'Gesp@2025!',
-      database: 'gesp_practice_system',
+      host: process.env.DB_HOST || 'localhost',
+      user: process.env.DB_USER || 'gesp_user',
+      password: process.env.DB_PASSWORD || '',
+      database: process.env.DB_NAME || 'gesp_practice_system',
       charset: 'utf8mb4',
       multipleStatements: true
     });

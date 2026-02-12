@@ -22,9 +22,10 @@ const execFileAsync = promisify(execFile);
  * @param {string} code - 代码
  * @param {string} language - 语言
  * @param {number|null} task_id - 任务ID（可选，用于任务内提交）
+ * @param {number|null} practice_duration_seconds - 本次练习持续时间（秒，可选）
  * @returns {Promise<Object>} 提交结果
  */
-async function submitOjInternal(connection, user_id, problem_id, code, language, task_id = null) {
+async function submitOjInternal(connection, user_id, problem_id, code, language, task_id = null, practice_duration_seconds = null) {
   // 验证题目是否存在
   const [problemRows] = await connection.execute(
     'SELECT * FROM oj_problems WHERE id = ?',
@@ -88,7 +89,7 @@ async function submitOjInternal(connection, user_id, problem_id, code, language,
     });
   }
   
-  // 创建提交记录（如果提供了task_id，则记录任务ID）
+  // 创建提交记录（如果提供了task_id，则记录任务ID；practice_duration_seconds 为本次练习持续时间）
   const [insertResult] = await connection.execute(
     `INSERT INTO oj_submissions (
       problem_id,
@@ -102,12 +103,13 @@ async function submitOjInternal(connection, user_id, problem_id, code, language,
       results,
       error_message,
       submit_time,
+      practice_duration_seconds,
       judge_start_time,
       judge_end_time,
       judge_duration,
       user_id,
       ip_address
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW(), NOW(), ?, ?, NULL)`,
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?, NOW(), NOW(), ?, ?, NULL)`,
     [
       problem_id,
       task_id,
@@ -119,6 +121,7 @@ async function submitOjInternal(connection, user_id, problem_id, code, language,
       passedTests,
       serializedResults,
       errorMessage,
+      practice_duration_seconds,
       judgeDuration,
       user_id
     ]

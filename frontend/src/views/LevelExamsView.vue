@@ -44,6 +44,17 @@
 
     <!-- 主内容区域 -->
     <div class="main-content">
+      <!-- GESP考级备考阶段横幅提示 -->
+      <div v-if="shouldShowBanner" class="preparation-banner">
+        <div class="banner-content">
+          <Icon name="info" :size="20" />
+          <div class="banner-text">
+            <strong>GESP考级备考阶段</strong>
+            <span>2月2日-3月14日为GESP考级备考阶段，请备考1-4级的同学们前往学习计划页面练习。</span>
+          </div>
+        </div>
+      </div>
+
       <div v-if="loading" class="loading-state">
         <Icon name="loader-2" :size="24" spin />
         <p>正在加载考试列表...</p>
@@ -86,7 +97,11 @@
               <td class="description-cell">{{ exam.description || '暂无描述' }}</td>
               <td>
                   <div class="action-buttons">
-                  <button @click.stop="startExam(exam)" class="btn-action btn-view" title="开始练习">
+                  <button 
+                    @click.stop="startExam(exam)" 
+                    class="btn-action btn-view" 
+                    title="开始练习"
+                  >
                     <Icon name="play" :size="16" />
                     <span>开始练习</span>
                     </button>
@@ -171,6 +186,40 @@ const isTeacher = computed(() => {
     console.error('获取用户信息失败:', error)
     return false
   }
+})
+
+// 判断是否在备考期间（2月2日-3月14日）
+const isPreparationPeriod = computed(() => {
+  const now = new Date()
+  const currentYear = now.getFullYear()
+  const startDate = new Date(currentYear, 1, 2) // 2月2日（月份从0开始）
+  const endDate = new Date(currentYear, 2, 14) // 3月14日
+  
+  return now >= startDate && now <= endDate
+})
+
+// 判断当前等级是否为1-4级
+const isLevel1To4 = computed(() => {
+  return level.value >= 1 && level.value <= 4
+})
+
+// 判断是否显示横幅
+const shouldShowBanner = computed(() => {
+  if (!isPreparationPeriod.value) {
+    return false
+  }
+  
+  // 如果当前等级是1-4级，显示横幅
+  if (isLevel1To4.value) {
+    return true
+  }
+  
+  // 如果当前等级是0（全部等级），检查列表中是否有1-4级的考试
+  if (level.value === 0) {
+    return filteredExams.value.some(exam => exam.level >= 1 && exam.level <= 4)
+  }
+  
+  return false
 })
 
 // 用户信息
@@ -946,5 +995,73 @@ onMounted(() => {
 .toast-fade-leave-to {
   opacity: 0;
   transform: translateX(-50%) translateY(-20px);
+}
+
+/* GESP考级备考阶段横幅 */
+.preparation-banner {
+  margin-bottom: 20px;
+  background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+  border-radius: 12px;
+  padding: 16px 20px;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+  animation: slideDown 0.5s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.banner-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  color: white;
+}
+
+.banner-content :deep(.lucide-icon) {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: white;
+}
+
+.banner-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.banner-text strong {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.banner-text span {
+  font-size: 14px;
+  line-height: 1.5;
+  opacity: 0.95;
+}
+
+/* 禁用按钮样式 */
+.btn-action.btn-disabled {
+  background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%) !important;
+  color: rgba(255, 255, 255, 0.7) !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+  opacity: 0.7;
+}
+
+.btn-action.btn-disabled:hover {
+  transform: none !important;
+  box-shadow: none !important;
+  background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%) !important;
 }
 </style>

@@ -342,9 +342,9 @@ server {
     gzip_comp_level 6;
     gzip_disable "msie6";
 
-    # API反向代理
+    # API反向代理（仅本机后端 127.0.0.1:3000）
     location /api {
-        proxy_pass http://${SERVER_IP}:3000/api;
+        proxy_pass http://127.0.0.1:3000/api;
         proxy_http_version 1.1;
         proxy_set_header Upgrade \$http_upgrade;
         proxy_set_header Connection 'upgrade';
@@ -355,6 +355,30 @@ server {
         proxy_cache_bypass \$http_upgrade;
         proxy_read_timeout 300s;
         proxy_connect_timeout 75s;
+    }
+
+    # AI 服务反向代理（仅本机 127.0.0.1:8000，不对外暴露 8000 端口）
+    location /ai-api/ {
+        proxy_pass http://127.0.0.1:8000/api/;
+        proxy_http_version 1.1;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_read_timeout 300s;
+        proxy_connect_timeout 75s;
+        client_max_body_size 50m;
+    }
+
+    # 上传文件代理（^~ 优先于静态资源正则，避免 /uploads/xxx.png 被误匹配）
+    location ^~ /uploads/ {
+        proxy_pass http://127.0.0.1:3000/uploads/;
+        proxy_http_version 1.1;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_read_timeout 60s;
     }
 
     # 处理Vue Router的history模式
@@ -414,9 +438,9 @@ server {
     gzip_comp_level 6;
     gzip_disable "msie6";
 
-    # API反向代理
+    # API反向代理（仅本机后端 127.0.0.1:3000）
     location /api {
-        proxy_pass http://${SERVER_IP}:3000/api;
+        proxy_pass http://127.0.0.1:3000/api;
         proxy_http_version 1.1;
         proxy_set_header Upgrade \$http_upgrade;
         proxy_set_header Connection 'upgrade';
@@ -427,6 +451,30 @@ server {
         proxy_cache_bypass \$http_upgrade;
         proxy_read_timeout 300s;
         proxy_connect_timeout 75s;
+    }
+
+    # AI 服务反向代理（仅本机 127.0.0.1:8000）
+    location /ai-api/ {
+        proxy_pass http://127.0.0.1:8000/api/;
+        proxy_http_version 1.1;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_read_timeout 300s;
+        proxy_connect_timeout 75s;
+        client_max_body_size 50m;
+    }
+
+    # 上传文件代理（^~ 优先于静态资源正则，避免 /uploads/xxx.png 被误匹配）
+    location ^~ /uploads/ {
+        proxy_pass http://127.0.0.1:3000/uploads/;
+        proxy_http_version 1.1;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_read_timeout 60s;
     }
 
     # 处理Vue Router的history模式

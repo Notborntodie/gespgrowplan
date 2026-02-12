@@ -58,9 +58,9 @@
                 class="image-item"
               >
                 <img 
-                  :src="question.image_url" 
+                  :src="getImageUrl(question.image_url)" 
                   :alt="`题目图片`"
-                  @click="openImageModal(question.image_url)"
+                  @click="openImageModal(getImageUrl(question.image_url))"
                   class="question-image"
                 />
                 <div class="image-info">
@@ -74,9 +74,9 @@
                 class="image-item"
               >
                 <img 
-                  :src="image.image_url" 
+                  :src="getImageUrl(image.image_url)" 
                   :alt="`附加图片 ${index + 1}`"
-                  @click="openImageModal(image.image_url)"
+                  @click="openImageModal(getImageUrl(image.image_url))"
                   class="question-image"
                 />
                 <div class="image-info">
@@ -176,6 +176,15 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { API_SERVER_BASE, normalizeImageUrl } from '@/config/api'
+
+function getImageUrl(url: string | undefined): string {
+  if (!url || !url.trim()) return ''
+  const n = normalizeImageUrl(url)
+  if (!n) return ''
+  if (n.startsWith('http://') || n.startsWith('https://')) return n
+  return n.startsWith('/') ? `${API_SERVER_BASE}${n}` : `${API_SERVER_BASE}/${n}`
+}
 
 const props = defineProps<{
   visible: boolean

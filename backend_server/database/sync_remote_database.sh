@@ -23,10 +23,10 @@ echo ""
 # ============================================
 # 配置信息（请修改为实际值）
 # ============================================
-REMOTE_HOST="106.14.143.27"      # 旧服务器IP（必填）
+REMOTE_HOST="your-remote-server-ip"  # 远程服务器IP（必填）
 REMOTE_PORT="3306"               # 数据库端口（默认3306）
 REMOTE_USER="gesp_user"          # 远程数据库用户名（必填）
-REMOTE_PASSWORD="Gesp@2025!"     # 远程数据库密码（留空会提示输入）
+REMOTE_PASSWORD=""               # 远程数据库密码（留空会提示输入）
 REMOTE_DB="gesp_practice_system" # 数据库名称（默认gesp_practice_system）
 
 LOCAL_DB="gesp_practice_system"  # 本地数据库名称

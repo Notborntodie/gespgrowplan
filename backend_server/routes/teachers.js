@@ -8,7 +8,7 @@ const { logger } = require('../config/logger');
 router.post('/teacher/:teacherId/students', async (req, res) => {
   try {
     const { teacherId } = req.params;
-    const { student_ids } = req.body;
+    const { student_ids, class_no } = req.body;
     
     if (!Array.isArray(student_ids) || student_ids.length === 0) {
       return res.status(400).json({ error: 'student_ids 必须是包含学生ID的数组' });
@@ -45,13 +45,14 @@ router.post('/teacher/:teacherId/students', async (req, res) => {
       }
       
       const results = [];
+      const classNoValue = class_no && String(class_no).trim() ? String(class_no).trim() : null;
       
-      // 绑定学生到教师
+      // 绑定学生到教师（支持班级编号）
       for (const studentId of student_ids) {
         try {
           await connection.execute(
-            'INSERT INTO teacher_students (teacher_id, student_id) VALUES (?, ?)',
-            [teacherId, studentId]
+            'INSERT INTO teacher_students (teacher_id, student_id, class_no) VALUES (?, ?, ?)',
+            [teacherId, studentId, classNoValue]
           );
           results.push({ student_id: studentId, status: 'success' });
         } catch (error) {
@@ -96,11 +97,11 @@ router.get('/teacher/:teacherId/students', async (req, res) => {
     
     let sql = `
       SELECT u.id, u.username, u.email, u.real_name, u.created_at,
-             ts.created_at as bound_at,
+             ts.created_at as bound_at, ts.class_no,
              COUNT(DISTINCT s.id) as submission_count,
              COUNT(DISTINCT sa.id) as total_answers,
              SUM(sa.is_correct) as correct_answers,
-             ROUND(SUM(sa.is_correct) * 100.0 / COUNT(sa.id), 2) as correct_rate
+             ROUND(SUM(sa.is_correct) * 100.0 / NULLIF(COUNT(sa.id), 0), 2) as correct_rate
       FROM users u
       JOIN teacher_students ts ON u.id = ts.student_id
       LEFT JOIN submissions s ON u.id = s.user_id
@@ -110,7 +111,7 @@ router.get('/teacher/:teacherId/students', async (req, res) => {
     
     const params = [teacherId];
     
-    sql += ' GROUP BY u.id, u.username, u.email, u.real_name, u.created_at, ts.created_at';
+    sql += ' GROUP BY u.id, u.username, u.email, u.real_name, u.created_at, ts.created_at, ts.class_no';
     sql += ' ORDER BY ts.created_at DESC';
     
     const [results] = await connection.execute(sql, params);
@@ -167,6 +168,40 @@ router.delete('/teacher/:teacherId/students/:studentId', async (req, res) => {
     
   } catch (error) {
     logger.error('解绑学生错误', { error: error.message, teacherId, studentId });
+    res.status(500).json({ error: '服务器错误' });
+  }
+});
+
+// 更新学生班级编号
+router.put('/teacher/:teacherId/students/:studentId/class', async (req, res) => {
+  try {
+    const { teacherId, studentId } = req.params;
+    const { class_no } = req.body;
+    
+    const connection = await pool.getConnection();
+    
+    try {
+      const [result] = await connection.execute(
+        'UPDATE teacher_students SET class_no = ? WHERE teacher_id = ? AND student_id = ?',
+        [class_no && String(class_no).trim() ? String(class_no).trim() : null, teacherId, studentId]
+      );
+      
+      connection.release();
+      
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ error: '绑定关系不存在' });
+      }
+      
+      await cacheUtils.delPattern('users:*');
+      res.json({ message: '班级更新成功', class_no: class_no && String(class_no).trim() ? String(class_no).trim() : null });
+      
+    } catch (error) {
+      connection.release();
+      throw error;
+    }
+    
+  } catch (error) {
+    logger.error('更新学生班级错误', { error: error.message, teacherId, studentId });
     res.status(500).json({ error: '服务器错误' });
   }
 });
@@ -1581,6 +1616,351 @@ router.get('/teacher/:teacherId/learning-plans/:planId/all-students-progress', a
       error: '获取学生完成情况失败',
       message: error.message 
     });
+  }
+});
+
+// ==================== 动画演示相关API ====================
+
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+
+// HTML文件上传配置 - 同时存储到开发和生产环境目录
+const devHtmlUploadDir = path.join(__dirname, '../../frontend/public/html');
+const prodHtmlUploadDir = '/var/www/gesp-frontend/html';
+
+// 确保目录存在
+[devHtmlUploadDir, prodHtmlUploadDir].forEach(dir => {
+  if (!fs.existsSync(dir)) {
+    try {
+      fs.mkdirSync(dir, { recursive: true });
+    } catch (error) {
+      console.warn(`无法创建目录 ${dir}:`, error.message);
+    }
+  }
+});
+
+const htmlStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    // 优先使用生产环境目录，如果不存在则使用开发环境目录
+    const uploadDir = fs.existsSync(prodHtmlUploadDir) ? prodHtmlUploadDir : devHtmlUploadDir;
+    cb(null, uploadDir);
+  },
+  filename: function (req, file, cb) {
+    // 使用时间戳和随机数生成唯一文件名
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const ext = path.extname(file.originalname);
+    cb(null, 'animation-' + uniqueSuffix + ext);
+  }
+});
+
+const htmlUpload = multer({
+  storage: htmlStorage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+  fileFilter: function (req, file, cb) {
+    if (file.mimetype === 'text/html' || path.extname(file.originalname).toLowerCase() === '.html') {
+      cb(null, true);
+    } else {
+      cb(new Error('只支持 HTML 文件'), false);
+    }
+  }
+});
+
+// 上传动画HTML文件
+router.post('/teacher/:teacherId/animations/upload', htmlUpload.single('htmlFile'), async (req, res) => {
+  try {
+    const { teacherId } = req.params;
+    const { title, description, category, icon } = req.body;
+    
+    if (!req.file) {
+      return res.status(400).json({ 
+        success: false,
+        error: '请选择HTML文件' 
+      });
+    }
+    
+    if (!title || !title.trim()) {
+      // 删除已上传的文件
+      fs.unlinkSync(req.file.path);
+      return res.status(400).json({ 
+        success: false,
+        error: '请输入动画标题' 
+      });
+    }
+    
+    const connection = await pool.getConnection();
+    
+    try {
+      // 验证教师是否存在
+      const [teacherExists] = await connection.execute(
+        'SELECT id FROM users WHERE id = ?',
+        [teacherId]
+      );
+      
+      if (teacherExists.length === 0) {
+        fs.unlinkSync(req.file.path);
+        connection.release();
+        return res.status(404).json({ 
+          success: false,
+          error: '教师不存在' 
+        });
+      }
+      
+      // 文件路径（相对于public/html）
+      const filePath = `/html/${req.file.filename}`;
+      
+      // 如果上传到了开发环境目录，同时复制到生产环境目录
+      if (req.file.path.startsWith(devHtmlUploadDir) && fs.existsSync(prodHtmlUploadDir)) {
+        const prodFilePath = path.join(prodHtmlUploadDir, req.file.filename);
+        try {
+          fs.copyFileSync(req.file.path, prodFilePath);
+          // 设置生产环境文件权限（nginx用户可读）
+          fs.chmodSync(prodFilePath, 0o644);
+          console.log(`文件已同步到生产环境: ${prodFilePath}`);
+        } catch (error) {
+          console.warn(`同步文件到生产环境失败:`, error.message);
+          // 继续执行，不中断上传流程
+        }
+      }
+      
+      // 插入数据库
+      const [result] = await connection.execute(
+        `INSERT INTO animations 
+         (title, description, file_path, file_name, category, icon, uploader_id, is_active) 
+         VALUES (?, ?, ?, ?, ?, ?, ?, 1)`,
+        [
+          title.trim(),
+          description ? description.trim() : null,
+          filePath,
+          req.file.originalname,
+          category ? category.trim() : null,
+          icon || 'play-circle',
+          teacherId
+        ]
+      );
+      
+      connection.release();
+      
+      res.json({
+        success: true,
+        message: '动画上传成功',
+        data: {
+          id: result.insertId,
+          title: title.trim(),
+          file_path: filePath,
+          file_name: req.file.originalname
+        }
+      });
+      
+    } catch (error) {
+      // 删除已上传的文件
+      if (req.file && fs.existsSync(req.file.path)) {
+        fs.unlinkSync(req.file.path);
+      }
+      connection.release();
+      throw error;
+    }
+    
+  } catch (error) {
+    logger.error('上传动画HTML文件错误', { 
+      error: error.message, 
+      teacherId: req.params.teacherId,
+      stack: error.stack
+    });
+    res.status(500).json({ 
+      success: false,
+      error: '上传失败：' + error.message 
+    });
+  }
+});
+
+// 获取所有动画列表（所有人可见）
+router.get('/animations', async (req, res) => {
+  try {
+    const { category, search } = req.query;
+    
+    const connection = await pool.getConnection();
+    
+    let sql = `
+      SELECT a.id, a.title, a.description, a.file_path, a.file_name, 
+             a.category, a.icon, a.view_count, a.created_at,
+             u.real_name as uploader_name, u.username as uploader_username
+      FROM animations a
+      LEFT JOIN users u ON a.uploader_id = u.id
+      WHERE a.is_active = 1
+    `;
+    
+    const params = [];
+    
+    if (category) {
+      sql += ' AND a.category = ?';
+      params.push(category);
+    }
+    
+    if (search) {
+      sql += ' AND (a.title LIKE ? OR a.description LIKE ?)';
+      const searchPattern = `%${search}%`;
+      params.push(searchPattern, searchPattern);
+    }
+    
+    sql += ' ORDER BY a.created_at DESC';
+    
+    const [animations] = await connection.execute(sql, params);
+    connection.release();
+    
+    // 按分类分组
+    const categories = {};
+    animations.forEach(animation => {
+      const cat = animation.category || '其他';
+      if (!categories[cat]) {
+        categories[cat] = {
+          id: cat.toLowerCase().replace(/\s+/g, '-'),
+          name: cat,
+          animations: []
+        };
+      }
+      categories[cat].animations.push({
+        id: animation.id,
+        name: animation.title,
+        description: animation.description,
+        file: animation.file_name,
+        file_path: animation.file_path,
+        icon: animation.icon || 'play-circle',
+        view_count: animation.view_count,
+        uploader: animation.uploader_name || animation.uploader_username,
+        created_at: animation.created_at
+      });
+    });
+    
+    res.json({
+      success: true,
+      data: Object.values(categories)
+    });
+    
+  } catch (error) {
+    logger.error('获取动画列表错误', { error: error.message });
+    res.status(500).json({ 
+      success: false,
+      error: '获取动画列表失败' 
+    });
+  }
+});
+
+// 获取教师上传的动画列表
+router.get('/teacher/:teacherId/animations', async (req, res) => {
+  try {
+    const { teacherId } = req.params;
+    
+    const connection = await pool.getConnection();
+    
+    const [animations] = await connection.execute(
+      `SELECT id, title, description, file_path, file_name, category, icon, 
+              is_active, view_count, created_at, updated_at
+       FROM animations
+       WHERE uploader_id = ?
+       ORDER BY created_at DESC`,
+      [teacherId]
+    );
+    
+    connection.release();
+    
+    res.json({
+      success: true,
+      data: animations
+    });
+    
+  } catch (error) {
+    logger.error('获取教师动画列表错误', { error: error.message, teacherId });
+    res.status(500).json({ 
+      success: false,
+      error: '获取动画列表失败' 
+    });
+  }
+});
+
+// 删除动画（仅上传者可以删除）
+router.delete('/teacher/:teacherId/animations/:animationId', async (req, res) => {
+  try {
+    const { teacherId, animationId } = req.params;
+    
+    const connection = await pool.getConnection();
+    
+    // 验证动画是否存在且属于该教师
+    const [animations] = await connection.execute(
+      'SELECT file_path FROM animations WHERE id = ? AND uploader_id = ?',
+      [animationId, teacherId]
+    );
+    
+    if (animations.length === 0) {
+      connection.release();
+      return res.status(404).json({ 
+        success: false,
+        error: '动画不存在或无权删除' 
+      });
+    }
+    
+    const filePath = animations[0].file_path;
+    const fileName = path.basename(filePath);
+    
+    // 删除开发环境和生产环境的文件
+    const devFilePath = path.join(devHtmlUploadDir, fileName);
+    const prodFilePath = path.join(prodHtmlUploadDir, fileName);
+    
+    [devFilePath, prodFilePath].forEach(file => {
+      if (fs.existsSync(file)) {
+        try {
+          fs.unlinkSync(file);
+          console.log(`已删除文件: ${file}`);
+        } catch (error) {
+          console.warn(`删除文件失败 ${file}:`, error.message);
+        }
+      }
+    });
+    
+    // 删除数据库记录
+    await connection.execute(
+      'DELETE FROM animations WHERE id = ?',
+      [animationId]
+    );
+    
+    connection.release();
+    
+    res.json({
+      success: true,
+      message: '动画删除成功'
+    });
+    
+  } catch (error) {
+    logger.error('删除动画错误', { error: error.message, teacherId, animationId });
+    res.status(500).json({ 
+      success: false,
+      error: '删除失败' 
+    });
+  }
+});
+
+// 更新动画查看次数
+router.post('/animations/:animationId/view', async (req, res) => {
+  try {
+    const { animationId } = req.params;
+    
+    const connection = await pool.getConnection();
+    
+    await connection.execute(
+      'UPDATE animations SET view_count = view_count + 1 WHERE id = ?',
+      [animationId]
+    );
+    
+    connection.release();
+    
+    res.json({
+      success: true
+    });
+    
+  } catch (error) {
+    logger.error('更新动画查看次数错误', { error: error.message });
+    // 不返回错误，因为这不是关键操作
+    res.json({ success: true });
   }
 });
 

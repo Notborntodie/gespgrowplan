@@ -28,9 +28,8 @@ const preloadStaticResources = () => {
       document.head.appendChild(link)
     })
 
-    console.log('[资源预加载] 静态资源预加载完成')
-  } catch (error) {
-    console.warn('[资源预加载] 静态资源预加载失败:', error)
+  } catch {
+    // 静默忽略预加载失败
   }
 }
 
@@ -43,20 +42,20 @@ const preconnectAPIEndpoints = () => {
 
     const endpoints = new Set<string>()
 
+    // 开发环境未设置时，使用当前页面的 host（外网访问时预连接同一服务器）
+    const devHost = typeof window !== 'undefined' && window.location?.hostname ? window.location.hostname : 'localhost'
+
     // 从环境变量提取域名（主 API）
     if (apiBaseUrl) {
       try {
         const url = new URL(apiBaseUrl)
         endpoints.add(url.origin)
       } catch {
-        // 忽略无效 URL
-        console.warn('[资源预加载] 无效的 VITE_API_BASE_URL:', apiBaseUrl)
+        // 忽略无效 URL（相对路径如 /api 无法 new URL，属正常）
       }
     } else if (import.meta.env.DEV) {
-      // 开发环境默认值（如果没有设置环境变量）
       try {
-        const url = new URL('http://localhost:3000')
-        endpoints.add(url.origin)
+        endpoints.add(`http://${devHost}:3000`)
       } catch {
         // 忽略错误
       }
@@ -68,14 +67,11 @@ const preconnectAPIEndpoints = () => {
         const url = new URL(aiApiBaseUrl)
         endpoints.add(url.origin)
       } catch {
-        // 忽略无效 URL
-        console.warn('[资源预加载] 无效的 VITE_AI_API_BASE_URL:', aiApiBaseUrl)
+        // 忽略无效 URL（相对路径如 /ai-api 无法 new URL，属正常）
       }
     } else if (import.meta.env.DEV) {
-      // 开发环境默认值（如果没有设置环境变量）
       try {
-        const url = new URL('http://localhost:8000')
-        endpoints.add(url.origin)
+        endpoints.add(`http://${devHost}:8000`)
       } catch {
         // 忽略错误
       }
@@ -97,9 +93,8 @@ const preconnectAPIEndpoints = () => {
       document.head.appendChild(preconnectLink)
     })
 
-    console.log('[资源预加载] API 端点预连接完成')
-  } catch (error) {
-    console.warn('[资源预加载] API 端点预连接失败:', error)
+  } catch {
+    // 静默忽略预连接失败
   }
 }
 
@@ -131,10 +126,9 @@ const preloadAPIData = async () => {
         document.head.appendChild(link)
       })
 
-      console.log('[资源预加载] 常用 API 端点预加载完成')
     }
-  } catch (error) {
-    console.warn('[资源预加载] API 数据预加载失败:', error)
+  } catch {
+    // 静默忽略预加载失败
   }
 }
 
@@ -143,8 +137,6 @@ const preloadAPIData = async () => {
  * 在应用启动后调用，使用空闲时间预加载资源
  */
 export const startResourcePreload = () => {
-  console.log('[资源预加载] 开始资源预加载...')
-
   // 立即执行：DNS 预解析和静态资源预加载（轻量级操作）
   preconnectAPIEndpoints()
   preloadStaticResources()

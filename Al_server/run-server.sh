@@ -54,8 +54,8 @@ echo "Python路径: $(which python)" >> server.log
 echo "Uvicorn路径: $(which uvicorn)" >> server.log
 echo "========================================" >> server.log
 
-# 启动服务
-exec $(pwd)/venv/bin/uvicorn main:app --host 0.0.0.0 --port 8000
+# 启动服务（仅本机访问，由 Nginx 反向代理 /ai-api/ 对外）
+exec $(pwd)/venv/bin/uvicorn main:app --host 127.0.0.1 --port 8000
 
 
 

@@ -133,7 +133,7 @@
   />
 </template>
 
-<script setup lang="ts">import { BASE_URL } from '@/config/api'
+<script setup lang="ts">import { BASE_URL, API_SERVER_BASE, normalizeImageUrl } from '@/config/api'
 
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
@@ -188,11 +188,20 @@ async function handleImageUpload(event: any) {
   formData.append('image', file)
 
   try {
-          const response = await axios.post(`${BASE_URL}/upload-image`, formData, {
+    const response = await axios.post(`${BASE_URL}/upload-image`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     })
-    uploadedImage.value = response.data.imageUrl
-    newQuestion.value.image_url = response.data.imageUrl
+    let url = response.data.imageUrl
+    if (url) {
+      let normalized = normalizeImageUrl(url)
+      if (!normalized) normalized = url
+      if (!normalized.startsWith('http://') && !normalized.startsWith('https://')) {
+        normalized = normalized.startsWith('/') ? `${API_SERVER_BASE}${normalized}` : `${API_SERVER_BASE}/${normalized}`
+      }
+      url = normalized
+    }
+    uploadedImage.value = url
+    newQuestion.value.image_url = url
   } catch (error: any) {
     alert('图片上传失败: ' + error.response?.data?.error || error.message)
   }

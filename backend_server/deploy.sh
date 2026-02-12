@@ -24,12 +24,13 @@ echo "✅ Redis服务正常"
 # 检查数据库连接
 echo "🔍 检查数据库连接..."
 node -e "
+require('dotenv').config();
 const mysql = require('mysql2/promise');
 const pool = mysql.createPool({
-  host: '127.0.0.1',
-  user: 'gesp_user',
-  password: 'Gesp@2025!',
-  database: 'gesp_practice_system'
+  host: process.env.DB_HOST || '127.0.0.1',
+  user: process.env.DB_USER || 'gesp_user',
+  password: process.env.DB_PASSWORD || '',
+  database: process.env.DB_NAME || 'gesp_practice_system'
 });
 
 pool.getConnection()

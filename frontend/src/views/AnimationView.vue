@@ -64,12 +64,26 @@
     </transition>
     
     <!-- 嵌入的动画iframe -->
+    <div v-if="!animationUrl" class="loading-animation">
+      <div class="loading-spinner"></div>
+      <span>加载中...</span>
+    </div>
     <iframe 
+      v-else
       :src="animationUrl" 
       class="animation-iframe"
       frameborder="0"
       allowfullscreen
+      @load="onIframeLoad"
+      @error="onIframeError"
+      :key="animationUrl"
     ></iframe>
+    <div v-if="loadError" class="error-message">
+      <Icon name="alert-circle" :size="24" />
+      <p>无法加载动画文件</p>
+      <p class="error-detail">{{ loadError }}</p>
+      <a :href="animationUrl" target="_blank" class="btn-open-direct">直接打开文件</a>
+    </div>
   </div>
 </template>
 
@@ -88,6 +102,7 @@ const animationTitle = ref('N皇后问题')
 const showLinkDialog = ref(false)
 const showCopyToast = ref(false)
 const linkInputRef = ref<HTMLInputElement | null>(null)
+const loadError = ref('')
 
 // 返回上一页
 const goBack = () => {
@@ -152,6 +167,18 @@ const copyLink = async () => {
   }
 }
 
+// iframe加载成功
+const onIframeLoad = () => {
+  loadError.value = ''
+  console.log('动画iframe加载成功:', animationUrl.value)
+}
+
+// iframe加载失败
+const onIframeError = () => {
+  loadError.value = '无法加载动画文件，请检查文件是否存在'
+  console.error('动画iframe加载失败:', animationUrl.value)
+}
+
 // 加载动画信息
 onMounted(() => {
   // 从路由查询参数获取动画信息
@@ -163,10 +190,15 @@ onMounted(() => {
   }
   
   if (url) {
-    animationUrl.value = url
+    // 确保URL是绝对路径（以/开头）
+    animationUrl.value = url.startsWith('/') ? url : `/${url}`
+    console.log('设置动画URL:', animationUrl.value)
   } else if (animationId.value) {
     // 如果没有URL，尝试从ID构建本地路径
     animationUrl.value = `/html/${animationId.value}.html`
+    console.log('使用动画ID构建URL:', animationUrl.value)
+  } else {
+    loadError.value = '缺少动画URL或ID参数'
   }
 })
 </script>
@@ -480,6 +512,75 @@ onMounted(() => {
 
 .back-nav-arrow :deep(.lucide-icon) {
   flex-shrink: 0;
+}
+
+/* 加载和错误状态 */
+.loading-animation {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  color: #64748b;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e2e8f0;
+  border-top: 4px solid #1e90ff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error-message {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 40px;
+  color: #dc2626;
+  text-align: center;
+}
+
+.error-message p {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.error-detail {
+  font-size: 14px;
+  color: #64748b;
+  font-weight: normal;
+}
+
+.btn-open-direct {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #1e90ff 0%, #38bdf8 100%);
+  color: white;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  margin-top: 8px;
+}
+
+.btn-open-direct:hover {
+  background: linear-gradient(135deg, #0c7cd5 0%, #1e90ff 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(30, 144, 255, 0.3);
 }
 </style>
 

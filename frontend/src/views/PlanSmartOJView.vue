@@ -30,10 +30,15 @@
                   <Icon name="calendar" :size="16" />
                   <span>{{ formatDate(currentProblem.date) }}</span>
                 </span>
-                <!-- 任务内提交状态标识 -->
-                <span class="submission-mode-badge task-submission-badge" title="任务内提交，提交后会更新任务进度">
+                <!-- 计划标识 -->
+                <span class="submission-mode-badge task-submission-badge" title="计划内提交，提交后会更新任务进度">
                   <Icon name="clipboard-check" :size="14" />
                   <span>计划</span>
+                </span>
+                <!-- 本次练习计时器（计划标签后） -->
+                <span class="practice-timer-badge" title="本次练习已持续时间">
+                  <Icon name="clock" :size="14" />
+                  <span>{{ practiceTimerDisplay }}</span>
                 </span>
               </div>
               <div class="header-buttons">
@@ -456,7 +461,6 @@ const getCurrentApiConfig = () => {
 // 获取当前API基础URL（使用负载均衡）
 const getCurrentApiBaseUrl = () => {
   const config = getRandomApiConfig()
-  console.log(`负载均衡选择: ${config.name} (${config.url})`)
   return config ? config.url : OJ_API_CONFIGS[0].url
 }
   
@@ -467,13 +471,11 @@ const getCurrentApiBaseUrl = () => {
       .sort((a, b) => a.priority - b.priority)
     
     if (availableConfigs.length <= 1) {
-      console.warn('没有可用的备用API配置')
+      if (import.meta.env.DEV) console.warn('没有可用的备用API配置')
       return false
     }
-    
     currentApiIndex = (currentApiIndex + 1) % availableConfigs.length
-    const newConfig = getCurrentApiConfig()
-    console.log(`切换到备用API: ${newConfig.name} (${newConfig.url})`)
+    getCurrentApiConfig()
     return true
   }
   
@@ -486,7 +488,6 @@ const getCurrentApiBaseUrl = () => {
       const fullUrl = `${currentApiUrl}${url}`
       
       try {
-        console.log(`API请求尝试 ${attempt + 1}: ${fullUrl}`)
         const response = await fetch(fullUrl, options)
         
         if (response.ok) {
@@ -573,6 +574,27 @@ import katex from 'katex'
   // 加载状态
   const loading = ref(true)
   
+  // 本次练习开始时间（用于提交时计算练习持续时间，单位：毫秒时间戳）
+  const practiceStartTime = ref<number | null>(null)
+  // 计时器显示文案（每 1 秒更新）
+  const practiceTimerDisplay = ref('00:00')
+  
+  function updatePracticeTimerDisplay() {
+    if (practiceStartTime.value == null) {
+      practiceTimerDisplay.value = '00:00'
+      return
+    }
+    const totalSeconds = Math.max(0, Math.floor((Date.now() - practiceStartTime.value) / 1000))
+    const h = Math.floor(totalSeconds / 3600)
+    const m = Math.floor((totalSeconds % 3600) / 60)
+    const s = totalSeconds % 60
+    if (h > 0) {
+      practiceTimerDisplay.value = `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
+    } else {
+      practiceTimerDisplay.value = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
+    }
+  }
+  
   // 当前题目数据（初始为空，从API加载）
   const currentProblem = ref({
     title: '加载中...',
@@ -616,6 +638,9 @@ import katex from 'katex'
         }
         // 保存题目标题到localStorage，供NavBar显示
         localStorage.setItem('currentOJProblemTitle', data.title)
+        // 记录本次练习开始时间（用于提交时计算练习持续时间）
+        practiceStartTime.value = Date.now()
+        updatePracticeTimerDisplay()
       }
       
       // 延迟一点时间再关闭加载界面，让动画更自然
@@ -1240,12 +1265,18 @@ const confirmAndSubmit = async () => {
       const currentCode = getCode()
       console.log('提交代码:', currentCode)
   
+      // 本次练习持续时间（秒），从进入页面到提交
+      const practiceDurationSeconds = practiceStartTime.value != null
+        ? Math.max(0, Math.round((Date.now() - practiceStartTime.value) / 1000))
+        : null
+
       // 1. 提交代码
       const requestData = {
         problem_id: parseInt(problemId as string),
         code: currentCode,
         language: selectedLanguage.value,
         user_id: userInfo.id,
+        practice_duration_seconds: practiceDurationSeconds,
       }
       
       console.log('发送到后端的提交数据:', requestData)
@@ -2018,11 +2049,15 @@ const confirmAndSubmit = async () => {
     }, 100)
   }
   
+  let practiceTimerIntervalId: ReturnType<typeof setInterval> | null = null
+  
   // 组件挂载时初始化编辑器
   onMounted(() => {
     loadFontSize()
     fetchProblemDetail()
     initEditor()
+    // 每秒更新练习计时器显示
+    practiceTimerIntervalId = setInterval(updatePracticeTimerDisplay, 1000)
     // 重置滚动位置到顶部
     window.scrollTo(0, 0)
     document.documentElement.scrollTop = 0
@@ -2039,6 +2074,10 @@ const confirmAndSubmit = async () => {
   
   // 组件卸载时清理编辑器和事件监听器
   onUnmounted(() => {
+    if (practiceTimerIntervalId) {
+      clearInterval(practiceTimerIntervalId)
+      practiceTimerIntervalId = null
+    }
     if (editorView) {
       editorView.destroy()
     }
@@ -2873,6 +2912,26 @@ const confirmAndSubmit = async () => {
   }
   
   .task-submission-badge :deep(.lucide-icon) {
+    color: white;
+  }
+  
+  /* 本次练习计时器（计划标签后） */
+  .practice-timer-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.15) 100%);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 18px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    font-variant-numeric: tabular-nums;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    backdrop-filter: blur(10px);
+    flex-shrink: 0;
+  }
+  .practice-timer-badge :deep(.lucide-icon) {
     color: white;
   }
   

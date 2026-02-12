@@ -5,9 +5,11 @@ const app = require('./app');
 const { logger } = require('./config/logger');
 
 const port = process.env.PORT || 3000;
+const host = process.env.HOST || '127.0.0.1'; // 仅本机访问，不对外暴露
 
-const server = app.listen(port, () => {
+const server = app.listen(port, host, () => {
   logger.info(`服务器启动成功`, {
+    host,
     port: port,
     environment: process.env.NODE_ENV || 'development',
     timestamp: new Date().toISOString()

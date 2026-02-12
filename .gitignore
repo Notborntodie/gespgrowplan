@@ -17,6 +17,9 @@ build/
 .env.development
 Al_server/.env
 
+# Deploy config (contains server IP, paths, etc.)
+frontend/.deploy-config
+
 # Logs
 logs/
 *.log
@@ -115,6 +118,14 @@ backend_server/uploads/*
 test/
 tests/
 __tests__/
+
+# Legacy history scripts (removed from tracking, may contain hardcoded IPs)
+backend_server/history/
+frontend/history/
+history/
+
+# Generated animation HTML files
+frontend/public/html/animation-*.html
 
 # Temporary files
 tmp/

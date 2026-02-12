@@ -263,8 +263,6 @@ const editForm = ref<any>(null)
 
 // 初始化表单数据
 function initFormData(problemData: any) {
-  console.log('📝 [EditOJDialog] 开始初始化表单数据:', problemData)
-  
   // 处理样例数据，确保 is_displayed 和 is_hidden 字段正确映射
   const samples = problemData.samples ? problemData.samples.map((sample: any) => ({
     input: sample.input || '',
@@ -289,64 +287,37 @@ function initFormData(problemData: any) {
     publish_date: problemData.publish_date ? new Date(problemData.publish_date).toISOString().split('T')[0] : '',
     samples: samples
   }
-  console.log('✅ [EditOJDialog] 表单数据初始化完成:', editForm.value)
-  console.log('📊 [EditOJDialog] 样例数据详情:', samples)
 }
 
 // 监听弹窗打开，加载数据
 watch(() => props.visible, async (newVisible) => {
-  console.log('👁️ [EditOJDialog] visible变化:', newVisible)
-  console.log('📦 [EditOJDialog] props.problem:', props.problem)
-  
   if (newVisible && props.problem?.id) {
-    console.log('🚀 [EditOJDialog] 开始加载题目数据, ID:', props.problem.id)
-    
-    // 先用现有数据初始化，确保有内容显示
     if (props.problem) {
-      console.log('⚡ [EditOJDialog] 使用现有数据初始化')
       initFormData(props.problem)
     }
-    
-    // 然后异步获取完整数据
     await loadProblemDetails()
-  } else {
-    console.log('⚠️ [EditOJDialog] 条件不满足 - visible:', newVisible, 'problem.id:', props.problem?.id)
   }
 })
 
 // 监听 problem 变化
-watch(() => props.problem, (newProblem) => {
-  console.log('🔄 [EditOJDialog] props.problem 变化:', newProblem)
-}, { deep: true })
+watch(() => props.problem, () => {}, { deep: true })
 
 // 获取题目完整详情（包括所有测试样例）
 async function loadProblemDetails() {
-  if (!props.problem?.id) {
-    console.log('❌ [EditOJDialog] 无法加载详情: problem.id不存在')
-    return
-  }
-  
+  if (!props.problem?.id) return
+
   loading.value = true
-  console.log('🌐 [EditOJDialog] 开始请求完整题目详情, URL:', `${BASE_URL}/oj/problems/${props.problem.id}/all`)
-  
   try {
     const response = await axios.get(`${BASE_URL}/oj/problems/${props.problem.id}/all`)
-    console.log('📡 [EditOJDialog] 接口返回数据:', response.data)
-    
-    // 正确提取题目数据：response.data 是 {success: true, data: {...}}
     const problemData = response.data.data || response.data
-    console.log('🔍 [EditOJDialog] 提取的题目数据:', problemData)
-    
     initFormData(problemData)
-    console.log('✅ [EditOJDialog] 完整数据加载成功')
   } catch (error: any) {
-    console.error('❌ [EditOJDialog] 获取题目详情失败:', error)
-    console.error('错误详情:', error.response?.data)
-    // 接口失败时保持使用现有数据
+    if (import.meta.env.DEV) {
+      console.error('[EditOJDialog] 获取题目详情失败:', error)
+    }
     alert('获取完整题目详情失败，已加载基本信息: ' + (error.response?.data?.error || error.message))
   } finally {
     loading.value = false
-    console.log('🏁 [EditOJDialog] 数据加载流程结束, editForm:', editForm.value)
   }
 }
 

@@ -56,6 +56,16 @@ export default defineConfig({
     // 启用 chunk 大小警告阈值
     chunkSizeWarningLimit: 1000,
   },
+  // 开发服务器：监听所有网卡，便于局域网/外网访问
+  server: {
+    host: true, // 监听 0.0.0.0，外网可访问
+    port: 5137,
+    strictPort: false, // 若 5137 被占用则自动尝试下一端口
+    // 允许的 host（开发时外网访问可配置 VITE_ALLOWED_HOSTS 环境变量，逗号分隔，如：your-domain.com,192.168.1.100）
+    allowedHosts: process.env.VITE_ALLOWED_HOSTS
+      ? process.env.VITE_ALLOWED_HOSTS.split(',').map((h) => h.trim()).filter(Boolean).concat(['localhost', '127.0.0.1'])
+      : ['localhost', '127.0.0.1'],
+  },
   // 优化依赖预构建
   optimizeDeps: {
     include: [

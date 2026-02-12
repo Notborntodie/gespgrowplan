@@ -15,13 +15,13 @@
         <p>正在加载提交记录...</p>
       </div>
       
-      <div v-else-if="submissions.length === 0" class="empty-state">
+      <div v-else-if="submissions.length === 0 && !accessDenied" class="empty-state">
         <div class="empty-icon"><Icon name="file-text" :size="64" /></div>
         <h3>暂无提交记录</h3>
         <p>您还没有参加过这个考试</p>
       </div>
       
-      <div v-else class="submissions-by-month">
+      <div v-else-if="!accessDenied" class="submissions-by-month">
         <div v-for="(monthData, monthKey) in groupedSubmissions" :key="monthKey" class="month-group">
           <div class="month-header">
             <span class="month-title"><Icon name="calendar" :size="18" /> {{ monthKey }}</span>
@@ -33,6 +33,7 @@
                 <tr>
                   <th>尝试次数</th>
                   <th>提交时间</th>
+                  <th>持续时间</th>
                   <th>分数</th>
                   <th>状态</th>
                   <th>操作</th>
@@ -48,6 +49,7 @@
                     <span class="attempt-number">第 {{ submission.attempt_number }} 次</span>
                   </td>
                   <td class="date-cell">{{ formatDate(submission.submit_time) }}</td>
+                  <td class="duration-cell">{{ formatDuration(submission.practice_duration_seconds) }}</td>
                   <td>
                     <div class="score-display" :class="getScoreClass(submission.score)">
                       <span class="score-value">{{ submission.score }}</span>
@@ -96,6 +98,9 @@
               <div class="summary-info">
                 <h4>{{ examInfo.name }}</h4>
                 <p class="summary-date">{{ formatDateTime(selectedSubmission?.submit_time) }}</p>
+                <p v-if="selectedSubmission?.practice_duration_seconds != null" class="summary-duration">
+                  <Icon name="clock" :size="14" /> 本次练习时长：{{ formatDuration(selectedSubmission.practice_duration_seconds) }}
+                </p>
                 <div class="summary-stats">
                   <span class="stat-item">
                     <span class="stat-label">总题数:</span>
@@ -211,6 +216,30 @@
       @cancel="handleExportCancel"
     />
 
+    <!-- 访问被拒绝弹窗 -->
+    <div v-if="accessDenied" class="access-denied-modal" @click="goBack">
+      <div class="modal-content" @click.stop>
+        <div class="modal-header">
+          <h3>{{ accessDeniedReason === 'expired' ? '提交时间已过期' : '暂无提交记录' }}</h3>
+          <button @click="goBack" class="close-btn">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="access-denied-message">
+            <div class="access-denied-icon">
+              <Icon name="lock" :size="64" />
+            </div>
+            <p>{{ accessDeniedReason === 'expired' ? '只有近24小时内的提交才能查看提交记录，请重新提交后再查看。' : '您还没有提交过该考试，请先提交后再查看提交记录。' }}</p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button @click="goBack" class="btn btn-primary">
+            <Icon name="arrow-left" :size="16" />
+            <span>返回</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- 底部 Header -->
     <div class="submissions-header-bottom">
       <h2>{{ examInfo.name }} - 提交记录</h2>
@@ -242,6 +271,8 @@ const showDetailDialog = ref(false)
 const selectedSubmission = ref<any>(null)
 const submissionAnswers = ref<any[]>([])
 const showExportWrongQuestionsDialog = ref(false)
+const accessDenied = ref(false)
+const accessDeniedReason = ref<'none' | 'expired'>('none')
 
 // 计算错题列表
 const wrongQuestions = computed(() => {
@@ -294,15 +325,60 @@ async function fetchSubmissions() {
         exam_id: examId.value
       }
     })
+    
+    const allSubmissions = response.data || []
+    
+    // 如果没有提交记录
+    if (allSubmissions.length === 0) {
+      accessDenied.value = true
+      accessDeniedReason.value = 'none'
+      submissions.value = []
+      return
+    }
+    
     // 按提交时间倒序排列（最新的在前）
-    submissions.value = (response.data || []).sort((a: any, b: any) => {
+    const sortedSubmissions = allSubmissions.sort((a: any, b: any) => {
       const timeA = new Date(a.submit_time).getTime()
       const timeB = new Date(b.submit_time).getTime()
       return timeB - timeA
     })
+    
+    // 检查最近一次提交是否在24小时内
+    const latestSubmission = sortedSubmissions[0]
+    const submissionTime = new Date(latestSubmission.submit_time).getTime()
+    const now = new Date().getTime()
+    const oneDayInMs = 24 * 60 * 60 * 1000 // 24小时
+    const timeDiff = now - submissionTime
+    
+    console.log('提交时间检查:', {
+      submissionTime: new Date(latestSubmission.submit_time),
+      now: new Date(),
+      timeDiff: timeDiff,
+      oneDayInMs: oneDayInMs,
+      hoursDiff: timeDiff / (60 * 60 * 1000),
+      shouldDeny: timeDiff > oneDayInMs
+    })
+    
+    if (timeDiff > oneDayInMs) {
+      console.log('访问被拒绝：提交时间超过24小时')
+      accessDenied.value = true
+      accessDeniedReason.value = 'expired'
+      submissions.value = []
+      return
+    }
+    
+    console.log('访问允许：提交时间在24小时内')
+    
+    // 有近1天的提交，允许查看
+    accessDenied.value = false
+    submissions.value = sortedSubmissions
   } catch (error: any) {
     console.error('获取提交记录失败:', error)
-    alert('获取提交记录失败: ' + (error.response?.data?.error || error.message))
+    accessDenied.value = true
+    accessDeniedReason.value = 'none'
+    submissions.value = []
+    // 不显示 alert，让页面显示访问被拒绝的提示
+    // alert('获取提交记录失败: ' + (error.response?.data?.error || error.message))
   } finally {
     loading.value = false
   }
@@ -343,6 +419,19 @@ function formatDateTime(dateStr: string) {
   if (!dateStr) return ''
   const d = new Date(dateStr)
   return d.toLocaleString()
+}
+
+// 格式化持续时间（秒 -> "X分Y秒" 或 "X小时Y分Z秒"）
+function formatDuration(seconds: number | null | undefined): string {
+  if (seconds == null || seconds < 0) return '—'
+  const h = Math.floor(seconds / 3600)
+  const m = Math.floor((seconds % 3600) / 60)
+  const s = seconds % 60
+  const parts: string[] = []
+  if (h > 0) parts.push(`${h}小时`)
+  if (m > 0) parts.push(`${m}分`)
+  parts.push(`${s}秒`)
+  return parts.join('') || '0秒'
 }
 
 // 获取分数等级
@@ -692,6 +781,12 @@ onMounted(() => {
   font-size: 13px;
 }
 
+.duration-cell {
+  color: #64748b;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
 .score-display {
   display: inline-flex;
   align-items: baseline;
@@ -984,6 +1079,19 @@ onMounted(() => {
   margin: 0 0 12px 0;
   color: #64748b;
   font-size: 14px;
+}
+
+.summary-duration {
+  margin: 0 0 12px 0;
+  color: #64748b;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.summary-duration :deep(.lucide-icon) {
+  flex-shrink: 0;
 }
 
 .summary-stats {
@@ -1313,6 +1421,85 @@ onMounted(() => {
   padding: 24px;
   border-top: 1px solid #e2e8f0;
   background: #f8fafc;
+}
+
+/* 访问被拒绝弹窗样式 */
+.access-denied-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+  backdrop-filter: blur(4px);
+}
+
+.access-denied-modal .modal-content {
+  max-width: 500px;
+  width: 90%;
+  animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.access-denied-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  text-align: center;
+}
+
+.access-denied-icon {
+  margin-bottom: 24px;
+  color: #f59e0b;
+}
+
+.access-denied-message p {
+  margin: 0;
+  color: #64748b;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.access-denied-modal .modal-footer {
+  justify-content: center;
+}
+
+.access-denied-modal .btn-primary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #1e90ff 0%, #38bdf8 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(30, 144, 255, 0.3);
+}
+
+.access-denied-modal .btn-primary:hover {
+  background: linear-gradient(135deg, #0c7cd5 0%, #1e90ff 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(30, 144, 255, 0.4);
 }
 
 /* 响应式设计调整 */

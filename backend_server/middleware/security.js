@@ -36,15 +36,13 @@ const securityMiddleware = {
   
   // CORS 配置
   cors: (req, res, next) => {
-    // 允许的源列表（从环境变量读取，如果没有则使用默认值）
+    // 允许的源列表（从环境变量 ALLOWED_ORIGINS 读取，逗号分隔，如：http://localhost:3000,https://your-domain.com）
     const allowedOriginsEnv = process.env.ALLOWED_ORIGINS;
     const defaultOrigins = [
       'http://localhost:3000',
       'http://localhost:5173',
-      'http://106.14.143.27',
-      'http://106.14.143.27:80',
-      'https://106.14.143.27',
-      'https://106.14.143.27:443'
+      'http://127.0.0.1:3000',
+      'http://127.0.0.1:5173'
     ];
     const allowedOrigins = allowedOriginsEnv 
       ? allowedOriginsEnv.split(',').map(origin => origin.trim()).filter(origin => origin)
@@ -203,15 +201,13 @@ const securityMiddleware = {
   
   // 请求来源验证
   originValidation: (req, res, next) => {
-    // 从环境变量读取允许的来源，支持逗号分隔的多个来源
+    // 从环境变量 ALLOWED_ORIGINS 读取允许的来源，支持逗号分隔
     const allowedOriginsEnv = process.env.ALLOWED_ORIGINS;
     const defaultOrigins = [
       'http://localhost:3000',
       'http://localhost:5173',
-      'http://106.14.143.27',
-      'http://106.14.143.27:80',
-      'https://106.14.143.27',
-      'https://106.14.143.27:443'
+      'http://127.0.0.1:3000',
+      'http://127.0.0.1:5173'
     ];
     const allowedOrigins = allowedOriginsEnv 
       ? allowedOriginsEnv.split(',').map(origin => origin.trim()).filter(origin => origin)

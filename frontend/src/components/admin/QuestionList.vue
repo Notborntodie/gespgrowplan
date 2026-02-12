@@ -185,10 +185,10 @@
                     <div 
                       v-if="question.image_url"
                       class="preview-image-item"
-                      @click="openImageModal(question.image_url)"
+                      @click="openImageModal(getImageUrl(question.image_url))"
                     >
                       <img 
-                        :src="question.image_url" 
+                        :src="getImageUrl(question.image_url)" 
                         :alt="`题目图片`"
                         class="preview-image"
                       />
@@ -200,10 +200,10 @@
                       v-for="(image, imageIndex) in (question.images || [])" 
                       :key="imageIndex"
                       class="preview-image-item"
-                      @click="openImageModal(image.image_url)"
+                      @click="openImageModal(getImageUrl(image.image_url))"
                     >
                       <img 
-                        :src="image.image_url" 
+                        :src="getImageUrl(image.image_url)" 
                         :alt="`附加图片 ${imageIndex + 1}`"
                         class="preview-image"
                       />
@@ -342,7 +342,15 @@
   </div>
 </template>
 
-<script setup lang="ts">import { BASE_URL } from '@/config/api'
+<script setup lang="ts">import { BASE_URL, API_SERVER_BASE, normalizeImageUrl } from '@/config/api'
+
+function getImageUrl(url: string | undefined): string {
+  if (!url || !url.trim()) return ''
+  const n = normalizeImageUrl(url)
+  if (!n) return ''
+  if (n.startsWith('http://') || n.startsWith('https://')) return n
+  return n.startsWith('/') ? `${API_SERVER_BASE}${n}` : `${API_SERVER_BASE}/${n}`
+}
 
 import { ref, computed, onMounted, watch } from 'vue'
 import axios from 'axios'

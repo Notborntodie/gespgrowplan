@@ -75,7 +75,7 @@
                           </div>
                         </div>
                         <div class="exam-info">
-                          <p>GESP考级时间：2025年3月22日、6月28日、9月27日、12月27日</p>
+                          <p>GESP考级时间：2026年3月14日、6月27日、9月12日、12月19日</p>
                         </div>
                       </div>
                     </div>
@@ -199,14 +199,14 @@ const nextExamDate = ref('')
 
 let countdownInterval: ReturnType<typeof setInterval> | null = null
 
-// 获取2025年GESP考试日期
+// 获取GESP考试日期
 const getGESPExamDates = (year: number): Date[] => {
-  // 2025年GESP考试具体日期：3月22日、6月28日、9月27日、12月20日
+  // 2026年GESP考试具体日期：3月14日、6月27日、9月12日、12月19日
   const examDates = [
-    new Date(year, 2, 22),  // 3月22日 (月份从0开始，所以3月是2)
-    new Date(year, 5, 28),  // 6月28日
-    new Date(year, 8, 27),  // 9月27日
-    new Date(year, 11, 27)  // 12月27日
+    new Date(year, 2, 14),  // 3月14日 (月份从0开始，所以3月是2)
+    new Date(year, 5, 27),  // 6月27日
+    new Date(year, 8, 12),  // 9月12日
+    new Date(year, 11, 19)  // 12月19日
   ]
   return examDates
 }
@@ -227,7 +227,7 @@ const getNextExamDate = (): Date => {
     }
   }
   
-  // 如果当年没有更多考试，返回下一年的第一个考试（3月22日）
+  // 如果当年没有更多考试，返回下一年的第一个考试（3月14日）
   return nextYearExams[0]
 }
 

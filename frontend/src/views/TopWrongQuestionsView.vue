@@ -255,6 +255,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import { normalizeImageUrl } from '@/config/api'
 import Icon from '@/components/Icon.vue'
 import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, BorderStyle, Table, TableRow, TableCell, WidthType, ImageRun } from 'docx'
 import { saveAs } from 'file-saver'
@@ -349,14 +350,12 @@ const setPracticeResult = (questionId: number, isCorrect: boolean) => {
 const showImageModal = ref(false)
 const selectedImageUrl = ref('')
 
-// 获取图片URL
+// 获取图片URL（规范化以避免 HTTPS 下 Mixed Content）
 const getImageUrl = (imagePath: string): string => {
   if (!imagePath) return ''
-  // 如果已经是完整URL，直接返回
-  if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
-    return imagePath
-  }
-  // 否则从public/html目录加载
+  const normalized = normalizeImageUrl(imagePath)
+  if (normalized.startsWith('/')) return normalized
+  if (normalized.startsWith('http://') || normalized.startsWith('https://')) return normalized
   return `/html/${imagePath}`
 }
 

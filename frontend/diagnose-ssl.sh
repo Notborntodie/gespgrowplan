@@ -34,12 +34,12 @@ if [ -f ".deploy-config" ]; then
     source .deploy-config
 fi
 
-# 服务器配置
-SERVER_IP="${DEPLOY_SERVER_IP:-106.14.143.27}"
+# 服务器配置（必须通过 .deploy-config 或环境变量配置，勿提交真实 IP/域名）
+SERVER_IP="${DEPLOY_SERVER_IP:-your-server-ip}"
 SERVER_USER="${DEPLOY_SERVER_USER:-root}"
-DOMAIN_NAME="${DOMAIN_NAME:-zhengyanchen.cn}"
-SSL_CERT_PATH="${SSL_CERT_PATH:-/etc/letsencrypt/live/zhengyanchen.cn/fullchain.pem}"
-SSL_KEY_PATH="${SSL_KEY_PATH:-/etc/letsencrypt/live/zhengyanchen.cn/privkey.pem}"
+DOMAIN_NAME="${DOMAIN_NAME:-your-domain.com}"
+SSL_CERT_PATH="${SSL_CERT_PATH:-/etc/letsencrypt/live/your-domain.com/fullchain.pem}"
+SSL_KEY_PATH="${SSL_KEY_PATH:-/etc/letsencrypt/live/your-domain.com/privkey.pem}"
 
 echo ""
 echo "=========================================="

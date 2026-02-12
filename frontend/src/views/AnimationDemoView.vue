@@ -30,7 +30,21 @@
                   </div>
                 </div>
                 
-                <div class="my-plans-grid">
+                <!-- 加载状态 -->
+                <div v-if="loading" class="loading-state">
+                  <div class="loading-spinner"></div>
+                  <span>加载动画列表中...</span>
+                </div>
+                
+                <!-- 空状态 -->
+                <div v-else-if="filteredCategories.length === 0" class="empty-state">
+                  <Icon name="file" :size="64" class="empty-icon" />
+                  <h3>暂无动画</h3>
+                  <p>还没有上传任何动画演示</p>
+                </div>
+                
+                <!-- 动画列表 -->
+                <div v-else class="my-plans-grid">
                   <div 
                     v-for="category in filteredCategories" 
                     :key="category.id"
@@ -76,8 +90,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import axios from 'axios'
+import { BASE_URL } from '@/config/api'
 import Icon from '@/components/Icon.vue'
 
 const router = useRouter()
@@ -86,39 +102,70 @@ const router = useRouter()
 const searchQuery = ref('')
 
 // 动画分类和列表
-const animationCategories = ref([
-  {
-    id: 'dfs',
-    name: '深度优先搜索 (DFS)',
-    icon: 'tree',
-    animations: [
-      { 
-        id: 1, 
-        name: 'N皇后问题', 
-        file: 'n皇后.html', 
-        icon: 'grid',
-        description: '使用回溯算法解决N皇后问题的可视化演示'
-      }
-      // 可以在这里添加更多DFS相关的动画
-    ]
-  },
-  {
-    id: 'bfs',
-    name: '广度优先搜索 (BFS)',
-    icon: 'layers',
-    animations: [
-      { 
-        id: 2, 
-        name: 'BFS入门教学', 
-        file: 'BFS入门教学.html', 
-        icon: 'play-circle',
-        description: '广度优先搜索算法的入门教学和可视化演示'
-      }
-      // 可以在这里添加更多BFS相关的动画
-    ]
+const animationCategories = ref<any[]>([])
+const loading = ref(false)
+
+// 从后端获取动画列表
+const fetchAnimations = async () => {
+  loading.value = true
+  try {
+    const response = await axios.get(`${BASE_URL}/animations`)
+    if (response.data.success) {
+      animationCategories.value = response.data.data || []
+    } else {
+      console.error('获取动画列表失败:', response.data.error)
+      // 如果获取失败，使用默认的硬编码数据
+      loadDefaultAnimations()
+    }
+  } catch (error: any) {
+    console.error('获取动画列表失败:', error)
+    // 如果获取失败，使用默认的硬编码数据
+    loadDefaultAnimations()
+  } finally {
+    loading.value = false
   }
-  // 可以在这里添加更多分类
-])
+}
+
+// 加载默认动画（向后兼容）
+const loadDefaultAnimations = () => {
+  animationCategories.value = [
+    {
+      id: 'dfs',
+      name: '深度优先搜索 (DFS)',
+      icon: 'tree',
+      animations: [
+        { 
+          id: 1, 
+          name: 'N皇后问题', 
+          file: 'n皇后.html', 
+          file_path: '/html/n皇后.html',
+          icon: 'grid',
+          description: '使用回溯算法解决N皇后问题的可视化演示'
+        }
+      ]
+    },
+    {
+      id: 'bfs',
+      name: '广度优先搜索 (BFS)',
+      icon: 'layers',
+      animations: [
+        { 
+          id: 2, 
+          name: 'BFS入门教学', 
+          file: 'BFS入门教学.html',
+          file_path: '/html/BFS入门教学.html',
+          icon: 'play-circle',
+          description: '广度优先搜索算法的入门教学和可视化演示'
+        }
+      ]
+    }
+  ]
+}
+
+// 组件挂载时获取动画列表
+onMounted(() => {
+  fetchAnimations()
+})
 
 // 过滤后的动画分类
 const filteredCategories = computed(() => {
@@ -158,9 +205,19 @@ const handleCardClick = (category: any) => {
 }
 
 // 打开动画演示
-const openAnimation = (animation: any) => {
+const openAnimation = async (animation: any) => {
+  // 更新查看次数
+  if (animation.id) {
+    try {
+      await axios.post(`${BASE_URL}/animations/${animation.id}/view`)
+    } catch (error) {
+      // 忽略错误，不影响打开动画
+      console.error('更新查看次数失败:', error)
+    }
+  }
+  
   // 跳转到动画详情页面
-  const animationUrl = animation.url || `/html/${animation.file}`
+  const animationUrl = animation.file_path || animation.url || `/html/${animation.file}`
   router.push({
     path: `/animation/${animation.id}`,
     query: {
@@ -475,5 +532,57 @@ const openAnimation = (animation: any) => {
   .search-input {
     font-size: 0.9rem;
   }
+}
+
+/* 加载和空状态样式 */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  color: #64748b;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e2e8f0;
+  border-top: 4px solid #1e90ff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.empty-icon {
+  color: #94a3b8;
+  margin-bottom: 16px;
+}
+
+.empty-state h3 {
+  margin: 0 0 8px 0;
+  color: #1e293b;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.empty-state p {
+  margin: 0;
+  color: #64748b;
+  font-size: 16px;
 }
 </style>

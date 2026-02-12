@@ -151,6 +151,16 @@
 
               <!-- 侧边栏视图：我的计划 -->
               <div v-if="sidebarView === 'my-plans'">
+                <!-- GESP考级备考阶段横幅（计划页顶部） -->
+                <div v-if="currentView === 'plans'" class="preparation-banner">
+                  <div class="banner-content">
+                    <Icon name="info" :size="20" />
+                    <div class="banner-text">
+                      <strong>GESP考级备考阶段</strong>
+                      <span>欢迎大家来到信奥成长计划，我们2月2日-3月14日为GESP考级备考阶段，大家寒假期间练习辛苦啦！这次成长计划进行了升级，我们在后台增加了AI检测功能，将会对异常的提交情况进行判定，所以也请同学们认真作答哦～</span>
+                    </div>
+                  </div>
+                </div>
                 <!-- 视图1: 我的学习计划列表 -->
                 <div v-if="currentView === 'plans'" class="plans-list-view">
                 <!-- 错误状态 -->
@@ -2163,6 +2173,59 @@ onMounted(async () => {
   color: #0369a1;
   font-size: 1.3rem;
   font-weight: 600;
+}
+
+/* GESP考级备考阶段横幅（计划页） */
+.preparation-banner {
+  margin-bottom: 20px;
+  background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+  border-radius: 12px;
+  padding: 16px 20px;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+  animation: planBannerSlideDown 0.5s ease-out;
+}
+
+@keyframes planBannerSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.preparation-banner .banner-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  color: white;
+}
+
+.preparation-banner .banner-content :deep(.lucide-icon) {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: white;
+}
+
+.preparation-banner .banner-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.preparation-banner .banner-text strong {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.preparation-banner .banner-text span {
+  font-size: 14px;
+  line-height: 1.5;
+  opacity: 0.95;
 }
 
 /* 我的计划列表 */
