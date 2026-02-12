@@ -43,8 +43,10 @@ fi
 echo "🚀 启动AI服务器..."
 
 # 使用 run-server.sh 启动服务
+# 确保在 Al_server 目录下执行（支持从项目根或 Al_server 内运行）
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 setsid bash -c '
-    cd /root/SmartOI/gesp-practice-system/Al_server
+    cd "'"$SCRIPT_DIR"'"
     nohup ./run-server.sh >> server.log 2>&1 &
     echo $! > server.pid
 ' &

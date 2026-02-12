@@ -14,7 +14,7 @@
 ## 项目结构
 
 ```
-gesp-practice-system/
+gespgrowplan/
 ├── frontend/         # Vue 前端
 ├── backend_server/   # Node.js 后端 API
 ├── Al_server/        # PDF 题目提取、解析生成（可选）
@@ -29,6 +29,13 @@ gesp-practice-system/
 - Python >= 3.8（仅 AI 服务需）
 
 ## 快速开始
+
+### 0. 克隆项目
+
+```bash
+git clone https://github.com/Notborntodie/gespgrowplan.git
+cd gespgrowplan
+```
 
 ### 1. 安装依赖
 
