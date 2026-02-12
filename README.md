@@ -1,6 +1,8 @@
-# GESP 练习系统
+# gespgrowplan
 
 信奥成长计划 — GESP 编程能力等级认证练习平台，支持客观题、在线判题（OJ）、学习计划管理。
+
+- 仓库：https://github.com/Notborntodie/gespgrowplan
 
 ## 技术栈
 

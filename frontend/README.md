@@ -1,6 +1,6 @@
 # 前端
 
-Vue 3 + TypeScript + Vite 构建的 GESP 练习系统前端。
+[gespgrowplan](https://github.com/Notborntodie/gespgrowplan) 项目的前端模块，Vue 3 + TypeScript + Vite 构建。
 
 ## 开发
 
@@ -35,3 +35,7 @@ npm run build
 3. 执行：`./deploy-frontend.sh --build`
 
 脚本会构建、上传并配置 Nginx。详见根目录 [README.md](../README.md)。
+
+## 项目
+
+- 仓库：https://github.com/Notborntodie/gespgrowplan

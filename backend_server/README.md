@@ -1,6 +1,6 @@
 # 后端
 
-Node.js + Express 的 GESP 练习系统 API 服务。
+[gespgrowplan](https://github.com/Notborntodie/gespgrowplan) 项目的后端 API 服务，Node.js + Express。
 
 ## 环境
 

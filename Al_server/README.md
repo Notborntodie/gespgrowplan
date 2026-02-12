@@ -1,6 +1,6 @@
 # AI 服务
 
-基于 FastAPI 的 PDF 题目提取与解析生成服务，使用 DashScope（Qwen）API。
+[gespgrowplan](https://github.com/Notborntodie/gespgrowplan) 项目的 AI 模块，基于 FastAPI 的 PDF 题目提取与解析生成，使用 DashScope（Qwen）API。
 
 ## 安装
 
